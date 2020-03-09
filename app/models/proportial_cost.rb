@@ -1,0 +1,2 @@
+class ProportialCost < ApplicationRecord
+end

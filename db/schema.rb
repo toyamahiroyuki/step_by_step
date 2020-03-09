@@ -1,0 +1,142 @@
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# Note that this schema.rb definition is the authoritative source for your
+# database schema. If you need to create the application database on another
+# system, you should be using db:schema:load, not running all the migrations
+# from scratch. The latter is a flawed and unsustainable approach (the more migrations
+# you'll amass, the slower it'll run and the greater likelihood for issues).
+#
+# It's strongly recommended that you check this file into your version control system.
+
+ActiveRecord::Schema.define(version: 2020_03_08_091018) do
+
+  create_table "balances", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "house"
+    t.integer "lesson"
+    t.integer "scholarship"
+    t.integer "balances_other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "communications", force: :cascade do |t|
+    t.integer "fixed_costs_id"
+    t.integer "phone"
+    t.integer "wi_fi"
+    t.integer "communications_other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "fixed_costs", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "rent"
+    t.integer "insurance"
+    t.integer "fixed_costs_other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "goals", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "goal"
+    t.integer "transportation"
+    t.integer "food"
+    t.integer "entertainment"
+    t.integer "daily"
+    t.integer "goals_other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "incomes", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "salary"
+    t.integer "allowance"
+    t.integer "retirement"
+    t.integer "incomes_other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "lifelines", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "electron"
+    t.integer "gass"
+    t.integer "water"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "loans", force: :cascade do |t|
+    t.integer "fixed_costs_id"
+    t.integer "house"
+    t.integer "lesson"
+    t.integer "scholarship"
+    t.integer "loans_other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "movings", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "moving_cost"
+    t.integer "distance"
+    t.integer "family"
+    t.integer "season"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "proportial_costs", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "transportation"
+    t.integer "food"
+    t.integer "entertainment"
+    t.integer "daily"
+    t.integer "proportial_costs_other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "targets", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "purpose"
+    t.integer "target"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "taxes", force: :cascade do |t|
+    t.integer "fixed_costs_id"
+    t.integer "health"
+    t.integer "pension"
+    t.integer "resident"
+    t.integer "taxes_other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.string "profile_image_id"
+    t.integer "old"
+    t.integer "sex"
+    t.integer "job"
+    t.integer "deposit"
+    t.integer "member"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+end

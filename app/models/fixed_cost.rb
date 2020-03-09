@@ -1,0 +1,2 @@
+class FixedCost < ApplicationRecord
+end
