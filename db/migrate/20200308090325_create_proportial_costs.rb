@@ -2,11 +2,10 @@ class CreateProportialCosts < ActiveRecord::Migration[5.2]
   def change
     create_table :proportial_costs do |t|
       t.integer :user_id
-      t.integer :transportation
-      t.integer :food
-      t.integer :entertainment
-      t.integer :daily
-      t.integer :proportial_costs_other
+      t.date :day
+      t.integer :proportial_cost
+      t.integer :proportial_cost_item
+      t.string :proportial_cost_memo
       t.timestamps
     end
   end

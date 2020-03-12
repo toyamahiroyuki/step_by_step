@@ -54,10 +54,10 @@ ActiveRecord::Schema.define(version: 2020_03_08_091018) do
 
   create_table "incomes", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "salary"
-    t.integer "allowance"
-    t.integer "retirement"
-    t.integer "incomes_other"
+    t.date "day"
+    t.integer "income"
+    t.integer "income_item"
+    t.string "income_memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -93,11 +93,10 @@ ActiveRecord::Schema.define(version: 2020_03_08_091018) do
 
   create_table "proportial_costs", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "transportation"
-    t.integer "food"
-    t.integer "entertainment"
-    t.integer "daily"
-    t.integer "proportial_costs_other"
+    t.date "day"
+    t.integer "proportial_cost"
+    t.integer "proportial_cost_item"
+    t.string "proportial_cost_memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

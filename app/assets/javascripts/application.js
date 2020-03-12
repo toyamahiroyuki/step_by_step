@@ -13,4 +13,50 @@
 //= require rails-ujs
 //= require activestorage
 //= require turbolinks
+//= require jquery
+//= require moment
+//= require fullcalendar
 //= require_tree .
+
+// $('#calendar').fullCalendar({ });
+
+function eventCalendar() {
+  return $('#calendar').fullCalendar({
+  eventClick: function(info) {
+    alert('Event: ' + info.event.title);
+    alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+    alert('View: ' + info.view.type);
+
+    // change the border color just for fun
+    info.el.style.borderColor = 'red';
+  }});
+};
+function clearCalendar() {
+  $('#calendar').fullCalendar('delete');
+  $('#calendar').html('');
+};
+$(document).on('turbolinks:load', function(){
+  eventCalendar();
+});
+$(document).on('turbolinks:before-cache', clearCalendar);
+
+
+/*
+function _eventCalendar() {
+
+	var cal_elem = document.getElementById('calendar');
+	var calendar = new Calendar(cal_elem, {
+
+  eventClick: function(info) {
+    alert('Event: ' + info.event.title);
+    alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+    alert('View: ' + info.view.type);
+
+    // change the border color just for fun
+    info.el.style.borderColor = 'red';
+  }
+
+});
+}
+*/
+

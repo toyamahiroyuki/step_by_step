@@ -1,2 +1,29 @@
 <h1>Homes#top</h1>
 <p>Find me in app/views/homes/top.html.erb</p>
+
+<div id="calendar"></div>
+
+<form>
+<input type="hidden" name="day" value="aaa">
+</form>
+
+<script>
+
+</script>
+
+<!--     $(function () {
+        $("#calendar").fullCalendar({
+            dayClick: function (d, a, j, v) {
+                $("#calendar").fullCalendar("clientEvents", function (e) {
+                    var clicked_day = moment(d).format("YYYY-MM-DD")
+                    // var user_id = <%#= current_user.id %>;
+                    clicked_day;
+                });
+            },
+            // events: [{
+            //     title: "出張",
+            //     start: "2020-03-12",
+            //     color: "#92d050"
+            // }]
+        });
+    }); -->

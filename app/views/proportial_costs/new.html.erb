@@ -1,2 +1,32 @@
-<h1>ProportialCosts#new</h1>
-<p>Find me in app/views/proportial_costs/new.html.erb</p>
+<h1>proportial_costs#new</h1>
+
+<%= form_for(@ProportialCost) do |f| %>
+
+<table>
+
+<tr>
+  <th>支出金額</th>
+  <td><%= f.text_field :proportial_cost %></td>
+</tr>
+
+<tr>
+  <th>項目</th>
+  <td><%= f.radio_button :proportial_cost_item, "食費" %>食費</br>
+  	  <%= f.radio_button :proportial_cost_item, "交通費" %>交通費</br>
+  	  <%= f.radio_button :proportial_cost_item, "交際費" %>交際費</br>
+  	  <%= f.radio_button :proportial_cost_item, "日用品" %>日用品</br>
+  	  <%= f.radio_button :proportial_cost_item, "その他" %>その他</br>
+  </td>
+</tr>
+
+<tr>
+  <th>メモ</th>
+  <td><%= f.text_field :proportial_cost_memo %></td>
+</tr>
+
+</table>
+
+ <%= f.submit "登録" %>
+ <%= link_to "収入画面へ", new_income_path, class:"btn btn-default" %>
+
+<% end %>
