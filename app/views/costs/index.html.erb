@@ -1,2 +1,28 @@
 <h1>Costs#index</h1>
 <p>Find me in app/views/costs/index.html.erb</p>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<canvas id="myChart"></canvas>
+
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'doughnut',
+
+    // The data for our dataset
+    data: {
+        labels: ['食費', '交通費', '交際費', '日用品','家賃', '保険', '通信費', 'ライフライン', 'ローン', '税金', 'その他'],
+        datasets: [{
+            label: 'My First dataset',
+            backgroundColor: ['red','pink','orange', 'yellow', 'lightgreen','yellowgreen','lightblue','greenbleu','blue','purple'],
+            borderColor: 'rgb(255, 255, 255)',
+            data: [<%= @proportial_cost0 %>, <%= @proportial_cost1 %>, <%= @proportial_cost2 %>, <%= @proportial_cost3 %>, <%= @fixed_cost.rent %>, <%= @fixed_cost.insurance %>, <%= @communications %>, <%= @lifelines %>, <%= @loans %>, <%= @taxes %>, <%= @fixed_cost.fixed_costs_other %>]
+        }]
+    },
+
+    // Configuration options go here
+     options: {}
+});
+</script>

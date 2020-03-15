@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 2020_03_08_091018) do
   end
 
   create_table "communications", force: :cascade do |t|
-    t.integer "fixed_costs_id"
+    t.integer "fixed_cost_id"
     t.integer "phone"
     t.integer "wi_fi"
     t.integer "communications_other"
@@ -72,7 +72,7 @@ ActiveRecord::Schema.define(version: 2020_03_08_091018) do
   end
 
   create_table "loans", force: :cascade do |t|
-    t.integer "fixed_costs_id"
+    t.integer "fixed_cost_id"
     t.integer "house"
     t.integer "lesson"
     t.integer "scholarship"
@@ -110,7 +110,7 @@ ActiveRecord::Schema.define(version: 2020_03_08_091018) do
   end
 
   create_table "taxes", force: :cascade do |t|
-    t.integer "fixed_costs_id"
+    t.integer "fixed_cost_id"
     t.integer "health"
     t.integer "pension"
     t.integer "resident"

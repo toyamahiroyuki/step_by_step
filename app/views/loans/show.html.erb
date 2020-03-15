@@ -1,0 +1,70 @@
+
+<table>
+
+<tr>
+  <th>住宅ローン</th>
+  <td><%= @loan.house %></td>
+</tr>
+
+<tr>
+  <th>習いごと</th>
+  <td><%= @loan.lesson %></td>
+</tr>
+
+<tr>
+  <th>奨学金</th>
+  <td><%= @loan.scholarship %></td>
+</tr>
+
+<tr>
+  <th>その他</th>
+  <td><%= @loan.loans_other %></td>
+</tr>
+
+</table>
+
+<table>
+
+<tr>
+  <th>携帯代</th>
+  <td><%= @communication.phone %></td>
+</tr>
+
+<tr>
+  <th>Wi-iI</th>
+  <td><%= @communication.wi_fi %></td>
+</tr>
+
+<tr>
+  <th>その他</th>
+  <td><%= @communication.communications_other %></td>
+</tr>
+
+</table>
+
+<table>
+
+<tr>
+  <th>健康保険</th>
+  <td><%= @tax.health %></td>
+</tr>
+
+<tr>
+  <th>年金</th>
+  <td><%= @tax.pension %></td>
+</tr>
+
+<tr>
+  <th>市民税/府民税</th>
+  <td><%= @tax.resident %></td>
+</tr>
+
+<tr>
+  <th>その他</th>
+  <td><%= @tax.taxes_other %></td>
+</tr>
+
+</table>
+
+
+<%= link_to "編集画面へ", edit_loans_path, class:'btn btn-default' %>

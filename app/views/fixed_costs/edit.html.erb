@@ -1,2 +1,50 @@
 <h1>FixedCosts#edit</h1>
-<p>Find me in app/views/fixed_costs/edit.html.erb</p>
+
+<%= form_for @fixed_cost, url: fixed_costs_path do |f| %>
+
+<table>
+
+<tr>
+  <th>家賃</th>
+  <td><%= f.text_field :rent %></td>
+</tr>
+
+<tr>
+  <th>保険</th>
+  <td><%= f.text_field :insurance %></td>
+</tr>
+
+<tr>
+  <th>その他</th>
+  <td><%= f.text_field :fixed_costs_other %></td>
+</tr>
+
+</table>
+
+
+<%= fields_for @lifeline, url: lifelines_path do |c| %>
+
+<table>
+
+<tr>
+  <th>電気</th>
+  <td><%= c.text_field :electron %></td>
+</tr>
+
+<tr>
+  <th>ガス</th>
+  <td><%= c.text_field :gass %></td>
+</tr>
+
+<tr>
+  <th>水道</th>
+  <td><%= c.text_field :water %></td>
+</tr>
+
+</table>
+
+<%= f.submit "登録" %>
+
+<% end %>
+
+<% end %>

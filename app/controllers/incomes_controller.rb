@@ -8,6 +8,7 @@ class IncomesController < ApplicationController
    @incomes1 = Income.where(income_item: "手当て", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
    @incomes2 = Income.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
    @incomes3 = Income.where(income_item: "その他",created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+                                                             # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
   end
 
   def create

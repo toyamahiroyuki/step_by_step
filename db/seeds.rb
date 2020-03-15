@@ -11,7 +11,12 @@
     User.create!(name: "大阪#{i + 1}", email: "t#{i + 1}@test", old: "#{i + 20}", sex: "男性", job: "営業", deposit: "100", member: "#{i + 1}", password: "password", password_confirmation: "password")
   end
 
-  # Income.create!(user_id: "1", income: "50", income_item: "給料")
-  # Income.create!(user_id: "1", income: "100", income_item: "給料")
-  # Income.create!(user_id: "1", income: "150", income_item: "給料")
-
+  Income.create!(user_id: "1", income: 200000, income_item: "給料")
+  Income.create!(user_id: "1", income: 10000, income_item: "手当て")
+  ProportialCost.create!(user_id: "1", proportial_cost: 5000, proportial_cost_item: "食費")
+  ProportialCost.create!(user_id: "1", proportial_cost: 6000, proportial_cost_item: "交際費")
+  FixedCost.create!(user_id: 1, rent: 20000, insurance: 10000, fixed_costs_other: 5000)
+  Lifeline.create!(user_id: 1, electron: 2000, gass: 1000, water: 1500)
+  Loan.create!(fixed_cost_id: 1, house: 5000, lesson: 1000, scholarship: 12000, loans_other: 3000)
+  Communication.create!(fixed_cost_id: 1, phone: 5000, wi_fi: 2000, communications_other: 500)
+  Tax.create!(fixed_cost_id: 1, health: 10000, pension: 10000, resident: 5000, taxes_other: 3000)

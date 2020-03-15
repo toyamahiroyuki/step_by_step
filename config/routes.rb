@@ -16,11 +16,11 @@ Rails.application.routes.draw do
   resources :incomes
   resources :targets, only: [:new, :create, :index, :edit, :update]
   resources :proportial_costs
-  resources :fixed_costs, only: [:new, :create, :index, :edit, :update]
-  resources :lifelines, only: [:new, :create, :index, :edit, :update]
-  resources :loans
-  resources :goals
-  resources :simulations, only: [:new, :index, :update]
+  resource :fixed_costs, only: [:new, :create, :show, :edit, :update]
+  resource :lifelines, only: [:new, :create, :index, :edit, :update]
+  resource :loans
+  resource :goals
+  resource :simulations, only: [:new, :index, :update]
   get 'simulations/knowledge' => "simulations#knowledge"
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
