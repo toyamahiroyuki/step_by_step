@@ -11,10 +11,10 @@ class User < ApplicationRecord
   validates :member, presence: true
 
   has_many :balances, dependent: :destroy
-  has_many :fixed_costs, dependent: :destroy
+  has_one :fixed_cost, dependent: :destroy
   has_many :goals, dependent: :destroy
   has_many :incomes, dependent: :destroy
-  has_many :lifelines, dependent: :destroy
+  has_one :lifeline, dependent: :destroy
   has_many :movings, dependent: :destroy
   has_many :proportial_costs, dependent: :destroy
   has_many :movings, dependent: :destroy

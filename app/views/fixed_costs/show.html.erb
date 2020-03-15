@@ -1,0 +1,45 @@
+<h1>FixedCosts#show</h1>
+
+「固定費」
+
+<table>
+<tr>
+  <th>家賃</th>
+  <td><%= @fixed_cost.rent %></td>
+
+</tr>
+
+<tr>
+  <th>保険</th>
+  <td><%= @fixed_cost.insurance %></td>
+</tr>
+
+<tr>
+  <th>その他</th>
+  <td><%= @fixed_cost.fixed_costs_other %></td>
+</tr>
+</table>
+
+
+
+「ライフライン」
+
+<table>
+<tr>
+  <th>電気</th>
+  <td><%= @lifeline.electron %></td>
+</tr>
+
+<tr>
+  <th>ガス</th>
+  <td><%= @lifeline.gass %></td>
+</tr>
+
+<tr>
+  <th>水道</th>
+  <td><%= @lifeline.water %></td>
+</tr>
+
+</table>
+
+<%= link_to "編集画面へ", edit_fixed_costs_path, class:'btn btn-default' %>
