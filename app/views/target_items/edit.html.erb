@@ -1,0 +1,14 @@
+<h1>TargetItems#edit</h1>
+<p>Find me in app/views/target_items/edit.html.erb</p>
+
+
+
+<%= form_for (@target_item) do |f| %>
+
+	<%= f.label :貯金額の変更 %>
+	<%= f.text_field :target_by_month %>
+
+	<%= f.submit "貯金" %>
+
+<% end %>
+

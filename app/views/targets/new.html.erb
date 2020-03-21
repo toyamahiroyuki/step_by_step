@@ -1,2 +1,24 @@
 <h1>Targets#new</h1>
-<p>Find me in app/views/targets/new.html.erb</p>
+
+<%= form_for @target, url: targets_path do |f| %>
+
+<table>
+
+<tr>
+  <th>貯金目的</th>
+  <td><%= f.text_field :target_purpose %></td>
+</tr></br>
+
+<tr>
+  <th>目標金額</th>
+  <td><%= f.text_field :target_cost %></td>
+</tr></br>
+
+
+
+</table>
+
+<%= f.submit "登録" %>
+
+<% end %>
+

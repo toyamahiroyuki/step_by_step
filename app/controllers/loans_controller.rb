@@ -1,67 +1,43 @@
 class LoansController < ApplicationController
+
   def new
   	@loan = Loan.new
-  	@communication = Communication.new
-  	@tax = Tax.new
-  end
-
-  def show
-  	@loan = current_user.fixed_cost.loan
-  	@communication = current_user.fixed_cost.communication
-  	@tax = current_user.fixed_cost.tax
   end
 
   def create
   	loan = Loan.new(loan_params)
-  	communication = Communication.new(communication_params)
-  	tax = Tax.new(tax_params)
+    loan.fixed_cost_id = current_user.fixed_cost.id
+    loan.loan_balance = loan.loan_cost - loan.loan_by_month
 
-  	loan.fixed_cost_id = current_user.fixed_cost.id
-  	communication.fixed_cost_id = current_user.fixed_cost.id
-  	tax.fixed_cost_id = current_user.fixed_cost.id
+    if loan.save
 
-
-
-    if  loan.save
-    	communication.save
-        tax.save
-        redirect_to loans_path
+  	   redirect_to targets_path
     else
-
     end
   end
 
   def edit
-  	@loan = current_user.fixed_cost.loan
-  	@communication = current_user.fixed_cost.communication
-  	@tax = current_user.fixed_cost.tax
+  	@loan = Loan.find(params[:id])
   end
 
   def update
-  	loan = current_user.fixed_cost.loan
-  	communication = current_user.fixed_cost.communication
-  	tax = current_user.fixed_cost.tax
+    loan = Loan.find(params[:id])
+    loan.loan_balance = loan.loan_cost - loan.loan_by_month
 
-  	if loan.update(loan_params)
-       communication.update(communication_params)
-       tax.update(tax_params)
-
-    redirect_to loans_path
+    if loan.update(loan_params)
+  	   redirect_to targets_path
     else
-      render action: :edit
     end
   end
+  def destroy
+    loan = Loan.find(params[:id])
+    loan.destroy
 
- private
+    redirect_to targets_path
+  end
+
+private
   def loan_params
-  	params.require(:loan).permit(:fixed_costs_id, :house, :lesson, :scholarship, :loans_other)
-  end
-
-  def communication_params
-  	params.require(:communication).permit(:fixed_costs_id,:phone, :wi_fi, :communications_other)
-  end
-
-  def tax_params
-  	params.require(:tax).permit(:fixed_costs_id, :health, :pension, :resident, :taxes_other)
+    params.require(:loan).permit(:loan_purpose, :loan_cost, :loan_by_month, :loan_balance)
   end
 end

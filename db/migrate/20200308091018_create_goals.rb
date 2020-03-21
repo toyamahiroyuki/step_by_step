@@ -7,6 +7,9 @@ class CreateGoals < ActiveRecord::Migration[5.2]
       t.integer :food
       t.integer :entertainment
       t.integer :daily
+      t.integer :gass
+      t.integer :electron
+      t.integer :water
       t.integer :goals_other
       t.timestamps
     end

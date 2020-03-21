@@ -22,14 +22,17 @@
 
 function eventCalendar() {
   return $('#calendar').fullCalendar({
-  eventClick: function(info) {
-    alert('Event: ' + info.event.title);
-    alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-    alert('View: ' + info.view.type);
+      dayClick: function(date, jsEvent, view, resourceObj) {
 
-    // change the border color just for fun
-    info.el.style.borderColor = 'red';
-  }});
+    window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
+    $(function(){
+      $('.fc-day').mouseover(function(){
+        $('.fc-day').css({'background-color': 'red'});
+    });
+});
+  }
+});
+
 };
 function clearCalendar() {
   $('#calendar').fullCalendar('delete');
