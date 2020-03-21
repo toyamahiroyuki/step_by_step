@@ -1,6 +1,7 @@
 class ProportialCostsController < ApplicationController
   def new
-   @ProportialCost = ProportialCost.new
+   @proportial_cost = ProportialCost.new
+   @income_day = params["day"]
   end
 
   def create

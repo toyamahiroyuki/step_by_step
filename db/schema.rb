@@ -10,14 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_08_091018) do
+ActiveRecord::Schema.define(version: 2020_03_16_112735) do
 
   create_table "balances", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "house"
-    t.integer "lesson"
-    t.integer "scholarship"
-    t.integer "balances_other"
+    t.string "balance_purpose"
+    t.integer "balance_cost"
+    t.integer "balance_by_month"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -47,6 +46,9 @@ ActiveRecord::Schema.define(version: 2020_03_08_091018) do
     t.integer "food"
     t.integer "entertainment"
     t.integer "daily"
+    t.integer "gass"
+    t.integer "electron"
+    t.integer "water"
     t.integer "goals_other"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -71,12 +73,18 @@ ActiveRecord::Schema.define(version: 2020_03_08_091018) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "loan_items", force: :cascade do |t|
+    t.integer "loan_id"
+    t.integer "loan_by_month"
+    t.integer "loan_balance"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "loans", force: :cascade do |t|
     t.integer "fixed_cost_id"
-    t.integer "house"
-    t.integer "lesson"
-    t.integer "scholarship"
-    t.integer "loans_other"
+    t.string "loan_purpose"
+    t.integer "loan_cost"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -101,10 +109,18 @@ ActiveRecord::Schema.define(version: 2020_03_08_091018) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "target_items", force: :cascade do |t|
+    t.integer "target_id"
+    t.integer "target_by_month"
+    t.integer "target_balance"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "targets", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "purpose"
-    t.integer "target"
+    t.string "target_purpose"
+    t.integer "target_cost"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -4,7 +4,7 @@
 <div id="calendar"></div>
 
 <form>
-<input type="hidden" name="day" value="aaa">
+<input type="hidden" name="day" id="day">
 </form>
 
 <script>
@@ -40,6 +40,13 @@
 
 <%= link_to "固定費・ライフライン詳細へ",fixed_costs_path %></br>
 
-<%= link_to "固定費登録へ（loan.communication.tax）", new_loans_path %></br>
+<%= link_to "固定費登録へ（loan.communication.tax）", new_communication_path %></br>
 
-<%= link_to "固定費編集へ（loan.communication.tax）", edit_loans_path %></br>
+<%= link_to "固定費編集へ（loan.communication.tax）", edit_communication_path %></br>
+
+<%= link_to "貯金登録へ",new_target_path %></br>
+
+<%= link_to "ローン登録へ",new_loan_path %></br>
+
+<%= link_to "貯金・ローン一覧へ",targets_path %></br>
+

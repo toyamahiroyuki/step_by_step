@@ -1,8 +1,17 @@
 <h1>proportial_costs#new</h1>
 
-<%= form_for(@ProportialCost) do |f| %>
+<tr>
+  <th>日付</th>
+  <td><%= @income_day %></td>
+</tr>
+
+<%= form_for(@proportial_cost) do |f| %>
 
 <table>
+<tr>
+  <th>日付</th>
+  <td><%= f.hidden_field :day ,value: @income_day %></td>
+</tr>
 
 <tr>
   <th>支出金額</th>
@@ -27,6 +36,6 @@
 </table>
 
  <%= f.submit "登録" %>
- <%= link_to "収入画面へ", new_income_path, class:"btn btn-default" %>
+ <%= link_to "収入画面へ", new_income_path(day: @income_day), class:"btn btn-default" %>
 
 <% end %>

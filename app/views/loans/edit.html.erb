@@ -1,83 +1,25 @@
-<h1>Loans#edit</h1>
 
-<%= form_for @loan, url: loans_path do |f| %>
-
-<table>
-<tr>
-  <th>住宅ローン</th>
-  <td><%= f.text_field :house %></td>
-</tr>
-
-<tr>
-  <th>習いごと</th>
-  <td><%= f.text_field :lesson %></td>
-</tr>
-
-<tr>
-  <th>奨学金</th>
-  <td><%= f.text_field :scholarship %></td>
-</tr>
-
-<tr>
-  <th>その他</th>
-  <td><%= f.text_field :loans_other %></td>
-</tr>
-
-</table>
-
-
-<%= fields_for @communication, url: loans_path do |c| %>
+<%= form_for @loan, url: loan_path do |f| %>
 
 <table>
 
 <tr>
-  <th>携帯代</th>
-  <td><%= c.text_field :phone %></td>
-</tr>
+  <th>ローン</th>
+  <td><%= f.text_field :loan_purpose %></td>
+</tr></br>
 
 <tr>
-  <th>Wi-iI</th>
-  <td><%= c.text_field :wi_fi %></td>
-</tr>
+  <th>返済金額</th>
+  <td><%= f.text_field :loan_cost %></td>
+</tr></br>
 
 <tr>
-  <th>その他</th>
-  <td><%= c.text_field :communications_other %></td>
-</tr>
+  <th>月の返済額</th>
+  <td><%= f.text_field :loan_by_month %></td>
+</tr></br>
 
 </table>
 
-<%= fields_for @tax, url: loans_path do |d| %>
-
-<table>
-
-<tr>
-  <th>健康保険</th>
-  <td><%= d.text_field :health %></td>
-</tr>
-
-<tr>
-  <th>年金</th>
-  <td><%= d.text_field :pension %></td>
-</tr>
-
-<tr>
-  <th>市民税/府民税</th>
-  <td><%= d.text_field :resident %></td>
-</tr>
-
-<tr>
-  <th>その他</th>
-  <td><%= d.text_field :taxes_other %></td>
-</tr>
-
-</table>
-
-<%= f.submit "登録" %>
+<%= f.submit "更新" %>
 
 <% end %>
-
-<% end %>
-
-<% end %>
-
