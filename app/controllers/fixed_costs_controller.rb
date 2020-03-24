@@ -1,7 +1,11 @@
 class FixedCostsController < ApplicationController
   def new
-   @fixed_cost = FixedCost.new
-   @lifeline = Lifeline.new
+       if current_user.fixed_cost.id.nil?
+       @fixed_cost = FixedCost.new
+       @lifeline = Lifeline.new
+       else
+       redirect_to fixed_costs_path
+       end
   end
 
   # def index

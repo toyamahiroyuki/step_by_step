@@ -1,7 +1,11 @@
 class CommunicationsController < ApplicationController
   def new
+    if current_user.fixed_cost.communication.id.nil?
   	@communication = Communication.new
   	@tax = Tax.new
+    else
+    redirect_to communication_path
+    end
   end
 
   def show

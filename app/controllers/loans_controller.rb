@@ -2,14 +2,23 @@ class LoansController < ApplicationController
 
   def new
   	@loan = Loan.new
+    @loan_item = LoanItem.new
+  end
+
+  def index
+    @loans = Loan.all
   end
 
   def create
   	loan = Loan.new(loan_params)
     loan.fixed_cost_id = current_user.fixed_cost.id
-    loan.loan_balance = loan.loan_cost - loan.loan_by_month
+    loan.save
 
-    if loan.save
+    loan_item = LoanItem.new(loan_item_params)
+
+    loan_item.loan_id = loan.id
+    loan_item.loan_balance = loan.loan_cost - loan_item.loan_by_month
+    if loan_item.save
 
   	   redirect_to targets_path
     else
@@ -18,6 +27,8 @@ class LoansController < ApplicationController
 
   def edit
   	@loan = Loan.find(params[:id])
+    @loan_id = @loan.id
+    @loan_item = LoanItem.find(@loan_id)
   end
 
   def update
@@ -29,6 +40,7 @@ class LoansController < ApplicationController
     else
     end
   end
+
   def destroy
     loan = Loan.find(params[:id])
     loan.destroy
@@ -37,7 +49,12 @@ class LoansController < ApplicationController
   end
 
 private
+
   def loan_params
     params.require(:loan).permit(:loan_purpose, :loan_cost, :loan_by_month, :loan_balance)
+  end
+
+  def loan_item_params
+    params.require(:loan_item).permit(:loan_by_month, :loan_balance)
   end
 end

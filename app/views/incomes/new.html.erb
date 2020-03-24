@@ -39,3 +39,33 @@
 
 
 <% end %>
+
+
+<% @incomes.each do |income| %>
+
+<table>
+    <tr>
+      <th>日付</th>
+      <td><%= income.day %></td>
+    </tr>
+
+    <tr>
+      <th>収入金額</th>
+      <td><%= income.income %></td>
+    </tr>
+
+    <tr>
+      <th>項目</th>
+      <td><%= income.income_item %></td>
+    </tr>
+
+    <tr>
+      <th>メモ</th>
+      <td><%= income.income_memo %></td>
+    </tr>
+
+</table>
+　　<%= link_to "編集画面へ", edit_income_path(income, day: @income_day), class:'btn btn-default' %>
+   <%= link_to "削除へ", income_path(income), method: :delete, class:'btn btn-default' %>
+
+<% end %>

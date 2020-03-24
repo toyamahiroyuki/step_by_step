@@ -9,7 +9,11 @@
 	<%= target.target_purpose %></br>
 
 	「貯金目標金額」
-	<%= target.target_cost %></br>
+	<%= target.target_cost %>
+
+			<%= link_to "目標の編集", edit_target_path(target.id) %>
+			<%= link_to "目標の削除", target_path(target.id), method: :delete %></br>
+
 
     		<%= form_for @target_item, url: target_target_items_path(target) do |f| %>
 
@@ -22,44 +26,56 @@
 
 		    <% end %>
 
+		    「現在の貯金額」
+			<%= target.target_items.sum(:target_by_month) %>円</br>
+
+
 	<% target.target_items.each do |target_item| %>
 
+		「日付」
+		<%= target_item.created_at.strftime('%Y/%m/%d')  %>
 
-		「現在の貯金額」
-		<%=  %>円</br>
-
+	    「貯金額」
+		<%= target_item.target_by_month %>
 
 		「残り金額」
-		<%= target_item.target_balance %></br>
+		<%= target_item.target_balance %>
+		<%= link_to "貯金の編集", edit_target_target_item_path(target_item.id, id: target_item.id) %>
+		<%= link_to "貯金の削除", target_target_item_path(target_item.id,id: target_item.id), method: :delete %></br>
 
-
-
-		<%= link_to "編集", edit_target_path(target.id) %></br>
-		<%= link_to "削除", target_path(target.id), method: :delete %></br>
 
 
 	<% end %>
 
-<% end %>
+<% end %></br></br>
+
+
 
 <% @loans.each do |loan| %>
 
-「目標目的」
-<%= loan.loan_purpose %></br>
+	「ローン項目」
+	 <%= loan.loan_purpose %></br>
 
-「返済総額」
-<%= loan.loan_cost %></br>
+	「ローン総額」
+	 <%= loan.loan_cost %></br>
 
-「月の返済額」
-<%= %>円/月</br>
 
-「残り金額」
-<%=  %></br>
+		<% loan.loan_items.each do |loan_item| %>
 
-<%= link_to "編集", edit_loan_path(loan.id) %></br>
-<%= link_to "削除", loan_path(loan.id), method: :delete %></br>
+	　　「月の返済額」
+		 <%= loan_item.loan_by_month %>
+
+		 <% end %></br>
+
+	「現在の返済額(Loan.loan_items.sum(Loan_item.loan_by_month)」
+	<%= loan.loan_items.sum(:loan_by_month) %>円</br>
+
+		<%= link_to "ローンの編集", edit_loan_path(loan.id) %>
+		<%= link_to "ローンの削除", loan_path(loan.id), method: :delete %></br>
 
 <% end %>
+
+
 
 
 
