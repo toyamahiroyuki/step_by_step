@@ -1,4 +1,6 @@
 class TargetsController < ApplicationController
+  before_action :create_loan_item_per_month, only: %i[new index edit]
+
   def new
     @target = Target.new
   end
@@ -57,6 +59,20 @@ class TargetsController < ApplicationController
   end
 
 private
+
+  # 毎月ローンの支払いをしてない場合、支払いレコードを作成する
+  def create_loan_item_per_month
+    # TODO: Loanの取得処理をログインユーザーから引いてくるようにする
+    loans = Loan.all
+    loans.map(&:loan_items).each do |loan_item|
+      next if loan_item.last.created_at >= Time.zone.now.beginning_of_month
+      new_loan_item = loan_item.first.dup
+      new_loan_item.loan_balance = new_loan_item.loan_balance - new_loan_item.loan_by_month
+      new_loan_item.save
+    end
+    # @loans.map { |loan| loan.loan_items }
+  end
+
   def target_params
     params.require(:target).permit(:target_purpose, :target_cost, :target_by_month)
   end

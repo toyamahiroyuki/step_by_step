@@ -1,20 +1,26 @@
 <%= form_for @loan, url: loans_path do |g| %>
 <table>
 
-<tr>
-  <th>ローン項目</th>
-  <td><%= g.text_field :loan_purpose %></td>
-</tr></br>
+	<tr>
+	  <th>ローン項目</th>
+	  <td><%= g.text_field :loan_purpose %></td>
+	</tr></br>
 
-<tr>
-  <th>返済金額</th>
-  <td><%= g.text_field :loan_cost %></td>
-</tr></br>
+	<tr>
+	  <th>返済金額</th>
+	  <td><%= g.text_field :loan_cost %></td>
+	</tr></br>
 
-<tr>
-  <th>月の返済額</th>
-  <td><%= g.text_field :loan_by_month %></td>
-</tr></br>
+
+		<%= fields_for @loan_item, url: loans_path do |c| %>
+
+		<tr>
+		  <th>月の返済額</th>
+		  <td><%= c.text_field :loan_by_month %></td>
+		</tr></br>
+
+
+	<% end %>
 
 </table>
 

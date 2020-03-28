@@ -13,10 +13,14 @@
   <td><%= f.text_field :loan_cost %></td>
 </tr></br>
 
-<tr>
-  <th>月の返済額</th>
-  <td><%= f.text_field :loan_by_month %></td>
-</tr></br>
+	<% fields_for @loan_item do |c| %>
+
+		<tr>
+		  <th>月の返済額</th>
+		  <td><%= c.text_field :loan_by_month %></td>
+		</tr></br>
+
+	<% end %>
 
 </table>
 

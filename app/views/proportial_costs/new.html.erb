@@ -39,3 +39,34 @@
  <%= link_to "収入画面へ", new_income_path(day: @income_day), class:"btn btn-default" %>
 
 <% end %>
+
+
+<% @proportial_costs.each do |proportial_cost| %>
+
+<table>
+    <tr>
+      <th>日付</th>
+      <td><%= proportial_cost.day %></td>
+    </tr>
+
+    <tr>
+      <th>収入金額</th>
+      <td><%= proportial_cost.proportial_cost %></td>
+    </tr>
+
+    <tr>
+      <th>項目</th>
+      <td><%= proportial_cost.proportial_cost_item %></td>
+    </tr>
+
+    <tr>
+      <th>メモ</th>
+      <td><%= proportial_cost.proportial_cost_memo %></td>
+    </tr>
+
+</table>
+　　<%= link_to "編集画面へ", edit_proportial_cost_path(proportial_cost, day: @income_day), class:'btn btn-default' %>
+   <%= link_to "削除へ", proportial_cost_path(proportial_cost), method: :delete, class:'btn btn-default' %>
+
+<% end %>
+

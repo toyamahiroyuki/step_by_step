@@ -21,19 +21,73 @@
 // $('#calendar').fullCalendar({ });
 
 function eventCalendar() {
-  return $('#calendar').fullCalendar({
+
+  $.ajax({
+    type: 'GET',
+    url: 'calendar_total',
+  }).done(function(totals){
+    var total = [];
+    for (var total_key in totals) {
+      total.push({
+        title: totals[total_key],
+        start: total_key,
+      })
+    }
+    console.log (totals)
+    return $('#calendar').fullCalendar({
       dayClick: function(date, jsEvent, view, resourceObj) {
-
-    window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
-    $(function(){
-      $('.fc-day').mouseover(function(){
-        $('.fc-day').css({'background-color': 'red'});
+        window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
+      },
+      events: total
     });
-});
-  }
-});
+  });
 
-};
+  // $.ajax({
+  //   type: 'GET',
+  //   url: 'calendar_incomes',
+  // }).done(function(incomes){
+  //   var income_key = [];
+  //   for (var income in incomes) {
+  //     income_key.push({
+  //       title: incomes[income],
+  //       start: income,
+  //     })
+  //   }
+  //   console.log (income_key)
+  //   return $('#calendar').fullCalendar({
+  //     dayClick: function(date, jsEvent, view, resourceObj) {
+  //       window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
+  //     },
+  //     events: income_key,
+  //   });
+  // });
+
+  // $.ajax({
+  //   type: 'GET',
+  //   url: 'calendar_proportial_costs',
+  // }).done(function(proportial_costs){
+  //   var proportial_cost = [];
+
+  //   for (var proportial_cost_key in proportial_costs) {
+  //    proportial_cost.push({
+  //       title: proportial_costs[proportial_cost_key],
+  //       start: proportial_cost_key,
+  //     })
+  //   }
+  //   console.log(proportial_cost)
+
+  //   return $('#calendar').fullCalendar({
+  //     dayClick: function(date, jsEvent, view, resourceObj) {
+  //       window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
+  //     },
+  //     events: proportial_cost,
+  //   });
+  // });
+
+}
+
+
+
 function clearCalendar() {
   $('#calendar').fullCalendar('delete');
   $('#calendar').html('');
@@ -44,22 +98,40 @@ $(document).on('turbolinks:load', function(){
 $(document).on('turbolinks:before-cache', clearCalendar);
 
 
-/*
-function _eventCalendar() {
+ /*
+  * 1. getEventsのリクエスト送信
+  * 2. getEventsのレスポンス返却
+    3. fullCalendarの画面描画
+  */
+  /*
+  * 1. getEventsのリクエスト送信 -> 1.2. getEventsのレスポンス返却
+  * 2. fullCalendarの画面描画
+  */
+  // var events = getEvents();
+  // return $('#calendar').fullCalendar({
+  //   dayClick: function(date, jsEvent, view, resourceObj) {
+  //     window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
+  //   },
+  //   events: events,
+  // });
 
-	var cal_elem = document.getElementById('calendar');
-	var calendar = new Calendar(cal_elem, {
+  // return $('#calendar').fullCalendar({
+  //   dayClick: function(date, jsEvent, view, resourceObj) {
+  //     window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
+  //   },
+  //   viewRender :function(){
+  //     $.ajax({
+  //       type: 'GET',
+  //       url: 'calendar_incomes',
+  //     }).done(function(res){
+  //       console.log(res)
+  //       var dste = {"id":"1", "title":"aaaaaa", "start":"2020-03-21", "end":"2020-03-21", "url":"some_address", "description":"説明"}
+  //       events: dste
+  //     });
+  //   }
+  //     // .fail(function() {
+  //     // // // 通信失敗時の処理を記述
+  //     //    });
 
-  eventClick: function(info) {
-    alert('Event: ' + info.event.title);
-    alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-    alert('View: ' + info.view.type);
 
-    // change the border color just for fun
-    info.el.style.borderColor = 'red';
-  }
-
-});
-}
-*/
-
+  // });

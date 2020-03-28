@@ -2,7 +2,7 @@ class IncomesController < ApplicationController
   def new
    @income = Income.new
    @income_day = params["day"]
-   # @proportial_day = params["day"]
+   @incomes = Income.where(day: @income_day)
   end
 
   def index
@@ -11,6 +11,7 @@ class IncomesController < ApplicationController
    @incomes2 = Income.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
    @incomes3 = Income.where(income_item: "その他",created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
                                                              # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
+   @imcomes = Income.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
   end
 
   def create
@@ -21,6 +22,26 @@ class IncomesController < ApplicationController
    else
    end
   end
+
+  def edit
+   @income_day = params["day"]
+   @income = Income.find(params[:id])
+  end
+
+  def update
+   income = Income.find(params[:id])
+   income.update(income_params)
+
+   redirect_to homes_top_path
+  end
+
+  def destroy
+   income = Income.find(params[:id])
+   income.destroy
+
+   redirect_to homes_top_path
+  end
+
 
 private
  def income_params

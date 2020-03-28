@@ -3,7 +3,7 @@
 
 
 
-<%= form_for (@target_item) do |f| %>
+<%= form_for @target_item, url: target_target_item_path do |f| %>
 
 	<%= f.label :貯金額の変更 %>
 	<%= f.text_field :target_by_month %>

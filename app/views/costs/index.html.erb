@@ -3,6 +3,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
+「Total（支出）」
+<%= @total_cost %>
+
 <canvas id="myChart"></canvas>
 
 <script>
@@ -13,12 +16,12 @@ var chart = new Chart(ctx, {
 
     // The data for our dataset
     data: {
-        labels: ['食費', '交通費', '交際費', '日用品','家賃', '保険', '通信費', 'ライフライン', 'ローン', '税金', 'その他'],
+        labels: ['食費', '交通費', '交際費', '日用品','家賃', '保険', '通信費', 'ライフライン', '貯金','ローン', '税金', 'その他'],
         datasets: [{
             label: 'My First dataset',
-            backgroundColor: ['red','pink','orange', 'yellow', 'lightgreen','yellowgreen','lightblue','greenbleu','blue','purple'],
+            backgroundColor: ['red','pink','orange', 'yellow', 'lightgreen','yellowgreen', 'white','lightblue','greenbleu','blue','purple'],
             borderColor: 'rgb(255, 255, 255)',
-            data: [<%= @proportial_cost0 %>, <%= @proportial_cost1 %>, <%= @proportial_cost2 %>, <%= @proportial_cost3 %>, <%= @fixed_cost.rent %>, <%= @fixed_cost.insurance %>, <%= @communications %>, <%= @lifelines %>, <%= @loan_items %>, <%= @taxes %>, <%= @fixed_cost.fixed_costs_other %>]
+            data: [<%= @proportial_cost0 %>, <%= @proportial_cost1 %>, <%= @proportial_cost2 %>, <%= @proportial_cost3 %>, <%= @fixed_cost.rent %>, <%= @fixed_cost.insurance %>, <%= @communications %>, <%= @lifelines %>, <%= @target_items %>,　<%= @loan_items %>, <%= @taxes %>, <%= @fixed_cost.fixed_costs_other %>]
         }]
     },
 
