@@ -14,11 +14,13 @@
 //= require activestorage
 //= require turbolinks
 //= require jquery
+//= require bootstrap-sprockets
 //= require moment
 //= require fullcalendar
 //= require_tree .
 
 // $('#calendar').fullCalendar({ });
+
 
 function eventCalendar() {
 
@@ -33,13 +35,25 @@ function eventCalendar() {
         start: total_key,
       })
     }
-    console.log (totals)
-    return $('#calendar').fullCalendar({
+    console.log (total)
+    $('#calendar').fullCalendar({
       dayClick: function(date, jsEvent, view, resourceObj) {
         window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
       },
-      events: total
+      titleFormat: 'YYYY年 M月',
+      dayNamesShort: ['日', '月', '火', '水', '木', '金', '土'],
+      events: total,
+      header: {
+                    left: '',
+                    center: 'title',
+                    right: 'today prev,next',
+                },
+     eventColor: '#1e90ff'
     });
+    console.log($(".fc-event:contains('-')"));
+    $(".fc-event:contains('-')").css("background-color",'#ff0000');
+    $(".fc-event:contains('-')").css("border-color",'#ff0000');
+
   });
 
   // $.ajax({
@@ -132,6 +146,7 @@ $(document).on('turbolinks:before-cache', clearCalendar);
   //     // .fail(function() {
   //     // // // 通信失敗時の処理を記述
   //     //    });
+
 
 
   // });

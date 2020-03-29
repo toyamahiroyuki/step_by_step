@@ -1,8 +1,4 @@
 Rails.application.routes.draw do
-  get 'loan_items/new'
-  get 'loan_items/edit'
-  get 'target_items/new'
-  get 'target_items/edit'
   devise_for :users, controllers: {
       sessions:      'users/sessions',
       passwords:     'users/passwords',
@@ -24,10 +20,10 @@ Rails.application.routes.draw do
   resource :fixed_costs, only: [:new, :create, :show, :edit, :update]
   resource :lifelines, only: [:new, :create, :index, :edit, :update]
   resources :loans do
-    resources :loan_items
+  resources :loan_items
   end
   resource :communication
-  resource :goal
+  resources :goals
   resource :simulations, only: [:new, :index, :update]
   get 'simulations/knowledge' => "simulations#knowledge"
   get 'homes/calendar_total' => "calendar_incomes#total"

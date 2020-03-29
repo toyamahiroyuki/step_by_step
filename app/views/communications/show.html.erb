@@ -1,50 +1,69 @@
-<h1>Communications#show</h1>
-<p>Find me in app/views/communications/show.html.erb</p>
+<div class="fixed-costs-title">
+  <h1>通信費・保険の一覧</h1>
+</div>
 
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-5">
 
-<table>
+      <h4 class="fixed-table-title">通信費</h4>
 
-<tr>
-  <th>携帯代</th>
-  <td><%= @communication.phone %></td>
-</tr>
+      <table>
 
-<tr>
-  <th>Wi-iI</th>
-  <td><%= @communication.wi_fi %></td>
-</tr>
+        <tr>
+          <th>携帯代</th>
+          <td><%= @communication.phone %></td>
+        </tr>
 
-<tr>
-  <th>その他</th>
-  <td><%= @communication.communications_other %></td>
-</tr>
+        <tr>
+          <th>Wi-iI</th>
+          <td><%= @communication.wi_fi %></td>
+        </tr>
 
-</table>
+        <tr>
+          <th>その他</th>
+          <td><%= @communication.communications_other %></td>
+        </tr>
 
-<table>
+      </table>
 
-<tr>
-  <th>健康保険</th>
-  <td><%= @tax.health %></td>
-</tr>
+    </div>
 
-<tr>
-  <th>年金</th>
-  <td><%= @tax.pension %></td>
-</tr>
+    <div class="col-xs-1"></div>
 
-<tr>
-  <th>市民税/府民税</th>
-  <td><%= @tax.resident %></td>
-</tr>
+    <div class="col-xs-5">
 
-<tr>
-  <th>その他</th>
-  <td><%= @tax.taxes_other %></td>
-</tr>
+      <h4 class="fixed-table-title">保険・税金</h4>
 
-</table>
+        <table>
 
+          <tr>
+            <th>健康保険</th>
+            <td><%= @tax.health %></td>
+          </tr>
 
-<%= link_to "編集画面へ", edit_communication_path, class:'btn btn-default' %>
+          <tr>
+            <th>年金</th>
+            <td><%= @tax.pension %></td>
+          </tr>
+
+          <tr>
+            <th>市民税/府民税</th>
+            <td><%= @tax.resident %></td>
+          </tr>
+
+          <tr>
+            <th>その他</th>
+            <td><%= @tax.taxes_other %></td>
+          </tr>
+
+        </table>
+
+    </div>
+  </div>
+</div>
+
+<div class="fixed-edit">
+  <%= link_to "編集画面へ", edit_communication_path, class:'btn btn-default' %>
+</div>
 

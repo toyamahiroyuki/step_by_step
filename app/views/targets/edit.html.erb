@@ -1,23 +1,36 @@
-<h1>Targets#edit</h1>
-<p>Find me in app/views/targets/edit.html.erb</p>
-
-<table>
+<div class="fixed-costs-title">
+  <h1>貯金項目の編集</h1>
+</div>
 
 <%= form_for @target, url: target_path do |f| %>
 
-<tr>
-  <th>貯金目的</th>
-  <td><%= f.text_field :target_purpose %></td>
-</tr></br>
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-6">
 
-<tr>
-  <th>目標金額</th>
-  <td><%= f.text_field :target_cost %></td>
-</tr></br>
+      <h4 class="fixed-table-title">項目と目標金額</h4>
 
-</table>
+		<table>
 
-<%= f.submit "更新" %>
+			<tr>
+			  <th>項目</th>
+			  <td><%= f.text_field :target_purpose %></td>
+			</tr>
+
+			<tr>
+			  <th>目標金額</th>
+			  <td><%= f.text_field :target_cost %></td>
+			</tr>
+
+		</table>
+
+		<div class="fixed-edit">
+			<%= f.submit "更新", class:'btn btn-primary' %>
+		</div>
+
+		</div>
+	</div>
+</div>
 
 <% end %>
 

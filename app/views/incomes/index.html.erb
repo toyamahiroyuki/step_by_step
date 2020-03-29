@@ -1,9 +1,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
-「Total(支出)」
-<%= @imcomes %>円
+<div class="cost-title">
+  <h1>今月の収入・・・<%= @imcomes %>円</h1>
+</div>
 
-<canvas id="myChart"></canvas>
+<div class="calendar">
+  <canvas id="myChart"></canvas>
+</div>
 
 <script>
 var ctx = document.getElementById('myChart').getContext('2d');
@@ -23,7 +26,15 @@ var chart = new Chart(ctx, {
     },
 
     // Configuration options go here
-     options: {}
+     options: {
+      legend: {
+            labels: {
+                fontColor: 'black',
+                boxWidth: 40,
+                fontSize: 15,
+                    }
+              },
+     }
 });
 </script>
 

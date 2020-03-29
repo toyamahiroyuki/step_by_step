@@ -27,18 +27,26 @@ class LoansController < ApplicationController
 
   def edit
   	@loan = Loan.find(params[:id])
-    @loan_id = @loan.id
-    @loan_item = LoanItem.find(@loan_id)
+    @loan_items = @loan.loan_items
+    # loan_items.each do |loan_item| end
+    # binding.pry
   end
 
   def update
     loan = Loan.find(params[:id])
-    loan.loan_balance = loan.loan_cost - loan.loan_by_month
+    loan_items = loan.loan_items
+    loan_items.each do |loan_item|
+
+       loan_item.loan_balance = loan.loan_cost - loan_item.loan_by_month
+       loan_item.update(loan_item_params)
+
+       end
 
     if loan.update(loan_params)
-  	   redirect_to targets_path
+  	    redirect_to targets_path
     else
     end
+
   end
 
   def destroy

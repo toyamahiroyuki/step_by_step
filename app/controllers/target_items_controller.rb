@@ -6,11 +6,6 @@ class TargetItemsController < ApplicationController
         if target_item.save
            redirect_to targets_path
         else
-            @targets = Target.all
-            # @target_items = TargetItem.all
-            @loans = Loan.all
-            @loan_items = LoanItem.all
-              render 'targets/index'
         end
      # else
      #       target_item.target_balance = target_item.target_balance - target_item.target_by_month
@@ -30,7 +25,16 @@ class TargetItemsController < ApplicationController
 
   def update
   	target_item = TargetItem.find(params[:id])
+    target = Target.find(target_item.target_id)
     target_item.update(target_item_params)
+    target_item.target_balance = target.target_cost - target.target_items.where(id: 1..params[:id].to_i).sum(:target_by_month)
+    target_items = target.target_items
+
+      target_items.each do |target_item|
+        target_item.target_balance = target.target_cost - target.target_items.where(id: 1..target_item.id).sum(:target_by_month)
+        target_item.update(target_item_params)
+   binding.pry
+      end
 
     redirect_to targets_path
   end

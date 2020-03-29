@@ -1,6 +1,6 @@
 class FixedCostsController < ApplicationController
   def new
-       if current_user.fixed_cost.id.nil?
+       if current_user.fixed_cost.nil?
        @fixed_cost = FixedCost.new
        @lifeline = Lifeline.new
        else
