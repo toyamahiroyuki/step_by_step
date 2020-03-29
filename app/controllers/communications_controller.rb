@@ -1,16 +1,20 @@
 class CommunicationsController < ApplicationController
   def new
-    if current_user.fixed_cost.communication.id.nil?
-  	@communication = Communication.new
-  	@tax = Tax.new
+    if  FixedCost.exists?(user_id: current_user.id)
+      if Communication.exists?(fixed_cost_id: current_user.fixed_cost.id)
+         redirect_to communication_path
+      else
+         @communication = Communication.new
+         @tax = Tax.new
+      end
     else
-    redirect_to communication_path
+      redirect_to new_fixed_costs_path
     end
   end
 
   def show
-  	@communication = current_user.fixed_cost.communication
-  	@tax = current_user.fixed_cost.tax
+  	@communication = current_user.communication
+  	@tax = current_user.tax
   end
 
   def create

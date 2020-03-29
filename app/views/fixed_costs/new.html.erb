@@ -1,52 +1,72 @@
-<h1>FixedCosts#new</h1>
-<p>Find me in app/views/fixed_costs/new.html.erb</p>
+<div class="fixed-costs-title">
+  <h1>固定費の登録</h1>
+</div>
 
 <%= form_for @fixed_cost, url: fixed_costs_path do |f| %>
 
-<table>
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-5">
 
-<tr>
-  <th>家賃</th>
-  <td><%= f.text_field :rent %></td>
-</tr>
+      <h4 class="fixed-table-title">固定費</h4>
 
-<tr>
-  <th>保険</th>
-  <td><%= f.text_field :insurance %></td>
-</tr>
+      <table>
 
-<tr>
-  <th>その他</th>
-  <td><%= f.text_field :fixed_costs_other %></td>
-</tr>
+        <tr>
+          <th>家賃</th>
+          <td><%= f.text_field :rent %></td>
+        </tr>
 
-</table>
+        <tr>
+          <th>保険</th>
+          <td><%= f.text_field :insurance %></td>
+        </tr>
+
+        <tr>
+          <th>その他</th>
+          <td><%= f.text_field :fixed_costs_other %></td>
+          </tr>
+
+      </table>
+  </div>
 
 
-<%= fields_for @lifeline, url: lifelines_path do |c| %>
+    <%= fields_for @lifeline, url: lifelines_path do |c| %>
 
-<table>
+    <div class="col-xs-1"></div>
 
-<tr>
-  <th>電気</th>
-  <td><%= c.text_field :electron %></td>
-</tr>
+    <div class="col-xs-5">
 
-<tr>
-  <th>ガス</th>
-  <td><%= c.text_field :gass %></td>
-</tr>
+      <h4 class="fixed-table-title">ライフライン</h4>
 
-<tr>
-  <th>水道</th>
-  <td><%= c.text_field :water %></td>
-</tr>
+      <table>
 
-</table>
+        <tr>
+          <th>電気</th>
+          <td><%= c.text_field :electron %></td>
+        </tr>
 
-<%= f.submit "登録" %>
+        <tr>
+          <th>ガス</th>
+          <td><%= c.text_field :gass %></td>
+        </tr>
 
-<% end %>
+        <tr>
+          <th>水道</th>
+          <td><%= c.text_field :water %></td>
+        </tr>
+
+        </table>
+
+    </div>
+  </div>
+</div>
+
+<div class="fixed-edit">
+  <%= f.submit "登録", class:'btn btn-success' %>
+</div>
+
+  <% end %>
 
 <% end %>
 

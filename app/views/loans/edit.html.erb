@@ -1,29 +1,46 @@
+<div class="fixed-costs-title">
+  <h1>ローン項目の編集</h1>
+</div>
 
 <%= form_for @loan, url: loan_path do |f| %>
 
-<table>
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-6">
 
-<tr>
-  <th>ローン</th>
-  <td><%= f.text_field :loan_purpose %></td>
-</tr></br>
+      <h4 class="fixed-table-title">項目と返済金額</h4>
 
-<tr>
-  <th>返済金額</th>
-  <td><%= f.text_field :loan_cost %></td>
-</tr></br>
+			<table>
 
-	<% fields_for @loan_item do |c| %>
+				<tr>
+				  <th>ローン項目</th>
+				  <td><%= f.text_field :loan_purpose %></td>
+				</tr>
 
-		<tr>
-		  <th>月の返済額</th>
-		  <td><%= c.text_field :loan_by_month %></td>
-		</tr></br>
+				<tr>
+				  <th>返済金額</th>
+				  <td><%= f.text_field :loan_cost %></td>
+				</tr>
 
-	<% end %>
+					<% @loan_items.each do |loan_item| %>
+						<%= fields_for loan_item do |c| %>
 
-</table>
+							<tr>
+							  <th><%= loan_item.created_at.strftime("%Y年%m月") %>の返済額</th>
+							  <td><%= c.text_field :loan_by_month %></td>
+							</tr>
 
-<%= f.submit "更新" %>
+						<% end %>
+					<% end %>
+
+			</table>
+
+			<div class="fixed-edit">
+				<%= f.submit "更新", class:'btn btn-danger' %>
+			</div>
+
+		</div>
+	</div>
+</div>
 
 <% end %>

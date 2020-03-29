@@ -1,79 +1,126 @@
-<h1>Targets#index</h1>
-<p>Find me in app/views/targets/index.html.erb</p>
+<div class="fixed-costs-title">
+	<h1>貯金・ローン一覧</h1>
+</div>
 
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-6">
 
+		<% @targets.each do |target| %>
 
-<% @targets.each do |target| %>
+    	<h4 class="fixed-table-title"><%= target.target_purpose %></h4>
+    	<div class="e_d_box">
+	    	<%= link_to "目標・金額の編集", edit_target_path(target.id),class:'btn btn-primary' %>
+	    	<%= link_to "目標・金額の削除", target_path(target.id), method: :delete, class:'btn btn-danger' %>
+	    </div>
 
-	「目標目的」
-	<%= target.target_purpose %></br>
+    	<table>
 
-	「貯金目標金額」
-	<%= target.target_cost %>
-
-			<%= link_to "目標の編集", edit_target_path(target.id) %>
-			<%= link_to "目標の削除", target_path(target.id), method: :delete %></br>
-
+    		<tr>
+    			<th>金額</th>
+    			<td><%= target.target_cost %>円</td>
+    			<td></td>
+    		</tr>
 
     		<%= form_for @target_item, url: target_target_items_path(target) do |f| %>
 
-			<%= f.label :貯金の追加 %>
-			<%= f.text_field :target_by_month %>
-
-			<%= f.hidden_field :target_id, value: target.id %>
-
-			<%= f.submit "貯金" %>
+    			　<tr>
+    					<th><%= f.label :貯金の追加 %></th>
+    					<td><%= f.text_field :target_by_month %>円</td>
+			        <%= f.hidden_field :target_id, value: target.id %>
+			        <td><%= f.submit "貯金", class:'btn btn-warning' %></td>
+			      </tr>
 
 		    <% end %>
 
-		    「現在の貯金額」
-			<%= target.target_items.sum(:target_by_month) %>円</br>
+		     	<tr>
+	    			<th>現在の貯金額</th>
+	    			<td><%= target.target_items.sum(:target_by_month) %>円</td>
+	    			<td></td>
+    			</tr>
+
+      </table>
+
+      		<table class="list-table">
+
+						<tr>
+		    			<th>日付</th>
+		    			<th>貯金額</th>
+		    			<th>残り金額</th>
+		    			<th></th>
+		    			<th></th>
+    				</tr>
+
+					<% target.target_items.each do |target_item| %>
+
+    				<tr>
+		    			<td><%= target_item.created_at.strftime('%Y/%m/%d') %></td>
+		    			<td><%= target_item.target_by_month %>円</td>
+		    			<td><%= target_item.target_balance %>円</td>
+		    			<td><%= link_to "編集", edit_target_target_item_path(target_item.id, id: target_item.id),class:'btn btn-primary' %></td>
+		    			<td><%= link_to "削除", target_target_item_path(target_item.id,id: target_item.id), method: :delete,class:'btn btn-danger' %></td>
+    				</tr>
+
+					<% end %>
+
+					</table>
+
+		<% end %>
+		</div>
 
 
-	<% target.target_items.each do |target_item| %>
-
-		「日付」
-		<%= target_item.created_at.strftime('%Y/%m/%d')  %>
-
-	    「貯金額」
-		<%= target_item.target_by_month %>
-
-		「残り金額」
-		<%= target_item.target_balance %>
-		<%= link_to "貯金の編集", edit_target_target_item_path(target_item.id, id: target_item.id) %>
-		<%= link_to "貯金の削除", target_target_item_path(target_item.id,id: target_item.id), method: :delete %></br>
 
 
 
-	<% end %>
+    <div class="col-xs-6">
 
-<% end %></br></br>
+		<% @loans.each do |loan| %>
+
+			<h4 class="loan-table-title"><%= loan.loan_purpose %></h4>
+    	<div class="e_d_box">
+	    	<%= link_to "ローン・金額の編集", edit_loan_path(loan.id),class:'btn btn-primary' %>
+	    	<%= link_to "ローン・金額の削除", loan_path(loan.id), method: :delete, class:'btn btn-danger' %>
+	    </div>
+
+	    <table class="loan-table">
+
+	    		<tr>
+	    			<th>返済総額</th>
+	    			<td><%= loan.loan_cost %>円</td>
+	    			<td></td>
+ 	    		</tr>
+
+	     </table>
 
 
+	     <table class="list-table">
 
-<% @loans.each do |loan| %>
+						<tr>
+		    			<th>日付</th>
+		    			<th>返済額</th>
+		    			<th>残り金額</th>
+		    			<th></th>
+		    			<th></th>
+    				</tr>
 
-	「ローン項目」
-	 <%= loan.loan_purpose %></br>
+					<% loan.loan_items.each do |loan_item| %>
 
-	「ローン総額」
-	 <%= loan.loan_cost %></br>
+    				<tr>
+		    			<td><%= loan_item.created_at.strftime('%Y/%m/%d') %></td>
+		    			<td><%= loan_item.loan_by_month %>円</td>
+		    			<td><%= loan_item.loan_balance %>円</td>
+		    			<td><%= link_to "編集", edit_loan_loan_item_path(loan_item.id, id: loan_item.id),class:'btn btn-primary' %></td>
+		    			<td><%= link_to "削除", loan_loan_item_path(loan_item.id,id: loan_item.id), method: :delete,class:'btn btn-danger' %></td>
+    				</tr>
 
+					<% end %>
 
-		<% loan.loan_items.each do |loan_item| %>
+　　　</table>
 
-	　　「月の返済額」
-		 <%= loan_item.loan_by_month %>
-
-		 <% end %></br>
-
-	「現在の返済額(Loan.loan_items.sum(Loan_item.loan_by_month)」
-	<%= loan.loan_items.sum(:loan_by_month) %>円</br>
-
-		<%= link_to "ローンの編集", edit_loan_path(loan.id) %>
-		<%= link_to "ローンの削除", loan_path(loan.id), method: :delete %></br>
-
-<% end %>
+		<% end %>
+		</div>
+	</div>
+</div>
 
 
 

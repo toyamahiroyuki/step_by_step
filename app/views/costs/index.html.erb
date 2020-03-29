@@ -1,12 +1,12 @@
-<h1>Costs#index</h1>
-<p>Find me in app/views/costs/index.html.erb</p>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
-「Total（支出）」
-<%= @total_cost %>
+<div class="cost-title">
+    <h1>今月の支出・・・<%= @total_cost %>円</h1>
+</div>
 
-<canvas id="myChart"></canvas>
+<div class="calendar">
+  <canvas id="myChart"></canvas>
+</div>
 
 <script>
 var ctx = document.getElementById('myChart').getContext('2d');
@@ -26,6 +26,14 @@ var chart = new Chart(ctx, {
     },
 
     // Configuration options go here
-     options: {}
+     options: {
+        legend: {
+            labels: {
+                fontColor: 'black',
+                boxWidth: 40,
+                fontSize: 15,
+                    }
+              },
+     }
 });
 </script>

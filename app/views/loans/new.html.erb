@@ -1,29 +1,45 @@
+<div class="fixed-costs-title">
+	<h1>ローン項目の作成</h1>
+</div>
+
 <%= form_for @loan, url: loans_path do |g| %>
-<table>
 
-	<tr>
-	  <th>ローン項目</th>
-	  <td><%= g.text_field :loan_purpose %></td>
-	</tr></br>
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-6">
 
-	<tr>
-	  <th>返済金額</th>
-	  <td><%= g.text_field :loan_cost %></td>
-	</tr></br>
+      <h4 class="fixed-table-title">項目と返済金額</h4>
+
+			<table>
+
+				<tr>
+					<th>ローン項目</th>
+					<td><%= g.text_field :loan_purpose %></td>
+				</tr>
+
+				<tr>
+					<th>返済金額</th>
+					<td><%= g.text_field :loan_cost %></td>
+				</tr>
 
 
-		<%= fields_for @loan_item, url: loans_path do |c| %>
+				<%= fields_for @loan_item, url: loans_path do |c| %>
 
-		<tr>
-		  <th>月の返済額</th>
-		  <td><%= c.text_field :loan_by_month %></td>
-		</tr></br>
+				<tr>
+					<th>月の返済額</th>
+					<td><%= c.text_field :loan_by_month %></td>
+				</tr>
 
+				<% end %>
 
-	<% end %>
+			</table>
 
-</table>
+			<div class="fixed-edit">
+				<%= g.submit "登録", class:'btn btn-danger' %>
+			</div>
 
-<%= g.submit "登録" %>
+		</div>
+	</div>
+</div>
 
 <% end %>

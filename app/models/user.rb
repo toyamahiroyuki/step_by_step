@@ -12,6 +12,8 @@ class User < ApplicationRecord
 
   has_many :balances, dependent: :destroy
   has_one :fixed_cost, dependent: :destroy
+  has_one :communication, through: :fixed_cost, dependent: :destroy
+  has_one :tax, through: :fixed_cost, dependent: :destroy
   has_many :goals, dependent: :destroy
   has_many :incomes, dependent: :destroy
   has_one :lifeline, dependent: :destroy

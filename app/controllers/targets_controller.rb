@@ -36,7 +36,7 @@ class TargetsController < ApplicationController
 
   def edit
   	@target = Target.find(params[:id])
-    # @target_item = TargetItem.find_by(params[:id])
+
   end
 
   def update
