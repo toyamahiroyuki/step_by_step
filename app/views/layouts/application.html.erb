@@ -26,11 +26,15 @@
         <nav>
             <ul class="header-item clearfix text-right">
               <li class="header-item-li btn btn-default" aria-hidden="true" style="background-color: #565656;  background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
-                <%= link_to "home", homes_top_path %>
+                <%= link_to "Home", homes_top_path %>
               </li>
               <li class="header-item-li btn btn-default" style="background-color: #565656; color: #fff8e8; background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
-                <%= link_to "about", destroy_user_session_path, method: :delete %>
+                <%= link_to "about", homes_about_path %>
               </li>
+              <li class="header-item-li btn btn-default" aria-hidden="true" style="background-color: #565656; color: #fff8e8; background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
+                <%= link_to "My page", user_path(current_user) %>
+              </li>
+
               <li class="header-item-li btn btn-default" aria-hidden="true" style="background-color: #565656; color: #fff8e8; background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
                 <%= link_to "logout", destroy_user_session_path, method: :delete %>
               </li>

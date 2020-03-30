@@ -1,3 +1,51 @@
 // Place all the styles related to the homes controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.fixed-costs-title {
+  h1 {
+	  position: relative;
+	  background: #f0e68c;
+	  box-shadow: 0px 0px 0px 5px #f0e68c;
+	  padding: 10px 10px;
+	  margin: 20px 20px;
+	  color: #454545;
+	  width: 500px;
+	  text-align: center;
+	  font-family: 'M PLUS Rounded 1c', sans-serif;
+	  }
+
+}
+
+h1:after {
+  position: absolute;
+  content: '';
+  left: -7px;
+  top: -7px;
+  border-width: 0 0 15px 15px;
+  border-style: solid;
+  border-color: #fff #fff #f0e68c;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.about {
+  margin-left: 100px;
+  margin-bottom: 100px;
+}
+
+.about {
+  h2 {
+    margin: 10px 10px;
+    padding: 10px;
+    border: 2px solid black;
+    width: 200px;
+    text-align: center;
+    border-radius: 10px;
+  }
+  h4 {
+    width: 500px;
+    margin: 30px 0;
+    border-bottom: solid 3px #00ffff;
+
+  }
+}

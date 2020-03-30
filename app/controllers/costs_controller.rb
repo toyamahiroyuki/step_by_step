@@ -1,15 +1,15 @@
 class CostsController < ApplicationController
   def index
-  	@proportial_cost0 = ProportialCost.where(proportial_cost_item: "食費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-  	@proportial_cost1 = ProportialCost.where(proportial_cost_item: "交通費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-  	@proportial_cost2 = ProportialCost.where(proportial_cost_item: "交際費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-  	@proportial_cost3 = ProportialCost.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+  	@proportial_cost0 = current_user.proportial_costs.where(proportial_cost_item: "食費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+  	@proportial_cost1 = current_user.proportial_costs.where(proportial_cost_item: "交通費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+  	@proportial_cost2 = current_user.proportial_costs.where(proportial_cost_item: "交際費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+  	@proportial_cost3 = current_user.proportial_costs.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
 
   	@fixed_cost = current_user.fixed_cost
 
     @fixed_costs = current_user.fixed_cost.rent + current_user.fixed_cost.insurance + current_user.fixed_cost.fixed_costs_other
 
-  	@communications = Communication.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:phone)+ Communication.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:wi_fi)+ Communication.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:communications_other)
+  	@communications = current_user.fixed_cost.communication.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:phone)+ Communication.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:wi_fi)+ Communication.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:communications_other)
 
     @lifelines = Lifeline.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:electron)+ Lifeline.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:gass)+ Lifeline.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:water)
 
