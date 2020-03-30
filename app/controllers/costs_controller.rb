@@ -17,14 +17,26 @@ class CostsController < ApplicationController
       @lifelines = Lifeline.where(user_id: current_user.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:electron)+ Lifeline.where(user_id: current_user.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:gass)+ Lifeline.where(user_id: current_user.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:water)
 
 
-      @loan_items = LoanItem.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:loan_by_month)
+      loans = Loan.where(fixed_cost_id: current_user.fixed_cost.id)
+      loan_ids = []
+      loans.each do |loan|
+        loan_ids.push(loan.id)
+      end
+      @loan_items = LoanItem
+        .where(loan_id: loan_ids)
+        .where(created_at: Time.now.beginning_of_month..Time.now.end_of_month)
+        .sum(:loan_by_month)
 
-      @target_items = TargetItem.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:target_by_month)
+      targets = current_user.targets
+        targets.each do |target|
 
+          @target_items = TargetItem.where(target_id: target.id,created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:target_by_month)
+
+        end
 
       @taxes = Tax.where(fixed_cost_id: current_user.fixed_cost.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:health)+ Tax.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:pension)+ Tax.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:resident)+ Tax.sum(:taxes_other)
 
-      @total_cost = @proportial_cost0 + @proportial_cost1 + @proportial_cost2 + @proportial_cost3 + @fixed_costs + @communications + @lifelines + @loan_items + @target_items + @taxes
+      @total_cost = @proportial_cost0 + @proportial_cost1 + @proportial_cost2 + @proportial_cost3 + @fixed_costs + @communications + @lifelines + @loan_items.to_i + @target_items.to_i + @taxes
    end
   end
 end
