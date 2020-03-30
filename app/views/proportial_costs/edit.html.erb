@@ -1,41 +1,67 @@
+<div class="fixed-costs-title">
+  <h1>支出の編集</h1>
+</div>
 
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-12">
 
-<tr>
-  <th>日付</th>
-  <td><%= @income_day %></td>
-</tr>
+    <table>
 
-<%= form_for(@proportial_cost) do |f| %>
+      <tr>
+        <th>日付</th>
+        <td><%= @income_day %></td>
+      </tr>
 
-<table>
-<tr>
-  <th>日付</th>
-  <td><%= f.hidden_field :day ,value: @income_day %></td>
-</tr>
+      <%= form_for(@proportial_cost) do |f| %>
 
-<tr>
-  <th>収入金額</th>
-  <td><%= f.text_field :proportial_cost %></td>
-</tr>
+      <%= f.hidden_field :day ,value: @income_day %></td>
 
-<tr>
-  <th>項目</th>
-  <td><%= f.radio_button :proportial_cost_item, "食費" %>食費</br>
-      <%= f.radio_button :proportial_cost_item, "交通費" %>交通費</br>
-      <%= f.radio_button :proportial_cost_item, "交際費" %>交際費</br>
-      <%= f.radio_button :proportial_cost_item, "日用品" %>日用品</br>
-      <%= f.radio_button :proportial_cost_item, "その他" %>その他</br>
-  </td>
-</tr>
+      <tr>
+        <th>支出金額</th>
+        <td><%= f.text_field :proportial_cost %></td>
+      </tr>
 
-<tr>
-  <th>メモ</th>
-  <td><%= f.text_field :proportial_cost_memo %></td>
-</tr>
+      <tr>
+        <th>項目</th>
+        <td>
+            <ul class="pro-cost-item">
 
-</table>
+              <li class="pro-cost-items">
+                <%= f.radio_button :proportial_cost_item, "食費" %>食費
+              </li>
 
- <%= f.submit "登録" %>
+              <li class="pro-cost-items">
+                 <%= f.radio_button :proportial_cost_item, "交通費" %>交通費
+              </li>
 
+              <li class="pro-cost-items">
+                 <%= f.radio_button :proportial_cost_item, "交際費" %>交際費
+              </li>
 
-<% end %>
+              <li class="pro-cost-items">
+                 <%= f.radio_button :proportial_cost_item, "日用品" %>日用品
+              </li>
+
+              <li class="pro-cost-items">
+                 <%= f.radio_button :proportial_cost_item, "その他" %>その他
+              </li>
+            </ul>
+          </td>
+      </tr>
+
+      <tr>
+        <th>メモ</th>
+        <td><%= f.text_field :proportial_cost_memo %></td>
+      </tr>
+
+      </table>
+
+　　　<div class="goal-btn">
+       <%= f.submit "登録", class:'btn btn-primary' %>
+     </div>
+    
+    <% end %>
+    </div>
+  </div>
+</div>

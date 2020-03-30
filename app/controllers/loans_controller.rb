@@ -17,7 +17,7 @@ class LoansController < ApplicationController
     loan_item = LoanItem.new(loan_item_params)
 
     loan_item.loan_id = loan.id
-    loan_item.loan_balance = loan.loan_cost - loan_item.loan_by_month
+    loan_item.loan_balance = loan.loan_cost.to_i - loan_item.loan_by_month.to_i
     if loan_item.save
 
   	   redirect_to targets_path

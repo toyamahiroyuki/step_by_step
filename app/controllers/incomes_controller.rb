@@ -2,16 +2,16 @@ class IncomesController < ApplicationController
   def new
    @income = Income.new
    @income_day = params["day"]
-   @incomes = Income.where(day: @income_day)
+   @incomes = current_user.incomes.where(day: @income_day)
   end
 
   def index
-   @incomes0 = Income.where(income_item: "給料", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-   @incomes1 = Income.where(income_item: "手当て", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-   @incomes2 = Income.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-   @incomes3 = Income.where(income_item: "その他",created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+   @incomes0 = current_user.incomes.where(income_item: "給料", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+   @incomes1 = current_user.incomes.where(income_item: "手当て", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+   @incomes2 = current_user.incomes.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+   @incomes3 = current_user.incomes.where(income_item: "その他",created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
                                                              # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
-   @imcomes = Income.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+   @imcomes = current_user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
   end
 
   def create

@@ -1,39 +1,64 @@
+<div class="fixed-costs-title">
+  <h1>収入の編集</h1>
+</div>
 
-<tr>
-  <th>日付</th>
-  <td><%= @income_day %></td>
-</tr>
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-12">
 
-<%= form_for(@income) do |f| %>
+    <table>
 
-<table>
-<tr>
-  <th>日付</th>
-  <td><%= f.hidden_field :day ,value: @income_day %></td>
-</tr>
+        <tr>
+          <th>日付</th>
+          <td><%= @income_day %></td>
+        </tr>
 
-<tr>
-  <th>収入金額</th>
-  <td><%= f.text_field :income %></td>
-</tr>
+        <%= form_for(@income) do |f| %>
 
-<tr>
-  <th>項目</th>
-  <td><%= f.radio_button :income_item, "給料" %>給料</br>
-      <%= f.radio_button :income_item, "手当て" %>手当て</br>
-      <%= f.radio_button :income_item, "退職金" %>退職金</br>
-      <%= f.radio_button :income_item, "その他" %>その他</br>
-  </td>
-</tr>
+        <%= f.hidden_field :day ,value: @income_day %>
 
-<tr>
-  <th>メモ</th>
-  <td><%= f.text_field :income_memo %></td>
-</tr>
+        <tr>
+          <th>収入金額</th>
+          <td><%= f.text_field :income %></td>
+        </tr>
 
-</table>
+        <tr>
+          <th>項目</th>
+          <td>
+            <ul class="income-item">
 
- <%= f.submit "登録" %>
+              <li class="income-items"><%= f.radio_button :income_item, "給料" %>給料
+              </li>
+
+              <li class="income-items">
+              <%= f.radio_button :income_item, "手当て" %>手当て
+              </li>
+
+              <li class="income-items">
+              <%= f.radio_button :income_item, "退職金" %>退職金
+              </li>
+
+              <li class="income-items">
+              <%= f.radio_button :income_item, "その他" %>その他
+              </li>
+            </ul>
+          </td>
+        </tr>
+
+        <tr>
+          <th>メモ</th>
+          <td><%= f.text_field :income_memo %></td>
+        </tr>
+
+      </table>
+
+        <div class="goal-btn">
+          <%= f.submit "登録" , class:'btn btn-primary'%>
+        </div>
+    <% end %>
+
+    </div>
+  </div>
+</div>
 
 
-<% end %>

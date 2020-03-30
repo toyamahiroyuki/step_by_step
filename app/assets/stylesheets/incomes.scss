@@ -33,3 +33,135 @@ h1:after {
 	width: 1000px;
 	margin-left: 220px;
 }
+
+table{
+  width: 600px;
+  border-collapse: collapse;
+  height:20px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 16px;
+}
+
+table tr{
+  border-bottom: solid 2px white;
+  height:20px;
+}
+
+table tr:last-child{
+  border-bottom: none;
+}
+table th{
+  position: relative;
+  text-align: left;
+  width: 50px;
+  background-color: #00bfff;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  height:20px;
+}
+
+table td{
+  text-align: left;
+  width: 100px;
+  text-align: center;
+  background-color: #dcdcdc;
+  padding: 10px 0;
+  font-size: 20px;
+  height:20px;
+}
+
+table td input{
+  text-align: left;
+  width: 70%;
+  text-align: center;
+  background-color: #d6ebff;
+  border-radius: 10px;
+  margin: 0 auto;
+  font-size: 20px;
+}
+
+.list-table{
+  width: 1200px;
+  height:20px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.list-table tr{
+  border-bottom: solid 2px white;
+  height:10px;
+}
+
+.list-table tr:last-child{
+  border-bottom: none;
+}
+.list-table th{
+  position: relative;
+  text-align: left;
+  width: 100px;
+  background-color: 00bfff;
+  color: white;
+  text-align: center;
+  padding:  0;
+  height:10px;
+}
+
+.list-table td{
+  text-align: left;
+  width: 100px;
+  text-align: center;
+  background-color: #dcdcdc;
+  padding: 10px 0;
+  font-size: 20px;
+  height:20px;
+}
+
+.list-table td input{
+  text-align: left;
+  width: 100;
+  text-align: center;
+  background-color: #d6ebff;
+  border-radius: 10px;
+  margin: 0 auto;
+  font-size: 20px;
+}
+
+.goal-btn {
+  margin: 10px 0 20px 0;
+}
+
+.container {
+  width: 1400px ;
+  height: 400px;
+}
+
+.col-xs-6 {
+ width: 650px;
+ margin: px 10px;
+}
+
+.btn-primary {
+  margin-right: 10px;
+}
+.btn-danger {
+  margin-right: 10px;
+}
+
+.income-items {
+  list-style: none;
+  width: 80px;
+  display: inline-block;
+}
+
+.income_item {
+ display: inline-block;
+}
+
+input#income_income_item_給料,
+input#income_income_item_手当て,
+input#income_income_item_退職金,
+input#income_income_item_その他,{
+	width: 20px;
+}
