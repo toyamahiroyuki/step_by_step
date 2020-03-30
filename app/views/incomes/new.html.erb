@@ -1,71 +1,92 @@
-<h1>Incomes#new</h1>
+<div class="fixed-costs-title">
+  <h1>収入</h1>
+</div>
 
-<tr>
-  <th>日付</th>
-  <td><%= @income_day %></td>
-</tr>
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-12">
 
-<%= form_for(@income) do |f| %>
+    <table>
+      <tr>
+        <th>日付</th>
+        <td><%= @income_day %></td>
+      </tr>
 
-<table>
-<tr>
-  <th>日付</th>
-  <td><%= f.hidden_field :day ,value: @income_day %></td>
-</tr>
+      <%= form_for(@income) do |f| %>
 
-<tr>
-  <th>収入金額</th>
-  <td><%= f.text_field :income,value: 0 %></td>
-</tr>
+      <%= f.hidden_field :day ,value: @income_day %>
 
-<tr>
-  <th>項目</th>
-  <td><%= f.radio_button :income_item, "給料" %>給料</br>
-  	  <%= f.radio_button :income_item, "手当て" %>手当て</br>
-  	  <%= f.radio_button :income_item, "退職金" %>退職金</br>
-  	  <%= f.radio_button :income_item, "その他" %>その他</br>
-  </td>
-</tr>
+      <tr>
+        <th>収入金額</th>
+        <td><%= f.text_field :income,value: 0 %></td>
+      </tr>
 
-<tr>
-  <th>メモ</th>
-  <td><%= f.text_field :income_memo %></td>
-</tr>
+      <tr>
+        <th>項目</th>
+        <td>
+          <ul class="income-item">
 
-</table>
+            <li class="income-items"><%= f.radio_button :income_item, "給料" %>給料
+            </li>
 
- <%= f.submit "登録" %>
- <%= link_to "支出画面へ", new_proportial_cost_path(day: @income_day), class:'btn btn-default' %>
+            <li class="income-items">
+        	  <%= f.radio_button :income_item, "手当て" %>手当て
+            </li>
 
+            <li class="income-items">
+        	  <%= f.radio_button :income_item, "退職金" %>退職金
+            </li>
 
-<% end %>
+            <li class="income-items">
+        	  <%= f.radio_button :income_item, "その他" %>その他
+            </li>
+          </ul>
+        </td>
+      </tr>
 
+      <tr>
+        <th>メモ</th>
+        <td><%= f.text_field :income_memo %></td>
+      </tr>
 
-<% @incomes.each do |income| %>
+    </table>
 
-<table>
-    <tr>
-      <th>日付</th>
-      <td><%= income.day %></td>
-    </tr>
+    <div class="goal-btn">
 
-    <tr>
-      <th>収入金額</th>
-      <td><%= income.income %></td>
-    </tr>
+       <%= f.submit "登録", class:'btn btn-primary' %>
+       <%= link_to "支出画面へ", new_proportial_cost_path(day: @income_day), class:'btn btn-warning' %>
+    </div>
 
-    <tr>
-      <th>項目</th>
-      <td><%= income.income_item %></td>
-    </tr>
+  </div>
 
-    <tr>
-      <th>メモ</th>
-      <td><%= income.income_memo %></td>
-    </tr>
-
-</table>
-　　<%= link_to "編集画面へ", edit_income_path(income, day: @income_day), class:'btn btn-default' %>
-   <%= link_to "削除へ", income_path(income), method: :delete, class:'btn btn-default' %>
 
 <% end %>
+
+    <% @incomes.each do |income| %>
+
+    <table class="list-table">
+
+        <tr>
+          <th>日付</th>
+          <th>収入金額</th>
+          <th>項目</th>
+          <th>メモ</th>
+          <th></th>
+          <th></th>
+        </tr>
+
+        <tr>
+          <td><%= income.day %></td>
+          <td><%= income.income %></td>
+          <td><%= income.income_item %></td>
+          <td><%= income.income_memo %></td>
+          <td><%= link_to "編集画面へ", edit_income_path(income, day: @income_day), class:'btn btn-primary' %></td>
+          <td><%= link_to "削除へ", income_path(income), method: :delete, class:'btn btn-danger' %></td>
+        </tr>
+
+    </table>
+    <% end %>
+
+ </div>
+</div>
+

@@ -1,72 +1,99 @@
-<h1>proportial_costs#new</h1>
+<div class="fixed-costs-title">
+  <h1>支出</h1>
+</div>
 
-<tr>
-  <th>日付</th>
-  <td><%= @income_day %></td>
-</tr>
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-12">
 
-<%= form_for(@proportial_cost) do |f| %>
+    <table>
 
-<table>
-<tr>
-  <th>日付</th>
-  <td><%= f.hidden_field :day ,value: @income_day %></td>
-</tr>
+        <tr>
+          <th>日付</th>
+          <td><%= @income_day %></td>
+        </tr>
 
-<tr>
-  <th>支出金額</th>
-  <td><%= f.text_field :proportial_cost %></td>
-</tr>
+        <%= form_for(@proportial_cost) do |f| %>
 
-<tr>
-  <th>項目</th>
-  <td><%= f.radio_button :proportial_cost_item, "食費" %>食費</br>
-  	  <%= f.radio_button :proportial_cost_item, "交通費" %>交通費</br>
-  	  <%= f.radio_button :proportial_cost_item, "交際費" %>交際費</br>
-  	  <%= f.radio_button :proportial_cost_item, "日用品" %>日用品</br>
-  	  <%= f.radio_button :proportial_cost_item, "その他" %>その他</br>
-  </td>
-</tr>
+        <%= f.hidden_field :day ,value: @income_day %>
 
-<tr>
-  <th>メモ</th>
-  <td><%= f.text_field :proportial_cost_memo %></td>
-</tr>
+        <tr>
+          <th>支出金額</th>
+          <td><%= f.text_field :proportial_cost %></td>
+        </tr>
 
-</table>
+        <tr>
+          <th>項目</th>
+          <td>
+            <ul class="pro-cost-item">
 
- <%= f.submit "登録" %>
- <%= link_to "収入画面へ", new_income_path(day: @income_day), class:"btn btn-default" %>
+              <li class="pro-cost-items">
+                <%= f.radio_button :proportial_cost_item, "食費" %>食費
+              </li>
 
-<% end %>
+              <li class="pro-cost-items">
+          	     <%= f.radio_button :proportial_cost_item, "交通費" %>交通費
+              </li>
+
+              <li class="pro-cost-items">
+          	     <%= f.radio_button :proportial_cost_item, "交際費" %>交際費
+              </li>
+
+              <li class="pro-cost-items">
+          	     <%= f.radio_button :proportial_cost_item, "日用品" %>日用品
+              </li>
+
+              <li class="pro-cost-items">
+          	     <%= f.radio_button :proportial_cost_item, "その他" %>その他
+              </li>
+            </ul>
+          </td>
+        </tr>
+
+        <tr>
+          <th>メモ</th>
+          <td><%= f.text_field :proportial_cost_memo %></td>
+        </tr>
+
+        </table>
+
+        <div class="goal-btn">
+           <%= f.submit "登録",class:'btn btn-primary' %>
+           <%= link_to "収入画面へ", new_income_path(day: @income_day), class:"btn btn-warning" %>
+        </div>
+
+      </div>
+
+  <% end %>
 
 
-<% @proportial_costs.each do |proportial_cost| %>
+    <% @proportial_costs.each do |proportial_cost| %>
 
-<table>
-    <tr>
-      <th>日付</th>
-      <td><%= proportial_cost.day %></td>
-    </tr>
+    <table class="list-table">
 
-    <tr>
-      <th>収入金額</th>
-      <td><%= proportial_cost.proportial_cost %></td>
-    </tr>
+        <tr>
+          <th>日付</th>
+          <th>収入金額</th>
+          <th>項目</th>
+          <th>メモ</th>
+          <th></th>
+          <th></th>
+        </tr>
 
-    <tr>
-      <th>項目</th>
-      <td><%= proportial_cost.proportial_cost_item %></td>
-    </tr>
+        <tr>
+          <td><%= proportial_cost.day %></td>
+          <td><%= proportial_cost.proportial_cost %></td>
+          <td><%= proportial_cost.proportial_cost_item %></td>
+          <td><%= proportial_cost.proportial_cost_memo %></td>
+          <td><%= link_to "編集画面へ", edit_proportial_cost_path(proportial_cost, day: @income_day), class:'btn btn-primary' %></td>
+          <td><%= link_to "削除へ", proportial_cost_path(proportial_cost), method: :delete, class:'btn btn-danger' %></td>
+        </tr>
 
-    <tr>
-      <th>メモ</th>
-      <td><%= proportial_cost.proportial_cost_memo %></td>
-    </tr>
 
-</table>
-　　<%= link_to "編集画面へ", edit_proportial_cost_path(proportial_cost, day: @income_day), class:'btn btn-default' %>
-   <%= link_to "削除へ", proportial_cost_path(proportial_cost), method: :delete, class:'btn btn-default' %>
+    </table>
+    <% end %>
 
-<% end %>
+    </div>
+  </div>
+
 

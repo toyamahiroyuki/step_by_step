@@ -33,7 +33,6 @@ class TargetItemsController < ApplicationController
       target_items.each do |target_item|
         target_item.target_balance = target.target_cost - target.target_items.where(id: 1..target_item.id).sum(:target_by_month)
         target_item.update(target_item_params)
-   binding.pry
       end
 
     redirect_to targets_path

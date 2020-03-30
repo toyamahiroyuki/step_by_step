@@ -28,9 +28,9 @@ class GoalsController < ApplicationController
   	@proportial_cost3 = current_user.proportial_costs.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
   	@proportial_cost4 = current_user.proportial_costs.where(proportial_cost_item: "その他", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
 
-    @lifelines_gass = Lifeline.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:electron)
-    @lifelines_electron = Lifeline.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:gass)
-    @lifeline_water =Lifeline.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:water)
+    @lifelines_gass = Lifeline.where(user_id: current_user.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:electron)
+    @lifelines_electron = Lifeline.where(user_id: current_user.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:gass)
+    @lifeline_water =Lifeline.where(user_id: current_user.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:water)
 
   end
 

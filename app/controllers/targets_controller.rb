@@ -65,10 +65,13 @@ private
     # TODO: Loanの取得処理をログインユーザーから引いてくるようにする
     loans = Loan.all
     loans.map(&:loan_items).each do |loan_item|
-      next if loan_item.last.created_at >= Time.zone.now.beginning_of_month
-      new_loan_item = loan_item.first.dup
-      new_loan_item.loan_balance = new_loan_item.loan_balance - new_loan_item.loan_by_month
-      new_loan_item.save
+      if loan_item = nil
+        next if loan_item.last.created_at >= Time.zone.now.beginning_of_month
+        new_loan_item = loan_item.first.dup
+        new_loan_item.loan_balance = new_loan_item.loan_balance - new_loan_item.loan_by_month
+        new_loan_item.save
+      else
+      end
     end
     # @loans.map { |loan| loan.loan_items }
   end
