@@ -1,2 +1,65 @@
-<h1>Users#show</h1>
-<p>Find me in app/views/users/show.html.erb</p>
+<div class="fixed-costs-title">
+  <h1>マイページ</h1>
+</div>
+
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-5">
+
+      <h4 class="fixed-table-title">個人情報</h4>
+
+      <table>
+
+      	  <tr>
+            <th>名前</th>
+            <td><%= current_user.name %></td>
+          </tr>
+
+          <tr>
+            <th>年齢</th>
+            <td><%= current_user.old %></td>
+          </tr>
+
+          <tr>
+            <th>性別</th>
+            <td><%= current_user.sex %></td>
+          </tr>
+
+          <tr>
+            <th>職業（前職）</th>
+            <td><%= current_user.job %></td>
+          </tr>
+
+          <tr>
+            <th>預金額</th>
+            <td><%= current_user.deposit %></td>
+          </tr>
+
+          <tr>
+            <th>家族の人数</th>
+            <td><%= current_user.member %></td>
+          </tr>
+
+          <tr>
+            <th>メールアドレス </th>
+            <td><%= current_user.email %></td>
+          </tr>
+
+      </table>
+
+      <div class="goal-btn">
+
+	    <%= link_to "編集", edit_user_path(current_user),class:'btn btn-primary' %>
+		<%= link_to "退会", user_path(current_user), method: :delete, class:'btn btn-danger' %>
+	  </div>
+
+	  <div class="goal-btn">
+
+	    <%= link_to "userの一覧", users_path,class:'btn btn-warning' %>
+	  </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

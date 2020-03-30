@@ -1,2 +1,79 @@
-<h1>Users#edit</h1>
-<p>Find me in app/views/users/edit.html.erb</p>
+<div class="fixed-costs-title">
+  <h1>マイページの編集</h1>
+</div>
+
+<%= form_for @user do |f| %>
+
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-6">
+
+      <h4 class="fixed-table-title">個人情報</h4>
+
+      <table class="mypage">
+
+      	 <tr>
+            <th><%= f.label :名前 %></th>
+            <td><%= f.text_field :name, autofocus: true, autocomplete: "name" %></td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :年齢 %></th>
+            <td><%= f.text_field :old, autofocus: true, autocomplete: "old" %></td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :性別 %></th>
+            <td>
+            	<ul class="sex-item">
+
+	                <li class="sex-items-edit">
+	                    男性
+	                    <%= f.radio_button :sex, "男性", autofocus: true, autocomplete: "sex" %>
+	                </li>
+	                <li class="sex-items-edit">
+	                    女性
+	                    <%= f.radio_button :sex, "女性", autofocus: true, autocomplete: "sex" %>
+	                </li>
+
+	                <li class="sex-items-edit">
+	                    その他
+	                    <%= f.radio_button :sex, "その他", autofocus: true, autocomplete: "sex" %>
+	                </li>
+                </ul>
+            </td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :職業（前職） %></th>
+            <td><%= f.text_field :job, autofocus: true, autocomplete: "job" %></td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :預金額 %></th>
+            <td><%= f.text_field :deposit, autofocus: true, autocomplete: "deposit" %></td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :家族の人数 %></th>
+            <td><%= f.text_field :member, autofocus: true, autocomplete: "member" %></td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :メールアドレス %></th>
+            <td><%= f.email_field :email, autofocus: true, autocomplete: "email" %></td>
+          </tr>
+
+      </table>
+
+      <div class="goal-btn">
+
+        <%= f.submit "更新",class:'btn btn-primary' %>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<% end %>

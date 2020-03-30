@@ -18,13 +18,13 @@ class CalendarIncomesController < ApplicationController
   # end
 
   def total
-    @incomes = Income
+    @incomes = current_user.incomes
    		.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month)
    		.where(user_id: current_user.id)
    		.group(:day)
    		.sum(:income)
 
-  	@proportial_costs = ProportialCost
+  	@proportial_costs = current_user.proportial_costs
    		.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month)
    		.where(user_id: current_user.id)
    		.group(:day)

@@ -24,7 +24,7 @@
 
     		<%= form_for @target_item, url: target_target_items_path(target) do |f| %>
 
-    			　<tr>
+    			　　<tr>
     					<th><%= f.label :貯金の追加 %></th>
     					<td><%= f.text_field :target_by_month %>円</td>
 			        <%= f.hidden_field :target_id, value: target.id %>
