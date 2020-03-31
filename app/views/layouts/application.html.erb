@@ -46,11 +46,11 @@
         <ul class="nav-list">
 
                 <li class="nav-list-item">
-                  <%= link_to "収入一覧",incomes_path %>
+                  <%= link_to "収入一覧",income_path(current_user) %>
                 </li>
 
                 <li class="nav-list-item">
-                  <%= link_to "支出一覧",costs_path %>
+                  <%= link_to "支出一覧",cost_path(current_user) %>
                 </li>
 
                 <li class="nav-list-item">
@@ -95,7 +95,7 @@
               </li>
 
               <li class="nav-list-item">
-                <%= link_to "about", new_user_session_path %>
+                <%= link_to "about", homes_about_path %>
               </li>
 
         </ul>

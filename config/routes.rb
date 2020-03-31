@@ -11,8 +11,8 @@ Rails.application.routes.draw do
   get 'homes/top' => "homes#top"
   get 'homes/about' => "homes#about"
   resources :users
-  resources :costs, only: [:index]
-  resources :incomes, only: [:new, :create, :index, :edit, :update, :destroy]
+  resources :costs, only: [:show]
+  resources :incomes, only: [:new, :create, :show, :edit, :update, :destroy]
   resources :targets do
     resources :target_items
   end

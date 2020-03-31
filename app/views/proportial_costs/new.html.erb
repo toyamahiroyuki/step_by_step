@@ -67,7 +67,7 @@
   <% end %>
 
 
-    <% @proportial_costs.each do |proportial_cost| %>
+  <% @proportial_costs.each do |proportial_cost| %>
 
     <table class="list-table">
 
@@ -80,6 +80,7 @@
           <th></th>
         </tr>
 
+
         <tr>
           <td><%= proportial_cost.day %></td>
           <td><%= proportial_cost.proportial_cost %></td>
@@ -88,10 +89,11 @@
           <td><%= link_to "編集画面へ", edit_proportial_cost_path(proportial_cost, day: @income_day), class:'btn btn-primary' %></td>
           <td><%= link_to "削除へ", proportial_cost_path(proportial_cost), method: :delete, class:'btn btn-danger' %></td>
         </tr>
+       <% end %>
 
 
     </table>
-    <% end %>
+   
 
     </div>
   </div>
