@@ -6,11 +6,10 @@ class TargetsController < ApplicationController
   end
 
   def index
-  	@targets = Target.all
+  	@targets = current_user.targets
     @target_item = TargetItem.new
-    @target_items = TargetItem.all
-    @loans = Loan.all
-    @loan_items = LoanItem.all
+    # @target_items = TargetItem.
+    @loans = Loan.where(fixed_cost_id: current_user.fixed_cost.id)
   end
 
   def create
