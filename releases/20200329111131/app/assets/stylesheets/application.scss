@@ -1,0 +1,260 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require fullcalendar
+ *= require_self
+ */
+
+ @import "bootstrap-sprockets";
+ @import "bootstrap";
+
+footer {
+  background: #d6ebff;
+  height: 60px;
+  text-align:right;
+  line-height: 60px;
+  padding-right: 60px;
+  margin-top: 60px;
+  font-size: 16px;
+}
+
+.fc-day {
+	&:hover {
+		background-color: #98fb98;
+	}
+}
+
+.clearfix::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.header-title {
+ width: 300px;
+ font-family: 'M PLUS 1p', sans-serif;
+ font-size: 40px;
+ text-align: center;
+ margin: 0 auto;
+
+}
+.underline {
+	border: dashed 2px orange;
+
+	maigin-left: 0 auto;
+	padding-left: 20px;
+}
+
+
+.logout {
+	display: inline;
+}
+
+.header-item {
+  list-style: none;
+  padding: 0;
+  height: 40px;
+}
+
+.header-item-li {
+  width: 100px;
+  text-align: center;
+  display: inline-block;
+  padding: 0.5em 1em;
+  color: #232323;
+  background: #fff8e8;
+  border-left: solid 10px #ffc06e;
+}
+
+.nav {
+
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  list-style: none;
+  height: 50px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.nav-list-item {
+  list-style: none;
+  width: 165px;
+  font-size: 14px;
+  float: left;
+  text-align: center;
+  padding: 0.2em 0.5em;
+  margin: 0 0.5em;
+  background: #d6ebff;
+  box-shadow: 0px 0px 0px 10px #d6ebff;
+  border: dashed 2px white;
+  font-family: 'M PLUS 1p', sans-serif;
+
+}
+
+a {
+
+  display: block;
+
+}
+
+.sex {
+	display: inline-block;
+}
+
+h1 {
+  position: relative;
+  background: #f0e68c;
+  box-shadow: 0px 0px 0px 5px #f0e68c;
+  padding: 10px 10px;
+  margin: 20px 20px;
+  color: #454545;
+  width: 250px;
+  text-align: center;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+
+}
+
+h1:after {
+  position: absolute;
+  content: '';
+  left: -7px;
+  top: -7px;
+  border-width: 0 0 15px 15px;
+  border-style: solid;
+  border-color: #fff #fff #f0e68c;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+#calendar {
+  font-size: 20px;
+  width: 70%;
+  margin: 20px auto;
+}
+
+
+.fc-content {
+  text-align: center;
+  height: 25px;
+  line-height: 25px;
+}
+
+
+
+.log-form {
+  width: 40%;
+  min-width: 320px;
+  max-width: 475px;
+  background: #fff;
+  box-shadow: 0px 2px 5px rgba(0,0,0,.25);
+  }
+
+  .form {
+    display: block;
+    width: 100%;
+    padding: 2em;
+  }
+
+  .log-form {
+    h2 {
+    width: 100%;
+    font-family: 'M PLUS 1p', sans-serif;
+    font-size: 30px;
+    display: block;
+    background: #e6e6fa;
+    width: 100%;
+    text-transform: uppercase;
+    padding: .75em 1em .75em 1.5em;
+    margin: 0;
+    };
+  }
+
+
+  input#user_name,
+  input#user_password,
+  input#user_old,
+  input#user_job,
+  input#user_deposit,
+  input#user_member,
+  input#user_email,
+  input#user_password_confirmation
+   {
+    display: block;
+    margin: auto auto;
+    width: 100%;
+    margin-bottom: 2em;
+    padding: .5em 0;
+    border: none;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 1.25em;
+    color: #757575;
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .forgot {
+    color: lighten(#1fb5bf, 10%);
+    line-height: .5em;
+    position: relative;
+    top: 2.5em;
+    text-decoration: none;
+    font-size: .75em;
+    margin:0;
+    padding: 0;
+    float: right;
+
+    &:hover {
+      color:darken(#1fb5bf, 5%);
+    }
+    &:active{
+    }
+  }
+
+.row {
+  padding-top: 100px;
+
+}
+
+.s {
+  margin: 0;
+  background-image: url('top.jpg');
+  background-size:  cover;
+  background-color: rgba( 0, 0, 0, 0.5);
+  height: 1300px;
+}
+
+
+.space {
+  height: 60px;
+}
+
+.sex {
+  width: 250px;
+  padding: 0;
+}
+
+.sex-item {
+  display :flex;
+  list-style: none;
+  padding: 0;
+}
+
+.sex-items {
+  width: 300px;
+  text-align: left;
+}
+.sex-space {
+  margin-bottom: 20px;
+}

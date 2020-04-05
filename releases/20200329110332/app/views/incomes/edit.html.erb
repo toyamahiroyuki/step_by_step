@@ -1,0 +1,39 @@
+
+<tr>
+  <th>日付</th>
+  <td><%= @income_day %></td>
+</tr>
+
+<%= form_for(@income) do |f| %>
+
+<table>
+<tr>
+  <th>日付</th>
+  <td><%= f.hidden_field :day ,value: @income_day %></td>
+</tr>
+
+<tr>
+  <th>収入金額</th>
+  <td><%= f.text_field :income %></td>
+</tr>
+
+<tr>
+  <th>項目</th>
+  <td><%= f.radio_button :income_item, "給料" %>給料</br>
+      <%= f.radio_button :income_item, "手当て" %>手当て</br>
+      <%= f.radio_button :income_item, "退職金" %>退職金</br>
+      <%= f.radio_button :income_item, "その他" %>その他</br>
+  </td>
+</tr>
+
+<tr>
+  <th>メモ</th>
+  <td><%= f.text_field :income_memo %></td>
+</tr>
+
+</table>
+
+ <%= f.submit "登録" %>
+
+
+<% end %>

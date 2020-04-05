@@ -1,0 +1,77 @@
+<div class="fixed-costs-title">
+  <h1>通信費・保険の登録</h1>
+</div>
+
+<%= form_for @communication, url: communication_path do |c| %>
+
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-5">
+
+      <h4 class="fixed-table-title">通信費</h4>
+
+      <table>
+
+        <tr>
+          <th>携帯代</th>
+          <td><%= c.text_field :phone %></td>
+        </tr>
+
+        <tr>
+          <th>Wi-iI</th>
+          <td><%= c.text_field :wi_fi %></td>
+        </tr>
+
+        <tr>
+          <th>その他</th>
+          <td><%= c.text_field :communications_other %></td>
+        </tr>
+
+      </table>
+    </div>
+
+  <%= fields_for @tax, url: communication_path do |d| %>
+
+  <div class="col-xs-1"></div>
+
+  <div class="col-xs-5">
+
+    <h4 class="fixed-table-title">ライフライン</h4>
+
+      <table>
+
+        <tr>
+          <th>健康保険</th>
+          <td><%= d.text_field :health %></td>
+        </tr>
+
+        <tr>
+          <th>年金</th>
+          <td><%= d.text_field :pension %></td>
+        </tr>
+
+        <tr>
+          <th>市民税/府民税</th>
+          <td><%= d.text_field :resident %></td>
+        </tr>
+
+        <tr>
+          <th>その他</th>
+          <td><%= d.text_field :taxes_other %></td>
+        </tr>
+
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<div class="fixed-edit">
+  <%= c.submit "登録", class:'btn btn-success' %>
+</div>
+
+  <% end %>
+
+<% end %>
+
+

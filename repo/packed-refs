@@ -1,0 +1,10 @@
+# pack-refs with: peeled fully-peeled 
+e52bfe6d2f57cad4296ab8ace96e054b3691a7e6 refs/heads/cost
+e627fc5246c508353853cb9332879e9a4e0ca0ca refs/heads/dependabot/bundler/bootstrap-sass-3.4.1
+37afa656bec55bbafed1f7f6c9a9043881e22579 refs/heads/master
+e627fc5246c508353853cb9332879e9a4e0ca0ca refs/pull/1/head
+bda255f2a5780f5a1480f781fe359b6f566762fc refs/pull/1/merge
+73bff30fc8a5d5aad60c4766f5ec8e2dd2a5d6da refs/pull/2/head
+f93651dc0bee85c2dc53b3eb0aeb6e279eaa054d refs/pull/3/head
+8008f5c345c89ffb14223cf8cf552b9647665404 refs/pull/4/head
+e52bfe6d2f57cad4296ab8ace96e054b3691a7e6 refs/pull/5/head
