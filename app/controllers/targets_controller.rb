@@ -1,19 +1,19 @@
 class TargetsController < ApplicationController
-  before_action :create_loan_item_per_month, only: %i[new index edit]
+  before_action :create_loan_item_per_month, only: %i(new index edit)
 
   def new
     @target = Target.new
   end
 
   def index
-  	@targets = current_user.targets
+    @targets = current_user.targets
     @target_item = TargetItem.new
     # @target_items = TargetItem.
     @loans = Loan.where(fixed_cost_id: current_user.fixed_cost.id)
   end
 
   def create
-  	target = Target.new(target_params)
+    target = Target.new(target_params)
     target.user_id = current_user.id
     target.save
 
@@ -23,7 +23,7 @@ class TargetsController < ApplicationController
 
     # if target_item.save
 
-      redirect_to targets_path
+    redirect_to targets_path
     # else
     # end
   end
@@ -34,22 +34,22 @@ class TargetsController < ApplicationController
   # end
 
   def edit
-  	@target = Target.find(params[:id])
-
+    @target = Target.find(params[:id])
   end
 
   def update
-  	target = Target.find(params[:id])
+    target = Target.find(params[:id])
     target_item = TargetItem.find(params[:id])
     target.target_balance = target.target_cost - target_item.target_by_month
 
     if target.update(target_params)
-       # target_item.update(target_item_params)
+      # target_item.update(target_item_params)
 
-  	   redirect_to targets_path
+      redirect_to targets_path
     else
     end
   end
+
   def destroy
     target = Target.find(params[:id])
     target.destroy
@@ -57,7 +57,7 @@ class TargetsController < ApplicationController
     redirect_to targets_path
   end
 
-private
+  private
 
   # 毎月ローンの支払いをしてない場合、支払いレコードを作成する
   def create_loan_item_per_month
@@ -82,5 +82,4 @@ private
   # def target_item_params
   #   params.require(:target_item).permit(:id, :target_by_month, :target_balance)
   # end
-
 end

@@ -15,5 +15,4 @@ class SimulationsControllerTest < ActionDispatch::IntegrationTest
     get simulations_knowledge_url
     assert_response :success
   end
-
 end

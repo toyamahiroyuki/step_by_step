@@ -1,16 +1,16 @@
-<div class="fixed-costs-title">
-　<h1>額の編集</h1>
+<div class="loan-item-title">
+　<h1>金額の編集</h1>
 </div>
 
 <%= form_for @target_item, url: target_target_item_path do |f| %>
 
 <div class="container">
-  <div class="row-fix">
+  <div class="row">
     <div class="col-xs-6">
 
-      <h4 class="fixed-table-title">項目と目標金額</h4>
+      <h4 class="loan-item-table-title">項目と目標金額</h4>
 
-        <table>
+        <table　class="loan-item-red-table">
 
         	<tr>
         	  <th>貯金額の変更</th>
@@ -19,10 +19,9 @@
 
         </table>
 
-        <div class="fixed-edit">
-
-			<%= f.submit "貯金",class:'btn btn-primary' %>
-	    </div>
+        <div class="loan-item-edit-btn">
+  			 <%= f.submit "貯金",class:'btn btn-primary' %>
+  	    </div>
 
 	<% end %>
 

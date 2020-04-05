@@ -3,36 +3,40 @@
 </div>
 
 <div class="container">
-  <div class="row-fix">
+  <div class="row">
     <div class="col-xs-5">
 
-    <table >
-      <h4 class="fixed-table-title">固定費</h4>
-    <tr>
-      <th>家賃</th>
-      <td><%= @fixed_cost.rent %></td>
-    </tr>
+    <h3 class="table-title">固定費</h3>
 
-    <tr>
-      <th>保険</th>
-      <td><%= @fixed_cost.insurance %></td>
-    </tr>
+    <table class="green-table">
 
-    <tr>
-      <th>その他</th>
-      <td><%= @fixed_cost.fixed_costs_other %></td>
-    </tr>
-    </table>
+      <tr>
+        <th>家賃</th>
+        <td><%= @fixed_cost.rent %></td>
+      </tr>
+
+      <tr>
+        <th>保険</th>
+        <td><%= @fixed_cost.insurance %></td>
+      </tr>
+
+      <tr>
+        <th>その他</th>
+        <td><%= @fixed_cost.fixed_costs_other %></td>
+      </tr>
+
+      </table>
    </div>
 
-    <div class="col-xs-1"></div>
+   <div class="col-xs-1"></div>
 
-    <div class="col-xs-5">
+   <div class="col-xs-5">
 
-      <h4 class="fixed-table-title">ライフライン</h4>
+    <h3 class="table-title">ライフライン</h3>
 
 
-    <table>
+    <table class="green-table">
+
       <tr>
         <th>電気</th>
         <td><%= @lifeline.electron %></td>
@@ -52,11 +56,14 @@
 
     </div>
   </div>
+
+  <div class="fixed-edit-btn">
+    <%= link_to "編集画面へ", edit_fixed_costs_path, class:'btn btn-success btn-block' %>
+  </div>
+
 </div>
 
-<div class="fixed-edit">
-  <%= link_to "編集画面へ", edit_fixed_costs_path, class:'btn btn-success' %>
-</div>
+
 
 
 

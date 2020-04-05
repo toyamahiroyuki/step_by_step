@@ -15,5 +15,4 @@ class FixedCostsControllerTest < ActionDispatch::IntegrationTest
     get fixed_costs_edit_url
     assert_response :success
   end
-
 end

@@ -10,5 +10,4 @@ class LifelinesControllerTest < ActionDispatch::IntegrationTest
     get lifelines_index_url
     assert_response :success
   end
-
 end

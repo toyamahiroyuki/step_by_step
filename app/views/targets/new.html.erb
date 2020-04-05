@@ -1,16 +1,16 @@
-<div class="fixed-costs-title">
+<div class="target-title">
 	<h1>貯金項目の作成</h1>
 </div>
 
 <%= form_for @target, url: targets_path do |f| %>
 
 <div class="container">
-  <div class="row-fix">
+  <div class="row">
     <div class="col-xs-6">
 
-		  <h4 class="fixed-table-title">項目と目標金額</h4>
+		  <h3 class="target-table-title">項目と目標金額</h3>
 
-			<table>
+			<table class="target-blue-table">
 
 				<tr>
 				  <th>項目</th>
@@ -24,9 +24,9 @@
 
 			</table>
 
-      		<div class="fixed-edit">
-				<%= f.submit "登録", class:'btn btn-primary' %>
-			</div>
+      		<div class="target-create-btn">
+						<%= f.submit "登録", class:'btn btn-primary btn-block' %>
+					</div>
 
 		</div>
 	</div>
