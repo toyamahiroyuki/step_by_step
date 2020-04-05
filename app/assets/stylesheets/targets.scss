@@ -2,8 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.fixed-costs-title {
-  h1 {
+.target-title h1 {
 	  position: relative;
 	  background: #f0e68c;
 	  box-shadow: 0px 0px 0px 5px #f0e68c;
@@ -13,11 +12,9 @@
 	  width: 500px;
 	  text-align: center;
 	  font-family: 'M PLUS Rounded 1c', sans-serif;
-	  }
-
 }
 
-h1:after {
+.target-title h1:after {
   position: absolute;
   content: '';
   left: -7px;
@@ -28,16 +25,16 @@ h1:after {
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
+//targetテーブルのCSS
 
-
-.fixed-table-title {
+.target-table-title {
   position: relative;
   padding-left: 25px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
   margin-top: 35px;
 }
 
-.fixed-table-title:before {
+.target-table-title:before {
   position: absolute;
   content: '';
   bottom: -3px;
@@ -49,7 +46,7 @@ h1:after {
   border-bottom: solid 15px #00bfff;
 }
 
-.fixed-table-title:after {
+.target-table-title:after {
   position: absolute;
   content: '';
   bottom: -3px;
@@ -58,6 +55,9 @@ h1:after {
   border-bottom: solid 3px #00bfff;
 }
 
+.edit-destroy-btn {
+  text-align: right;
+}
 
 .loan-table-title {
   position: relative;
@@ -87,17 +87,7 @@ h1:after {
   border-bottom: solid 3px #fa8072;
 }
 
-.row-fix {
- margin-top: 50px
-}
-
-.fixed-edit {
-	padding-left: 600px;
-	padding-top: 50px;
-	width: 100px;
-}
-
-table{
+.target-blue-table{
   width: 100%;
   border-collapse: collapse;
   height:20px;
@@ -105,15 +95,16 @@ table{
   font-size: 16px;
 }
 
-table tr{
+.target-blue-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-table tr:last-child{
+.target-blue-table tr:last-child{
   border-bottom: none;
 }
-table th{
+
+.target-blue-table th{
   position: relative;
   text-align: left;
   width: 30%;
@@ -124,31 +115,35 @@ table th{
   height:20px;
 }
 
-table td{
+.target-blue-table td{
   text-align: left;
   width: 70%;
   text-align: center;
-  background-color: #dcdcdc;
   padding: 10px 0;
   font-size: 20px;
   height:20px;
 }
 
-table td input{
+.target-blue-table td .btn-warning {
+  width: 90px;
+  margin-right: 10px;
+}
+
+.target-blue-table td input{
   text-align: left;
   width: 70%;
   text-align: center;
-  background-color: #d6ebff;
   border-radius: 10px;
   margin: 0 auto;
   font-size: 20px;
 }
 
-.e_d_box {
-  text-align: right;
-  margin-bottom: 10px;
+.target-create-btn {
+  width: 200px;
+  margin: 30px 0;
 }
 
+//targetとloanのリストのテーブルのCSS
 
 .list-table{
   width: 100%;
@@ -166,6 +161,7 @@ table td input{
 .list-table tr:last-child{
   border-bottom: none;
 }
+
 .list-table th{
   position: relative;
   text-align: left;
@@ -197,39 +193,56 @@ table td input{
   font-size: 20px;
 }
 
-.container {
-  width: 80%;
+//loanテーブルのCSS
+
+.loan-table-title {
+  position: relative;
+  padding-left: 25px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  margin-top: 35px;
 }
 
-.btn-warning {
-  width: 90px;
-  margin-right: 10px;
+.loan-table-title:before {
+  position: absolute;
+  content: '';
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border: none;
+  border-left: solid 15px transparent;
+  border-bottom: solid 15px #fa8072;
 }
 
-.btn-primary {
-  margin-right: 10px;
-}
-.btn-danger {
-  margin-right: 10px;
+.loan-table-title:after {
+  position: absolute;
+  content: '';
+  bottom: -3px;
+  left: 10px;
+  width: 100%;
+  border-bottom: solid 3px #fa8072;
 }
 
-.loan-table{
+.loan-red-table{
   width: 100%;
   border-collapse: collapse;
   height:20px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
   font-size: 16px;
+  margin-top: 20px;
 }
 
-.loan-table tr{
+
+.loan-red-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-.loan-table tr:last-child{
+.loan-red-table tr:last-child{
   border-bottom: none;
 }
-.loan-table th{
+
+.loan-red-table th{
   position: relative;
   text-align: left;
   width: 30%;
@@ -240,7 +253,7 @@ table td input{
   height:20px;
 }
 
-.loan-table td{
+.loan-red-table td{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -250,7 +263,7 @@ table td input{
   height:20px;
 }
 
-.loan-table td input{
+.loan-red-table td input{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -258,4 +271,13 @@ table td input{
   border-radius: 10px;
   margin: 0 auto;
   font-size: 20px;
+}
+
+//共通のボタン
+
+.btn-primary {
+  margin-right: 10px;
+}
+.btn-danger {
+  margin-right: 10px;
 }

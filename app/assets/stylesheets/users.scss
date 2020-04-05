@@ -7,14 +7,136 @@
 
 *{box-sizing:border-box;}
 
+//サインイン・ログインのデザイン
 
-.fixed-table-title {
+.login-body {
+  width: 100%;
+  height: 1200px;
+  margin: 0;
+  background-image: url('top.jpg');
+  background-size:  cover;
+  background-color: rgba( 0, 0, 0, 0.5);
+}
+
+.container {
+  height: 600px;
+  margin-top: 50px;
+}
+
+.log-form {
+  width: 40%;
+  min-width: 320px;
+  max-width: 475px;
+  background: #fff;
+  box-shadow: 0px 2px 5px rgba(0,0,0,.25);
+  }
+
+.log-form > h2 {
+  font-family: 'M PLUS 1p', sans-serif;
+  background: #e6e6fa;
+  text-transform: uppercase;
+  padding: .75em 1em .75em 1.5em;
+}
+
+.form {
+  padding: 2em;
+}
+
+.input {
+  margin: 15px 0;
+}
+
+input#user_name,
+input#user_password,
+input#user_old,
+input#user_job,
+input#user_deposit,
+input#user_member,
+input#user_email,
+input#user_password_confirmation {
+    height: 30px;
+    display: block;
+    margin: 0  auto;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #eaeaea;
+    color: #757575;
+}
+
+
+.forgot {
+  color: lighten(#1fb5bf, 10%);
+  line-height: .5em;
+  position: relative;
+  top: 2.5em;
+  text-decoration: none;
+  font-size: .75em;
+  margin:0;
+  padding: 0;
+  float: right;
+
+  &:hover {
+    color:darken(#1fb5bf, 5%);
+  }
+  &:active{
+  }
+}
+
+.sex {
+  width: 250px;
+  padding: 0;
+}
+
+.sex-item {
+  display :flex;
+  list-style: none;
+  padding: 0;
+}
+
+input#user_sex_男性,
+input#user_sex_女性,
+input#user_sex_その他,{
+  width: 30px;
+}
+
+.login-btn {
+  margin-top: 45px;
+}
+
+
+//login後のuserデザイン
+
+.title h1 {
+  position: relative;
+  background: #f0e68c;
+  box-shadow: 0px 0px 0px 5px #f0e68c;
+  padding: 10px 10px;
+  margin: 20px 20px;
+  color: #454545;
+  width: 250px;
+  text-align: center;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+
+}
+
+.title h1 :after {
+  position: absolute;
+  content: '';
+  left: -7px;
+  top: -7px;
+  border-width: 0 0 15px 15px;
+  border-style: solid;
+  border-color: #fff #fff #f0e68c;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.table-title {
   position: relative;
   padding-left: 25px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
-.fixed-table-title:before {
+.table-title:before {
   position: absolute;
   content: '';
   bottom: -3px;
@@ -25,7 +147,7 @@
   border-left: solid 15px transparent;
   border-bottom: solid 15px #52c2d0;
 }
-.fixed-table-title:after {
+.table-title:after {
   position: absolute;
   content: '';
   bottom: -3px;
@@ -34,25 +156,24 @@
   border-bottom: solid 3px #52c2d0;
 }
 
-
-table{
-  width: 100%;
+.green-table {
   border-collapse: collapse;
   height:20px;
+  table-layout: fixed;
 }
 
-table tr{
+.green-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-table tr:last-child{
+.green-table tr:last-child{
   border-bottom: none;
 }
-table th{
+.green-table th{
   position: relative;
   text-align: left;
-  width: 30%;
+  width: 120px;
   background-color: #52c2d0;
   color: white;
   text-align: center;
@@ -60,19 +181,17 @@ table th{
   height:20px;
 }
 
-table td{
+.green-table td{
   text-align: left;
-  width: 70%;
   text-align: center;
   background-color: #dcdcdc;
-  padding: 10px 60px;
+  padding: 10px 50px;
   font-size: 20px;
   height:20px;
 }
 
-table td input{
+.green-table td input{
   text-align: left;
-  width: 70%;
   text-align: center;
   background-color: #d6ebff;
   border-radius: 10px;
@@ -80,40 +199,21 @@ table td input{
   font-size: 20px;
 }
 
-  input#user_name,
-  input#user_password,
-  input#user_old,
-  input#user_job,
-  input#user_deposit,
-  input#user_member,
-  input#user_email,
-  input#user_password_confirmation
+.green-table .user-index-btn a{
+  width: 40px;
+}
 
-   {
-    display: block;
-    margin: auto auto;
-    width: 100%;
-    border: none;
-    border-bottom: 1px solid #eaeaea;
-    color: #757575;
-    &:focus {
-      outline: none;
-    }
-  }
+.green-table .user-index-btn {
+  width: 40px;
+  padding: 10px
+}
+
 
 .goal-btn {
-  margin: 10px 0 0 0;
+  width: 140px;
+  margin: 10px 0 15px 0;
 }
 
-.sex-items-edit {
-  width: 100px ;
-}
-
-input#user_sex_男性,
-input#user_sex_女性,
-input#user_sex_その他,{
-  width: 30px;
-}
 
 .list-table{
   width: 100%;
@@ -162,4 +262,7 @@ input#user_sex_その他,{
   font-size: 20px;
 }
 
-
+.sex-items-edit {
+  width: 100px;
+  padding-top: 10px;
+}

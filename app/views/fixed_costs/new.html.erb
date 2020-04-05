@@ -2,15 +2,16 @@
   <h1>固定費の登録</h1>
 </div>
 
-<%= form_for @fixed_cost, url: fixed_costs_path do |f| %>
-
 <div class="container">
-  <div class="row-fix">
+  <div class="row">
+
+  <%= form_for @fixed_cost, url: fixed_costs_path do |f| %>
+
     <div class="col-xs-5">
 
-      <h4 class="fixed-table-title">固定費</h4>
+      <h3 class="table-title">固定費</h3>
 
-      <table>
+      <table class="green-table">
 
         <tr>
           <th>家賃</th>
@@ -28,18 +29,18 @@
           </tr>
 
       </table>
+
   </div>
-
-
-    <%= fields_for @lifeline, url: lifelines_path do |c| %>
 
     <div class="col-xs-1"></div>
 
+    <%= fields_for @lifeline, url: lifelines_path do |c| %>
+
     <div class="col-xs-5">
 
-      <h4 class="fixed-table-title">ライフライン</h4>
+      <h3 class="table-title">ライフライン</h3>
 
-      <table>
+      <table class="green-table">
 
         <tr>
           <th>電気</th>
@@ -56,17 +57,21 @@
           <td><%= c.text_field :water %></td>
         </tr>
 
-        </table>
+      </table>
 
     </div>
+
+    <% end %>
+
   </div>
+
+  <div class="fixed-edit-btn">
+    <%= f.submit "登録", class:'btn btn-success btn-block' %>
+  </div>
+
 </div>
 
-<div class="fixed-edit">
-  <%= f.submit "登録", class:'btn btn-success' %>
-</div>
 
-  <% end %>
 
 <% end %>
 

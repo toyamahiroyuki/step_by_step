@@ -1,62 +1,61 @@
 class IncomesController < ApplicationController
   def new
-   @income = Income.new
-   @income_day = params["day"]
-   @incomes = current_user.incomes.where(day: @income_day)
+    @income = Income.new
+    @income_day = params["day"]
+    @incomes = current_user.incomes.where(day: @income_day)
   end
 
   def show
     user = User.find(params[:id])
-   # if user.id == current_user.id
-   #   @incomes0 = current_user.incomes.where(income_item: "給料", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-   #   @incomes1 = current_user.incomes.where(income_item: "手当て", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-   #   @incomes2 = current_user.incomes.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-   #   @incomes3 = current_user.incomes.where(income_item: "その他",created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-   #                                                             # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
-   #   @imcomes = current_user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-   #  else
-     @incomes0 = user.incomes.where(income_item: "給料", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-     @incomes1 = user.incomes.where(income_item: "手当て", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-     @incomes2 = user.incomes.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-     @incomes3 = user.incomes.where(income_item: "その他",created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-                                                               # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
-     @imcomes = user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    # if user.id == current_user.id
+    #   @incomes0 = current_user.incomes.where(income_item: "給料", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    #   @incomes1 = current_user.incomes.where(income_item: "手当て", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    #   @incomes2 = current_user.incomes.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    #   @incomes3 = current_user.incomes.where(income_item: "その他",created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    #                                                             # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
+    #   @imcomes = current_user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    #  else
+    @incomes0 = user.incomes.where(income_item: "給料", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes1 = user.incomes.where(income_item: "手当て", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes2 = user.incomes.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes3 = user.incomes.where(income_item: "その他", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @imcomes = user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
 
-    # end 
+    # end
   end
 
   def create
-   @income = Income.new(income_params)
-   @income.user_id = current_user.id
-   if @income.save
-   	redirect_to homes_top_path
-   else
-   end
+    @income = Income.new(income_params)
+    @income.user_id = current_user.id
+    if @income.save
+      redirect_to homes_top_path
+    else
+    end
   end
 
   def edit
-   @income_day = params["day"]
-   @income = Income.find(params[:id])
+    @income_day = params["day"]
+    @income = Income.find(params[:id])
   end
 
   def update
-   income = Income.find(params[:id])
-   income.update(income_params)
+    income = Income.find(params[:id])
+    income.update(income_params)
 
-   redirect_to homes_top_path
+    redirect_to homes_top_path
   end
 
   def destroy
-   income = Income.find(params[:id])
-   income.destroy
+    income = Income.find(params[:id])
+    income.destroy
 
-   redirect_to homes_top_path
+    redirect_to homes_top_path
   end
 
+  private
 
-private
- def income_params
-   params.require(:income).permit(:day, :income, :income_item, :income_memo)
- end
-
+  def income_params
+    params.require(:income).permit(:day, :income, :income_item, :income_memo)
+  end
 end

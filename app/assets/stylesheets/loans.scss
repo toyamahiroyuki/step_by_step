@@ -2,8 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.fixed-costs-title {
-  h1 {
+.loan-title h1 {
 	  position: relative;
 	  background: #f0e68c;
 	  box-shadow: 0px 0px 0px 5px #f0e68c;
@@ -13,11 +12,9 @@
 	  width: 500px;
 	  text-align: center;
 	  font-family: 'M PLUS Rounded 1c', sans-serif;
-	  }
-
 }
 
-h1:after {
+.loan-title h1:after {
   position: absolute;
   content: '';
   left: -7px;
@@ -28,15 +25,13 @@ h1:after {
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
-
-
-.fixed-table-title {
+.loan-table-title {
   position: relative;
   padding-left: 25px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
-.fixed-table-title:before {
+.loan-table-title:before {
   position: absolute;
   content: '';
   bottom: -3px;
@@ -47,7 +42,7 @@ h1:after {
   border-left: solid 15px transparent;
   border-bottom: solid 15px #fa8072;
 }
-.fixed-table-title:after {
+.loan-table-title:after {
   position: absolute;
   content: '';
   bottom: -3px;
@@ -56,17 +51,7 @@ h1:after {
   border-bottom: solid 3px #fa8072;
 }
 
-.row-fix {
- margin-top: 50px
-}
-
-.fixed-edit {
-	padding-left: 600px;
-	padding-top: 50px;
-	width: 100px;
-}
-
-table{
+.loan-red-table{
   width: 100%;
   border-collapse: collapse;
   height:20px;
@@ -74,15 +59,15 @@ table{
   font-size: 16px;
 }
 
-table tr{
+.loan-red-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-table tr:last-child{
+.loan-red-table tr:last-child{
   border-bottom: none;
 }
-table th{
+.loan-red-table th{
   position: relative;
   text-align: left;
   width: 30%;
@@ -93,7 +78,7 @@ table th{
   height:20px;
 }
 
-table td{
+.loan-red-table td{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -103,7 +88,7 @@ table td{
   height:20px;
 }
 
-table td input{
+.loan-red-table td input{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -111,4 +96,9 @@ table td input{
   border-radius: 10px;
   margin: 0 auto;
   font-size: 20px;
+}
+
+.loan-create-btn {
+  width: 200px;
+  margin: 30px 0 ;
 }

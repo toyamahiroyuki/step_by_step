@@ -39,5 +39,5 @@ set :repo_url, "https://github.com/toyamahiroyuki/step_by_step.git"
 # set :ssh_options, verify_host_key: :secure
 set :deploy_to, "/home/ec2-user/step_by_step"
 set :rbenv_ruby, '2.5.7'
-set :linked_files, %w{config/master.key .env}
+set :linked_files, %w(config/master.key .env)
 append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system"

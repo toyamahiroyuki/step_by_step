@@ -2,22 +2,19 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.fixed-costs-title {
-  h1 {
+.fixed-costs-title h1 {
 	  position: relative;
 	  background: #f0e68c;
 	  box-shadow: 0px 0px 0px 5px #f0e68c;
 	  padding: 10px 10px;
 	  margin: 20px 20px;
 	  color: #454545;
-	  width: 500px;
+	  width: 400px;
 	  text-align: center;
 	  font-family: 'M PLUS Rounded 1c', sans-serif;
-	  }
-
 }
 
-h1:after {
+.fixed-costs-title h1:after {
   position: absolute;
   content: '';
   left: -7px;
@@ -28,15 +25,13 @@ h1:after {
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
-
-
-.fixed-table-title {
+.table-title {
   position: relative;
   padding-left: 25px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
-.fixed-table-title:before {
+.table-title:before {
   position: absolute;
   content: '';
   bottom: -3px;
@@ -47,7 +42,7 @@ h1:after {
   border-left: solid 15px transparent;
   border-bottom: solid 15px rgb(119, 195, 223);
 }
-.fixed-table-title:after {
+.table-title:after {
   position: absolute;
   content: '';
   bottom: -3px;
@@ -56,31 +51,26 @@ h1:after {
   border-bottom: solid 3px rgb(119, 195, 223);
 }
 
-.row-fix {
- margin-top: 50px
+.fixed-edit-btn {
+	width: 300px;
+  margin: 30px 0;
 }
 
-.fixed-edit {
-	padding-left: 600px;
-	padding-top: 50px;
-	width: 100px;
-}
-
-table{
+.green-table{
   width: 100%;
   border-collapse: collapse;
   height:20px;
 }
 
-table tr{
+.green-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-table tr:last-child{
+.green-table tr:last-child{
   border-bottom: none;
 }
-table th{
+.green-table th{
   position: relative;
   text-align: left;
   width: 30%;
@@ -91,7 +81,7 @@ table th{
   height:20px;
 }
 
-table td{
+.green-table td{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -101,7 +91,7 @@ table td{
   height:20px;
 }
 
-table td input{
+.green-table td input{
   text-align: left;
   width: 70%;
   text-align: center;

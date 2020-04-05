@@ -1,16 +1,16 @@
-<div class="fixed-costs-title">
+<div class="communication-title">
   <h1>通信費・保険の登録</h1>
 </div>
 
 <%= form_for @communication, url: communication_path do |c| %>
 
 <div class="container">
-  <div class="row-fix">
+  <div class="row">
     <div class="col-xs-5">
 
-      <h4 class="fixed-table-title">通信費</h4>
+      <h3 class="communication-table-title">通信費</h3>
 
-      <table>
+      <table class="communication-green-table">
 
         <tr>
           <th>携帯代</th>
@@ -28,17 +28,18 @@
         </tr>
 
       </table>
+
     </div>
 
   <%= fields_for @tax, url: communication_path do |d| %>
 
-  <div class="col-xs-1"></div>
+    <div class="col-xs-1"></div>
 
-  <div class="col-xs-5">
+    <div class="col-xs-5">
 
-    <h4 class="fixed-table-title">ライフライン</h4>
+      <h3 class="communication-table-title">ライフライン</h3>
 
-      <table>
+      <table class="communication-green-table">
 
         <tr>
           <th>健康保険</th>
@@ -64,11 +65,13 @@
 
     </div>
   </div>
+
+  <div class="commication-edit-btn">
+    <%= c.submit "登録", class:'btn btn-success btn-block' %>
+  </div>
 </div>
 
-<div class="fixed-edit">
-  <%= c.submit "登録", class:'btn btn-success' %>
-</div>
+
 
   <% end %>
 

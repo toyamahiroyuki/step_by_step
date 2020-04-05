@@ -18,24 +18,24 @@
         <div class="header-title">
           <%= link_to "Step by Step", homes_top_path %>
           <h4>家計簿のアプリ</h4>
-          <div class="underline"></div>
+          <div class="underline-title"></div>
         </div>
 
     <% if user_signed_in? %>
 
         <nav>
             <ul class="header-item clearfix text-right">
-              <li class="header-item-li btn btn-default" aria-hidden="true" style="background-color: #565656;  background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
+              <li class="header-items btn" aria-hidden="true">
                 <%= link_to "Home", homes_top_path %>
               </li>
-              <li class="header-item-li btn btn-default" style="background-color: #565656; color: #fff8e8; background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
+              <li class="header-items btn" ">
                 <%= link_to "about", homes_about_path %>
               </li>
-              <li class="header-item-li btn btn-default" aria-hidden="true" style="background-color: #565656; color: #fff8e8; background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
+              <li class="header-items btn" aria-hidden="true">
                 <%= link_to "My page", user_path(current_user) %>
               </li>
 
-              <li class="header-item-li btn btn-default" aria-hidden="true" style="background-color: #565656; color: #fff8e8; background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
+              <li class="header-items btn" aria-hidden="true">
                 <%= link_to "logout", destroy_user_session_path, method: :delete %>
               </li>
             </ul>
@@ -109,7 +109,7 @@
     <%= yield %>
 
     <footer>
-      created at  2020年3月31日
+      <span>created at  2020年3月31日</span>
     </footer>
   </body>
 </html>

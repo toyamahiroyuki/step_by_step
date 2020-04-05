@@ -1,7 +1,6 @@
 class LoansController < ApplicationController
-
   def new
-  	@loan = Loan.new
+    @loan = Loan.new
     @loan_item = LoanItem.new
   end
 
@@ -10,7 +9,7 @@ class LoansController < ApplicationController
   end
 
   def create
-  	loan = Loan.new(loan_params)
+    loan = Loan.new(loan_params)
     loan.fixed_cost_id = current_user.fixed_cost.id
     loan.save
 
@@ -20,13 +19,13 @@ class LoansController < ApplicationController
     loan_item.loan_balance = loan.loan_cost.to_i - loan_item.loan_by_month.to_i
     if loan_item.save
 
-  	   redirect_to targets_path
+      redirect_to targets_path
     else
     end
   end
 
   def edit
-  	@loan = Loan.find(params[:id])
+    @loan = Loan.find(params[:id])
     @loan_items = @loan.loan_items
     # loan_items.each do |loan_item| end
     # binding.pry
@@ -36,17 +35,14 @@ class LoansController < ApplicationController
     loan = Loan.find(params[:id])
     loan_items = loan.loan_items
     loan_items.each do |loan_item|
-
-       loan_item.loan_balance = loan.loan_cost - loan_item.loan_by_month
-       loan_item.update(loan_item_params)
-
-       end
-
-    if loan.update(loan_params)
-  	    redirect_to targets_path
-    else
+      loan_item.loan_balance = loan.loan_cost - loan_item.loan_by_month
+      loan_item.update(loan_item_params)
     end
 
+    if loan.update(loan_params)
+      redirect_to targets_path
+    else
+    end
   end
 
   def destroy
@@ -56,7 +52,7 @@ class LoansController < ApplicationController
     redirect_to targets_path
   end
 
-private
+  private
 
   def loan_params
     params.require(:loan).permit(:loan_purpose, :loan_cost, :loan_by_month, :loan_balance)

@@ -1,20 +1,20 @@
-<div class="fixed-costs-title">
+<div class="target-title">
 	<h1>貯金・ローン一覧</h1>
 </div>
 
 <div class="container">
-  <div class="row-fix">
+  <div class="row-">
     <div class="col-xs-6">
 
 		<% @targets.each do |target| %>
 
-    	<h4 class="fixed-table-title"><%= target.target_purpose %></h4>
-    	<div class="e_d_box">
+    	<h3 class="target-table-title"><%= target.target_purpose %></h3>
+    	<div class="edit-destroy-btn ">
 	    	<%= link_to "目標・金額の編集", edit_target_path(target.id),class:'btn btn-primary' %>
 	    	<%= link_to "目標・金額の削除", target_path(target.id), method: :delete, class:'btn btn-danger' %>
 	    </div>
 
-    	<table>
+    	<table class="target-blue-table">
 
     		<tr>
     			<th>金額</th>
@@ -76,13 +76,14 @@
 
 		<% @loans.each do |loan| %>
 
-			<h4 class="loan-table-title"><%= loan.loan_purpose %></h4>
-    	<div class="e_d_box">
+			<h3 class="loan-table-title"><%= loan.loan_purpose %></h3>
+
+    	<div class="edit-destroy-btn">
 	    	<%= link_to "ローン・金額の編集", edit_loan_path(loan.id),class:'btn btn-primary' %>
 	    	<%= link_to "ローン・金額の削除", loan_path(loan.id), method: :delete, class:'btn btn-danger' %>
 	    </div>
 
-	    <table class="loan-table">
+	    <table class="loan-red-table">
 
 	    		<tr>
 	    			<th>返済総額</th>

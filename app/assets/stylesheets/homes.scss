@@ -2,6 +2,24 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+#calendar {
+  font-size: 20px;
+  width: 70%;
+  margin: 20px auto;
+}
+
+.fc-content {
+  text-align: center;
+  height: 25px;
+  line-height: 25px;
+}
+
+.fc-day {
+  &:hover {
+    background-color: #98fb98;
+  }
+}
+
 .fixed-costs-title {
   h1 {
 	  position: relative;

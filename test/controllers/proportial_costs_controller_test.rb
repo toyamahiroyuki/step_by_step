@@ -5,5 +5,4 @@ class ProportialCostsControllerTest < ActionDispatch::IntegrationTest
     get proportial_costs_new_url
     assert_response :success
   end
-
 end
