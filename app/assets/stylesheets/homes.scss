@@ -19,6 +19,7 @@
 .fc-day {
   &:hover {
     background-color: #98fb98;
+    border-color: black;
   }
 }
 
@@ -34,6 +35,12 @@
 .fc-sat {
   background-color: #87cefa;
   color: blue;
+}
+
+.fc-event-container .fc-event div {
+  font-size: 17px;
+  height: 25px;
+  text-align: center;
 }
 
 .home-title h1 {

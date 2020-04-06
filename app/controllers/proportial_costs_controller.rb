@@ -11,6 +11,7 @@ class ProportialCostsController < ApplicationController
     if @ProportialCost.save
       redirect_to homes_top_path
     else
+      redirect_to new_proportial_cost_path
     end
   end
 

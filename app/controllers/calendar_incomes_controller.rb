@@ -30,7 +30,7 @@ class CalendarIncomesController < ApplicationController
       group(:day).
       sum(:proportial_cost)
 
-    @total = @incomes.merge(@proportial_costs) { |day, incomes, proportial_costs| (incomes - proportial_costs) }
+    @total = @incomes.merge(@proportial_costs) { |day, incomes, proportial_costs| (incomes + proportial_costs) }
 
     render json: @total
   end

@@ -35,7 +35,6 @@ function eventCalendar() {
         start: total_key,
       })
     }
-    console.log (total)
     $('#calendar').fullCalendar({
       dayClick: function(date, jsEvent, view, resourceObj) {
         window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
@@ -50,13 +49,14 @@ function eventCalendar() {
                 },
      eventColor: '#1e90ff'
     });
-    console.log($(".fc-event:contains('-')"));
+
     $(".fc-event:contains('-')").css("background-color",'#ff0000');
     $(".fc-event:contains('-')").css("border-color",'#ff0000');
-
+    $(".fc-event:contains('\u00A0')").css("background-color",'#dcdcdc');
+    $(".fc-event:contains('\u00A0')").css("border-color",'#dcdcdc');
+    $(".fc-event:contains('\u00A0')").html("<div>0</div>").css("color",'white');
   });
 
-  // $.ajax({
   //   type: 'GET',
   //   url: 'calendar_incomes',
   // }).done(function(incomes){
