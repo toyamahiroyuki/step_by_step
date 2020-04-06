@@ -6,10 +6,15 @@ class TargetsController < ApplicationController
   end
 
   def index
-    @targets = current_user.targets
-    @target_item = TargetItem.new
-    # @target_items = TargetItem.
-    @loans = Loan.where(fixed_cost_id: current_user.fixed_cost.id)
+    if FixedCost.exists?(user_id: current_user.id)
+      @targets = current_user.targets
+      @target_item = TargetItem.new
+      # @target_items = TargetItem.
+      @loans = Loan.where(fixed_cost_id: current_user.fixed_cost.id)
+    else
+      flash[:notice] = "まずは固定費を入力しましょう"
+      redirect_to new_fixed_costs_path
+    end
   end
 
   def create

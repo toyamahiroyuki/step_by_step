@@ -26,7 +26,7 @@ class FixedCostsController < ApplicationController
 
     @fixed_cost.save
     @lifeline.save
-    redirect_to homes_top_path
+    redirect_to fixed_costs_path
   end
 
   def edit

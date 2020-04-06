@@ -1,7 +1,9 @@
 class CostsController < ApplicationController
   def show
     if current_user.fixed_cost.nil?
-      redirect_to homes_top_path
+      flash[:notice] = "まずは固定費を入力しましょう"
+      redirect_to new_fixed_costs_path
+
     else
       user = User.find(params[:id])
 

@@ -8,6 +8,7 @@ class CommunicationsController < ApplicationController
         @tax = Tax.new
       end
     else
+      flash[:notice] = "まずは固定費を入力しましょう"
       redirect_to new_fixed_costs_path
     end
   end
