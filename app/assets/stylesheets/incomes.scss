@@ -2,23 +2,19 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.cost-title {
-  h1 {
+.income-title h1 {
 	  position: relative;
 	  background: #f0e68c;
 	  box-shadow: 0px 0px 0px 5px #f0e68c;
 	  padding: 10px 10px;
 	  margin: 20px 20px;
 	  color: #454545;
-	  width: 550px;
+	  width: 250px;
 	  text-align: center;
 	  font-family: 'M PLUS Rounded 1c', sans-serif;
-	  margin: 10px auto 30px;
-	  }
-
 }
 
-h1:after {
+.income-title h1:after {
   position: absolute;
   content: '';
   left: -7px;
@@ -29,12 +25,7 @@ h1:after {
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
-.calendar {
-	width: 1000px;
-	margin-left: 220px;
-}
-
-table{
+.income-blue-table{
   width: 600px;
   border-collapse: collapse;
   height:20px;
@@ -42,15 +33,16 @@ table{
   font-size: 16px;
 }
 
-table tr{
+.income-blue-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-table tr:last-child{
+.income-blue-table tr:last-child{
   border-bottom: none;
 }
-table th{
+
+.income-blue-table th{
   position: relative;
   text-align: left;
   width: 50px;
@@ -61,7 +53,7 @@ table th{
   height:20px;
 }
 
-table td{
+.income-blue-table td{
   text-align: left;
   width: 100px;
   text-align: center;
@@ -71,7 +63,7 @@ table td{
   height:20px;
 }
 
-table td input{
+.income-blue-table td input{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -81,7 +73,7 @@ table td input{
   font-size: 20px;
 }
 
-.list-table{
+.income-list-table{
   width: 1200px;
   height:20px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
@@ -89,26 +81,26 @@ table td input{
   margin-top: 20px;
 }
 
-.list-table tr{
+.income-list-table tr{
   border-bottom: solid 2px white;
   height:10px;
 }
 
-.list-table tr:last-child{
+.income-list-table tr:last-child{
   border-bottom: none;
 }
-.list-table th{
+
+.income-list-table th{
   position: relative;
   text-align: left;
   width: 100px;
-  background-color: 00bfff;
-  color: white;
+  background-color: linen;
   text-align: center;
   padding:  0;
   height:10px;
 }
 
-.list-table td{
+.income-list-table td{
   text-align: left;
   width: 100px;
   text-align: center;
@@ -118,7 +110,7 @@ table td input{
   height:20px;
 }
 
-.list-table td input{
+.income-list-table td input{
   text-align: left;
   width: 100;
   text-align: center;
@@ -128,25 +120,14 @@ table td input{
   font-size: 20px;
 }
 
-.goal-btn {
+.income-create-btn {
   margin: 10px 0 20px 0;
+  width: 200px;
 }
 
 .container {
   width: 1400px ;
   height: 400px;
-}
-
-.col-xs-6 {
- width: 650px;
- margin: px 10px;
-}
-
-.btn-primary {
-  margin-right: 10px;
-}
-.btn-danger {
-  margin-right: 10px;
 }
 
 .income-items {
@@ -156,7 +137,7 @@ table td input{
 }
 
 .income_item {
- display: inline-block;
+ padding: 0;
 }
 
 input#income_income_item_給料,

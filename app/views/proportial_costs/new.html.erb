@@ -1,12 +1,12 @@
-<div class="fixed-costs-title">
+<div class="pro-cost-title">
   <h1>支出</h1>
 </div>
 
 <div class="container">
-  <div class="row-fix">
+  <div class="row">
     <div class="col-xs-12">
 
-    <table>
+    <table class="pro-cost-red-table">
 
         <tr>
           <th>日付</th>
@@ -57,19 +57,18 @@
 
         </table>
 
-        <div class="goal-btn">
-           <%= f.submit "登録",class:'btn btn-primary' %>
-           <%= link_to "収入画面へ", new_income_path(day: @income_day), class:"btn btn-warning" %>
-        </div>
+        <div class="pro-cost-create-btn">
 
-      </div>
+           <%= f.submit "登録",class:'btn btn-primary btn-block' %>
+           <%= link_to "収入画面へ", new_income_path(day: @income_day), class:"btn btn-warning btn-block" %>
+        </div>
 
   <% end %>
 
 
   <% @proportial_costs.each do |proportial_cost| %>
 
-    <table class="list-table">
+    <table class="pro-cost-list-table">
 
         <tr>
           <th>日付</th>
@@ -89,12 +88,12 @@
           <td><%= link_to "編集画面へ", edit_proportial_cost_path(proportial_cost, day: @income_day), class:'btn btn-primary' %></td>
           <td><%= link_to "削除へ", proportial_cost_path(proportial_cost), method: :delete, class:'btn btn-danger' %></td>
         </tr>
-       <% end %>
-
 
     </table>
-   
+  <% end %>
 
+
+      </div>
     </div>
   </div>
 

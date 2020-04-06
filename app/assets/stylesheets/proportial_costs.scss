@@ -2,23 +2,19 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.cost-title {
-  h1 {
+.pro-cost-title h1 {
 	  position: relative;
 	  background: #f0e68c;
 	  box-shadow: 0px 0px 0px 5px #f0e68c;
 	  padding: 10px 10px;
 	  margin: 20px 20px;
 	  color: #454545;
-	  width: 550px;
+	  width: 250px;
 	  text-align: center;
 	  font-family: 'M PLUS Rounded 1c', sans-serif;
-	  margin: 10px auto 30px;
-	  }
-
 }
 
-h1:after {
+.pro-cost-title h1:after {
   position: absolute;
   content: '';
   left: -7px;
@@ -29,12 +25,7 @@ h1:after {
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
-.calendar {
-	width: 1000px;
-	margin-left: 220px;
-}
-
-table{
+.pro-cost-red-table{
   width: 700px;
   border-collapse: collapse;
   height:20px;
@@ -42,18 +33,19 @@ table{
   font-size: 16px;
 }
 
-table tr{
+.pro-cost-red-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-table tr:last-child{
+.pro-cost-red-table tr:last-child{
   border-bottom: none;
 }
-table th{
+
+.pro-cost-red-table th{
   position: relative;
   text-align: left;
-  width: 50px;
+  width: 30px;
   background-color: #fa8072;
   color: white;
   text-align: center;
@@ -61,7 +53,7 @@ table th{
   height:20px;
 }
 
-table td{
+.pro-cost-red-table td{
   text-align: left;
   width: 100px;
   text-align: center;
@@ -71,7 +63,7 @@ table td{
   height:20px;
 }
 
-table td input{
+.pro-cost-red-table td input{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -81,34 +73,34 @@ table td input{
   font-size: 20px;
 }
 
-.list-table{
+.pro-cost-list-table{
   width: 1200px;
   height:20px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
   font-size: 16px;
-  margin-top: 20px;
+  margin: 20px 0;
 }
 
-.list-table tr{
+.pro-cost-list-table tr{
   border-bottom: solid 2px white;
   height:10px;
 }
 
-.list-table tr:last-child{
+.pro-cost-list-table tr:last-child{
   border-bottom: none;
 }
-.list-table th{
+
+.pro-cost-list-table th{
   position: relative;
   text-align: left;
   width: 100px;
-  background-color: 00bfff;
-  color: white;
+  background-color: linen;
   text-align: center;
   padding:  0;
   height:10px;
 }
 
-.list-table td{
+.pro-cost-list-table td{
   text-align: left;
   width: 100px;
   text-align: center;
@@ -118,7 +110,7 @@ table td input{
   height:20px;
 }
 
-.list-table td input{
+.pro-cost-list-table td input{
   text-align: left;
   width: 100;
   text-align: center;
@@ -128,8 +120,9 @@ table td input{
   font-size: 20px;
 }
 
-.goal-btn {
+.pro-cost-create-btn {
   margin: 10px 0 20px 0;
+  width: 200px;
 }
 
 .container {
@@ -137,33 +130,20 @@ table td input{
   height: 400px;
 }
 
-.col-xs-6 {
- width: 650px;
- margin: px 10px;
-}
-
-.btn-primary {
-  margin-right: 10px;
-}
-.btn-danger {
-  margin-right: 10px;
-}
-
 .pro-cost-items {
   list-style: none;
-  width: 80px;
   display: inline-block;
+  width: 80px;
 }
 
 .pro-cost-item {
- display: inline-block;
+ padding: 0;
 }
 
 input#proportial_cost_proportial_cost_item_食費,
 input#proportial_cost_proportial_cost_item_交通費,
 input#proportial_cost_proportial_cost_item_交際費,
 input#proportial_cost_proportial_cost_item_日用品,
-input#proportial_cost_proportial_cost_item_その他,
-{
+input#proportial_cost_proportial_cost_item_その他, {
 	width: 15px;
 }

@@ -1,12 +1,13 @@
-<div class="fixed-costs-title">
+<div class="income-title">
   <h1>収入</h1>
 </div>
 
 <div class="container">
-  <div class="row-fix">
+  <div class="row">
     <div class="col-xs-12">
 
-    <table>
+    <table class="income-blue-table">
+
       <tr>
         <th>日付</th>
         <td><%= @income_day %></td>
@@ -51,7 +52,7 @@
 
     </table>
 
-    <div class="goal-btn">
+    <div class="income-create-btn">
 
        <%= f.submit "登録", class:'btn btn-primary' %>
        <%= link_to "支出画面へ", new_proportial_cost_path(day: @income_day), class:'btn btn-warning' %>
@@ -64,7 +65,8 @@
 
 
 
-    <table class="list-table">
+    <table class="income-list-table">
+
     <% if current_user.incomes == nil %>
 
       <% else %>
