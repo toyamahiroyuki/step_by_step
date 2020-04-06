@@ -2,10 +2,12 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+.calendar-box {
+}
+
 #calendar {
   font-size: 20px;
-  width: 70%;
-  margin: 20px auto;
+  margin: 20px 100px;
 }
 
 .fc-content {
@@ -18,6 +20,20 @@
   &:hover {
     background-color: #98fb98;
   }
+}
+
+.fc-unthemed th, .fc-unthemed td, .fc-unthemed thead, .fc-unthemed tbody, .fc-unthemed .fc-divider, .fc-unthemed .fc-row, .fc-unthemed .fc-content, .fc-unthemed .fc-popover, .fc-unthemed .fc-list-view, .fc-unthemed .fc-list-heading td {
+  border-color: black;
+}
+
+.fc-sun {
+  background-color: #ffe4e1;
+  color: red;
+}
+
+.fc-sat {
+  background-color: #87cefa;
+  color: blue;
 }
 
 .home-title h1 {
