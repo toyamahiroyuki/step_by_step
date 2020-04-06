@@ -1,0 +1,39 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<div class="cost-title">
+    <h1>今月の支出・・・<%= @total_cost %>円</h1>
+</div>
+
+<div class="calendar">
+  <canvas id="myChart"></canvas>
+</div>
+
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'doughnut',
+
+    // The data for our dataset
+    data: {
+        labels: ['食費', '交通費', '交際費', '日用品','家賃', '保険', '通信費', 'ライフライン', '貯金','ローン', '税金', 'その他'],
+        datasets: [{
+            label: 'My First dataset',
+            backgroundColor: ['red','pink','orange', 'yellow', 'lightgreen','yellowgreen', 'white','lightblue','greenbleu','blue','purple'],
+            borderColor: 'rgb(255, 255, 255)',
+            data: [<%= @proportial_cost0 %>, <%= @proportial_cost1 %>, <%= @proportial_cost2 %>, <%= @proportial_cost3 %>, <%= @fixed_cost.rent %>, <%= @fixed_cost.insurance %>, <%= @communications %>, <%= @lifelines %>, <%= @target_items %>,　<%= @loan_items %>, <%= @taxes %>, <%= @fixed_cost.fixed_costs_other %>]
+        }]
+    },
+
+    // Configuration options go here
+     options: {
+        legend: {
+            labels: {
+                fontColor: 'black',
+                boxWidth: 40,
+                fontSize: 15,
+                    }
+              },
+     }
+});
+</script>

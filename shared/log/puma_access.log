@@ -1,0 +1,14 @@
+=== puma startup: 2020-03-29 11:05:38 +0000 ===
+* Listening on unix:///home/ec2-user/step_by_step/shared/tmp/sockets/puma.sock
+* Restarting...
+Refreshing Gemfile
+Puma starting in single mode...
+* Version 3.12.4 (ruby 2.5.7-p206), codename: Llamas in Pajamas
+* Min threads: 0, max threads: 16
+* Environment: production
+* Daemonizing...
+=== puma startup: 2020-03-29 11:11:58 +0000 ===
+* Inherited unix:///home/ec2-user/step_by_step/shared/tmp/sockets/puma.sock
+- Gracefully stopping, waiting for requests to finish
+=== puma shutdown: 2020-03-30 10:30:01 +0000 ===
+- Goodbye!

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>StepByStep</title>
+
+        <%= csrf_meta_tags %>
+        <%= csp_meta_tag %>
+        <%= stylesheet_link_tag "application" %>
+        <% self_css_path = "/assets/"+controller.controller_name %>
+        <%= stylesheet_link_tag self_css_path, media: 'all', 'data-turbolinks-track': 'reload' %>
+        <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+        <link href="https://fonts.googleapis.com/css?family=M+PLUS+1p&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c&display=swap" rel="stylesheet">
+
+  </head>
+
+  <body>
+        <div class="header-title">
+          <%= link_to "Step by Step", homes_top_path %>
+          <h4>家計簿のアプリ</h4>
+          <div class="underline"></div>
+        </div>
+
+    <% if user_signed_in? %>
+
+        <nav>
+            <ul class="header-item clearfix text-right">
+              <li class="header-item-li btn btn-default" aria-hidden="true" style="background-color: #565656;  background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
+                <%= link_to "home", homes_top_path %>
+              </li>
+              <li class="header-item-li btn btn-default" style="background-color: #565656; color: #fff8e8; background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
+                <%= link_to "about", destroy_user_session_path, method: :delete %>
+              </li>
+              <li class="header-item-li btn btn-default" aria-hidden="true" style="background-color: #565656; color: #fff8e8; background: #ffeaea; border: dashed 2px #ffc3c3; border-radius: 8px;">
+                <%= link_to "logout", destroy_user_session_path, method: :delete %>
+              </li>
+            </ul>
+        </nav>
+
+
+      <nav class="clearfix">
+        <ul class="nav-list">
+
+                <li class="nav-list-item">
+                  <%= link_to "収入一覧",incomes_path %>
+                </li>
+
+                <li class="nav-list-item">
+                  <%= link_to "支出一覧",costs_path %>
+                </li>
+
+                <li class="nav-list-item">
+                  <%= link_to "固定費",new_fixed_costs_path %>
+                </li>
+
+                <li class="nav-list-item">
+                  <%= link_to "通信費・保険", new_communication_path %>
+                </li>
+
+                <li class="nav-list-item">
+                  <%= link_to "貯金設定",new_target_path %>
+                </li>
+
+                <li class="nav-list-item">
+                 <%= link_to "ローン設定",new_loan_path %>
+                </li>
+
+                <li class="nav-list-item">
+                  <%= link_to "貯金・ローン一覧",targets_path %>
+                </li>
+
+                <li class="nav-list-item">
+                  <%= link_to "予算", new_goal_path %>
+                </li>
+
+        </ul>
+      </nav>
+
+    <% else %>
+
+      <nav class="clearfix">
+        <ul class="nav-list text-right">
+
+              <li class="nav-list-item">
+                <%= link_to "ログイン画面へ", new_user_session_path %>
+              </li>
+
+
+              <li class="nav-list-item">
+                <%= link_to "新規登録", new_user_registration_path %>
+              </li>
+
+              <li class="nav-list-item">
+                <%= link_to "about", new_user_session_path %>
+              </li>
+
+        </ul>
+      </nav>
+
+
+
+
+    <% end %>
+
+    <%= yield %>
+
+    <footer>
+      created at  2020年3月31日
+    </footer>
+  </body>
+</html>
+
+

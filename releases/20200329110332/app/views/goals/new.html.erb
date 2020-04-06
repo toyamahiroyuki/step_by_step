@@ -1,0 +1,67 @@
+<div class="fixed-costs-title">
+  <h1>予算の登録</h1>
+</div>
+
+<%= form_for @goal, url: goals_path do |f| %>
+
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-5">
+
+      <h4 class="fixed-table-title">項目</h4>
+
+      <table>
+
+          <th><%= f.label :食費 %></th>
+            <td><%= f.text_field :food %>円</td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :交通費 %></th>
+            <td><%= f.text_field :transportation %>円</td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :交際費 %></th>
+            <td><%= f.text_field :entertainment %>円</td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :日用品 %></th>
+            <td><%= f.text_field :daily %>円</td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :ガス %></th>
+            <td><%= f.text_field :gass %>円</td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :電気 %></th>
+            <td><%= f.text_field :electron %>円</td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :水道 %></th>
+            <td><%= f.text_field :water %>円</td>
+          </tr>
+
+          <tr>
+            <th><%= f.label :その他 %></th>
+            <td><%= f.text_field :goals_other %>円</td>
+          </tr>
+
+      </table>
+
+      <div class="goal-btn">
+
+        <%= f.submit "登録",class:'btn btn-primary' %>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<% end %>
+

@@ -1,0 +1,35 @@
+// Place all the styles related to the incomes controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.cost-title {
+  h1 {
+	  position: relative;
+	  background: #f0e68c;
+	  box-shadow: 0px 0px 0px 5px #f0e68c;
+	  padding: 10px 10px;
+	  margin: 20px 20px;
+	  color: #454545;
+	  width: 550px;
+	  text-align: center;
+	  font-family: 'M PLUS Rounded 1c', sans-serif;
+	  margin: 10px auto 30px;
+	  }
+
+}
+
+h1:after {
+  position: absolute;
+  content: '';
+  left: -7px;
+  top: -7px;
+  border-width: 0 0 15px 15px;
+  border-style: solid;
+  border-color: #fff #fff #f0e68c;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.calendar {
+	width: 1000px;
+	margin-left: 220px;
+}

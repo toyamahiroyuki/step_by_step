@@ -1,0 +1,117 @@
+<div class="fixed-costs-title">
+  <h1>予算と実績の比較</h1>
+</div>
+
+<div class="container">
+  <div class="row-fix">
+    <div class="col-xs-3">
+
+        <% @goals.each do |goal| %>
+
+        <table>
+
+          <h4 class="fixed-table-title">固定費</h4>
+
+          <tr>
+            <th>食費</th>
+            <td><%= goal.food %>円</td>
+          </tr>
+
+          <tr>
+            <th>交通費</th>
+            <td><%= goal.transportation %>円</td>
+          </tr>
+
+          <tr>
+            <th>交際費</th>
+            <td><%= goal.entertainment %>円</td>
+          </tr>
+
+          <tr>
+            <th>日用品</th>
+            <td><%= goal.daily %>円</td>
+          </tr>
+
+          <tr>
+            <th>ガス</th>
+            <td><%= goal.gass %>円</td>
+          </tr>
+
+          <tr>
+            <th>電気</th>
+            <td><%= goal.electron %>円</td>
+          </tr>
+
+          <tr>
+            <th>水道</th>
+            <td><%= goal.water %>円</td>
+          </tr>
+
+          <tr>
+            <th>その他</th>
+            <td><%= goal.goals_other %>円</td>
+          </tr>
+
+        </table>
+
+        <div class="goal-btn">
+
+          <%= link_to "編集へ",edit_goal_path, class:'btn btn-primary' %>
+
+          <%= link_to "削除へ", goal_path, method: :delete, class:'btn btn-danger' %>
+        </div>
+
+    </div>
+
+    <div class="col-xs-9">
+
+      <canvas id="myBarChart"></canvas>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+
+        <script>
+        var ctx = document.getElementById("myBarChart");
+        var myBarChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['食費', '交通費', '交際費', '日用品', 'ガス', '電気', '水道', 'その他'],
+            datasets: [
+              {
+                label: '現在の支出',
+                data: [<%= @proportial_cost0 %>, <%= @proportial_cost1 %>, <%= @proportial_cost2 %>, <%= @proportial_cost3 %>, <%= @lifelines_gass %>, <%= @lifelines_electron %>, <%= @lifeline_water %>, <%= @proportial_cost4 %>],
+                backgroundColor: "rgba(130,201,169,0.5)"
+              },{
+                label: '予算',
+                data: [<%= goal.food %>, <%= goal.transportation %>, <%= goal.entertainment %>, <%= goal.daily %>, <%= goal.gass %>, <%= goal.electron %>, <%= goal.water %>, <%= goal.goals_other %>],
+                backgroundColor: "rgba(255,183,76,0.5)"
+              }
+            ]
+          },
+          options: {
+            title: {
+              display: true,
+              text: '予算管理グラフ'
+            },
+            scales: {
+              yAxes: [{
+                ticks: {
+                  suggestedMax: 50000,
+                  suggestedMin: 0,
+                  stepSize: 1000,
+                  callback: function(value, index, values){
+                    return  value +  '円'
+                  }
+                }
+              }]
+            },
+          }
+        });
+        </script>
+
+      </div>
+    </div>
+  </div>
+
+<% end %>
+
+
+
