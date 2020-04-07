@@ -2,6 +2,17 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+.pro-cost-notice {
+  font-size: 30px;
+  color: red;
+  background-color: #fffacd;
+  border: orange;
+  border-radius: 10px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  text-align: center;
+  margin: 10px auto;
+}
+
 .pro-cost-title h1 {
 	  position: relative;
 	  background: #f0e68c;

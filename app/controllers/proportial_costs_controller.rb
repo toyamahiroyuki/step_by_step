@@ -8,10 +8,12 @@ class ProportialCostsController < ApplicationController
   def create
     @ProportialCost = ProportialCost.new(proportial_cost_params)
     @ProportialCost.user_id = current_user.id
+    @income_day = params[:day]
     if @ProportialCost.save
       redirect_to homes_top_path
     else
-      redirect_to new_proportial_cost_path
+      flash[:notice] = "金額には「-」を含めてください。"
+      redirect_to new_proportial_cost_path(day: @income_day )
     end
   end
 

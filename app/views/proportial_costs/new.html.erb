@@ -1,3 +1,7 @@
+<% if flash[:notice] %>
+  <div class="pro-cost-notice"><%= flash[:notice] %></div>
+<% end %>
+
 <div class="pro-cost-title">
   <h1>支出</h1>
 </div>
@@ -16,6 +20,8 @@
         <%= form_for(@proportial_cost) do |f| %>
 
         <%= f.hidden_field :day ,value: @income_day %>
+
+        <%= hidden_field_tag( 'day', @income_day) %>
 
         <tr>
           <th>支出金額</th>
