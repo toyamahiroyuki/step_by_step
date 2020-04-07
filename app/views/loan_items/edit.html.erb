@@ -2,7 +2,7 @@
 　<h1>金額の編集</h1>
 </div>
 
-<%= form_for @target_item, url: target_target_item_path do |f| %>
+<%= form_for @loan_item, url: loan_loan_item_path do |f| %>
 
 <div class="container">
   <div class="row">
@@ -13,14 +13,14 @@
         <table　class="loan-item-red-table">
 
         	<tr>
-        	  <th>貯金額の変更</th>
-        	  <td><%= f.text_field :target_by_month %></td>
+        	  <th>返済額の変更</th>
+        	  <td><%= f.text_field :loan_by_month %></td>
         	</tr>
 
         </table>
 
         <div class="loan-item-edit-btn">
-  			 <%= f.submit "貯金",class:'btn btn-primary' %>
+  			 <%= f.submit "変更",class:'btn btn-primary' %>
   	    </div>
 
 	<% end %>

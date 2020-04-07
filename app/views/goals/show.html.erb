@@ -77,7 +77,7 @@
             datasets: [
               {
                 label: '現在の支出',
-                data: [<%= @proportial_cost0 %>, <%= @proportial_cost1 %>, <%= @proportial_cost2 %>, <%= @proportial_cost3 %>, <%= @lifelines_gass %>, <%= @lifelines_electron %>, <%= @lifeline_water %>, <%= @proportial_cost4 %>],
+                data: [<%= -@proportial_cost_food %>, <%= -@proportial_cost_taransition %>, <%= -@proportial_cost_entertainment %>, <%= -@proportial_cost_daily %>, <%= @lifelines_gass %>, <%= @lifelines_electron %>, <%= @lifeline_water %>, <%= -@proportial_cost_other %>],
                 backgroundColor: "rgba(130,201,169,0.5)"
               },{
                 label: '予算',

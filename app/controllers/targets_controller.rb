@@ -9,8 +9,13 @@ class TargetsController < ApplicationController
     if FixedCost.exists?(user_id: current_user.id)
       @targets = current_user.targets
       @target_item = TargetItem.new
-      # @target_items = TargetItem.
       @loans = Loan.where(fixed_cost_id: current_user.fixed_cost.id)
+
+      if @targets.empty? && @loans.empty?
+
+         flash[:notice] = "貯金とローンを登録しよう"
+      else
+      end
     else
       flash[:notice] = "まずは固定費を入力しましょう"
       redirect_to new_fixed_costs_path

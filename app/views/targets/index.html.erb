@@ -1,5 +1,9 @@
+<% if flash[:notice] %>
+  <div class="fixed-cost-notice"><%= flash[:notice] %></div>
+<% end %>
+
 <div class="target-title">
-	<h1>貯金・ローン一覧</h1>
+  <h1>貯金・ローン一覧</h1>
 </div>
 
 <div class="container">
@@ -43,15 +47,20 @@
 
       		<table class="list-table">
 
-						<tr>
+      		<% target.target_items.each do |target_item| %>
+
+    		<% if target_item == nil %>
+
+    		<% else %>
+					<tr>
 		    			<th>日付</th>
 		    			<th>貯金額</th>
 		    			<th>残り金額</th>
 		    			<th></th>
 		    			<th></th>
     				</tr>
+    		<% end %>
 
-					<% target.target_items.each do |target_item| %>
 
     				<tr>
 		    			<td><%= target_item.created_at.strftime('%Y/%m/%d') %></td>
@@ -93,10 +102,15 @@
 
 	     </table>
 
-
 	     <table class="list-table">
 
-						<tr>
+	     <% loan.loan_items.each do |loan_item| %>
+
+	     <% if loan_item == nil %>
+
+    	 <% else %>
+
+					<tr>
 		    			<th>日付</th>
 		    			<th>返済額</th>
 		    			<th>残り金額</th>
@@ -104,7 +118,7 @@
 		    			<th></th>
     				</tr>
 
-					<% loan.loan_items.each do |loan_item| %>
+    	 <% end %>
 
     				<tr>
 		    			<td><%= loan_item.created_at.strftime('%Y/%m/%d') %></td>

@@ -21,7 +21,7 @@ var chart = new Chart(ctx, {
             label: 'My First dataset',
             backgroundColor: ['red','pink','orange', 'yellow', 'lightgreen','yellowgreen', '#eee8aa','#20b2aa','#f0ffff','greenbleu','blue','purple'],
             borderColor: 'rgb(255, 255, 255)',
-            data: [<%= @proportial_cost0 %>, <%= @proportial_cost1 %>, <%= @proportial_cost2 %>, <%= @proportial_cost3 %>, <%= @fixed_cost.rent %>, <%= @fixed_cost.insurance %>, <%= @communications %>, <%= @lifelines %>, <%= @target_items %>,　<%= @loan_items %>, <%= @taxes %>, <%= @fixed_cost.fixed_costs_other %>]
+            data: [<%= -@proportial_cost_food %>, <%= -@proportial_cost_taransition %>, <%= -@proportial_cost_entertainment %>, <%= -@proportial_cost_daily %>, <%= @fixed_cost.rent %>, <%= @fixed_cost.insurance %>, <%= @communications %>, <%= @lifelines %>, <%= @target_items %>,　<%= @loan_items %>, <%= @taxes %>, <%= -@fixed_cost.fixed_costs_other %>]
         }]
     },
 

@@ -7,10 +7,10 @@ class CostsController < ApplicationController
     else
       user = User.find(params[:id])
 
-      @proportial_cost0 = user.proportial_costs.where(proportial_cost_item: "食費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-      @proportial_cost1 = user.proportial_costs.where(proportial_cost_item: "交通費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-      @proportial_cost2 = user.proportial_costs.where(proportial_cost_item: "交際費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-      @proportial_cost3 = user.proportial_costs.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+      @proportial_cost_food = user.proportial_costs.where(proportial_cost_item: "食費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+      @proportial_cost_taransition = user.proportial_costs.where(proportial_cost_item: "交通費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+      @proportial_cost_entertainment = user.proportial_costs.where(proportial_cost_item: "交際費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+      @proportial_cost_daily = user.proportial_costs.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
 
       @fixed_cost = user.fixed_cost
 
@@ -36,7 +36,7 @@ class CostsController < ApplicationController
       end
       @taxes = Tax.where(fixed_cost_id: user.fixed_cost.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:health) + Tax.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:pension) + Tax.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:resident) + Tax.sum(:taxes_other)
 
-      @total_cost = @proportial_cost0 + @proportial_cost1 + @proportial_cost2 + @proportial_cost3 + @fixed_costs + @communications + @lifelines + @loan_items.to_i + @target_items.to_i + @taxes
+      @total_cost = @proportial_cost_food + @proportial_cost_taransition + @proportial_cost_entertainment + @proportial_cost_daily + @fixed_costs + @communications + @lifelines + @loan_items.to_i + @target_items.to_i + @taxes
    end
   end
 end

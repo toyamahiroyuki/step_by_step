@@ -35,7 +35,7 @@ class LoansController < ApplicationController
     loan = Loan.find(params[:id])
     loan_items = loan.loan_items
     loan_items.each do |loan_item|
-      loan_item.loan_balance = loan.loan_cost - loan_item.loan_by_month
+      loan_item.loan_balance = loan.loan_cost.to_i - loan_item.loan_by_month.to_i
       loan_item.update(loan_item_params)
     end
 

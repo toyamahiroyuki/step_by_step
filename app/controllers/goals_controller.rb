@@ -22,11 +22,11 @@ class GoalsController < ApplicationController
   def show
     @goals = current_user.goals
 
-    @proportial_cost0 = current_user.proportial_costs.where(proportial_cost_item: "食費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-    @proportial_cost1 = current_user.proportial_costs.where(proportial_cost_item: "交通費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-    @proportial_cost2 = current_user.proportial_costs.where(proportial_cost_item: "交際費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-    @proportial_cost3 = current_user.proportial_costs.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-    @proportial_cost4 = current_user.proportial_costs.where(proportial_cost_item: "その他", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+    @proportial_cost_food = current_user.proportial_costs.where(proportial_cost_item: "食費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+    @proportial_cost_taransition = current_user.proportial_costs.where(proportial_cost_item: "交通費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+    @proportial_cost_entertainment = current_user.proportial_costs.where(proportial_cost_item: "交際費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+    @proportial_cost_daily = current_user.proportial_costs.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+    @proportial_cost_other = current_user.proportial_costs.where(proportial_cost_item: "その他", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
 
     @lifelines_gass = Lifeline.where(user_id: current_user.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:electron)
     @lifelines_electron = Lifeline.where(user_id: current_user.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:gass)
