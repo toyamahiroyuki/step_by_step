@@ -77,6 +77,9 @@ gem 'chart-js-rails', '~> 0.1.4'
 
 # Devise
 gem 'devise'
+  # Deviseの日本語化
+  gem 'devise-i18n'
+  gem 'devise-i18n-views'
 
 # Refile
 gem 'refile', require: 'refile/rails', github: 'manfe/refile'

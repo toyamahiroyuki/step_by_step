@@ -6,19 +6,25 @@
     <div class="col-xs-8">
       <div class="log-form">
 
+        <%= render "devise/shared/error_messages", resource: resource %>
+
 
       <h2>Log in</h2>
       <div class="form">
       <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
 
+      <% if alert %>
+        <p class="alert"><%= alert %></p>
+      <% end %>
+
         <div class="input">
           <%= f.label :名前 %><br />
-          <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
+          <%= f.text_field :name, autofocus: true, autocomplete: "name",class: "validate[required]" %>
         </div>
 
         <div class="input">
           <%= f.label :パスワード %><br />
-          <%= f.password_field :password, autocomplete: "current-password" %>
+          <%= f.password_field :password, autocomplete: "current-password",class: "validate[required,minSize[6],custom[onlyLetterNumber]" %>
         </div>
 
         <div class="login-btn">
@@ -35,6 +41,9 @@
 </div>
 
 </div>
+
+
+
 
 
 

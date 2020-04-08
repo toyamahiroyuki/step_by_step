@@ -29,6 +29,9 @@ class CommunicationsController < ApplicationController
       tax.save
       redirect_to communication_path
     else
+      @communication = Communication.new
+      @tax = Tax.new
+      render action: :new
 
     end
   end
