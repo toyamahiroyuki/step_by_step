@@ -32,9 +32,9 @@ ActiveRecord::Schema.define(version: 2020_03_16_112735) do
 
   create_table "fixed_costs", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "rent", default: 0
-    t.integer "insurance", default: 0
-    t.integer "fixed_costs_other", default: 0
+    t.integer "rent"
+    t.integer "insurance"
+    t.integer "fixed_costs_other"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -66,9 +66,9 @@ ActiveRecord::Schema.define(version: 2020_03_16_112735) do
 
   create_table "lifelines", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "electron", default: 0
-    t.integer "gass", default: 0
-    t.integer "water", default: 0
+    t.integer "electron"
+    t.integer "gass"
+    t.integer "water"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -19,7 +19,7 @@
 
           <div class="input">
             <%= f.label :年齢 %><br />
-            <%= f.text_field :old, autofocus: true, autocomplete: "old", class: "validate[required,custom[onlyNumberSp]]" %>
+            <%= f.text_field :old, autofocus: true, autocomplete: "old", class: "validate[required,custom[number]]" %>
           </div>
 
             <%= f.label :性別 %><br/>
@@ -50,12 +50,12 @@
 
           <div class="input">
             <%= f.label :預金額 %><br />
-            <%= f.text_field :deposit, autofocus: true, autocomplete: "deposit", class: "validate[required,custom[onlyNumberSp]]" %>
+            <%= f.text_field :deposit, autofocus: true, autocomplete: "deposit", class: "validate[required,custom[number]]" %>
           </div>
 
           <div class="input">
             <%= f.label :家族の人数 %><br />
-            <%= f.text_field :member, autofocus: true, autocomplete: "member", class: "validate[required,custom[onlyNumberSp]]"%>
+            <%= f.text_field :member, autofocus: true, autocomplete: "member", class: "validate[required,custom[number]]"%>
           </div>
 
           <div class="input">

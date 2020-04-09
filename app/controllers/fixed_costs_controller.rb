@@ -24,9 +24,14 @@ class FixedCostsController < ApplicationController
     @fixed_cost.user_id = current_user.id
     @lifeline.user_id = current_user.id
 
-    @fixed_cost.save
-    @lifeline.save
-    redirect_to fixed_costs_path
+    if @fixed_cost.save
+       @lifeline.save
+       redirect_to fixed_costs_path
+    else
+      @fixed_cost = FixedCost.new
+      @lifeline = Lifeline.new
+      render action: :new
+    end
   end
 
   def edit
@@ -43,6 +48,8 @@ class FixedCostsController < ApplicationController
 
       redirect_to fixed_costs_path
     else
+      @fixed_cost = current_user.fixed_cost
+      @lifeline = current_user.lifeline
       render action: :edit
     end
    end

@@ -14,12 +14,12 @@
 
 				<tr>
 				  <th>項目</th>
-				  <td><%= f.text_field :target_purpose %></td>
+				  <td><%= f.text_field :target_purpose, class: "validate[required]" %></td>
 				</tr>
 
 				<tr>
 				  <th>目標金額</th>
-				  <td><%= f.text_field :target_cost %></td>
+				  <td><%= f.text_field :target_cost, class: "validate[required,custom[number]]" %></td>
 				</tr>
 
 			</table>

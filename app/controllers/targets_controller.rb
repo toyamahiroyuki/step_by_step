@@ -13,11 +13,11 @@ class TargetsController < ApplicationController
 
       if @targets.empty? && @loans.empty?
 
-         flash[:notice] = "貯金とローンを登録しよう"
+         flash[:target] = "貯金とローンを登録しよう"
       else
       end
     else
-      flash[:notice] = "まずは固定費を入力しましょう"
+      flash[:target] = "まずは固定費を入力しましょう"
       redirect_to new_fixed_costs_path
     end
   end
@@ -25,7 +25,12 @@ class TargetsController < ApplicationController
   def create
     target = Target.new(target_params)
     target.user_id = current_user.id
-    target.save
+    if target.save
+      redirect_to targets_path
+    else
+      @target = Target.new
+      render action: :new
+    end
 
     # target_item = TargetItem.new(target_item_params)
     # target_item.target_id = target.id
@@ -33,7 +38,6 @@ class TargetsController < ApplicationController
 
     # if target_item.save
 
-    redirect_to targets_path
     # else
     # end
   end
@@ -57,6 +61,8 @@ class TargetsController < ApplicationController
 
       redirect_to targets_path
     else
+      @target = Target.find(params[:id])
+      render action: :edit
     end
   end
 

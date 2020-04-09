@@ -37,28 +37,28 @@
 
     <div class="col-xs-5">
 
-      <h3 class="communication-table-title">ライフライン</h3>
+      <h3 class="communication-table-title">保険・税金</h3>
 
       <table class="communication-green-table">
 
         <tr>
           <th>健康保険</th>
-          <td><%= d.text_field :health, class: "validate[required,custom[onlyNumberSp]]" %></td>
+          <td><%= d.text_field :health, class: "validate[required,custom[number]]" %></td>
         </tr>
 
         <tr>
           <th>年金</th>
-          <td><%= d.text_field :pension, class: "validate[required,custom[onlyNumberSp]]" %></td>
+          <td><%= d.text_field :pension, class: "validate[required,custom[number]]" %></td>
         </tr>
 
         <tr>
           <th>市民税/府民税</th>
-          <td><%= d.text_field :resident, class: "validate[required,custom[onlyNumberSp]]" %></td>
+          <td><%= d.text_field :resident, class: "validate[required,custom[number]]" %></td>
         </tr>
 
         <tr>
           <th>その他</th>
-          <td><%= d.text_field :taxes_other, class: "validate[required,custom[onlyNumberSp]]" %></td>
+          <td><%= d.text_field :taxes_other, class: "validate[required,custom[number]]" %></td>
         </tr>
 
       </table>

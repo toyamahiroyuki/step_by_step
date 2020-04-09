@@ -12,6 +12,7 @@ class LoanItemsController < ApplicationController
 
        redirect_to targets_path
     else
+       @loan_item = LoanItem.find(params[:loan_id])
        render action: :edit
   	end
   end

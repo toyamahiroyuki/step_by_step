@@ -17,9 +17,11 @@
 
       <%= f.hidden_field :day ,value: @income_day %>
 
+      <%= hidden_field_tag( 'day', @income_day) %>
+
       <tr>
         <th>収入金額</th>
-        <td><%= f.text_field :income,value: 0 %></td>
+        <td><%= f.text_field :income,value: 0, class: "validate[required,custom[number]]" %></td>
       </tr>
 
       <tr>
@@ -27,19 +29,19 @@
         <td>
           <ul class="income-item">
 
-            <li class="income-items"><%= f.radio_button :income_item, "給料" %>給料
+            <li class="income-items"><%= f.radio_button :income_item, "給料",class: "validate[required]" %>給料
             </li>
 
             <li class="income-items">
-        	  <%= f.radio_button :income_item, "手当て" %>手当て
+        	  <%= f.radio_button :income_item, "手当て",class: "validate[required]" %>手当て
             </li>
 
             <li class="income-items">
-        	  <%= f.radio_button :income_item, "退職金" %>退職金
+        	  <%= f.radio_button :income_item, "退職金",class: "validate[required]" %>退職金
             </li>
 
             <li class="income-items">
-        	  <%= f.radio_button :income_item, "その他" %>その他
+        	  <%= f.radio_button :income_item, "その他",class: "validate[required]" %>その他
             </li>
           </ul>
         </td>
@@ -47,7 +49,7 @@
 
       <tr>
         <th>メモ</th>
-        <td><%= f.text_field :income_memo %></td>
+        <td><%= f.text_field :income_memo,class: "validate[required]" %></td>
       </tr>
 
     </table>

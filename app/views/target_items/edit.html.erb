@@ -14,7 +14,7 @@
 
         	<tr>
         	  <th>貯金額の変更</th>
-        	  <td><%= f.text_field :target_by_month %></td>
+        	  <td><%= f.text_field :target_by_month, class: "validate[required,custom[number]]" %></td>
         	</tr>
 
         </table>

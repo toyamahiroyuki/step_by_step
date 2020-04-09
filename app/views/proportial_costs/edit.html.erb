@@ -19,7 +19,7 @@
 
       <tr>
         <th>支出金額</th>
-        <td><%= f.text_field :proportial_cost %></td>
+        <td><%= f.text_field :proportial_cost, class: "validate[required,custom[integer],max[0]]" %></td>
       </tr>
 
       <tr>
@@ -28,23 +28,23 @@
             <ul class="pro-cost-item">
 
               <li class="pro-cost-items">
-                <%= f.radio_button :proportial_cost_item, "食費" %>食費
+                <%= f.radio_button :proportial_cost_item, "食費", class: "validate[required]" %>食費
               </li>
 
               <li class="pro-cost-items">
-                 <%= f.radio_button :proportial_cost_item, "交通費" %>交通費
+                 <%= f.radio_button :proportial_cost_item, "交通費", class: "validate[required]" %>交通費
               </li>
 
               <li class="pro-cost-items">
-                 <%= f.radio_button :proportial_cost_item, "交際費" %>交際費
+                 <%= f.radio_button :proportial_cost_item, "交際費", class: "validate[required]" %>交際費
               </li>
 
               <li class="pro-cost-items">
-                 <%= f.radio_button :proportial_cost_item, "日用品" %>日用品
+                 <%= f.radio_button :proportial_cost_item, "日用品", class: "validate[required]" %>日用品
               </li>
 
               <li class="pro-cost-items">
-                 <%= f.radio_button :proportial_cost_item, "その他" %>その他
+                 <%= f.radio_button :proportial_cost_item, "その他", class: "validate[required]" %>その他
               </li>
             </ul>
           </td>

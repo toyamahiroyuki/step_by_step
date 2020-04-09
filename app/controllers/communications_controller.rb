@@ -50,8 +50,10 @@ class CommunicationsController < ApplicationController
 
       redirect_to communication_path
     else
+      @communication = current_user.fixed_cost.communication
+      @tax = current_user.fixed_cost.tax
       render action: :edit
-  end
+    end
   end
 
   private

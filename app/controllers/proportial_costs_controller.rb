@@ -24,9 +24,14 @@ class ProportialCostsController < ApplicationController
 
   def update
     proportial_cost = ProportialCost.find(params[:id])
-    proportial_cost.update(proportial_cost_params)
+    if proportial_cost.update(proportial_cost_params)
 
-    redirect_to homes_top_path
+       redirect_to homes_top_path
+    else
+       @income_day = params["day"]
+       @proportial_cost = ProportialCost.find(params[:id])
+       render action: :edit
+    end
   end
 
   def destroy

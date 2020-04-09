@@ -14,12 +14,12 @@
 
 				<tr>
 				  <th>ローン項目</th>
-				  <td><%= f.text_field :loan_purpose %></td>
+				  <td><%= f.text_field :loan_purpose, class: "validate[required]" %></td>
 				</tr>
 
 				<tr>
 				  <th>返済金額</th>
-				  <td><%= f.text_field :loan_cost %></td>
+				  <td><%= f.text_field :loan_cost, class: "validate[required,custom[number]]" %></td>
 				</tr>
 
 					<% @loan_items.each do |loan_item| %>
@@ -27,7 +27,7 @@
 
 							<tr>
 							  <th><%= loan_item.created_at.strftime("%Y年%m月") %>の返済額</th>
-							  <td><%= c.text_field :loan_by_month %></td>
+							  <td><%= c.text_field :loan_by_month, class: "validate[required,custom[number]]" %></td>
 							</tr>
 
 						<% end %>

@@ -14,17 +14,17 @@
 
           <tr>
             <th>家賃</th>
-            <td><%= f.text_field :rent %></td>
+            <td><%= f.text_field :rent, class: "validate[required,custom[number]]" %></td>
           </tr>
 
           <tr>
             <th>保険</th>
-            <td><%= f.text_field :insurance %></td>
+            <td><%= f.text_field :insurance, class: "validate[required,custom[number]]" %></td>
           </tr>
 
           <tr>
             <th>その他</th>
-            <td><%= f.text_field :fixed_costs_other %></td>
+            <td><%= f.text_field :fixed_costs_other, class: "validate[required,custom[number]]" %></td>
           </tr>
 
       </table>
@@ -43,24 +43,24 @@
 
           <tr>
             <th>電気</th>
-            <td><%= c.text_field :electron %></td>
+            <td><%= c.text_field :electron, class: "validate[required,custom[number]]" %></td>
           </tr>
 
           <tr>
             <th>ガス</th>
-            <td><%= c.text_field :gass %></td>
+            <td><%= c.text_field :gass, class: "validate[required,custom[number]]" %></td>
           </tr>
 
           <tr>
             <th>水道</th>
-            <td><%= c.text_field :water %></td>
+            <td><%= c.text_field :water, class: "validate[required,custom[number]]" %></td>
           </tr>
 
         </table>
 
     </div>
   </div>
-  
+
   <div class="fixed-edit-btn">
   <%= f.submit "登録", class:'btn btn-success btn-block' %>
   </div>

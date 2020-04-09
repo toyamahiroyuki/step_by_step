@@ -21,6 +21,9 @@ class LoansController < ApplicationController
 
       redirect_to targets_path
     else
+      @loan = Loan.new
+      @loan_item = LoanItem.new
+      render action: :new
     end
   end
 
@@ -40,8 +43,11 @@ class LoansController < ApplicationController
     end
 
     if loan.update(loan_params)
-      redirect_to targets_path
+       redirect_to targets_path
     else
+       @loan = Loan.find(params[:id])
+       @loan_items = @loan.loan_items
+       render aciton: :edit
     end
   end
 

@@ -14,12 +14,12 @@
 
       	 <tr>
             <th><%= f.label :名前 %></th>
-            <td><%= f.text_field :name, autofocus: true, autocomplete: "name" %></td>
+            <td><%= f.text_field :name, autofocus: true, autocomplete: "name",class: "validate[required]" %></td>
           </tr>
 
           <tr>
             <th><%= f.label :年齢 %></th>
-            <td><%= f.text_field :old, autofocus: true, autocomplete: "old" %></td>
+            <td><%= f.text_field :old, autofocus: true, autocomplete: "old", class: "validate[required,custom[number]]" %></td>
           </tr>
 
           <tr>
@@ -29,16 +29,16 @@
 
 	                <li class="sex-items-edit">
 	                    男性
-	                    <%= f.radio_button :sex, "男性", autofocus: true, autocomplete: "sex" %>
+	                    <%= f.radio_button :sex, "男性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
 	                </li>
 	                <li class="sex-items-edit">
 	                    女性
-	                    <%= f.radio_button :sex, "女性", autofocus: true, autocomplete: "sex" %>
+	                    <%= f.radio_button :sex, "女性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
 	                </li>
 
 	                <li class="sex-items-edit">
 	                    その他
-	                    <%= f.radio_button :sex, "その他", autofocus: true, autocomplete: "sex" %>
+	                    <%= f.radio_button :sex, "その他", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
 	                </li>
                 </ul>
             </td>
@@ -46,22 +46,22 @@
 
           <tr>
             <th><%= f.label :職業（前職） %></th>
-            <td><%= f.text_field :job, autofocus: true, autocomplete: "job" %></td>
+            <td><%= f.text_field :job, autofocus: true, autocomplete: "job", class: "validate[required]" %></td>
           </tr>
 
           <tr>
             <th><%= f.label :預金額 %></th>
-            <td><%= f.text_field :deposit, autofocus: true, autocomplete: "deposit" %></td>
+            <td><%= f.text_field :deposit, autofocus: true, autocomplete: "deposit", class: "validate[required,custom[number]]" %></td>
           </tr>
 
           <tr>
             <th><%= f.label :家族の人数 %></th>
-            <td><%= f.text_field :member, autofocus: true, autocomplete: "member" %></td>
+            <td><%= f.text_field :member, autofocus: true, autocomplete: "member", class: "validate[required,custom[number]]" %></td>
           </tr>
 
           <tr>
             <th><%= f.label :メールアドレス %></th>
-            <td><%= f.email_field :email, autofocus: true, autocomplete: "email" %></td>
+            <td><%= f.email_field :email, autofocus: true, autocomplete: "email", class: "validate[required,custom[email]]" %></td>
           </tr>
 
       </table>

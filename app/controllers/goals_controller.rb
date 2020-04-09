@@ -13,6 +13,8 @@ class GoalsController < ApplicationController
     if goal.save
       redirect_to goal_path(goal.id)
     else
+      @goal = Goal.new
+      render action: :new
     end
   end
 
@@ -39,9 +41,12 @@ class GoalsController < ApplicationController
 
   def update
     goal = Goal.find_by(params[:user_id])
-    goal.update(goal_params)
-
-    redirect_to goal_path
+    if goal.update(goal_params)
+       redirect_to goal_path
+    else
+       @goal = Goal.find_by(params[:user_id])
+       render action: :edit
+    end
   end
 
   def destroy
