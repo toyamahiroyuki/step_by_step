@@ -1,4 +1,5 @@
 class CostsController < ApplicationController
+    before_action :authenticate_user!
   def show
     if current_user.fixed_cost.nil?
       flash[:notice] = "まずは固定費を入力しましょう"

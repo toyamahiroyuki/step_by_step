@@ -5,7 +5,7 @@ Rails.application.routes.draw do
     registrations: 'users/registrations',
   }
 
-  root :to => "homes#top"
+  root :to => "homes#home"
 
   get 'homes' => "homes#home"
   get 'homes/top' => "homes#top"

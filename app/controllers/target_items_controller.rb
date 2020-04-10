@@ -1,4 +1,5 @@
 class TargetItemsController < ApplicationController
+    before_action :authenticate_user!
   def create
     target_item = TargetItem.new(target_item_params)
     target_item.save

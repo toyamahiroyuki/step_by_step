@@ -1,92 +1,92 @@
 <div class="login-body">
-<div class="container" >
-  <div class="row">
+  <div class="login-body-mask">
+    <div class="container" >
+      <div class="row">
 
-    <div class="col-xs-8">
-      <div class="log-form">
+        <div class="col-xs-8">
+          <div class="log-form">
 
 
-      <h2>Sign in</h2>
-      <div class="form">
-        <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-          <%#= render "devise/shared/error_messages", resource: resource %>
+          <h2>Sign in</h2>
+            <div class="form">
+              <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+                <%#= render "devise/shared/error_messages", resource: resource %>
 
-          <div class="input">
-            <%= f.label :名前 %><br />
-            <%= f.text_field :name, autofocus: true, autocomplete: "name",class: "validate[required]"%>
+                <div class="input">
+                  <%= f.label :名前 %><br />
+                  <%= f.text_field :name, autofocus: true, autocomplete: "name",class: "validate[required]"%>
 
-          </div>
+                </div>
 
-          <div class="input">
-            <%= f.label :年齢 %><br />
-            <%= f.text_field :old, autofocus: true, autocomplete: "old", class: "validate[required,custom[number]]" %>
-          </div>
+                <div class="input">
+                  <%= f.label :年齢 %><br />
+                  <%= f.text_field :old, autofocus: true, autocomplete: "old", class: "validate[required,custom[number]]" %>
+                </div>
 
-            <%= f.label :性別 %><br/>
-            <div class="input">
-              <ul class="sex-item">
+                  <%= f.label :性別 %><br/>
+                  <div class="input">
+                    <ul class="sex-item">
 
-                <li class="sex-items">
-                    <%= f.label :男性 %>
-                    <%= f.radio_button :sex, "男性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
-                </li>
-                <li class="sex-items">
-                    <%= f.label :女性 %>
-                    <%= f.radio_button :sex, "女性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
-                </li>
+                      <li class="sex-items">
+                          <%= f.label :男性 %>
+                          <%= f.radio_button :sex, "男性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
+                      </li>
+                      <li class="sex-items">
+                          <%= f.label :女性 %>
+                          <%= f.radio_button :sex, "女性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
+                      </li>
 
-                <li class="sex-items">
-                    <%= f.label :その他 %>
-                    <%= f.radio_button :sex, "その他", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
-                </li>
-              </ul>
+                      <li class="sex-items">
+                          <%= f.label :その他 %>
+                          <%= f.radio_button :sex, "その他", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
+                      </li>
+                    </ul>
+
+                  </div>
+
+                <div class="input">
+                  <%= f.label :職業（前職） %><br />
+                  <%= f.text_field :job, autofocus: true, autocomplete: "job",class: "validate[required]" %>
+                </div>
+
+                <div class="input">
+                  <%= f.label :預金額 %><br />
+                  <%= f.text_field :deposit, autofocus: true, autocomplete: "deposit", class: "validate[required,custom[number]]" %>
+                </div>
+
+                <div class="input">
+                  <%= f.label :家族の人数 %><br />
+                  <%= f.text_field :member, autofocus: true, autocomplete: "member", class: "validate[required,custom[number]]"%>
+                </div>
+
+                <div class="input">
+                  <%= f.label :メールアドレス %><br />
+                  <%= f.email_field :email, autofocus: true, autocomplete: "email",class: "validate[required,custom[email]]" %>
+                </div>
+
+                <div class="input">
+                  <%= f.label :パスワード（6文字以上） %>
+                  <% if @minimum_password_length %>
+                  <!-- （<%= @minimum_password_length %>  -->
+                  <% end %><br />
+                  <%= f.password_field :password, autocomplete: "new-password",class: "validate[required,minSize[6],custom[onlyLetterNumber]" %>
+                </div>
+
+                <div class="input">
+                  <%= f.label :パスワード（確認） %><br />
+                  <%= f.password_field :password_confirmation, autocomplete: "new-password",class: "validate[required,equals[user_password]]" %>
+                </div>
+
+                <div class="input">
+                  <%= f.submit "新規登録",class:'btn btn-primary' %>
+                </div>
+
+              <% end %>
 
             </div>
-
-          <div class="input">
-            <%= f.label :職業（前職） %><br />
-            <%= f.text_field :job, autofocus: true, autocomplete: "job",class: "validate[required]" %>
           </div>
-
-          <div class="input">
-            <%= f.label :預金額 %><br />
-            <%= f.text_field :deposit, autofocus: true, autocomplete: "deposit", class: "validate[required,custom[number]]" %>
-          </div>
-
-          <div class="input">
-            <%= f.label :家族の人数 %><br />
-            <%= f.text_field :member, autofocus: true, autocomplete: "member", class: "validate[required,custom[number]]"%>
-          </div>
-
-          <div class="input">
-            <%= f.label :メールアドレス %><br />
-            <%= f.email_field :email, autofocus: true, autocomplete: "email",class: "validate[required,custom[email]]" %>
-          </div>
-
-          <div class="input">
-            <%= f.label :パスワード（6文字以上） %>
-            <% if @minimum_password_length %>
-            <!-- （<%= @minimum_password_length %>  -->
-            <% end %><br />
-            <%= f.password_field :password, autocomplete: "new-password",class: "validate[required,minSize[6],custom[onlyLetterNumber]" %>
-          </div>
-
-          <div class="input">
-            <%= f.label :パスワード（確認） %><br />
-            <%= f.password_field :password_confirmation, autocomplete: "new-password",class: "validate[required,equals[user_password]]" %>
-          </div>
-
-          <div class="input">
-            <%= f.submit "新規登録",class:'btn btn-primary' %>
-          </div>
-
-        <% end %>
-
+        </div>
+      </div>
     </div>
   </div>
 </div>
-</div>
-
-</div>
-</div>
-

@@ -1,4 +1,5 @@
 class LoansController < ApplicationController
+    before_action :authenticate_user!
   def new
     @loan = Loan.new
     @loan_item = LoanItem.new

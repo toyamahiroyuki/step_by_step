@@ -1,5 +1,6 @@
 class TargetsController < ApplicationController
-  before_action :create_loan_item_per_month, only: %i(new index edit)
+    before_action :authenticate_user!
+    before_action :create_loan_item_per_month, only: %i(new index edit)
 
   def new
     @target = Target.new

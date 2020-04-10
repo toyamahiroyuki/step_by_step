@@ -1,4 +1,5 @@
 class IncomesController < ApplicationController
+    before_action :authenticate_user!
   def new
     @income = Income.new
     @income_day = params["day"]

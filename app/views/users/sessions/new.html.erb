@@ -1,45 +1,46 @@
 <div class="login-body">
+  <div class="login-body-mask">
 
-<div class="container" >
-  <div class="row">
+    <div class="container" >
+      <div class="row">
 
-    <div class="col-xs-8">
-      <div class="log-form">
+        <div class="col-xs-8">
+          <div class="log-form">
 
-        <%= render "devise/shared/error_messages", resource: resource %>
+            <%= render "devise/shared/error_messages", resource: resource %>
 
 
-      <h2>Log in</h2>
-      <div class="form">
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+            <h2>Log in</h2>
+              <div class="form">
+              <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
 
-      <% if alert %>
-        <p class="alert"><%= alert %></p>
-      <% end %>
+              <% if alert %>
+                <p class="alert"><%= alert %></p>
+              <% end %>
 
-        <div class="input">
-          <%= f.label :名前 %><br />
-          <%= f.text_field :name, autofocus: true, autocomplete: "name",class: "validate[required]" %>
+              <div class="input">
+                <%= f.label :名前 %><br />
+                <%= f.text_field :name, autofocus: true, autocomplete: "name",class: "validate[required]" %>
+              </div>
+
+              <div class="input">
+                <%= f.label :パスワード %><br />
+                <%= f.password_field :password, autocomplete: "current-password",class: "validate[required,minSize[6],custom[onlyLetterNumber]" %>
+              </div>
+
+              <div class="login-btn">
+                <%= f.submit "ログイン", class:'btn btn-primary' %>
+              </div>
+
+            <% end %>
+
+            <%#= render "users/shared/links" %>
+            </div>
+          </div>
         </div>
-
-        <div class="input">
-          <%= f.label :パスワード %><br />
-          <%= f.password_field :password, autocomplete: "current-password",class: "validate[required,minSize[6],custom[onlyLetterNumber]" %>
-        </div>
-
-        <div class="login-btn">
-          <%= f.submit "ログイン", class:'btn btn-primary' %>
-        </div>
-
-      <% end %>
-
-      <%#= render "users/shared/links" %>
       </div>
     </div>
   </div>
-</div>
-</div>
-
 </div>
 
 

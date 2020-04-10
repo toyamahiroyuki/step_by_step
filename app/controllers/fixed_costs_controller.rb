@@ -1,4 +1,5 @@
 class FixedCostsController < ApplicationController
+    before_action :authenticate_user!
   def new
     if current_user.fixed_cost.nil?
       @fixed_cost = FixedCost.new
