@@ -67,21 +67,21 @@
   margin: 30px 0;
 }
 
-.fixed-cost-green-table{
+.communication-green-table{
   width: 100%;
   border-collapse: collapse;
   height:20px;
 }
 
-.fixed-cost-green-table tr{
+.communication-green-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-.fixed-cost-green-table tr:last-child{
+.communication-green-table tr:last-child{
   border-bottom: none;
 }
-.fixed-cost-green-table th{
+.communication-green-table th{
   position: relative;
   text-align: left;
   width: 30%;
@@ -92,7 +92,7 @@
   height:20px;
 }
 
-.fixed-cost-green-table td{
+.communication-green-table td{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -102,7 +102,7 @@
   height:20px;
 }
 
-.fixed-cost-green-table td input{
+.communication-green-table td input{
   text-align: left;
   width: 70%;
   text-align: center;
