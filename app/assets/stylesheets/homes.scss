@@ -43,47 +43,100 @@
   text-align: center;
 }
 
-.home-title h1 {
-	  position: relative;
-	  background: #f0e68c;
-	  box-shadow: 0px 0px 0px 5px #f0e68c;
-	  padding: 10px 10px;
-	  margin: 20px 20px;
-	  color: #454545;
-	  width: 500px;
-	  text-align: center;
-	  font-family: 'M PLUS Rounded 1c', sans-serif;
+.background {
+  background-image: url('about.jpg');
+  background-size: cover;
+  background-position: top center;
+  height: 350px;
 }
 
-.home-title h1:after {
+.home-title {
+  padding-top: 100px;
+  padding-bottom: 100px;
+  padding-left: 200px;
+  background-color: rgba( 0, 0, 0, 0.5);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+.home-title h1 , .home-title p{
+ color: white;
+ margin-top:20px;
+}
+
+.img {
+  width: 200px;
+  text-align: center;
+  padding-top: 30px;
+}
+
+.img-box {
+  width: 150px;
+  height: 150px;
+  background-size: cover;
+}
+
+.img-box-small {
+  width: 150px;
+  height: 150px;
+  background-size: cover;
+}
+
+.about-item {
+  display: flex;
+  width: 600px;
+  padding: 20px;
+  margin: 40px 50px ;
+  border-style: solid;
+  border-color: gray;
+  border-radius: 10px;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.15);
+}
+
+.about {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.category {
+  width: 350px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+.category h4 {
+  margin-bottom: 40px;
+  border-left: solid 5px orange;
+  padding-left: 20px;
+}
+
+.category p {
+  padding-left: 10px;
+}
+
+.about-title {
+  position: relative;
+  padding-left: 25px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  width: 400px;
+  margin-top: 60px;
+  margin-left: 50px;
+}
+
+.about-title:before {
   position: absolute;
   content: '';
-  left: -7px;
-  top: -7px;
-  border-width: 0 0 15px 15px;
-  border-style: solid;
-  border-color: #fff #fff #f0e68c;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border: none;
+  border-left: solid 15px transparent;
+  border-bottom: solid 15px rgb(119, 195, 223);
 }
-
-.about {
-  margin-left: 100px;
-  margin-bottom: 100px;
-}
-
-.about {
-  h2 {
-    margin: 10px 10px;
-    padding: 10px;
-    border: 2px solid black;
-    width: 200px;
-    text-align: center;
-    border-radius: 10px;
-  }
-  h4 {
-    width: 500px;
-    margin: 30px 0;
-    border-bottom: solid 3px #00ffff;
-
-  }
+.about-title:after {
+  position: absolute;
+  content: '';
+  bottom: -3px;
+  left: 10px;
+  width: 100%;
+  border-bottom: solid 3px rgb(119, 195, 223);
 }
