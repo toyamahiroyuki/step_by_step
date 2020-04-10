@@ -14,7 +14,7 @@
 
     	<h3 class="target-table-title"><%= target.target_purpose %></h3>
     	<div class="edit-destroy-btn ">
-	    	<%= link_to "目標・金額の編集", edit_target_path(target.id),class:'btn btn-primary' %>
+	    	<%= link_to "目標・金額の編集", edit_target_path(target.id),class:'btn btn-primary',data: {"turbolinks"=>false} %>
 	    	<%= link_to "目標・金額の削除", target_path(target.id), method: :delete, class:'btn btn-danger' %>
 	    </div>
 
@@ -32,7 +32,7 @@
     					<th><%= f.label :貯金の追加 %></th>
     					<td><%= f.text_field :target_by_month, class: "validate[required,custom[number]]"%>円</td>
 			        <%= f.hidden_field :target_id, value: target.id %>
-			        <td><%= f.submit "貯金", class:'btn btn-warning' %></td>
+			        <td><%= f.submit "貯金", class: "btn btn-warning",data: {"turbolinks"=>false} %></td>
 			      </tr>
 
 		    <% end %>
@@ -66,7 +66,7 @@
 		    			<td><%= target_item.created_at.strftime('%Y/%m/%d') %></td>
 		    			<td><%= target_item.target_by_month %>円</td>
 		    			<td><%= target_item.target_balance %>円</td>
-		    			<td><%= link_to "編集", edit_target_target_item_path(target_item.id, id: target_item.id),class:'btn btn-primary' %></td>
+		    			<td><%= link_to "編集", edit_target_target_item_path(target_item.id, id: target_item.id),class:'btn btn-primary',data: {"turbolinks"=>false} %></td>
 		    			<td><%= link_to "削除", target_target_item_path(target_item.id,id: target_item.id), method: :delete,class:'btn btn-danger' %></td>
     				</tr>
 
@@ -88,7 +88,7 @@
 			<h3 class="loan-table-title"><%= loan.loan_purpose %></h3>
 
     	<div class="edit-destroy-btn">
-	    	<%= link_to "ローン・金額の編集", edit_loan_path(loan.id),class:'btn btn-primary' %>
+	    	<%= link_to "ローン・金額の編集", edit_loan_path(loan.id),class:'btn btn-primary',data: {"turbolinks"=>false} %>
 	    	<%= link_to "ローン・金額の削除", loan_path(loan.id), method: :delete, class:'btn btn-danger' %>
 	    </div>
 
@@ -124,7 +124,7 @@
 		    			<td><%= loan_item.created_at.strftime('%Y/%m/%d') %></td>
 		    			<td><%= loan_item.loan_by_month %>円</td>
 		    			<td><%= loan_item.loan_balance %>円</td>
-		    			<td><%= link_to "編集", edit_loan_loan_item_path(loan_item.id, id: loan_item.id),class:'btn btn-primary' %></td>
+		    			<td><%= link_to "編集", edit_loan_loan_item_path(loan_item.id, id: loan_item.id),class:'btn btn-primary',data: {"turbolinks"=>false} %></td>
 		    			<td><%= link_to "削除", loan_loan_item_path(loan_item.id,id: loan_item.id), method: :delete,class:'btn btn-danger' %></td>
     				</tr>
 

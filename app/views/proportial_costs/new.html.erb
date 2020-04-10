@@ -66,7 +66,7 @@
         <div class="pro-cost-create-btn">
 
            <%= f.submit "登録",class:'btn btn-primary btn-block' %>
-           <%= link_to "収入画面へ", new_income_path(day: @income_day), class:"btn btn-warning btn-block" %>
+           <%= link_to "収入画面へ", new_income_path(day: @income_day), class:"btn btn-warning btn-block",data: {"turbolinks"=>false} %>
         </div>
 
   <% end %>
@@ -90,7 +90,7 @@
           <td><%= proportial_cost.proportial_cost %></td>
           <td><%= proportial_cost.proportial_cost_item %></td>
           <td><%= proportial_cost.proportial_cost_memo %></td>
-          <td><%= link_to "編集画面へ", edit_proportial_cost_path(proportial_cost, day: @income_day), class:'btn btn-primary' %></td>
+          <td><%= link_to "編集画面へ", edit_proportial_cost_path(proportial_cost, day: @income_day), class:'btn btn-primary',data: {"turbolinks"=>false} %></td>
           <td><%= link_to "削除へ", proportial_cost_path(proportial_cost), method: :delete, class:'btn btn-danger' %></td>
         </tr>
 

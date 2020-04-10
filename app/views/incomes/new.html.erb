@@ -56,7 +56,7 @@
 
     <div class="income-create-btn">
 
-       <%= f.submit "登録", class:'btn btn-primary' %>
+       <%= f.submit "登録", class:'btn btn-primary',data: {"turbolinks"=>false} %>
        <%= link_to "支出画面へ", new_proportial_cost_path(day: @income_day), class:'btn btn-warning' %>
     </div>
 
@@ -90,7 +90,7 @@
           <td><%= income.income %></td>
           <td><%= income.income_item %></td>
           <td><%= income.income_memo %></td>
-          <td><%= link_to "編集画面へ", edit_income_path(income, day: @income_day), class:'btn btn-primary' %></td>
+          <td><%= link_to "編集画面へ", edit_income_path(income, day: @income_day), class:'btn btn-primary',data: {"turbolinks"=>false} %></td>
           <td><%= link_to "削除へ", income_path(income), method: :delete, class:'btn btn-danger' %></td>
         </tr>
 

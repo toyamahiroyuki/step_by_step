@@ -16,31 +16,29 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-ja.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/jquery.validationEngine.min.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
-          jQuery(document).ready(function($){
-            jQuery(document).ready(function(){
-          jQuery(".new_communication").validationEngine();
-          jQuery(".edit_communication").validationEngine();
-          jQuery(".new_fixed_cost").validationEngine();
-          jQuery(".edit_fixed_cost").validationEngine();
-          jQuery(".new_goal").validationEngine();
-          jQuery(".edit_goal").validationEngine();
-          jQuery(".new_income").validationEngine();
-          jQuery(".edit_income").validationEngine();
-          jQuery(".new_loan").validationEngine();
-          jQuery(".edit_loan").validationEngine();
-          jQuery(".new_loan_item").validationEngine();
-          jQuery(".edit_loan_item").validationEngine();
-          jQuery(".new_proportial_cost").validationEngine();
-          jQuery(".edit_proportial_cost").validationEngine();
-          jQuery(".new_target").validationEngine();
-          jQuery(".edit_target").validationEngine();
-          jQuery(".new_target_item").validationEngine();
-          jQuery(".edit_targer_item").validationEngine();
-          jQuery(".new_tax").validationEngine();
-          jQuery(".edit_tax").validationEngine();
-          jQuery(".new_user").validationEngine();
-          jQuery(".edit_user").validationEngine();
-          });
+          $(function(){
+          $(".new_communication").validationEngine();
+          $(".edit_communication").validationEngine();
+          $(".new_fixed_cost").validationEngine();
+          $(".edit_fixed_cost").validationEngine();
+          $(".new_goal").validationEngine();
+          $(".edit_goal").validationEngine();
+          $(".new_income").validationEngine();
+          $(".edit_income").validationEngine();
+          $(".new_loan").validationEngine();
+          $(".edit_loan").validationEngine();
+          $(".new_loan_item").validationEngine();
+          $(".edit_loan_item").validationEngine();
+          $(".new_proportial_cost").validationEngine();
+          $(".edit_proportial_cost").validationEngine();
+          $(".new_target").validationEngine();
+          $(".edit_target").validationEngine();
+          $(".new_target_item").validationEngine();
+          $(".edit_targer_item").validationEngine();
+          $(".new_tax").validationEngine();
+          $(".edit_tax").validationEngine();
+          $(".new_user").validationEngine();
+          $(".edit_user").validationEngine();
           });
         </script>
 
@@ -81,11 +79,11 @@
         <ul class="nav-list">
 
                 <li class="nav-list-item">
-                  <%= link_to "収入一覧",income_path(current_user) %>
+                  <%= link_to "収入一覧",income_path(current_user),data: {"turbolinks"=>false} %>
                 </li>
 
                 <li class="nav-list-item">
-                  <%= link_to "支出一覧",cost_path(current_user) %>
+                  <%= link_to "支出一覧",cost_path(current_user),data: {"turbolinks"=>false} %>
                 </li>
 
                 <li class="nav-list-item">

@@ -12,9 +12,9 @@
 //
 //= require rails-ujs
 //= require activestorage
-//= require turbolinks
 //= require jquery
 //= require bootstrap-sprockets
+//= require turbolinks
 //= require moment
 //= require fullcalendar
 //= require_tree .
@@ -56,6 +56,18 @@ function eventCalendar() {
     $(".fc-event:contains('\u00A0')").css("border-color",'#dcdcdc');
     $(".fc-event:contains('\u00A0')").html("<div>0</div>").css("color",'white');
   });
+}
+
+function clearCalendar() {
+  $('#calendar').fullCalendar('delete');
+  $('#calendar').html('');
+};
+$(document).on('turbolinks:load', function(){
+  eventCalendar();
+});
+$(document).on('turbolinks:before-cache', clearCalendar);
+
+
 
   //   type: 'GET',
   //   url: 'calendar_incomes',
@@ -97,20 +109,6 @@ function eventCalendar() {
   //     events: proportial_cost,
   //   });
   // });
-
-}
-
-
-
-function clearCalendar() {
-  $('#calendar').fullCalendar('delete');
-  $('#calendar').html('');
-};
-$(document).on('turbolinks:load', function(){
-  eventCalendar();
-});
-$(document).on('turbolinks:before-cache', clearCalendar);
-
 
  /*
   * 1. getEventsのリクエスト送信

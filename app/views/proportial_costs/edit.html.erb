@@ -6,16 +6,16 @@
   <div class="row">
     <div class="col-xs-12">
 
+    <%= form_for(@proportial_cost) do |f| %>
+
+    <%= f.hidden_field :day ,value: @income_day %></td>
+
     <table class="pro-cost-red-table">
 
       <tr>
         <th>日付</th>
         <td><%= @income_day %></td>
       </tr>
-
-      <%= form_for(@proportial_cost) do |f| %>
-
-      <%= f.hidden_field :day ,value: @income_day %></td>
 
       <tr>
         <th>支出金額</th>

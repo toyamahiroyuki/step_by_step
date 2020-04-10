@@ -67,21 +67,21 @@
   margin: 30px 0;
 }
 
-.green-table{
+.fixed-cost-green-table{
   width: 100%;
   border-collapse: collapse;
   height:20px;
 }
 
-.green-table tr{
+.fixed-cost-green-table tr{
   border-bottom: solid 2px white;
   height:20px;
 }
 
-.green-table tr:last-child{
+.fixed-cost-green-table tr:last-child{
   border-bottom: none;
 }
-.green-table th{
+.fixed-cost-green-table th{
   position: relative;
   text-align: left;
   width: 30%;
@@ -92,7 +92,7 @@
   height:20px;
 }
 
-.green-table td{
+.fixed-cost-green-table td{
   text-align: left;
   width: 70%;
   text-align: center;
@@ -102,7 +102,7 @@
   height:20px;
 }
 
-.green-table td input{
+.fixed-cost-green-table td input{
   text-align: left;
   width: 70%;
   text-align: center;

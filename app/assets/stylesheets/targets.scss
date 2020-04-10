@@ -265,11 +265,10 @@
   height:20px;
 }
 
-.loan-red-table td input{
+.loan-red-table td input {
   text-align: left;
   width: 70%;
   text-align: center;
-  background-color: #fa8072;
   border-radius: 10px;
   margin: 0 auto;
   font-size: 20px;
@@ -282,4 +281,7 @@
 }
 .btn-danger {
   margin-right: 10px;
+}
+.btn btn-warning {
+  background-color: orange;
 }
