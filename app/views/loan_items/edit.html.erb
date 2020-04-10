@@ -1,30 +1,32 @@
-<div class="loan-item-item-title">
-　<h1>金額の編集</h1>
-</div>
+<div class="loan-item-background">
+  <div class="loan-item-item-title">
+  　<h1>金額の編集</h1>
+  </div>
 
-<%= form_for @loan_item, url: loan_loan_item_path do |f| %>
+  <%= form_for @loan_item, url: loan_loan_item_path do |f| %>
 
-<div class="container">
-  <div class="row">
-    <div class="col-xs-6">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-6">
 
-      <h3 class="loan-item-table-title">項目と目標金額</h3>
+        <h3 class="loan-item-table-title">項目と目標金額</h3>
 
-        <table class="loan-item-red-table">
+          <table class="loan-item-red-table">
 
-        	<tr>
-        	  <th>返済額の変更</th>
-        	  <td><%= f.text_field :loan_by_month, class: "validate[required,custom[number]]" %></td>
-        	</tr>
+          	<tr>
+          	  <th>返済額の変更</th>
+          	  <td><%= f.text_field :loan_by_month, class: "validate[required,custom[number]]" %>円</td>
+          	</tr>
 
-        </table>
+          </table>
 
-        <div class="loan-item-create-btn">
-  			 <%= f.submit "変更",class:'btn btn-primary' %>
-  	    </div>
+          <div class="loan-item-create-btn">
+    			 <%= f.submit "変更",class:'btn btn-primary' %>
+    	    </div>
 
-	<% end %>
+  	<% end %>
 
-	</div>
+  	</div>
+    </div>
   </div>
 </div>

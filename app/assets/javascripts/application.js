@@ -43,8 +43,8 @@ function eventCalendar() {
       dayNamesShort: ['日', '月', '火', '水', '木', '金', '土'],
       events: total,
       header: {
-                    left: '',
-                    center: 'title',
+                    left: 'title',
+                    center: '',
                     right: 'today prev,next',
                 },
      eventColor: '#1e90ff'

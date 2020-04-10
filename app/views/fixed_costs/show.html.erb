@@ -1,66 +1,68 @@
-<div class="fixed-costs-title">
-  <h1>固定費・ライフライン</h1>
-</div>
+<div class="fixes-cost-background">
+  <div class="fixed-costs-title">
+    <h1>固定費・ライフライン</h1>
+  </div>
 
-<div class="container">
-  <div class="row">
-    <div class="col-xs-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-5">
 
-    <h3 class="table-title">固定費</h3>
+        <h3 class="table-title">固定費</h3>
 
-    <table class="communication-green-table">
+        <table class="communication-green-table">
 
-      <tr>
-        <th>家賃</th>
-        <td><%= @fixed_cost.rent %></td>
-      </tr>
+          <tr>
+            <th>家賃</th>
+            <td><%= @fixed_cost.rent %>円</td>
+          </tr>
 
-      <tr>
-        <th>保険</th>
-        <td><%= @fixed_cost.insurance %></td>
-      </tr>
+          <tr>
+            <th>保険</th>
+            <td><%= @fixed_cost.insurance %>円</td>
+          </tr>
 
-      <tr>
-        <th>その他</th>
-        <td><%= @fixed_cost.fixed_costs_other %></td>
-      </tr>
+          <tr>
+            <th>その他</th>
+            <td><%= @fixed_cost.fixed_costs_other %>円</td>
+          </tr>
 
-      </table>
-   </div>
+          </table>
+       </div>
 
-   <div class="col-xs-1"></div>
+       <div class="col-xs-1"></div>
 
-   <div class="col-xs-5">
+       <div class="col-xs-5">
 
-    <h3 class="table-title">ライフライン</h3>
+        <h3 class="table-title">ライフライン</h3>
 
 
-    <table class="communication-green-table">
+        <table class="communication-green-table">
 
-      <tr>
-        <th>電気</th>
-        <td><%= @lifeline.electron %></td>
-      </tr>
+          <tr>
+            <th>電気</th>
+            <td><%= @lifeline.electron %>円</td>
+          </tr>
 
-      <tr>
-        <th>ガス</th>
-        <td><%= @lifeline.gass %></td>
-      </tr>
+          <tr>
+            <th>ガス</th>
+            <td><%= @lifeline.gass %>円</td>
+          </tr>
 
-      <tr>
-        <th>水道</th>
-        <td><%= @lifeline.water %></td>
-      </tr>
+          <tr>
+            <th>水道</th>
+            <td><%= @lifeline.water %>円</td>
+          </tr>
 
-    </table>
+        </table>
+
+        </div>
+      </div>
+
+      <div class="fixed-edit-btn">
+        <%= link_to "編集画面へ", edit_fixed_costs_path, class:'btn btn-success btn-block', data: {"turbolinks"=>false} %>
+      </div>
 
     </div>
-  </div>
-
-  <div class="fixed-edit-btn">
-    <%= link_to "編集画面へ", edit_fixed_costs_path, class:'btn btn-success btn-block', data: {"turbolinks"=>false} %>
-  </div>
-
 </div>
 
 

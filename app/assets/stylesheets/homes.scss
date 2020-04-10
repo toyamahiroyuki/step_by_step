@@ -3,11 +3,14 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .calendar-box {
+  background-image: image-url('calender_back.jpg');
+  background-size: cover;
 }
 
 #calendar {
   font-size: 20px;
-  margin: 20px 100px;
+  margin: 20px auto;
+  width: 60%;
 }
 
 .fc-content {
@@ -58,32 +61,30 @@
   font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
-.home-title h1 , .home-title p{
+.home-title h1, .home-title p {
  color: white;
  margin-top:20px;
 }
 
+ .welcome {
+  padding-left: 20px;
+}
+
 .home-title-calendar h1 {
-    position: relative;
-    background: #f0e68c;
-    box-shadow: 0px 0px 0px 5px #f0e68c;
-    padding: 10px 10px;
-    margin: 20px 20px;
+    padding: 30px 250px 0;
+    margin: 0;
     color: #454545;
-    width: 500px;
-    text-align: center;
+    width: 60%;
     font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
-.home-title-calendar h1:after {
-  position: absolute;
-  content: '';
-  left: -7px;
-  top: -7px;
-  border-width: 0 0 15px 15px;
-  border-style: solid;
-  border-color: #fff #fff #f0e68c;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+.home-title-calendar h2 {
+    color: #454545;
+    width: 50%;
+    text-align: center;
+    margin: 0 auto;
+    padding-top: 30px;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
 .img {

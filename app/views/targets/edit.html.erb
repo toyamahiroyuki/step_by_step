@@ -1,36 +1,39 @@
-<div class="target-title">
-  <h1>貯金項目の編集</h1>
-</div>
+<div class="target-background">
+	<div class="target-title">
+	  <h1>貯金項目の編集</h1>
+	</div>
 
-<%= form_for @target, url: target_path do |f| %>
+	<%= form_for @target, url: target_path do |f| %>
 
-<div class="container">
-  <div class="row">
-    <div class="col-xs-6">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-xs-6">
 
-      <h4 class="target-table-title">項目と目標金額</h4>
+	      <h4 class="target-table-title">項目と目標金額</h4>
 
-		<table class="target-blue-table">
+			<table class="target-blue-table">
 
-			<tr>
-			  <th>項目</th>
-			  <td><%= f.text_field :target_purpose, class: "validate[required]" %></td>
-			</tr>
+				<tr>
+				  <th>項目</th>
+				  <td><%= f.text_field :target_purpose, class: "validate[required]" %></td>
+				</tr>
 
-			<tr>
-			  <th>目標金額</th>
-			  <td><%= f.text_field :target_cost, class: "validate[required,custom[number]]" %></td>
-			</tr>
+				<tr>
+				  <th>目標金額</th>
+				  <td><%= f.text_field :target_cost, class: "validate[required,custom[number]]" %>円</td>
+				</tr>
 
-		</table>
+			</table>
 
-		<div class="target-create-btn">
-			<%= f.submit "更新", class:'btn btn-primary btn-block' %>
-		</div>
+			<div class="target-create-btn">
+				<%= f.submit "更新", class:'btn btn-primary btn-block' %>
+			</div>
 
+			</div>
 		</div>
 	</div>
-</div>
 
-<% end %>
+	<% end %>
+
+</div>
 
