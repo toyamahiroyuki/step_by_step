@@ -23,7 +23,7 @@
 
 
 function eventCalendar() {
-
+  //fullcalendarの日付クリック
   $.ajax({
     type: 'GET',
     url: 'calendar_total',
@@ -50,8 +50,10 @@ function eventCalendar() {
      eventColor: '#1e90ff'
     });
 
+　　//収支が+,-,0の時で色が変わる
     $(".fc-event:contains('-')").css("background-color",'#ff0000');
     $(".fc-event:contains('-')").css("border-color",'#ff0000');
+    //0の時、半角スペースになるので、半角スペースを感知し、0を挿入後、色変化
     $(".fc-event:contains('\u00A0')").css("background-color",'#dcdcdc');
     $(".fc-event:contains('\u00A0')").css("border-color",'#dcdcdc');
     $(".fc-event:contains('\u00A0')").html("<div>0</div>").css("color",'white');
@@ -67,8 +69,19 @@ $(document).on('turbolinks:load', function(){
 });
 $(document).on('turbolinks:before-cache', clearCalendar);
 
+//ナビの途中からスクロール
+$(function () {
+  $(window).scroll(function () {
 
-
+      if ($(this).scrollTop() > 160) {  //topから155px以上でバーがスクロール
+          $('.navbar').addClass('is-fixed');
+          $('.home-title-calendar').addClass('is-fixed-home');
+      } else {
+          $('.navbar').removeClass('is-fixed');
+          $('.home-title-calendar').removeClass('is-fixed-home');
+      }
+  });
+});
   //   type: 'GET',
   //   url: 'calendar_incomes',
   // }).done(function(incomes){

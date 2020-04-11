@@ -2,6 +2,12 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+ * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .calendar-box {
   background-image: image-url('calender_back.jpg');
   background-size: cover;
@@ -180,4 +186,8 @@
 
 .btn-primary {
   margin-left: 20px;
+}
+
+.is-fixed-home {
+  margin-top: 70px;
 }
