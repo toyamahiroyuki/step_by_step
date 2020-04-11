@@ -9,7 +9,9 @@
 
 #calendar {
   font-size: 20px;
-  margin: 20px auto;
+  margin: 0 auto;
+  padding-top: 50px;
+  padding-bottom: 50px;
   width: 60%;
 }
 
@@ -70,16 +72,27 @@
   padding-left: 20px;
 }
 
+.home-title-calendar {
+  background-image: image-url('calendar_head.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.home-title-back {
+  background-color: rgba( 0, 0, 0, 0.5);
+  height: 200px;
+}
+
 .home-title-calendar h1 {
     padding: 30px 250px 0;
     margin: 0;
-    color: #454545;
+    color: #f5deb3;
     width: 60%;
     font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
 .home-title-calendar h2 {
-    color: #454545;
+    color: #f5deb3;
     width: 50%;
     text-align: center;
     margin: 0 auto;

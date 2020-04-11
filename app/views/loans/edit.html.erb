@@ -1,4 +1,4 @@
-<div class="loan-item-background">
+<div class="loan-background">
 	<div class="loan-title">
 	  <h1>ローン項目の編集</h1>
 	</div>
@@ -15,7 +15,7 @@
 
 					<tr>
 					  <th>ローン項目</th>
-					  <td><%= f.text_field :loan_purpose, class: "validate[required]" %></td>
+					  <td><%= f.text_field :loan_purpose, class: "validate[required]" %>　</td>
 					</tr>
 
 					<tr>
@@ -36,13 +36,13 @@
 
 				</table>
 
-				<div class="loan-create-btn">
+			</div>
+			<div class="loan-create-btn">
 					<%= f.submit "更新", class:'btn btn-danger btn-block' %>
-				</div>
-
 			</div>
 		</div>
 	</div>
+	<div class="loan-space"></div>
 </div>
 
 	<% end %>

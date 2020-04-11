@@ -15,7 +15,7 @@
 
 					<tr>
 					  <th>項目</th>
-					  <td><%= f.text_field :target_purpose, class: "validate[required]" %></td>
+					  <td><%= f.text_field :target_purpose, class: "validate[required]" %>　</td>
 					</tr>
 
 					<tr>
@@ -25,13 +25,17 @@
 
 				</table>
 
-	      		<div class="target-create-btn">
-							<%= f.submit "登録", class:'btn btn-primary btn-block' %>
-				</div>
 
 			</div>
+
+  		<div class="target-create-btn">
+				<%= f.submit "登録", class:'btn btn-primary btn-block' %>
+			</div>
+
 		</div>
 	</div>
+
+	<div class="target-space"></div>
 
 	<% end %>
 </div>

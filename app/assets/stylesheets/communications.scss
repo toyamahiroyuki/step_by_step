@@ -9,7 +9,7 @@
 .communication-background {
   background-image: image-url('table_background.jpg');
   background-size: 100% 100%;
-  height: 400px;
+  height: 555px;
 }
 
 .communication-title {
@@ -18,7 +18,7 @@
 	  background: #f0e68c;
 	  box-shadow: 0px 0px 0px 5px #f0e68c;
 	  padding: 10px 10px;
-	  margin: 20px 20px;
+	  margin: 0px 20px;
 	  color: #454545;
 	  width: 500px;
 	  text-align: center;
@@ -115,4 +115,12 @@
   border-radius: 10px;
   margin: 0 auto;
   font-size: 20px;
+}
+
+.communication-background .col-xs-5 {
+  border: solid 2px gray;
+  border-radius: 10px;
+  padding:10px 20px 20px;
+  margin-top: 90px;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.15);
 }

@@ -1,66 +1,67 @@
-<div class="goal-title">
-  <h1>予算の編集</h1>
-</div>
+<div class="goal-background">
+  <div class="goal-title">
+    <h1>予算の編集</h1>
+  </div>
 
-<%= form_for @goal do |f| %>
+  <%= form_for @goal do |f| %>
 
-<div class="container">
-  <div class="row">
-    <div class="col-xs-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-5">
 
-      <h4 class="goal-table-title">項目</h4>
+        <h3 class="goal-table-title">項目</h3>
 
-      <table class="goal-green-table">
+        <table class="goal-green-table">
 
-          <th><%= f.label :食費 %></th>
-            <td><%= f.text_field :food, class: "validate[required,custom[number]]" %>円</td>
-          </tr>
+            <th><%= f.label :食費 %></th>
+              <td><%= f.text_field :food, class: "validate[required,custom[number]]" %>円</td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :交通費 %></th>
-            <td><%= f.text_field :transportation, class: "validate[required,custom[number]]"%>円</td>
-          </tr>
+            <tr>
+              <th><%= f.label :交通費 %></th>
+              <td><%= f.text_field :transportation, class: "validate[required,custom[number]]"%>円</td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :交際費 %></th>
-            <td><%= f.text_field :entertainment, class: "validate[required,custom[number]]" %>円</td>
-          </tr>
+            <tr>
+              <th><%= f.label :交際費 %></th>
+              <td><%= f.text_field :entertainment, class: "validate[required,custom[number]]" %>円</td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :日用品 %></th>
-            <td><%= f.text_field :daily, class: "validate[required,custom[number]]" %>円</td>
-          </tr>
+            <tr>
+              <th><%= f.label :日用品 %></th>
+              <td><%= f.text_field :daily, class: "validate[required,custom[number]]" %>円</td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :ガス %></th>
-            <td><%= f.text_field :gass, class: "validate[required,custom[number]]" %>円</td>
-          </tr>
+            <tr>
+              <th><%= f.label :ガス %></th>
+              <td><%= f.text_field :gass, class: "validate[required,custom[number]]" %>円</td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :電気 %></th>
-            <td><%= f.text_field :electron, class: "validate[required,custom[number]]" %>円</td>
-          </tr>
+            <tr>
+              <th><%= f.label :電気 %></th>
+              <td><%= f.text_field :electron, class: "validate[required,custom[number]]" %>円</td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :水道 %></th>
-            <td><%= f.text_field :water, class: "validate[required,custom[number]]" %>円</td>
-          </tr>
+            <tr>
+              <th><%= f.label :水道 %></th>
+              <td><%= f.text_field :water, class: "validate[required,custom[number]]" %>円</td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :その他 %></th>
-            <td><%= f.text_field :goals_other, class: "validate[required,custom[number]]" %>円</td>
-          </tr>
+            <tr>
+              <th><%= f.label :その他 %></th>
+              <td><%= f.text_field :goals_other, class: "validate[required,custom[number]]" %>円</td>
+            </tr>
 
-      </table>
+        </table>
 
+      </div>
       <div class="goal-create-btn">
 
         <%= f.submit "更新",class:'btn btn-primary btn-block' %>
 
       </div>
-
     </div>
   </div>
-</div>
 
-<% end %>
+  <% end %>
+</div>

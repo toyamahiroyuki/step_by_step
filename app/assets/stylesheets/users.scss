@@ -118,12 +118,17 @@ input#user_sex_その他,{
 
 //login後のuserデザイン
 
+.user-background {
+  background-image: image-url('background_yellow.jpg');
+  background-size: 100% 100%;
+}
+
 .title h1 {
   position: relative;
   background: #f0e68c;
   box-shadow: 0px 0px 0px 5px #f0e68c;
-  padding: 10px 10px;
-  margin: 20px 20px;
+  padding: 0px 10px;
+  margin: 0px 20px 20px;
   color: #454545;
   width: 250px;
   text-align: center;
@@ -159,6 +164,7 @@ input#user_sex_その他,{
   border-left: solid 15px transparent;
   border-bottom: solid 15px #52c2d0;
 }
+
 .table-title:after {
   position: absolute;
   content: '';
@@ -280,3 +286,12 @@ input#user_sex_その他,{
   width: 100px;
   padding-top: 10px;
 }
+
+.user-background .col-xs-5 {
+  border: solid 2px gray;
+  border-radius: 10px;
+  padding:10px 20px 20px;
+  margin-top: 50px;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.15);
+}
+
