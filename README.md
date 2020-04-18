@@ -54,13 +54,12 @@
 
 ## インストール　
 ```
-$ git clone https://github.com/nkwada/Volun-Tuner.git
-$ cd Volun-Tuner
+$ git clone https://github.com/toyamahiroyuki/step_by_step.git
+$ cd step_by_step
 $ bundle install
 $ rails db:migrate
 $ rails db:seed
 
-テストユーザー： mail "test1@test", password "aaaaaa"
-管理者： mail "test@admin", password "testadmin"
+テストユーザー： name "test1", password "testuser"
 ```
 
