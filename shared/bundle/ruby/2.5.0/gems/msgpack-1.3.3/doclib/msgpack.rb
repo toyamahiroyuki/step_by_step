@@ -1,4 +1,3 @@
-
 module MessagePack
   #
   # Serializes an object into an IO or String.
@@ -53,7 +52,7 @@ module MessagePack
   #
   # See Unpacker#initialize for supported options.
   #
-  def self.load(src, options={})
+  def self.load(src, options = {})
   end
 
   #
@@ -71,7 +70,7 @@ module MessagePack
   #
   # See Unpacker#initialize for supported options.
   #
-  def self.unpack(src, options={})
+  def self.unpack(src, options = {})
   end
 
   #
@@ -84,4 +83,3 @@ module MessagePack
   #
   DefaultFactory = Factory.new
 end
-

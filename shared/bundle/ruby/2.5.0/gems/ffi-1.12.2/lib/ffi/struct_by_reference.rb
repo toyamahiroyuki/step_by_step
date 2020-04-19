@@ -37,7 +37,7 @@ module FFI
 
     # @param [Struct] struct_class
     def initialize(struct_class)
-      unless Class === struct_class and struct_class < FFI::Struct
+      unless (Class === struct_class) && (struct_class < FFI::Struct)
         raise TypeError, 'wrong type (expected subclass of FFI::Struct)'
       end
       @struct_class = struct_class

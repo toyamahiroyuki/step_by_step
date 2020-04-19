@@ -1,6 +1,4 @@
 module Pry::Helpers; end
-
-# rubocop:disable Metrics/ModuleLength
 module Pry::Helpers::BaseHelpers
   extend self
 
@@ -151,7 +149,7 @@ module Pry::Helpers::BaseHelpers
 
   def find_command(name, set = Pry::Commands)
     command_match = set.find do |_, command|
-      (listing = command.options[:listing]) == name && listing != nil
+      (listing = command.options[:listing]) == name && !listing.nil?
     end
     command_match.last if command_match
   end
@@ -197,4 +195,3 @@ module Pry::Helpers::BaseHelpers
     end
   end
 end
-# rubocop:enable Metrics/ModuleLength

@@ -6,7 +6,6 @@
 
 module Mail
   class IndifferentHash < Hash
-
     def initialize(constructor = {})
       if constructor.is_a?(Hash)
         super()
@@ -89,7 +88,7 @@ module Mail
     #   hash.values_at("a", "b") # => ["x", "y"]
     #
     def values_at(*indices)
-      indices.collect {|key| self[convert_key(key)]}
+      indices.collect { |key| self[convert_key(key)] }
     end
 
     # Returns an exact copy of the hash.
@@ -100,7 +99,7 @@ module Mail
     # Merges the instantized and the specified hashes together, giving precedence to the values from the second hash
     # Does not overwrite the existing hash.
     def merge(hash)
-      self.dup.update(hash)
+      dup.update(hash)
     end
 
     # Performs the opposite of merge, with the keys and values from the first hash taking precedence over the second.
@@ -110,7 +109,7 @@ module Mail
     end
 
     def reverse_merge!(other_hash)
-      replace(reverse_merge( other_hash ))
+      replace(reverse_merge(other_hash))
     end
 
     # Removes a specified key from the hash.
@@ -118,19 +117,30 @@ module Mail
       super(convert_key(key))
     end
 
-    def stringify_keys!; self end
-    def stringify_keys; dup end
-    def symbolize_keys; to_hash.symbolize_keys end
-    def to_options!; self end
+    def stringify_keys!
+      self
+    end
+
+    def stringify_keys
+      dup
+    end
+
+    def symbolize_keys
+      to_hash.symbolize_keys
+    end
+
+    def to_options!
+      self
+    end
 
     def to_hash
       Hash.new(default).merge!(self)
     end
 
-  protected
+    protected
 
     def convert_key(key)
-      key.kind_of?(Symbol) ? key.to_s : key
+      key.is_a?(Symbol) ? key.to_s : key
     end
 
     def convert_value(value)
@@ -142,6 +152,5 @@ module Mail
         value
       end
     end
-
   end
 end

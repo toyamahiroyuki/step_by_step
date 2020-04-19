@@ -1,5 +1,4 @@
 module MethodSource
-
   module CodeHelpers
     # Retrieve the first expression starting on the given line of the given file.
     #
@@ -17,10 +16,10 @@ module MethodSource
     #   consume (add to the expression buffer) without checking for validity.
     # @return [String]  The first complete expression
     # @raise [SyntaxError]  If the first complete expression can't be identified
-    def expression_at(file, line_number, options={})
+    def expression_at(file, line_number, options = {})
       options = {
-        :strict  => false,
-        :consume => 0
+        :strict => false,
+        :consume => 0,
       }.merge!(options)
 
       lines = file.is_a?(Array) ? file : file.each_line.to_a
@@ -89,7 +88,7 @@ module MethodSource
     # @yield a clean-up function to run before checking for complete_expression
     # @return [String]  a valid ruby expression
     # @raise [SyntaxError]
-    def extract_first_expression(lines, consume=0, &block)
+    def extract_first_expression(lines, consume = 0, &block)
       code = consume.zero? ? "" : lines.slice!(0..(consume - 1)).join
 
       lines.each do |v|
@@ -127,12 +126,12 @@ module MethodSource
         /embedded document meets end of file/, # =begin
         /unterminated (quoted string|string|regexp) meets end of file/, # "quoted string" is ironruby
         /can't find string ".*" anywhere before EOF/, # rbx and jruby
-        /missing 'end' for/, /expecting kWHEN/ # rbx
-      ]
+        /missing 'end' for/, /expecting kWHEN/, # rbx
+      ].freeze
 
       RBX_ONLY_REGEXPS = [
-        /expecting '[})\]]'(?:$|:)/, /expecting keyword_end/
-      ]
+        /expecting '[})\]]'(?:$|:)/, /expecting keyword_end/,
+      ].freeze
 
       def self.===(ex)
         return false unless SyntaxError === ex

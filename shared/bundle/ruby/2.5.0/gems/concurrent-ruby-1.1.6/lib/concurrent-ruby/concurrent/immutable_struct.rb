@@ -2,7 +2,6 @@ require 'concurrent/synchronization/abstract_struct'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # A thread-safe, immutable variation of Ruby's standard `Struct`.
   #
   # @see http://ruby-doc.org/core-2.2.0/Struct.html Ruby standard library `Struct`
@@ -82,7 +81,7 @@ module Concurrent
     def self.new(*args, &block)
       clazz_name = nil
       if args.length == 0
-        raise ArgumentError.new('wrong number of arguments (0 for 1+)')
+        raise ArgumentError, 'wrong number of arguments (0 for 1+)'
       elsif args.length > 0 && args.first.is_a?(String)
         clazz_name = args.shift
       end

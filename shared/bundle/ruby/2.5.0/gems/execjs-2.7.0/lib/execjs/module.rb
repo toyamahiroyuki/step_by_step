@@ -2,7 +2,7 @@ require "execjs/version"
 require "rbconfig"
 
 module ExecJS
-  class Error           < ::StandardError; end
+  class Error < ::StandardError; end
   class RuntimeError              < Error; end
   class ProgramError              < Error; end
   class RuntimeUnavailable < RuntimeError; end

@@ -1,5 +1,6 @@
 # coding: utf-8
 # frozen_string_literal: true
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'mini_mime/version'
@@ -10,8 +11,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Sam Saffron"]
   spec.email         = ["sam.saffron@gmail.com"]
 
-  spec.summary       = %q{A lightweight mime type lookup toy}
-  spec.description   = %q{A lightweight mime type lookup toy}
+  spec.summary       = %q(A lightweight mime type lookup toy)
+  spec.description   = %q(A lightweight mime type lookup toy)
   spec.homepage      = "https://github.com/discourse/mini_mime"
   spec.license       = "MIT"
 

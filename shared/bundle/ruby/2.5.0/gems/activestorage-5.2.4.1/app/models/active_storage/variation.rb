@@ -75,15 +75,16 @@ class ActiveStorage::Variation
   end
 
   private
-    def pass_transform_argument(command, method, argument)
-      if eligible_argument?(argument)
-        command.public_send(method, argument)
-      else
-        command.public_send(method)
-      end
-    end
 
-    def eligible_argument?(argument)
-      argument.present? && argument != true
+  def pass_transform_argument(command, method, argument)
+    if eligible_argument?(argument)
+      command.public_send(method, argument)
+    else
+      command.public_send(method)
     end
+  end
+
+  def eligible_argument?(argument)
+    argument.present? && argument != true
+  end
 end

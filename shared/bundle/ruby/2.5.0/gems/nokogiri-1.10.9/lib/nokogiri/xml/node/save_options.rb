@@ -21,7 +21,7 @@ module Nokogiri
 
         if Nokogiri.jruby?
           # Save builder created document
-          AS_BUILDER    = 128
+          AS_BUILDER = 128
           # the default for XML documents
           DEFAULT_XML  = AS_XML # https://github.com/sparklemotion/nokogiri/issues/#issue/415
           # the default for HTML document
@@ -39,10 +39,12 @@ module Nokogiri
         attr_reader :options
 
         # Create a new SaveOptions object with +options+
-        def initialize options = 0; @options = options; end
+        def initialize(options = 0)
+          @options = options
+        end
 
         constants.each do |constant|
-          class_eval %{
+          class_eval %(
             def #{constant.downcase}
               @options |= #{constant}
               self
@@ -51,7 +53,7 @@ module Nokogiri
             def #{constant.downcase}?
               #{constant} & @options == #{constant}
             end
-          }
+          )
         end
 
         alias :to_i :options

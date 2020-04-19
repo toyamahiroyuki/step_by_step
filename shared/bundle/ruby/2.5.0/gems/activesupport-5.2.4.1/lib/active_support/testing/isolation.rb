@@ -34,16 +34,14 @@ module ActiveSupport
             yield
             begin
               if error?
-                failures.map! { |e|
-                  begin
-                    Marshal.dump e
-                    e
-                  rescue TypeError
-                    ex = Exception.new e.message
-                    ex.set_backtrace e.backtrace
-                    Minitest::UnexpectedError.new ex
-                  end
-                }
+                failures.map! do |e|
+                  Marshal.dump e
+                  e
+                rescue TypeError
+                  ex = Exception.new e.message
+                  ex.set_backtrace e.backtrace
+                  Minitest::UnexpectedError.new ex
+                end
               end
               test_result = defined?(Minitest::Result) ? Minitest::Result.from(self) : dup
               result = Marshal.dump(test_result)
@@ -79,7 +77,7 @@ module ActiveSupport
             Tempfile.open("isolation") do |tmpfile|
               env = {
                 "ISOLATION_TEST" => self.class.name,
-                "ISOLATION_OUTPUT" => tmpfile.path
+                "ISOLATION_OUTPUT" => tmpfile.path,
               }
 
               test_opts = "-n#{self.class.name}##{name}"
@@ -90,7 +88,7 @@ module ActiveSupport
                 load_path_args << File.expand_path(p)
               end
 
-              child = IO.popen([env, Gem.ruby, *load_path_args, $0, *ORIG_ARGV, test_opts])
+              child = IO.popen([env, Gem.ruby, *load_path_args, $PROGRAM_NAME, *ORIG_ARGV, test_opts])
 
               begin
                 Process.wait(child.pid)

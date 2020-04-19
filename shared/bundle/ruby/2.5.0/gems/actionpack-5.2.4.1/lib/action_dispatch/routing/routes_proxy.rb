@@ -22,7 +22,8 @@ module ActionDispatch
         end
       end
 
-    private
+      private
+
       def respond_to_missing?(method, _)
         super || @helpers.respond_to?(method)
       end
@@ -62,7 +63,7 @@ module ActionDispatch
         previous_parts = previous_script_name.count("/")
         context_parts = previous_parts - resolved_parts + 1
 
-        (previous_script_name.split("/").slice(0, context_parts).join("/")) + new_script_name
+        previous_script_name.split("/").slice(0, context_parts).join("/") + new_script_name
       end
     end
   end

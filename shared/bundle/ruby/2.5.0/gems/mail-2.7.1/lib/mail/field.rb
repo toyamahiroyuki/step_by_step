@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mail/fields'
 require 'mail/constants'
 
@@ -23,17 +24,18 @@ module Mail
   #     sections 3 and 4 of this standard.
   #
   class Field
-
     include Utilities
     include Comparable
 
-    STRUCTURED_FIELDS = %w[ bcc cc content-description content-disposition
-                            content-id content-location content-transfer-encoding
-                            content-type date from in-reply-to keywords message-id
-                            mime-version received references reply-to
-                            resent-bcc resent-cc resent-date resent-from
-                            resent-message-id resent-sender resent-to
-                            return-path sender to ]
+    STRUCTURED_FIELDS = %w(
+      bcc cc content-description content-disposition
+      content-id content-location content-transfer-encoding
+      content-type date from in-reply-to keywords message-id
+      mime-version received references reply-to
+      resent-bcc resent-cc resent-date resent-from
+      resent-message-id resent-sender resent-to
+      return-path sender to
+    ).freeze
 
     KNOWN_FIELDS = STRUCTURED_FIELDS + ['comments', 'subject']
 
@@ -53,7 +55,7 @@ module Mail
       "reply-to" => ReplyToField,
       "resent-date" => ResentDateField,
       "resent-from" => ResentFromField,
-      "resent-sender" =>  ResentSenderField,
+      "resent-sender" => ResentSenderField,
       "resent-to" => ResentToField,
       "resent-cc" => ResentCcField,
       "resent-bcc" => ResentBccField,
@@ -67,7 +69,7 @@ module Mail
       "content-type" => ContentTypeField,
       "content-id" => ContentIdField,
       "content-location" => ContentLocationField,
-    }
+    }.freeze
 
     FIELD_NAME_MAP = FIELDS_MAP.inject({}) do |map, (field, field_klass)|
       map.update(field => field_klass::CAPITALIZED_FIELD)
@@ -90,13 +92,14 @@ module Mail
       end
 
       private
-        def to_utf8(text)
-          if text.respond_to?(:force_encoding)
-            text.dup.force_encoding(Encoding::UTF_8)
-          else
-            text
-          end
+
+      def to_utf8(text)
+        if text.respond_to?(:force_encoding)
+          text.dup.force_encoding(Encoding::UTF_8)
+        else
+          text
         end
+      end
     end
 
     class NilParseError < ParseError #:nodoc:
@@ -133,7 +136,7 @@ module Mail
           name, value = raw_field.split(Constants::COLON, 2)
           name.rstrip!
           if name =~ /\A#{Constants::FIELD_NAME}\z/
-            [ name.rstrip, value.strip ]
+            [name.rstrip, value.strip]
           else
             Kernel.warn "WARNING: Ignoring unparsable header #{raw_field.inspect}: invalid header name syntax: #{name.inspect}"
             nil
@@ -179,17 +182,13 @@ module Mail
       @name = FIELD_NAME_MAP[@name.to_s.downcase] || @name
     end
 
-    def field=(value)
-      @field = value
-    end
+    attr_writer :field
 
     def field
       @field ||= create_field(@name, @unparsed_value, @charset)
     end
 
-    def name
-      @name
-    end
+    attr_reader :name
 
     def value
       field.value
@@ -213,26 +212,26 @@ module Mail
       @field = create_field(name, value, @charset)
     end
 
-    def same( other )
-      return false unless other.kind_of?(self.class)
-      match_to_s(other.name, self.name)
+    def same(other)
+      return false unless other.is_a?(self.class)
+      match_to_s(other.name, name)
     end
 
-    def ==( other )
-      return false unless other.kind_of?(self.class)
-      match_to_s(other.name, self.name) && match_to_s(other.value, self.value)
+    def ==(other)
+      return false unless other.is_a?(self.class)
+      match_to_s(other.name, name) && match_to_s(other.value, value)
     end
 
-    def responsible_for?( val )
+    def responsible_for?(val)
       name.to_s.casecmp(val.to_s) == 0
     end
 
-    def <=>( other )
-      self.field_order_id <=> other.field_order_id
+    def <=>(other)
+      field_order_id <=> other.field_order_id
     end
 
     def field_order_id
-      @field_order_id ||= (FIELD_ORDER_LOOKUP[self.name.to_s.downcase] || 100)
+      @field_order_id ||= (FIELD_ORDER_LOOKUP[name.to_s.downcase] || 100)
     end
 
     def method_missing(name, *args, &block)
@@ -249,14 +248,16 @@ module Mail
       end
     end
 
-    FIELD_ORDER = %w[ return-path received
-                      resent-date resent-from resent-sender resent-to
-                      resent-cc resent-bcc resent-message-id
-                      date from sender reply-to to cc bcc
-                      message-id in-reply-to references
-                      subject comments keywords
-                      mime-version content-type content-transfer-encoding
-                      content-location content-disposition content-description ]
+    FIELD_ORDER = %w(
+      return-path received
+      resent-date resent-from resent-sender resent-to
+      resent-cc resent-bcc resent-message-id
+      date from sender reply-to to cc bcc
+      message-id in-reply-to references
+      subject comments keywords
+      mime-version content-type content-transfer-encoding
+      content-location content-disposition content-description
+    ).freeze
 
     FIELD_ORDER_LOOKUP = Hash[FIELD_ORDER.each_with_index.to_a]
 

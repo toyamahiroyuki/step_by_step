@@ -41,7 +41,7 @@ module ActiveModel
 
     def []=(key, value)
       if frozen?
-        raise RuntimeError, "Can't modify frozen hash"
+        raise "Can't modify frozen hash"
       end
       delegate_hash[key] = value
     end
@@ -91,36 +91,36 @@ module ActiveModel
 
     protected
 
-      attr_reader :types, :values, :additional_types, :delegate_hash, :default_attributes
+    attr_reader :types, :values, :additional_types, :delegate_hash, :default_attributes
 
-      def materialize
-        unless @materialized
-          values.each_key { |key| self[key] }
-          types.each_key { |key| self[key] }
-          unless frozen?
-            @materialized = true
-          end
+    def materialize
+      unless @materialized
+        values.each_key { |key| self[key] }
+        types.each_key { |key| self[key] }
+        unless frozen?
+          @materialized = true
         end
-        delegate_hash
       end
+      delegate_hash
+    end
 
     private
 
-      def assign_default_value(name)
-        type = additional_types.fetch(name, types[name])
-        value_present = true
-        value = values.fetch(name) { value_present = false }
+    def assign_default_value(name)
+      type = additional_types.fetch(name, types[name])
+      value_present = true
+      value = values.fetch(name) { value_present = false }
 
-        if value_present
-          delegate_hash[name] = Attribute.from_database(name, value, type)
-        elsif types.key?(name)
-          attr = default_attributes[name]
-          if attr
-            delegate_hash[name] = attr.dup
-          else
-            delegate_hash[name] = Attribute.uninitialized(name, type)
-          end
+      if value_present
+        delegate_hash[name] = Attribute.from_database(name, value, type)
+      elsif types.key?(name)
+        attr = default_attributes[name]
+        if attr
+          delegate_hash[name] = attr.dup
+        else
+          delegate_hash[name] = Attribute.uninitialized(name, type)
         end
       end
+    end
   end
 end

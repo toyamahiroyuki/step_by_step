@@ -47,9 +47,9 @@ module Rails::Dom::Testing::Assertions::SelectorAssertions
   #   assert_select '.product'
   # end
 
-  PATTERN_HTML  = "['\"]((\\\\\"|\\\\'|[^\"'])*)['\"]"
-  PATTERN_UNICODE_ESCAPED_CHAR = /\\u([0-9a-zA-Z]{4})/
-  SKELETAL_PATTERN = "(?:jQuery|\\$)\\(%s\\)\\.%s\\(%s\\)[;]?"
+  PATTERN_HTML = "['\"]((\\\\\"|\\\\'|[^\"'])*)['\"]".freeze
+  PATTERN_UNICODE_ESCAPED_CHAR = /\\u([0-9a-zA-Z]{4})/.freeze
+  SKELETAL_PATTERN = "(?:jQuery|\\$)\\(%s\\)\\.%s\\(%s\\)[;]?".freeze
 
   def assert_select_jquery(*args, &block)
     jquery_method = args.first.is_a?(Symbol) ? args.shift : nil
@@ -115,35 +115,35 @@ module Rails::Dom::Testing::Assertions::SelectorAssertions
 
   private
 
-    # Unescapes a JS string.
-    def unescape_js(js_string)
-      # js encodes double quotes and line breaks.
-      unescaped= js_string.gsub('\"', '"')
-      unescaped.gsub!('\\\'', "'")
-      unescaped.gsub!(/\\\//, '/')
-      unescaped.gsub!('\n', "\n")
-      unescaped.gsub!('\076', '>')
-      unescaped.gsub!('\074', '<')
-      # js encodes non-ascii characters.
-      unescaped.gsub!(PATTERN_UNICODE_ESCAPED_CHAR) {|u| [$1.hex].pack('U*')}
-      unescaped
-    end
+  # Unescapes a JS string.
+  def unescape_js(js_string)
+    # js encodes double quotes and line breaks.
+    unescaped = js_string.gsub('\"', '"')
+    unescaped.gsub!('\\\'', "'")
+    unescaped.gsub!(/\\\//, '/')
+    unescaped.gsub!('\n', "\n")
+    unescaped.gsub!('\076', '>')
+    unescaped.gsub!('\074', '<')
+    # js encodes non-ascii characters.
+    unescaped.gsub!(PATTERN_UNICODE_ESCAPED_CHAR) { |u| [Regexp.last_match(1).hex].pack('U*') }
+    unescaped
+  end
 
-    def escape_id(selector)
-      return unless selector
+  def escape_id(selector)
+    return unless selector
 
-      id = selector.gsub('[', '\[')
-      id.gsub!(']', '\]')
-      id.gsub!('*', '\*')
-      id.gsub!('(', '\(')
-      id.gsub!(')', '\)')
-      id.gsub!('.', '\.')
-      id.gsub!('|', '\|')
-      id.gsub!('^', '\^')
-      id.gsub!('$', '\$')
-      id.gsub!('+', "\\\\+")
-      id.gsub!(',', '\,')
+    id = selector.gsub('[', '\[')
+    id.gsub!(']', '\]')
+    id.gsub!('*', '\*')
+    id.gsub!('(', '\(')
+    id.gsub!(')', '\)')
+    id.gsub!('.', '\.')
+    id.gsub!('|', '\|')
+    id.gsub!('^', '\^')
+    id.gsub!('$', '\$')
+    id.gsub!('+', "\\\\+")
+    id.gsub!(',', '\,')
 
-      id
-    end
+    id
+  end
 end

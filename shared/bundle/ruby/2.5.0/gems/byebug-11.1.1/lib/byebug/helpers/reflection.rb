@@ -10,9 +10,9 @@ module Byebug
       # List of "command" classes in the including module
       #
       def commands
-        constants(false)
-          .map { |const| const_get(const, false) }
-          .select { |c| c.is_a?(Class) && c.name =~ /[a-z]Command$/ }
+        constants(false).
+          map { |const| const_get(const, false) }.
+          select { |c| c.is_a?(Class) && c.name =~ /[a-z]Command$/ }
       end
     end
   end

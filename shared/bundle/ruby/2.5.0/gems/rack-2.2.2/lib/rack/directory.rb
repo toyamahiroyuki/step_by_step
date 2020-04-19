@@ -46,7 +46,7 @@ table { width:100%%; }
       # Yield strings for each part of the directory entry
       def each
         show_path = Utils.escape_html(path.sub(/^#{root}/, ''))
-        yield(DIR_PAGE_HEADER % [ show_path, show_path ])
+        yield(DIR_PAGE_HEADER % [show_path, show_path])
 
         unless path.chomp('/') == root
           yield(DIR_FILE % DIR_FILE_escape(files.call('..')))
@@ -104,9 +104,13 @@ table { width:100%%; }
       return if Utils.valid_path?(path_info)
 
       body = "Bad Request\n"
-      [400, { CONTENT_TYPE => "text/plain",
-        CONTENT_LENGTH => body.bytesize.to_s,
-        "X-Cascade" => "pass" }, [body]]
+      [
+        400, {
+          CONTENT_TYPE => "text/plain",
+          CONTENT_LENGTH => body.bytesize.to_s,
+          "X-Cascade" => "pass",
+        }, [body],
+      ]
     end
 
     # Rack response to use for requests with paths outside the root, or nil if path is inside the root.
@@ -115,9 +119,13 @@ table { width:100%%; }
       return if ::File.expand_path(::File.join(@root, path_info)).start_with?(@root)
 
       body = "Forbidden\n"
-      [403, { CONTENT_TYPE => "text/plain",
-        CONTENT_LENGTH => body.bytesize.to_s,
-        "X-Cascade" => "pass" }, [body]]
+      [
+        403, {
+          CONTENT_TYPE => "text/plain",
+          CONTENT_LENGTH => body.bytesize.to_s,
+          "X-Cascade" => "pass",
+        }, [body],
+      ]
     end
 
     # Rack response to use for directories under the root.
@@ -147,17 +155,17 @@ table { width:100%%; }
           size = filesize_format(stat.size)
         end
 
-        [ url, basename, size, type, mtime ]
+        [url, basename, size, type, mtime]
       end)
 
-      [ 200, { CONTENT_TYPE => 'text/html; charset=utf-8' }, body ]
+      [200, { CONTENT_TYPE => 'text/html; charset=utf-8' }, body]
     end
 
     # File::Stat for the given path, but return nil for missing/bad entries.
     def stat(path)
       ::File.stat(path)
     rescue Errno::ENOENT, Errno::ELOOP
-      return nil
+      nil
     end
 
     # Rack response to use for files and directories under the root.
@@ -174,9 +182,13 @@ table { width:100%%; }
     # Rack response to use for unreadable and non-file, non-directory entries.
     def entity_not_found(path_info)
       body = "Entity not found: #{path_info}\n"
-      [404, { CONTENT_TYPE => "text/plain",
-        CONTENT_LENGTH => body.bytesize.to_s,
-        "X-Cascade" => "pass" }, [body]]
+      [
+        404, {
+          CONTENT_TYPE => "text/plain",
+          CONTENT_LENGTH => body.bytesize.to_s,
+          "X-Cascade" => "pass",
+        }, [body],
+      ]
     end
 
     # Stolen from Ramaze
@@ -185,7 +197,7 @@ table { width:100%%; }
       ['%.1fG', 1 << 30],
       ['%.1fM', 1 << 20],
       ['%.1fK', 1 << 10],
-    ]
+    ].freeze
 
     # Provide human readable file sizes
     def filesize_format(int)

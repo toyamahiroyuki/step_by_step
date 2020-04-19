@@ -50,7 +50,7 @@ module Devise
       def remember_me!
         self.remember_token ||= self.class.remember_token if respond_to?(:remember_token)
         self.remember_created_at ||= Time.now.utc
-        save(validate: false) if self.changed?
+        save(validate: false) if changed?
       end
 
       # If the record is persisted, remove the remember token (but only if
@@ -125,7 +125,11 @@ module Devise
         if value =~ /\A\d+\.\d+\Z/
           Time.at(value.to_f)
         else
-          Time.parse(value) rescue nil
+          begin
+            Time.parse(value)
+          rescue
+            nil
+          end
         end
       end
 

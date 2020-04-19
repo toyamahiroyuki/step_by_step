@@ -3,9 +3,10 @@
 require "spec_helper"
 
 RSpec.describe NIO::ByteBuffer do
+  subject(:bytebuffer) { described_class.new(capacity) }
+
   let(:capacity)       { 256 }
   let(:example_string) { "Testing 1 2 3..." }
-  subject(:bytebuffer) { described_class.new(capacity) }
 
   describe "#initialize" do
     it "raises TypeError if given a bogus argument" do
@@ -352,4 +353,3 @@ RSpec.describe NIO::ByteBuffer do
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

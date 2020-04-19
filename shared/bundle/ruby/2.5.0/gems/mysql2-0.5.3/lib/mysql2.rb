@@ -6,17 +6,17 @@ require 'bigdecimal'
 # Or to bomb out with a clear error message instead of a linker crash
 if RUBY_PLATFORM =~ /mswin|mingw/
   dll_path = if ENV['RUBY_MYSQL2_LIBMYSQL_DLL']
-    # If this environment variable is set, it overrides any other paths
-    # The user is advised to use backslashes not forward slashes
-    ENV['RUBY_MYSQL2_LIBMYSQL_DLL']
-  elsif File.exist?(File.expand_path('../vendor/libmysql.dll', File.dirname(__FILE__)))
-    # Use vendor/libmysql.dll if it exists, convert slashes for Win32 LoadLibrary
-    File.expand_path('../vendor/libmysql.dll', File.dirname(__FILE__))
-  elsif defined?(RubyInstaller)
-    # RubyInstaller-2.4+ native build doesn't need DLL preloading
-  else
-    # This will use default / system library paths
-    'libmysql.dll'
+               # If this environment variable is set, it overrides any other paths
+               # The user is advised to use backslashes not forward slashes
+               ENV['RUBY_MYSQL2_LIBMYSQL_DLL']
+             elsif File.exist?(File.expand_path('../vendor/libmysql.dll', File.dirname(__FILE__)))
+               # Use vendor/libmysql.dll if it exists, convert slashes for Win32 LoadLibrary
+               File.expand_path('../vendor/libmysql.dll', File.dirname(__FILE__))
+             elsif defined?(RubyInstaller)
+             # RubyInstaller-2.4+ native build doesn't need DLL preloading
+             else
+               # This will use default / system library paths
+               'libmysql.dll'
   end
 
   if dll_path
@@ -78,9 +78,9 @@ module Mysql2
     #
     require 'timeout'
     TIMEOUT_ERROR_CLASS = if defined?(::Timeout::ExitException)
-      ::Timeout::ExitException
-    else
-      ::Timeout::Error
+                            ::Timeout::ExitException
+                          else
+                            ::Timeout::Error
     end
   end
 end

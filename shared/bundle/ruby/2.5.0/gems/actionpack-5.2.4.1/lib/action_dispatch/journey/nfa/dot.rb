@@ -5,9 +5,9 @@ module ActionDispatch
     module NFA # :nodoc:
       module Dot # :nodoc:
         def to_dot
-          edges = transitions.map { |from, sym, to|
+          edges = transitions.map do |from, sym, to|
             "  #{from} -> #{to} [label=\"#{sym || 'ε'}\"];"
-          }
+          end
 
           # memo_nodes = memos.values.flatten.map { |n|
           #   label = n

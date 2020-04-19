@@ -46,9 +46,8 @@ module I18n
         assert_equal Proc, I18n.t(nil, :default => lambda { |*args| I18n::Tests::Procs.filter_args(*args) }, :resolve => false).class
       end
 
-
       def self.filter_args(*args)
-        args.map {|arg| arg.delete(:fallback_in_progress) if arg.is_a?(Hash) ; arg }.inspect
+        args.map { |arg| arg.delete(:fallback_in_progress) if arg.is_a?(Hash); arg }.inspect
       end
     end
   end

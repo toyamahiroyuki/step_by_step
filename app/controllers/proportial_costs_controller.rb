@@ -1,5 +1,5 @@
 class ProportialCostsController < ApplicationController
-    before_action :authenticate_user!
+  before_action :authenticate_user!
   def new
     @proportial_cost = ProportialCost.new
     @income_day = params["day"]
@@ -14,7 +14,7 @@ class ProportialCostsController < ApplicationController
       redirect_to homes_top_path
     else
       flash[:notice] = "金額には「-」を含めてください。"
-      redirect_to new_proportial_cost_path(day: @income_day )
+      redirect_to new_proportial_cost_path(day: @income_day)
     end
   end
 
@@ -27,11 +27,11 @@ class ProportialCostsController < ApplicationController
     proportial_cost = ProportialCost.find(params[:id])
     if proportial_cost.update(proportial_cost_params)
 
-       redirect_to homes_top_path
+      redirect_to homes_top_path
     else
-       @income_day = params["day"]
-       @proportial_cost = ProportialCost.find(params[:id])
-       render action: :edit
+      @income_day = params["day"]
+      @proportial_cost = ProportialCost.find(params[:id])
+      render action: :edit
     end
   end
 

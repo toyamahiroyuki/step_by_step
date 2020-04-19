@@ -33,11 +33,11 @@ module ActionView
       @path = path
       prefixes = Array(prefixes)
       template_type = if partial
-        "partial"
-      elsif /layouts/i.match?(path)
-        "layout"
-      else
-        "template"
+                        "partial"
+                      elsif /layouts/i.match?(path)
+                        "layout"
+                      else
+                        "template"
       end
 
       if partial && path.present?
@@ -62,9 +62,9 @@ module ActionView
       attr_reader :cause
 
       def initialize(template)
-        super($!.message)
-        set_backtrace($!.backtrace)
-        @cause = $!
+        super($ERROR_INFO.message)
+        set_backtrace($ERROR_INFO.backtrace)
+        @cause = $ERROR_INFO
         @template, @sub_templates = template, nil
       end
 
@@ -87,8 +87,8 @@ module ActionView
 
         source_code = @template.source.split("\n")
 
-        start_on_line = [ num - SOURCE_CODE_RADIUS - 1, 0 ].max
-        end_on_line   = [ num + SOURCE_CODE_RADIUS - 1, source_code.length].min
+        start_on_line = [num - SOURCE_CODE_RADIUS - 1, 0].max
+        end_on_line   = [num + SOURCE_CODE_RADIUS - 1, source_code.length].min
 
         indent = end_on_line.to_s.size + indentation
         return unless source_code = source_code[start_on_line..end_on_line]
@@ -105,7 +105,7 @@ module ActionView
         @line_number ||=
           if file_name
             regexp = /#{Regexp.escape File.basename(file_name)}:(\d+)/
-            $1 if message =~ regexp || backtrace.find { |line| line =~ regexp }
+            Regexp.last_match(1) if message =~ regexp || backtrace.find { |line| line =~ regexp }
           end
       end
 
@@ -115,25 +115,25 @@ module ActionView
 
       private
 
-        def source_location
-          if line_number
-            "on line ##{line_number} of "
-          else
-            "in "
-          end + file_name
-        end
+      def source_location
+        if line_number
+          "on line ##{line_number} of "
+        else
+          "in "
+        end + file_name
+      end
 
-        def formatted_code_for(source_code, line_counter, indent, output)
-          start_value = (output == :html) ? {} : []
-          source_code.inject(start_value) do |result, line|
-            line_counter += 1
-            if output == :html
-              result.update(line_counter.to_s => "%#{indent}s %s\n" % ["", line])
-            else
-              result << "%#{indent}s: %s" % [line_counter, line]
-            end
+      def formatted_code_for(source_code, line_counter, indent, output)
+        start_value = (output == :html) ? {} : []
+        source_code.inject(start_value) do |result, line|
+          line_counter += 1
+          if output == :html
+            result.update(line_counter.to_s => "%#{indent}s %s\n" % ["", line])
+          else
+            result << "%#{indent}s: %s" % [line_counter, line]
           end
         end
+      end
     end
   end
 

@@ -1,7 +1,6 @@
 class MockExpectationError < StandardError; end # :nodoc:
 
 module Minitest # :nodoc:
-
   ##
   # A simple and clean mock object framework.
   #
@@ -10,7 +9,7 @@ module Minitest # :nodoc:
   class Mock
     alias :__respond_to? :respond_to?
 
-    overridden_methods = %w[
+    overridden_methods = %w(
       ===
       class
       inspect
@@ -21,7 +20,7 @@ module Minitest # :nodoc:
       respond_to_missing?
       send
       to_s
-    ]
+    )
 
     instance_methods.each do |m|
       undef_method m unless overridden_methods.include?(m.to_s) || m =~ /^__/
@@ -29,7 +28,7 @@ module Minitest # :nodoc:
 
     overridden_methods.map(&:to_sym).each do |method_id|
       define_method method_id do |*args, &b|
-        if @expected_calls.key? method_id then
+        if @expected_calls.key? method_id
           method_missing(method_id, *args, &b)
         else
           super(*args, &b)
@@ -37,7 +36,7 @@ module Minitest # :nodoc:
       end
     end
 
-    def initialize delegator = nil # :nodoc:
+    def initialize(delegator = nil) # :nodoc:
       @delegator = delegator
       @expected_calls = Hash.new { |calls, name| calls[name] = [] }
       @actual_calls   = Hash.new { |calls, name| calls[name] = [] }
@@ -78,7 +77,7 @@ module Minitest # :nodoc:
     #   @mock.ordinal_increment # => raises MockExpectationError "No more expects available for :ordinal_increment"
     #
 
-    def expect name, retval, args = [], &blk
+    def expect(name, retval, args = [], &blk)
       name = name.to_sym
 
       if block_given?
@@ -91,9 +90,9 @@ module Minitest # :nodoc:
       self
     end
 
-    def __call name, data # :nodoc:
+    def __call(name, data) # :nodoc:
       case data
-      when Hash then
+      when Hash
         "#{name}(#{data[:args].inspect[1..-2]}) => #{data[:retval].inspect}"
       else
         data.map { |d| __call name, d }.join ", "
@@ -115,8 +114,8 @@ module Minitest # :nodoc:
       true
     end
 
-    def method_missing sym, *args, &block # :nodoc:
-      unless @expected_calls.key?(sym) then
+    def method_missing(sym, *args, &block) # :nodoc:
+      unless @expected_calls.key?(sym)
         if @delegator && @delegator.respond_to?(sym)
           return @delegator.public_send(sym, *args, &block)
         else
@@ -128,7 +127,7 @@ module Minitest # :nodoc:
       index = @actual_calls[sym].length
       expected_call = @expected_calls[sym][index]
 
-      unless expected_call then
+      unless expected_call
         raise MockExpectationError, "No more expects available for %p: %p" %
           [sym, args]
       end
@@ -136,27 +135,29 @@ module Minitest # :nodoc:
       expected_args, retval, val_block =
         expected_call.values_at(:args, :retval, :block)
 
-      if val_block then
+      if val_block
         # keep "verify" happy
         @actual_calls[sym] << expected_call
 
-        raise MockExpectationError, "mocked method %p failed block w/ %p" %
-          [sym, args] unless val_block.call(*args, &block)
+        unless val_block.call(*args, &block)
+          raise MockExpectationError, "mocked method %p failed block w/ %p" %
+            [sym, args]
+        end
 
         return retval
       end
 
-      if expected_args.size != args.size then
+      if expected_args.size != args.size
         raise ArgumentError, "mocked method %p expects %d arguments, got %d" %
           [sym, expected_args.size, args.size]
       end
 
       zipped_args = expected_args.zip(args)
-      fully_matched = zipped_args.all? { |mod, a|
-        mod === a or mod == a
-      }
+      fully_matched = zipped_args.all? do |mod, a|
+        (mod === a) || (mod == a)
+      end
 
-      unless fully_matched then
+      unless fully_matched
         raise MockExpectationError, "mocked method %p called with unexpected arguments %p" %
           [sym, args]
       end
@@ -169,7 +170,7 @@ module Minitest # :nodoc:
       retval
     end
 
-    def respond_to? sym, include_private = false # :nodoc:
+    def respond_to?(sym, include_private = false) # :nodoc:
       return true if @expected_calls.key? sym.to_sym
       return true if @delegator && @delegator.respond_to?(sym, include_private)
       __respond_to?(sym, include_private)
@@ -181,7 +182,7 @@ module Minitest::Assertions
   ##
   # Assert that the mock verifies correctly.
 
-  def assert_mock mock
+  def assert_mock(mock)
     assert mock.verify
   end
 end
@@ -190,7 +191,6 @@ end
 # Object extensions for Minitest::Mock.
 
 class Object
-
   ##
   # Add a temporary stubbed method replacing +name+ for the duration
   # of the +block+. If +val_or_callable+ responds to #call, then it
@@ -209,12 +209,12 @@ class Object
   #     end
   #
 
-  def stub name, val_or_callable, *block_args
+  def stub(name, val_or_callable, *block_args)
     new_name = "__minitest_stub__#{name}"
 
     metaclass = class << self; self; end
 
-    if respond_to? name and not methods.map(&:to_s).include? name.to_s then
+    if respond_to?(name) && (!methods.map(&:to_s).include? name.to_s)
       metaclass.send :define_method, name do |*args|
         super(*args)
       end
@@ -223,7 +223,7 @@ class Object
     metaclass.send :alias_method, new_name, name
 
     metaclass.send :define_method, name do |*args, &blk|
-      if val_or_callable.respond_to? :call then
+      if val_or_callable.respond_to? :call
         val_or_callable.call(*args, &blk)
       else
         blk.call(*block_args) if blk

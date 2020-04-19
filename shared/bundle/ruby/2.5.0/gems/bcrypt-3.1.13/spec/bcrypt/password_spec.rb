@@ -1,7 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
 
 describe "Creating a hashed password" do
-
   before :each do
     @secret = "wheedle"
     @password = BCrypt::Password.create(@secret, :cost => 4)
@@ -17,14 +16,14 @@ describe "Creating a hashed password" do
 
   specify "should behave normally if the secret is not a string" do
     expect { BCrypt::Password.create(nil) }.not_to raise_error
-    expect { BCrypt::Password.create({:woo => "yeah"}) }.not_to raise_error
+    expect { BCrypt::Password.create({ :woo => "yeah" }) }.not_to raise_error
     expect { BCrypt::Password.create(false) }.not_to raise_error
   end
 
   specify "should tolerate empty string secrets" do
-    expect { BCrypt::Password.create( "\n".chop  ) }.not_to raise_error
-    expect { BCrypt::Password.create( ""         ) }.not_to raise_error
-    expect { BCrypt::Password.create( String.new ) }.not_to raise_error
+    expect { BCrypt::Password.create("\n".chop) }.not_to raise_error
+    expect { BCrypt::Password.create("") }.not_to raise_error
+    expect { BCrypt::Password.create('') }.not_to raise_error
   end
 end
 
@@ -35,9 +34,9 @@ describe "Reading a hashed password" do
   end
 
   specify "the cost is too damn high" do
-    expect {
+    expect do
       BCrypt::Password.create("hello", :cost => 32)
-    }.to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   specify "the cost should be set to the default if nil" do
@@ -119,6 +118,6 @@ describe "Validating a password hash" do
     expect(BCrypt::Password.valid_hash?("i_am_so_not_valid")).to be_falsey
   end
   specify "should accept a valid password" do
-    expect(BCrypt::Password.valid_hash?(BCrypt::Password.create "i_am_so_valid")).to be_truthy
+    expect(BCrypt::Password.valid_hash?(BCrypt::Password.create("i_am_so_valid"))).to be_truthy
   end
 end

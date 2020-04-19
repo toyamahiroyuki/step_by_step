@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 require './lib/crass/version'
 
 Gem::Specification.new do |s|
@@ -12,10 +13,10 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
 
   s.metadata = {
-    'bug_tracker_uri'   => 'https://github.com/rgrove/crass/issues',
-    'changelog_uri'     => "https://github.com/rgrove/crass/blob/v#{s.version}/HISTORY.md",
+    'bug_tracker_uri' => 'https://github.com/rgrove/crass/issues',
+    'changelog_uri' => "https://github.com/rgrove/crass/blob/v#{s.version}/HISTORY.md",
     'documentation_uri' => "https://www.rubydoc.info/gems/crass/#{s.version}",
-    'source_code_uri'   => "https://github.com/rgrove/crass/tree/v#{s.version}",
+    'source_code_uri' => "https://github.com/rgrove/crass/tree/v#{s.version}",
   }
 
   s.platform = Gem::Platform::RUBY

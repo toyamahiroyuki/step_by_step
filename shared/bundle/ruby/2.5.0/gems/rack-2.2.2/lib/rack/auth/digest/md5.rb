@@ -18,14 +18,13 @@ module Rack
       # +opaque+ needs to be set to a constant base64/hexadecimal string.
       #
       class MD5 < AbstractHandler
-
         attr_accessor :opaque
 
         attr_writer :passwords_hashed
 
         def initialize(app, realm = nil, opaque = nil, &authenticator)
           @passwords_hashed = nil
-          if opaque.nil? and realm.respond_to? :values_at
+          if opaque.nil? && realm.respond_to?(:values_at)
             realm, opaque, @passwords_hashed = realm.values_at :realm, :opaque, :passwords_hashed
           end
           super(app, realm, &authenticator)
@@ -59,7 +58,6 @@ module Rack
 
           unauthorized
         end
-
 
         private
 
@@ -124,7 +122,6 @@ module Rack
 
           KD password_hash, "#{auth.nonce}:#{auth.nc}:#{auth.cnonce}:#{QOP}:#{H A2(auth)}"
         end
-
       end
     end
   end

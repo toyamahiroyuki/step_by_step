@@ -29,11 +29,11 @@ module Rack
         end
 
         def respond_to?(sym, *)
-          super or params.has_key? sym.to_s
+          super || params.key?(sym.to_s)
         end
 
         def method_missing(sym, *args)
-          return super unless params.has_key?(key = sym.to_s)
+          return super unless params.key?(key = sym.to_s)
           return params[key] if args.size == 0
           raise ArgumentError, "wrong number of arguments (#{args.size} for 0)"
         end

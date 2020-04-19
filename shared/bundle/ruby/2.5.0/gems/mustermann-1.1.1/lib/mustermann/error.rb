@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mustermann
   unless defined?(Mustermann::Error)
     Error        = Class.new(StandardError) # Raised if anything goes wrong while generating a {Pattern}.

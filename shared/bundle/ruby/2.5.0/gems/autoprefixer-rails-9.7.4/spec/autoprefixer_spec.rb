@@ -42,18 +42,18 @@ describe AutoprefixerRails do
   end
 
   it "generates separated source map" do
-    result = AutoprefixerRails.process(@css, map: {inline: false})
+    result = AutoprefixerRails.process(@css, map: { inline: false })
     expect(result.map).to be_a(String)
   end
 
   it "uses file name in syntax errors", not_jruby: true do
-    expect {
+    expect do
       AutoprefixerRails.process("a {", from: "a.css")
-    }.to raise_error(/a.css:/)
+    end.to raise_error(/a.css:/)
   end
 
   it "includes sourcesContent by default" do
-    map = AutoprefixerRails.process("a{}", map: {inline: false}).map
+    map = AutoprefixerRails.process("a{}", map: { inline: false }).map
     expect(map).to include("sourcesContent")
   end
 
@@ -86,9 +86,9 @@ describe AutoprefixerRails do
   end
 
   it "shows correct error on country statistics" do
-    expect {
+    expect do
       AutoprefixerRails.process("", overrideBrowserslist: "> 1% in US")
-    }.to raise_error(/Use Autoprefixer with webpack/)
+    end.to raise_error(/Use Autoprefixer with webpack/)
   end
 
   context "Sprockets" do

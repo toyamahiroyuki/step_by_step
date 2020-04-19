@@ -99,7 +99,7 @@ class Pry
     #   histignore array.
     def should_ignore?(line)
       hist_ignore = Pry.config.history.histignore
-      return false if hist_ignore.nil? || hist_ignore.empty?
+      return false if hist_ignore.blank?
 
       hist_ignore.any? { |p| line.to_s.match(p) }
     end
@@ -139,7 +139,7 @@ class Pry
         unless File.exist?(history_file_path)
           FileUtils.mkdir_p(File.dirname(history_file_path))
         end
-        @history_file = File.open(history_file_path, 'a', 0600).tap do |file|
+        @history_file = File.open(history_file_path, 'a', 0o600).tap do |file|
           file.sync = true
         end
       end

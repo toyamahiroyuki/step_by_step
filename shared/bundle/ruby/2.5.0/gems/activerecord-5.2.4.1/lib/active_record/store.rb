@@ -81,7 +81,7 @@ module ActiveRecord
     module ClassMethods
       def store(store_attribute, options = {})
         serialize store_attribute, IndifferentCoder.new(store_attribute, options[:coder])
-        store_accessor(store_attribute, options[:accessors]) if options.has_key? :accessors
+        store_accessor(store_attribute, options[:accessors]) if options.key? :accessors
       end
 
       def store_accessor(store_attribute, *keys)
@@ -124,88 +124,89 @@ module ActiveRecord
     end
 
     private
-      def read_store_attribute(store_attribute, key) # :doc:
-        accessor = store_accessor_for(store_attribute)
-        accessor.read(self, store_attribute, key)
+
+    def read_store_attribute(store_attribute, key) # :doc:
+      accessor = store_accessor_for(store_attribute)
+      accessor.read(self, store_attribute, key)
+    end
+
+    def write_store_attribute(store_attribute, key, value) # :doc:
+      accessor = store_accessor_for(store_attribute)
+      accessor.write(self, store_attribute, key, value)
+    end
+
+    def store_accessor_for(store_attribute)
+      type_for_attribute(store_attribute).accessor
+    end
+
+    class HashAccessor # :nodoc:
+      def self.read(object, attribute, key)
+        prepare(object, attribute)
+        object.public_send(attribute)[key]
       end
 
-      def write_store_attribute(store_attribute, key, value) # :doc:
-        accessor = store_accessor_for(store_attribute)
-        accessor.write(self, store_attribute, key, value)
-      end
-
-      def store_accessor_for(store_attribute)
-        type_for_attribute(store_attribute).accessor
-      end
-
-      class HashAccessor # :nodoc:
-        def self.read(object, attribute, key)
-          prepare(object, attribute)
-          object.public_send(attribute)[key]
-        end
-
-        def self.write(object, attribute, key, value)
-          prepare(object, attribute)
-          if value != read(object, attribute, key)
-            object.public_send :"#{attribute}_will_change!"
-            object.public_send(attribute)[key] = value
-          end
-        end
-
-        def self.prepare(object, attribute)
-          object.public_send :"#{attribute}=", {} unless object.send(attribute)
+      def self.write(object, attribute, key, value)
+        prepare(object, attribute)
+        if value != read(object, attribute, key)
+          object.public_send :"#{attribute}_will_change!"
+          object.public_send(attribute)[key] = value
         end
       end
 
-      class StringKeyedHashAccessor < HashAccessor # :nodoc:
-        def self.read(object, attribute, key)
-          super object, attribute, key.to_s
-        end
+      def self.prepare(object, attribute)
+        object.public_send :"#{attribute}=", {} unless object.send(attribute)
+      end
+    end
 
-        def self.write(object, attribute, key, value)
-          super object, attribute, key.to_s, value
-        end
+    class StringKeyedHashAccessor < HashAccessor # :nodoc:
+      def self.read(object, attribute, key)
+        super object, attribute, key.to_s
       end
 
-      class IndifferentHashAccessor < ActiveRecord::Store::HashAccessor # :nodoc:
-        def self.prepare(object, store_attribute)
-          attribute = object.send(store_attribute)
-          unless attribute.is_a?(ActiveSupport::HashWithIndifferentAccess)
-            attribute = IndifferentCoder.as_indifferent_hash(attribute)
-            object.send :"#{store_attribute}=", attribute
-          end
-          attribute
-        end
+      def self.write(object, attribute, key, value)
+        super object, attribute, key.to_s, value
       end
+    end
 
-      class IndifferentCoder # :nodoc:
-        def initialize(attr_name, coder_or_class_name)
-          @coder =
-            if coder_or_class_name.respond_to?(:load) && coder_or_class_name.respond_to?(:dump)
-              coder_or_class_name
-            else
-              ActiveRecord::Coders::YAMLColumn.new(attr_name, coder_or_class_name || Object)
-            end
+    class IndifferentHashAccessor < ActiveRecord::Store::HashAccessor # :nodoc:
+      def self.prepare(object, store_attribute)
+        attribute = object.send(store_attribute)
+        unless attribute.is_a?(ActiveSupport::HashWithIndifferentAccess)
+          attribute = IndifferentCoder.as_indifferent_hash(attribute)
+          object.send :"#{store_attribute}=", attribute
         end
+        attribute
+      end
+    end
 
-        def dump(obj)
-          @coder.dump self.class.as_indifferent_hash(obj)
-        end
-
-        def load(yaml)
-          self.class.as_indifferent_hash(@coder.load(yaml || ""))
-        end
-
-        def self.as_indifferent_hash(obj)
-          case obj
-          when ActiveSupport::HashWithIndifferentAccess
-            obj
-          when Hash
-            obj.with_indifferent_access
+    class IndifferentCoder # :nodoc:
+      def initialize(attr_name, coder_or_class_name)
+        @coder =
+          if coder_or_class_name.respond_to?(:load) && coder_or_class_name.respond_to?(:dump)
+            coder_or_class_name
           else
-            ActiveSupport::HashWithIndifferentAccess.new
+            ActiveRecord::Coders::YAMLColumn.new(attr_name, coder_or_class_name || Object)
           end
+      end
+
+      def dump(obj)
+        @coder.dump self.class.as_indifferent_hash(obj)
+      end
+
+      def load(yaml)
+        self.class.as_indifferent_hash(@coder.load(yaml || ""))
+      end
+
+      def self.as_indifferent_hash(obj)
+        case obj
+        when ActiveSupport::HashWithIndifferentAccess
+          obj
+        when Hash
+          obj.with_indifferent_access
+        else
+          ActiveSupport::HashWithIndifferentAccess.new
         end
       end
+    end
   end
 end

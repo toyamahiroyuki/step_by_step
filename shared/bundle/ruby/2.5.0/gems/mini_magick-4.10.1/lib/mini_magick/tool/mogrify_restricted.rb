@@ -8,7 +8,7 @@ module MiniMagick
     class MogrifyRestricted < Mogrify
       def format(*args)
         fail NoMethodError,
-          "you must call #format on a MiniMagick::Image directly"
+             "you must call #format on a MiniMagick::Image directly"
       end
     end
   end

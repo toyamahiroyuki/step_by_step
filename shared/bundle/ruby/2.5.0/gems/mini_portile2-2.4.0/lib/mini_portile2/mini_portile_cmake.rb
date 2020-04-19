@@ -25,7 +25,7 @@ class MiniPortileCMake < MiniPortile
   def configured?
     configure = File.join(work_path, 'configure')
     makefile  = File.join(work_path, 'CMakefile')
-    cache_file  = File.join(tmp_path, 'configure.options_cache')
+    cache_file = File.join(tmp_path, 'configure.options_cache')
 
     stored_options  = File.exist?(cache_file) ? File.read(cache_file) : ""
     current_options = computed_options.to_s

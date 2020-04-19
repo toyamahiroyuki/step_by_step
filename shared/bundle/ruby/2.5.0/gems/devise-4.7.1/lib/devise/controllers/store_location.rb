@@ -35,7 +35,7 @@ module Devise
       #
       def store_location_for(resource_or_scope, location)
         session_key = stored_location_key_for(resource_or_scope)
-        
+
         path = extract_path_from_location(location)
         session[session_key] = path if path
       end
@@ -56,7 +56,7 @@ module Devise
       def extract_path_from_location(location)
         uri = parse_uri(location)
 
-        if uri 
+        if uri
           path = remove_domain_from_uri(uri)
           path = add_fragment_back_to_path(uri, path)
 

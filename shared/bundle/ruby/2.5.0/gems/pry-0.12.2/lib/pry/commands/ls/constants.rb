@@ -3,7 +3,7 @@ require 'pry/commands/ls/interrogatable'
 class Pry
   class Command::Ls < Pry::ClassCommand
     class Constants < Pry::Command::Ls::Formatter
-      DEPRECATED_CONSTANTS = [:Data, :Fixnum, :Bignum, :TimeoutError, :NIL, :FALSE, :TRUE]
+      DEPRECATED_CONSTANTS = [:Data, :Fixnum, :Bignum, :TimeoutError, :NIL, :FALSE, :TRUE].freeze
       DEPRECATED_CONSTANTS << :JavaPackageModuleTemplate if Helpers::Platform.jruby?
       include Pry::Command::Ls::Interrogatable
 
@@ -34,16 +34,28 @@ class Pry
 
       def format(mod, constants)
         constants.sort_by(&:downcase).map do |name|
-          if Object.respond_to?(:deprecate_constant) and
-            DEPRECATED_CONSTANTS.include?(name)      and
+          if Object.respond_to?(:deprecate_constant) &&
+            DEPRECATED_CONSTANTS.include?(name)      &&
             !show_deprecated_constants?
             next
           end
 
-          if (const = (!mod.autoload?(name) && (mod.const_get(name) || true) rescue nil))
-            if (const < Exception rescue false)
+          if (const = (begin
+                         !mod.autoload?(name) && (mod.const_get(name) || true)
+                       rescue
+                         nil
+                       end))
+            if begin
+                  const < Exception
+               rescue
+                 false
+                end
               color(:exception_constant, name)
-            elsif (Module === mod.const_get(name) rescue false)
+            elsif begin
+                     Module === mod.const_get(name)
+                  rescue
+                    false
+                   end
               color(:class_constant, name)
             else
               color(:constant, name)

@@ -39,7 +39,8 @@ module ActiveRecord
         end
       end
 
-    private
+      private
+
       # The check for an existing value should be run from a class that
       # isn't abstract. This means working down from the current class
       # (self), to the first non-abstract class. Since classes don't know
@@ -77,10 +78,10 @@ module ActiveRecord
         column = klass.columns_hash[attribute_name]
 
         comparison = if !options[:case_sensitive]
-          # will use SQL LOWER function before comparison, unless it detects a case insensitive collation
-          klass.connection.case_insensitive_comparison(table, attribute, column, value)
-        else
-          klass.connection.case_sensitive_comparison(table, attribute, column, value)
+                       # will use SQL LOWER function before comparison, unless it detects a case insensitive collation
+                       klass.connection.case_insensitive_comparison(table, attribute, column, value)
+                     else
+                       klass.connection.case_sensitive_comparison(table, attribute, column, value)
         end
         klass.unscoped.where!(comparison)
       end
@@ -88,9 +89,9 @@ module ActiveRecord
       def scope_relation(record, relation)
         Array(options[:scope]).each do |scope_item|
           scope_value = if record.class._reflect_on_association(scope_item)
-            record.association(scope_item).reader
-          else
-            record._read_attribute(scope_item)
+                          record.association(scope_item).reader
+                        else
+                          record._read_attribute(scope_item)
           end
           relation = relation.where(scope_item => scope_value)
         end

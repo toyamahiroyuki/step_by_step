@@ -20,8 +20,7 @@ class User < ApplicationRecord
   has_many :movings, dependent: :destroy
   has_many :proportial_costs, dependent: :destroy
   has_many :movings, dependent: :destroy
-  has_many :targets,  dependent: :destroy
+  has_many :targets, dependent: :destroy
 
-  enum sex: { 男性: 0, 女性: 1, その他: 2}
-
+  enum sex: { 男性: 0, 女性: 1, その他: 2 }
 end

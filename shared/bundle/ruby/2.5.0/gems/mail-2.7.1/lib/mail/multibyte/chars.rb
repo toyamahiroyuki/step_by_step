@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 require 'mail/multibyte/unicode'
 
 module Mail #:nodoc:
@@ -57,13 +58,13 @@ module Mail #:nodoc:
           self
         else
           result = @wrapped_string.__send__(method, *args, &block)
-          result.kind_of?(String) ? chars(result) : result
+          result.is_a?(String) ? chars(result) : result
         end
       end
 
       # Returns +true+ if _obj_ responds to the given method. Private methods are included in the search
       # only if the optional second parameter evaluates to +true+.
-      def respond_to?(method, include_private=false)
+      def respond_to?(method, include_private = false)
         super || @wrapped_string.respond_to?(method, include_private) || false
       end
 
@@ -123,12 +124,12 @@ module Mail #:nodoc:
         #   Mail::Multibyte.mb_chars('Café').insert(4, ' périferôl').to_s # => "Café périferôl"
         def insert(offset, fragment)
           unpacked = Unicode.u_unpack(@wrapped_string)
-          unless offset > unpacked.length
+          if offset > unpacked.length
+            raise IndexError, "index #{offset} out of string"
+          else
             @wrapped_string.replace(
               Unicode.u_unpack(@wrapped_string).insert(offset, *Unicode.u_unpack(fragment)).pack('U*')
             )
-          else
-            raise IndexError, "index #{offset} out of string"
           end
           self
         end
@@ -147,10 +148,10 @@ module Mail #:nodoc:
         # Example:
         #   Mail::Multibyte.mb_chars('Café périferôl').index('ô')   # => 12
         #   Mail::Multibyte.mb_chars('Café périferôl').index(/\w/u) # => 0
-        def index(needle, offset=0)
+        def index(needle, offset = 0)
           wrapped_offset = first(offset).wrapped_string.length
           index = @wrapped_string.index(needle, wrapped_offset)
-          index ? (Unicode.u_unpack(@wrapped_string.slice(0...index)).size) : nil
+          index ? Unicode.u_unpack(@wrapped_string.slice(0...index)).size : nil
         end
 
         # Returns the position _needle_ in the string, counting in
@@ -160,11 +161,11 @@ module Mail #:nodoc:
         # Example:
         #   Mail::Multibyte.mb_chars('Café périferôl').rindex('é')   # => 6
         #   Mail::Multibyte.mb_chars('Café périferôl').rindex(/\w/u) # => 13
-        def rindex(needle, offset=nil)
+        def rindex(needle, offset = nil)
           offset ||= length
           wrapped_offset = first(offset).wrapped_string.length
           index = @wrapped_string.rindex(needle, wrapped_offset)
-          index ? (Unicode.u_unpack(@wrapped_string.slice(0...index)).size) : nil
+          index ? Unicode.u_unpack(@wrapped_string.slice(0...index)).size : nil
         end
 
         # Returns the number of codepoints in the string
@@ -205,7 +206,7 @@ module Mail #:nodoc:
         #
         #   Mail::Multibyte.mb_chars("¾ cup").rjust(8, " ").to_s # Use non-breaking whitespace
         #   # => "   ¾ cup"
-        def rjust(integer, padstr=' ')
+        def rjust(integer, padstr = ' ')
           justify(integer, :right, padstr)
         end
 
@@ -218,7 +219,7 @@ module Mail #:nodoc:
         #
         #   Mail::Multibyte.mb_chars("¾ cup").rjust(8, " ").to_s # Use non-breaking whitespace
         #   # => "¾ cup   "
-        def ljust(integer, padstr=' ')
+        def ljust(integer, padstr = ' ')
           justify(integer, :left, padstr)
         end
 
@@ -231,7 +232,7 @@ module Mail #:nodoc:
         #
         #   Mail::Multibyte.mb_chars("¾ cup").center(8, " ").to_s # Use non-breaking whitespace
         #   # => " ¾ cup  "
-        def center(integer, padstr=' ')
+        def center(integer, padstr = ' ')
           justify(integer, :center, padstr)
         end
 
@@ -306,16 +307,16 @@ module Mail #:nodoc:
       def slice(*args)
         if args.size > 2
           raise ArgumentError, "wrong number of arguments (#{args.size} for 1)" # Do as if we were native
-        elsif (args.size == 2 && !(args.first.is_a?(Numeric) || args.first.is_a?(Regexp)))
+        elsif args.size == 2 && !(args.first.is_a?(Numeric) || args.first.is_a?(Regexp))
           raise TypeError, "cannot convert #{args.first.class} into Integer" # Do as if we were native
-        elsif (args.size == 2 && !args[1].is_a?(Numeric))
+        elsif args.size == 2 && !args[1].is_a?(Numeric)
           raise TypeError, "cannot convert #{args[1].class} into Integer" # Do as if we were native
-        elsif args[0].kind_of? Range
+        elsif args[0].is_a? Range
           cps = Unicode.u_unpack(@wrapped_string).slice(*args)
           result = cps.nil? ? nil : cps.pack('U*')
-        elsif args[0].kind_of? Regexp
+        elsif args[0].is_a? Regexp
           result = @wrapped_string.slice(*args)
-        elsif args.size == 1 && args[0].kind_of?(Numeric)
+        elsif args.size == 1 && args[0].is_a?(Numeric)
           character = Unicode.u_unpack(@wrapped_string)[args[0]]
           result = character && [character].pack('U')
         else
@@ -366,7 +367,7 @@ module Mail #:nodoc:
       #   Mail::Multibyte.mb_chars("ÉL QUE SE ENTERÓ").titleize    # => "Él Que Se Enteró"
       #   Mail::Multibyte.mb_chars("日本語").titleize                 # => "日本語"
       def titleize
-        chars(downcase.to_s.gsub(/\b('?\S)/u) { Unicode.apply_mapping $1, :uppercase_mapping })
+        chars(downcase.to_s.gsub(/\b('?\S)/u) { Unicode.apply_mapping Regexp.last_match(1), :uppercase_mapping })
       end
       alias_method :titlecase, :titleize
 
@@ -427,50 +428,50 @@ module Mail #:nodoc:
 
       protected
 
-        def translate_offset(byte_offset) #:nodoc:
-          return nil if byte_offset.nil?
-          return 0   if @wrapped_string == ''
+      def translate_offset(byte_offset) #:nodoc:
+        return nil if byte_offset.nil?
+        return 0   if @wrapped_string == ''
 
-          if @wrapped_string.respond_to?(:force_encoding)
-            @wrapped_string = @wrapped_string.dup.force_encoding(Encoding::ASCII_8BIT)
-          end
-
-          begin
-            @wrapped_string[0...byte_offset].unpack('U*').length
-          rescue ArgumentError
-            byte_offset -= 1
-            retry
-          end
+        if @wrapped_string.respond_to?(:force_encoding)
+          @wrapped_string = @wrapped_string.dup.force_encoding(Encoding::ASCII_8BIT)
         end
 
-        def justify(integer, way, padstr=' ') #:nodoc:
-          raise ArgumentError, "zero width padding" if padstr.length == 0
-          padsize = integer - size
-          padsize = padsize > 0 ? padsize : 0
-          case way
-          when :right
-            result = @wrapped_string.dup.insert(0, padding(padsize, padstr))
-          when :left
-            result = @wrapped_string.dup.insert(-1, padding(padsize, padstr))
-          when :center
-            lpad = padding((padsize / 2.0).floor, padstr)
-            rpad = padding((padsize / 2.0).ceil, padstr)
-            result = @wrapped_string.dup.insert(0, lpad).insert(-1, rpad)
-          end
-          chars(result)
+        begin
+          @wrapped_string[0...byte_offset].unpack('U*').length
+        rescue ArgumentError
+          byte_offset -= 1
+          retry
         end
+      end
 
-        def padding(padsize, padstr=' ') #:nodoc:
-          if padsize != 0
-            chars(padstr * ((padsize / Unicode.u_unpack(padstr).size) + 1)).slice(0, padsize)
-          else
-            ''
-          end
+      def justify(integer, way, padstr = ' ') #:nodoc:
+        raise ArgumentError, "zero width padding" if padstr.length == 0
+        padsize = integer - size
+        padsize = padsize > 0 ? padsize : 0
+        case way
+        when :right
+          result = @wrapped_string.dup.insert(0, padding(padsize, padstr))
+        when :left
+          result = @wrapped_string.dup.insert(-1, padding(padsize, padstr))
+        when :center
+          lpad = padding((padsize / 2.0).floor, padstr)
+          rpad = padding((padsize / 2.0).ceil, padstr)
+          result = @wrapped_string.dup.insert(0, lpad).insert(-1, rpad)
         end
+        chars(result)
+      end
 
-        def chars(string) #:nodoc:
-          self.class.new(string)
+      def padding(padsize, padstr = ' ') #:nodoc:
+        if padsize != 0
+          chars(padstr * ((padsize / Unicode.u_unpack(padstr).size) + 1)).slice(0, padsize)
+        else
+          ''
         end
+      end
+
+      def chars(string) #:nodoc:
+        self.class.new(string)
+      end
     end
   end
 end

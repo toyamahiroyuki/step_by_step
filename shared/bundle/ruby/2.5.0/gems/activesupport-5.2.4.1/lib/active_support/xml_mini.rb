@@ -30,47 +30,55 @@ module ActiveSupport
       end
     end
 
-    DEFAULT_ENCODINGS = {
-      "binary" => "base64"
-    } unless defined?(DEFAULT_ENCODINGS)
+    unless defined?(DEFAULT_ENCODINGS)
+      DEFAULT_ENCODINGS = {
+        "binary" => "base64",
+      }.freeze
+    end
 
     unless defined?(TYPE_NAMES)
       TYPE_NAMES = {
-        "Symbol"     => "symbol",
-        "Integer"    => "integer",
+        "Symbol" => "symbol",
+        "Integer" => "integer",
         "BigDecimal" => "decimal",
-        "Float"      => "float",
-        "TrueClass"  => "boolean",
+        "Float" => "float",
+        "TrueClass" => "boolean",
         "FalseClass" => "boolean",
-        "Date"       => "date",
-        "DateTime"   => "dateTime",
-        "Time"       => "dateTime",
-        "Array"      => "array",
-        "Hash"       => "hash"
-      }
+        "Date" => "date",
+        "DateTime" => "dateTime",
+        "Time" => "dateTime",
+        "Array" => "array",
+        "Hash" => "hash",
+      }.freeze
 
       # No need to map these on Ruby 2.4+
       TYPE_NAMES["Fixnum"] = "integer" unless 0.class == Integer
       TYPE_NAMES["Bignum"] = "integer" unless 0.class == Integer
     end
 
-    FORMATTING = {
-      "symbol"   => Proc.new { |symbol| symbol.to_s },
-      "date"     => Proc.new { |date| date.to_s(:db) },
-      "dateTime" => Proc.new { |time| time.xmlschema },
-      "binary"   => Proc.new { |binary| ::Base64.encode64(binary) },
-      "yaml"     => Proc.new { |yaml| yaml.to_yaml }
-    } unless defined?(FORMATTING)
+    unless defined?(FORMATTING)
+      FORMATTING = {
+        "symbol" => Proc.new { |symbol| symbol.to_s },
+        "date" => Proc.new { |date| date.to_s(:db) },
+        "dateTime" => Proc.new { |time| time.xmlschema },
+        "binary" => Proc.new { |binary| ::Base64.encode64(binary) },
+        "yaml" => Proc.new { |yaml| yaml.to_yaml },
+      }.freeze
+    end
 
     # TODO use regexp instead of Date.parse
     unless defined?(PARSING)
       PARSING = {
-        "symbol"       => Proc.new { |symbol|  symbol.to_s.to_sym },
-        "date"         => Proc.new { |date|    ::Date.parse(date) },
-        "datetime"     => Proc.new { |time|    Time.xmlschema(time).utc rescue ::DateTime.parse(time).utc },
-        "integer"      => Proc.new { |integer| integer.to_i },
-        "float"        => Proc.new { |float|   float.to_f },
-        "decimal"      => Proc.new do |number|
+        "symbol" => Proc.new { |symbol| symbol.to_s.to_sym },
+        "date" => Proc.new { |date| ::Date.parse(date) },
+        "datetime" => Proc.new do |time|
+                        Time.xmlschema(time).utc
+                      rescue
+                        ::DateTime.parse(time).utc
+                      end,
+        "integer" => Proc.new { |integer| integer.to_i },
+        "float" => Proc.new { |float| float.to_f },
+        "decimal" => Proc.new do |number|
           if String === number
             begin
               BigDecimal(number)
@@ -81,16 +89,20 @@ module ActiveSupport
             BigDecimal(number)
           end
         end,
-        "boolean"      => Proc.new { |boolean| %w(1 true).include?(boolean.to_s.strip) },
-        "string"       => Proc.new { |string|  string.to_s },
-        "yaml"         => Proc.new { |yaml|    YAML.load(yaml) rescue yaml },
-        "base64Binary" => Proc.new { |bin|     ::Base64.decode64(bin) },
-        "binary"       => Proc.new { |bin, entity| _parse_binary(bin, entity) },
-        "file"         => Proc.new { |file, entity| _parse_file(file, entity) }
-      }
+        "boolean" => Proc.new { |boolean| %w(1 true).include?(boolean.to_s.strip) },
+        "string" => Proc.new { |string| string.to_s },
+        "yaml" => Proc.new do |yaml|
+                    YAML.load(yaml)
+                  rescue
+                    yaml
+                  end,
+        "base64Binary" => Proc.new { |bin| ::Base64.decode64(bin) },
+        "binary" => Proc.new { |bin, entity| _parse_binary(bin, entity) },
+        "file" => Proc.new { |file, entity| _parse_file(file, entity) },
+      }.freeze
 
       PARSING.update(
-        "double"   => PARSING["float"],
+        "double" => PARSING["float"],
         "dateTime" => PARSING["datetime"]
       )
     end
@@ -153,7 +165,7 @@ module ActiveSupport
 
     def rename_key(key, options = {})
       camelize  = options[:camelize]
-      dasherize = !options.has_key?(:dasherize) || options[:dasherize]
+      dasherize = !options.key?(:dasherize) || options[:dasherize]
       if camelize
         key = true == camelize ? key.camelize : key.camelize(camelize)
       end
@@ -163,46 +175,46 @@ module ActiveSupport
 
     private
 
-      def _dasherize(key)
-        # $2 must be a non-greedy regex for this to work
-        left, middle, right = /\A(_*)(.*?)(_*)\Z/.match(key.strip)[1, 3]
-        "#{left}#{middle.tr('_ ', '--')}#{right}"
-      end
+    def _dasherize(key)
+      # $2 must be a non-greedy regex for this to work
+      left, middle, right = /\A(_*)(.*?)(_*)\Z/.match(key.strip)[1, 3]
+      "#{left}#{middle.tr('_ ', '--')}#{right}"
+    end
 
-      # TODO: Add support for other encodings
-      def _parse_binary(bin, entity)
-        case entity["encoding"]
-        when "base64"
-          ::Base64.decode64(bin)
-        else
-          bin
-        end
+    # TODO: Add support for other encodings
+    def _parse_binary(bin, entity)
+      case entity["encoding"]
+      when "base64"
+        ::Base64.decode64(bin)
+      else
+        bin
       end
+    end
 
-      def _parse_file(file, entity)
-        f = StringIO.new(::Base64.decode64(file))
-        f.extend(FileLike)
-        f.original_filename = entity["name"]
-        f.content_type = entity["content_type"]
-        f
-      end
+    def _parse_file(file, entity)
+      f = StringIO.new(::Base64.decode64(file))
+      f.extend(FileLike)
+      f.original_filename = entity["name"]
+      f.content_type = entity["content_type"]
+      f
+    end
 
-      def current_thread_backend
-        Thread.current[:xml_mini_backend]
-      end
+    def current_thread_backend
+      Thread.current[:xml_mini_backend]
+    end
 
-      def current_thread_backend=(name)
-        Thread.current[:xml_mini_backend] = name && cast_backend_name_to_module(name)
-      end
+    def current_thread_backend=(name)
+      Thread.current[:xml_mini_backend] = name && cast_backend_name_to_module(name)
+    end
 
-      def cast_backend_name_to_module(name)
-        if name.is_a?(Module)
-          name
-        else
-          require "active_support/xml_mini/#{name.downcase}"
-          ActiveSupport.const_get("XmlMini_#{name}")
-        end
+    def cast_backend_name_to_module(name)
+      if name.is_a?(Module)
+        name
+      else
+        require "active_support/xml_mini/#{name.downcase}"
+        ActiveSupport.const_get("XmlMini_#{name}")
       end
+    end
   end
 
   XmlMini.backend = "REXML"

@@ -6,10 +6,11 @@ module Rack
   module Handler
     class LSWS
       def self.run(app, **options)
-        while LSAPI.accept != nil
+        while !LSAPI.accept.nil?
           serve app
         end
       end
+
       def self.serve(app)
         env = ENV.to_hash
         env.delete "HTTP_CONTENT_LENGTH"
@@ -18,13 +19,13 @@ module Rack
         rack_input = RewindableInput.new($stdin.read.to_s)
 
         env.update(
-          RACK_VERSION      => Rack::VERSION,
-          RACK_INPUT        => rack_input,
-          RACK_ERRORS       => $stderr,
-          RACK_MULTITHREAD  => false,
+          RACK_VERSION => Rack::VERSION,
+          RACK_INPUT => rack_input,
+          RACK_ERRORS => $stderr,
+          RACK_MULTITHREAD => false,
           RACK_MULTIPROCESS => true,
-          RACK_RUNONCE      => false,
-          RACK_URL_SCHEME   => ["yes", "on", "1"].include?(ENV[HTTPS]) ? "https" : "http"
+          RACK_RUNONCE => false,
+          RACK_URL_SCHEME => ["yes", "on", "1"].include?(ENV[HTTPS]) ? "https" : "http"
         )
 
         env[QUERY_STRING] ||= ""
@@ -40,21 +41,23 @@ module Rack
       ensure
         rack_input.close
       end
+
       def self.send_headers(status, headers)
         print "Status: #{status}\r\n"
-        headers.each { |k, vs|
-          vs.split("\n").each { |v|
+        headers.each do |k, vs|
+          vs.split("\n").each do |v|
             print "#{k}: #{v}\r\n"
-          }
-        }
+          end
+        end
         print "\r\n"
         STDOUT.flush
       end
+
       def self.send_body(body)
-        body.each { |part|
+        body.each do |part|
           print part
           STDOUT.flush
-        }
+        end
       end
     end
   end

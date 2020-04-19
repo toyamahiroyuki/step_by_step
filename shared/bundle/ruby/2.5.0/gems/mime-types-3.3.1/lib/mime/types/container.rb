@@ -36,11 +36,11 @@ class MIME::Types::Container #:nodoc:
   end
 
   def merge!(other)
-    tap {
-      other = other.kind_of?(MIME::Types::Container) ? other.container : other
+    tap do
+      other = other.is_a?(MIME::Types::Container) ? other.container : other
       container.merge!(other)
       normalize
-    }
+    end
   end
 
   def to_hash
@@ -85,7 +85,7 @@ class MIME::Types::Container #:nodoc:
 
   def normalize
     container.each do |k, v|
-      next if v.kind_of?(Set)
+      next if v.is_a?(Set)
 
       container[k] = Set[*v]
     end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann'
 require 'mustermann/identity'
 require 'mustermann/ast/pattern'
@@ -58,7 +59,7 @@ module Mustermann
     # @see Mustermann::Pattern#|
     def |(other)
       return super unless converted = self.class.try_convert(other, **options)
-      return super unless converted.names.empty? or names.empty?
+      return super unless converted.names.empty? || names.empty?
       self.class.new(safe_string + "|" + converted.safe_string, **options)
     end
 

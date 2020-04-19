@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "zlib"
-require "time"  # for Time.httpdate
+require "time" # for Time.httpdate
 
 module Rack
   # This middleware enables content encoding of http responses,
@@ -93,14 +93,14 @@ module Rack
         @writer = block
         gzip = ::Zlib::GzipWriter.new(self)
         gzip.mtime = @mtime if @mtime
-        @body.each { |part|
+        @body.each do |part|
           # Skip empty strings, as they would result in no output,
           # and flushing empty parts would raise Zlib::BufError.
           next if part.empty?
 
           gzip.write(part)
           gzip.flush if @sync
-        }
+        end
       ensure
         gzip.close
       end
@@ -129,7 +129,7 @@ module Rack
       end
 
       # Skip if @compressible_types are given and does not include request's content type
-      return false if @compressible_types && !(headers.has_key?('Content-Type') && @compressible_types.include?(headers['Content-Type'][/[^;]*/]))
+      return false if @compressible_types && !(headers.key?('Content-Type') && @compressible_types.include?(headers['Content-Type'][/[^;]*/]))
 
       # Skip if @condition lambda is given and evaluates to false
       return false if @condition && !@condition.call(env, status, headers, body)

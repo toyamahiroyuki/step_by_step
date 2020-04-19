@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 require "minitest/metametameta"
 require "stringio"
 
@@ -17,7 +18,7 @@ describe Minitest::Spec do
 
   # do not parallelize this suite... it just can"t handle it.
 
-  def assert_triggered expected = "blah", klass = Minitest::Assertion
+  def assert_triggered(expected = "blah", klass = Minitest::Assertion)
     @assertion_count += 1
 
     e = assert_raises(klass) do
@@ -32,7 +33,7 @@ describe Minitest::Spec do
     if expected
       @assertion_count += 1
       case expected
-      when String then
+      when String
         assert_equal expected, msg
       when Regexp then
         @assertion_count += 1
@@ -48,7 +49,7 @@ describe Minitest::Spec do
   end
 
   after do
-    _(self.assertions).must_equal @assertion_count if passed? and not skipped?
+    _(assertions).must_equal @assertion_count if passed? && !skipped?
   end
 
   it "needs to be able to catch a Minitest::Assertion exception" do
@@ -154,26 +155,28 @@ describe Minitest::Spec do
 
     musts, wonts = methods.sort.partition { |m| m =~ /must/ }
 
-    expected_musts = %w[must_be
-                        must_be_close_to
-                        must_be_empty
-                        must_be_instance_of
-                        must_be_kind_of
-                        must_be_nil
-                        must_be_same_as
-                        must_be_silent
-                        must_be_within_delta
-                        must_be_within_epsilon
-                        must_equal
-                        must_include
-                        must_match
-                        must_output
-                        must_raise
-                        must_respond_to
-                        must_throw
-                        path_must_exist]
+    expected_musts = %w(
+      must_be
+      must_be_close_to
+      must_be_empty
+      must_be_instance_of
+      must_be_kind_of
+      must_be_nil
+      must_be_same_as
+      must_be_silent
+      must_be_within_delta
+      must_be_within_epsilon
+      must_equal
+      must_include
+      must_match
+      must_output
+      must_raise
+      must_respond_to
+      must_throw
+      path_must_exist
+    )
 
-    bad = %w[not raise throw send output be_silent]
+    bad = %w(not raise throw send output be_silent)
 
     expected_wonts = expected_musts.map { |m| m.sub(/must/, "wont") }.sort
     expected_wonts.reject! { |m| m =~ /wont_#{Regexp.union(*bad)}/ }
@@ -245,7 +248,7 @@ describe Minitest::Spec do
       _(_(nil).must_equal(nil)).must_equal true
     end
 
-    exp = "DEPRECATED: Use assert_nil if expecting nil from #{__FILE__}:#{__LINE__-3}. " \
+    exp = "DEPRECATED: Use assert_nil if expecting nil from #{__FILE__}:#{__LINE__ - 3}. " \
       "This will fail in Minitest 6.\n"
     exp = "" if $-w.nil?
 
@@ -545,11 +548,11 @@ describe Minitest::Spec do
 
       e = assert_raises RuntimeError do
         capture_io do
-          Thread.new { # forces ctx to be nil
+          Thread.new do # forces ctx to be nil
             describe("woot") do
               (1 + 1).must_equal 2
             end
-          }.join
+          end.join
         end
       end
 
@@ -694,6 +697,7 @@ describe Minitest::Spec, :let do
           let(:bar)
         end
       end
+
       :good
     end.call
     _(v).must_equal :good
@@ -785,27 +789,32 @@ class TestMeta < MetaMetaMetaTestCase
     after_list  = []
     x = describe "top-level thingy" do
       before { before_list << 1 }
+
       after  { after_list  << 1 }
 
       it "top-level-it" do end
 
       y = describe "inner thingy" do
         before { before_list << 2 }
+
         after  { after_list  << 2 }
+
         it "inner-it" do end
 
         z = describe "very inner thingy" do
           before { before_list << 3 }
+
           after  { after_list  << 3 }
+
           it "inner-it" do end
 
-          it      { } # ignore me
-          specify { } # anonymous it
+          it      {} # ignore me
+          specify {} # anonymous it
         end
       end
     end
 
-    return x, y, z, before_list, after_list
+    [x, y, z, before_list, after_list]
   end
 
   def test_register_spec_type
@@ -846,7 +855,7 @@ class TestMeta < MetaMetaMetaTestCase
 
   def test_bug_dsl_expectations
     spec_class = Class.new MiniSpecB do
-      it "should work" do
+      it "works" do
         _(0).must_equal 0
       end
     end
@@ -895,10 +904,10 @@ class TestMeta < MetaMetaMetaTestCase
     assert_equal "inner thingy",      y.desc
     assert_equal "very inner thingy", z.desc
 
-    top_methods = %w[setup teardown test_0001_top-level-it]
-    inner_methods1 = %w[setup teardown test_0001_inner-it]
+    top_methods = %w(setup teardown test_0001_top-level-it)
+    inner_methods1 = %w(setup teardown test_0001_inner-it)
     inner_methods2 = inner_methods1 +
-      %w[test_0002_anonymous test_0003_anonymous]
+      %w(test_0002_anonymous test_0003_anonymous)
 
     assert_equal top_methods,    x.instance_methods(false).sort.map(&:to_s)
     assert_equal inner_methods1, y.instance_methods(false).sort.map(&:to_s)
@@ -919,8 +928,8 @@ class TestMeta < MetaMetaMetaTestCase
       it "inner-it" do end
     end
 
-    assert_equal %w[test_0001_inner-it], y.instance_methods(false).map(&:to_s)
-    assert_equal %w[test_0001_inner-it], z.instance_methods(false).map(&:to_s)
+    assert_equal %w(test_0001_inner-it), y.instance_methods(false).map(&:to_s)
+    assert_equal %w(test_0001_inner-it), z.instance_methods(false).map(&:to_s)
   end
 
   def test_setup_teardown_behavior
@@ -946,9 +955,10 @@ class TestMeta < MetaMetaMetaTestCase
       z = describe "second thingy" do end
     end
 
-    test_methods = ["test_0001_top level it",
-                    "test_0002_не латинские &いった α, β, γ, δ, ε hello!!! world",
-                   ].sort
+    test_methods = [
+      "test_0001_top level it",
+      "test_0002_не латинские &いった α, β, γ, δ, ε hello!!! world",
+    ].sort
 
     assert_equal test_methods, [x1, x2]
     assert_equal test_methods, x.instance_methods.grep(/^test/).map(&:to_s).sort
@@ -962,7 +972,7 @@ class TestMeta < MetaMetaMetaTestCase
       def xyz; end
     end
     y = Class.new x do
-      z = describe("inner") { }
+      z = describe("inner") {}
     end
 
     assert_respond_to x.new(nil), "xyz"
@@ -980,7 +990,7 @@ class TestSpecInTestCase < MetaMetaMetaTestCase
     @assertion_count = 2
   end
 
-  def assert_triggered expected, klass = Minitest::Assertion
+  def assert_triggered(expected, klass = Minitest::Assertion)
     @assertion_count += 1
 
     e = assert_raises klass do
@@ -1022,7 +1032,7 @@ class ValueMonadTest < Minitest::Test
 
   def setup
     @struct = { :_ => "a", :value => "b", :expect => "c" }
-    def @struct.method_missing k # think openstruct
+    def @struct.method_missing(k) # think openstruct
       self[k]
     end
   end

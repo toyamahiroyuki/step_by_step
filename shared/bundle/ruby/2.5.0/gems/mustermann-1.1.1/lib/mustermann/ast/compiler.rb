@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/ast/translator'
 
 module Mustermann
@@ -22,7 +23,7 @@ module Mustermann
 
       translate :expression do |greedy: true, **options|
         t(payload, allow_reserved: operator.allow_reserved, greedy: greedy && !operator.allow_reserved,
-          parametric: operator.parametric, separator: operator.separator, **options)
+                   parametric: operator.parametric, separator: operator.separator, **options)
       end
 
       translate :with_look_ahead do |**options|
@@ -58,14 +59,38 @@ module Mustermann
         end
 
         private
-          def qualified(string, greedy: true, **options)        "#{string}#{qualifier || "+#{?? unless greedy}"}"                    end
-          def with_lookahead(string, lookahead: nil, **options)  lookahead ? "(?:(?!#{lookahead})#{string})" : string                end
-          def from_hash(hash,     **options)                     pattern(capture: hash[name.to_sym], **options)                      end
-          def from_array(array,   **options)                     Regexp.union(*array.map { |e| pattern(capture: e, **options) })     end
-          def from_symbol(symbol, **options)                     qualified(with_lookahead("[[:#{symbol}:]]", **options), **options)  end
-          def from_string(string, **options)                     Regexp.new(string.chars.map { |c| t.encoded(c, **options) }.join)   end
-          def from_nil(**options)                                qualified(with_lookahead(default(**options), **options), **options) end
-          def default(**options)                                 constraint || "[^/\\?#]"                                            end
+
+        def qualified(string, greedy: true, **options)
+          "#{string}#{qualifier || "+#{?? unless greedy}"}"
+          end
+
+        def with_lookahead(string, lookahead: nil, **options)
+          lookahead ? "(?:(?!#{lookahead})#{string})" : string
+          end
+
+        def from_hash(hash,     **options)
+          pattern(capture: hash[name.to_sym], **options)
+          end
+
+        def from_array(array,   **options)
+          Regexp.union(*array.map { |e| pattern(capture: e, **options) })
+          end
+
+        def from_symbol(symbol, **options)
+          qualified(with_lookahead("[[:#{symbol}:]]", **options), **options)
+          end
+
+        def from_string(string, **options)
+          Regexp.new(string.chars.map { |c| t.encoded(c, **options) }.join)
+          end
+
+        def from_nil(**options)
+          qualified(with_lookahead(default(**options), **options), **options)
+          end
+
+        def default(**options)
+          constraint || "[^/\\?#]"
+          end
       end
 
       # @!visibility private
@@ -84,9 +109,9 @@ module Mustermann
 
         # @!visibility private
         def translate(**options)
-          return super(**options) if explode or not options[:parametric]
+          return super(**options) if explode || !(options[:parametric])
           # Remove this line after fixing broken compatibility between 2.1 and 2.2
-          options.delete(:parametric) if options.has_key?(:parametric)
+          options.delete(:parametric) if options.key?(:parametric)
           parametric super(parametric: false, **options)
         end
 
@@ -95,7 +120,7 @@ module Mustermann
           register_param(parametric: parametric, separator: separator, **options)
           pattern = super(**options)
           pattern = parametric(pattern) if parametric
-          pattern = "#{pattern}(?:#{Regexp.escape(separator)}#{pattern})*" if explode and separator
+          pattern = "#{pattern}(?:#{Regexp.escape(separator)}#{pattern})*" if explode && separator
           pattern
         end
 
@@ -116,7 +141,7 @@ module Mustermann
 
         # @!visibility private
         def register_param(parametric: false, split_params: nil, separator: nil, **options)
-          return unless explode and split_params
+          return unless explode && split_params
           split_params[name] = { separator: separator, parametric: parametric }
         end
       end

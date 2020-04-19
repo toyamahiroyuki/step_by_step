@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/ast/translator'
 
 module Mustermann
@@ -6,7 +7,6 @@ module Mustermann
     # Takes a tree, turns it into an even better tree.
     # @!visibility private
     class Transformer < Translator
-
       # Transforms a tree.
       # @note might mutate handed in tree instead of creating a new one
       # @param [Mustermann::AST::Node] tree to be transformed
@@ -77,16 +77,16 @@ module Mustermann
         register :expression
 
         # @!visibility private
-        Operator  ||= Struct.new(:separator, :allow_reserved, :prefix, :parametric)
+        Operator ||= Struct.new(:separator, :allow_reserved, :prefix, :parametric)
 
         # Operators available for expressions.
         # @!visibility private
         OPERATORS ||= {
-          nil => Operator.new(?,, false, false, false), ?+  => Operator.new(?,, true,  false, false),
-          ?#  => Operator.new(?,, true,  ?#,    false), ?.  => Operator.new(?., false, ?.,    false),
-          ?/  => Operator.new(?/, false, ?/,    false), ?;  => Operator.new(?;, false, ?;,    true),
-          ??  => Operator.new(?&, false, ??,    true),  ?&  => Operator.new(?&, false, ?&,    true)
-        }
+          nil => Operator.new(?,, false, false, false), ?+ => Operator.new(?,, true, false, false),
+          ?# => Operator.new(?,, true,  ?#,    false), ?.  => Operator.new(?., false, ?.,    false),
+          ?/ => Operator.new(?/, false, ?/,    false), ?;  => Operator.new(?;, false, ?;,    true),
+          ?? => Operator.new(?&, false, ??,    true),  ?&  => Operator.new(?&, false, ?&,    true),
+        }.freeze
 
         # Sets operator and inserts separators in between variables.
         # @!visibility private
@@ -150,7 +150,7 @@ module Mustermann
           case element
           when Node[:char]     then in_lookahead
           when Node[:group]    then lookahead_payload?(element.payload, in_lookahead)
-          when Node[:optional] then lookahead?(element.payload, true) or expect_lookahead?(element.payload)
+          when Node[:optional] then lookahead?(element.payload, true) || expect_lookahead?(element.payload)
           end
         end
 
@@ -158,7 +158,7 @@ module Mustermann
         # @!visibility private
         def lookahead_payload?(payload, in_lookahead)
           return unless payload[0..-2].all? { |e| lookahead?(e, in_lookahead) }
-          expect_lookahead?(payload.last) or lookahead?(payload.last, in_lookahead)
+          expect_lookahead?(payload.last) || lookahead?(payload.last, in_lookahead)
         end
 
         # can the current element deal with a look-ahead?

@@ -6,7 +6,7 @@ module ActionView
   class Template #:nodoc:
     class Types
       class Type
-        SET = Struct.new(:symbols).new([ :html, :text, :js, :css, :xml, :json ])
+        SET = Struct.new(:symbols).new([:html, :text, :js, :css, :xml, :json])
 
         def self.[](type)
           if type.is_a?(self)
@@ -33,7 +33,7 @@ module ActionView
         alias to_sym ref
 
         def ==(type)
-          @symbol == type.to_sym unless type.blank?
+          @symbol == type.to_sym if type.present?
         end
       end
 

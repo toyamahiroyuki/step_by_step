@@ -21,24 +21,26 @@ module ActiveRecord
       end
 
       protected
-        attr_reader :max_identifier_length
+
+      attr_reader :max_identifier_length
 
       private
-        def sequence_name_from_parts(table_name, column_name, suffix)
-          over_length = [table_name, column_name, suffix].map(&:length).sum + 2 - max_identifier_length
 
-          if over_length > 0
-            column_name_length = [(max_identifier_length - suffix.length - 2) / 2, column_name.length].min
-            over_length -= column_name.length - column_name_length
-            column_name = column_name[0, column_name_length - [over_length, 0].min]
-          end
+      def sequence_name_from_parts(table_name, column_name, suffix)
+        over_length = [table_name, column_name, suffix].map(&:length).sum + 2 - max_identifier_length
 
-          if over_length > 0
-            table_name = table_name[0, table_name.length - over_length]
-          end
-
-          "#{table_name}_#{column_name}_#{suffix}"
+        if over_length > 0
+          column_name_length = [(max_identifier_length - suffix.length - 2) / 2, column_name.length].min
+          over_length -= column_name.length - column_name_length
+          column_name = column_name[0, column_name_length - [over_length, 0].min]
         end
+
+        if over_length > 0
+          table_name = table_name[0, table_name.length - over_length]
+        end
+
+        "#{table_name}_#{column_name}_#{suffix}"
+      end
     end
   end
 end

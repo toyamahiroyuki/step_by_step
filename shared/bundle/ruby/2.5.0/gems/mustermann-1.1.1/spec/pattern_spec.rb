@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'mustermann/pattern'
 require 'mustermann/sinatra'

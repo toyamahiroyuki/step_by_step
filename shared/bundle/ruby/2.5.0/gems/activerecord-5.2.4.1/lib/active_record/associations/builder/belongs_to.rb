@@ -34,7 +34,7 @@ module ActiveRecord::Associations::Builder # :nodoc:
           foreign_key  = reflection.foreign_key
           cache_column = reflection.counter_cache_column
 
-          if (@_after_replace_counter_called ||= false)
+          if @_after_replace_counter_called ||= false
             @_after_replace_counter_called = false
           elsif association(reflection.name).target_changed?
             if reflection.polymorphic?
@@ -61,10 +61,11 @@ module ActiveRecord::Associations::Builder # :nodoc:
         end
 
         private
-          def counter_cache_target(reflection, model, foreign_key)
-            primary_key = reflection.association_primary_key(model)
-            model.unscoped.where!(primary_key => foreign_key)
-          end
+
+        def counter_cache_target(reflection, model, foreign_key)
+          primary_key = reflection.association_primary_key(model)
+          model.unscoped.where!(primary_key => foreign_key)
+        end
       end
     end
 
@@ -119,17 +120,19 @@ module ActiveRecord::Associations::Builder # :nodoc:
       n           = reflection.name
       touch       = reflection.options[:touch]
 
-      callback = lambda { |changes_method| lambda { |record|
-        BelongsTo.touch_record(record, record.send(changes_method), foreign_key, n, touch, belongs_to_touch_method)
-      }}
+      callback = lambda { |changes_method|
+        lambda { |record|
+          BelongsTo.touch_record(record, record.send(changes_method), foreign_key, n, touch, belongs_to_touch_method)
+        }
+      }
 
       unless reflection.counter_cache_column
-        model.after_create callback.(:saved_changes), if: :saved_changes?
-        model.after_destroy callback.(:changes_to_save)
+        model.after_create callback.call(:saved_changes), if: :saved_changes?
+        model.after_destroy callback.call(:changes_to_save)
       end
 
-      model.after_update callback.(:saved_changes), if: :saved_changes?
-      model.after_touch callback.(:changes_to_save)
+      model.after_update callback.call(:saved_changes), if: :saved_changes?
+      model.after_touch callback.call(:changes_to_save)
     end
 
     def self.add_default_callbacks(model, reflection)

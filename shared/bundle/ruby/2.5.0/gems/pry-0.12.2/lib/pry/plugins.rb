@@ -1,6 +1,6 @@
 class Pry
   class PluginManager
-    PRY_PLUGIN_PREFIX = /^pry-/
+    PRY_PLUGIN_PREFIX = /^pry-/.freeze
 
     # Placeholder when no associated gem found, displays warning
     class NoPlugin
@@ -110,6 +110,7 @@ class Pry
     end
 
     private
+
     def plugin_located?(plugin)
       @plugins.any? { |existing| existing.gem_name == plugin.gem_name }
     end

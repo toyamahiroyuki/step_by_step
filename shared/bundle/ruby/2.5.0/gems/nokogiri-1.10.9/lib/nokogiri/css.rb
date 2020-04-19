@@ -13,13 +13,13 @@ module Nokogiri
     class << self
       ###
       # Parse this CSS selector in +selector+.  Returns an AST.
-      def parse selector
+      def parse(selector)
         Parser.new.parse selector
       end
 
       ###
       # Get the XPath for +selector+.
-      def xpath_for selector, options={}
+      def xpath_for(selector, options = {})
         Parser.new(options[:ns] || {}).xpath_for selector, options
       end
     end

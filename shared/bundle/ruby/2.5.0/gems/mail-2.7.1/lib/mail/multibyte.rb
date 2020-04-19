@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 require 'mail/multibyte/chars'
 
 module Mail #:nodoc:
@@ -84,8 +85,8 @@ module Mail #:nodoc:
       # Quick check for valid Shift-JIS characters, disregards the odd-even pairing
       'Shift_JIS' => /\A(?:
                   [\x00-\x7e\xa1-\xdf]                                     |
-                  [\x81-\x9f\xe0-\xef] [\x40-\x7e\x80-\x9e\x9f-\xfc])\z /xn
-    }
+                  [\x81-\x9f\xe0-\xef] [\x40-\x7e\x80-\x9e\x9f-\xfc])\z /xn,
+    }.freeze
   end
 end
 

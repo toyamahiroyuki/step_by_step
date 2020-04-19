@@ -95,7 +95,7 @@ db_namespace = namespace :db do
 
     # desc 'Runs the "up" for a given migration VERSION.'
     task up: :load_config do
-      raise "VERSION is required" if !ENV["VERSION"] || ENV["VERSION"].empty?
+      raise "VERSION is required" if ENV["VERSION"].blank?
 
       ActiveRecord::Tasks::DatabaseTasks.check_target_version
 
@@ -108,7 +108,7 @@ db_namespace = namespace :db do
 
     # desc 'Runs the "down" for a given migration VERSION.'
     task down: :load_config do
-      raise "VERSION is required - To go down one migration, use db:rollback" if !ENV["VERSION"] || ENV["VERSION"].empty?
+      raise "VERSION is required - To go down one migration, use db:rollback" if ENV["VERSION"].blank?
 
       ActiveRecord::Tasks::DatabaseTasks.check_target_version
 
@@ -151,7 +151,7 @@ db_namespace = namespace :db do
   end
 
   # desc 'Drops and recreates the database from db/schema.rb for the current environment and loads the seeds.'
-  task reset: [ "db:drop", "db:setup" ]
+  task reset: ["db:drop", "db:setup"]
 
   # desc "Retrieves the charset for the current environment's database"
   task charset: :load_config do
@@ -160,11 +160,9 @@ db_namespace = namespace :db do
 
   # desc "Retrieves the collation for the current environment's database"
   task collation: :load_config do
-    begin
-      puts ActiveRecord::Tasks::DatabaseTasks.collation_current
-    rescue NoMethodError
-      $stderr.puts "Sorry, your database adapter is not supported yet. Feel free to submit a patch."
-    end
+    puts ActiveRecord::Tasks::DatabaseTasks.collation_current
+  rescue NoMethodError
+    warn "Sorry, your database adapter is not supported yet. Feel free to submit a patch."
   end
 
   desc "Retrieves the current schema version number"
@@ -181,7 +179,7 @@ db_namespace = namespace :db do
       pending_migrations.each do |pending_migration|
         puts "  %4d %s" % [pending_migration.version, pending_migration.name]
       end
-      abort %{Run `rails db:migrate` to update your database then try again.}
+      abort %(Run `rails db:migrate` to update your database then try again.)
     end
   end
 
@@ -202,16 +200,16 @@ db_namespace = namespace :db do
       base_dir = ActiveRecord::Tasks::DatabaseTasks.fixtures_path
 
       fixtures_dir = if ENV["FIXTURES_DIR"]
-        File.join base_dir, ENV["FIXTURES_DIR"]
-      else
-        base_dir
+                       File.join base_dir, ENV["FIXTURES_DIR"]
+                     else
+                       base_dir
       end
 
       fixture_files = if ENV["FIXTURES"]
-        ENV["FIXTURES"].split(",")
-      else
-        # The use of String#[] here is to support namespaced fixtures.
-        Dir["#{fixtures_dir}/**/*.yml"].map { |f| f[(fixtures_dir.size + 1)..-5] }
+                        ENV["FIXTURES"].split(",")
+                      else
+                        # The use of String#[] here is to support namespaced fixtures.
+                        Dir["#{fixtures_dir}/**/*.yml"].map { |f| f[(fixtures_dir.size + 1)..-5] }
       end
 
       ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)
@@ -276,7 +274,6 @@ db_namespace = namespace :db do
         rm_f filename, verbose: false
       end
     end
-
   end
 
   namespace :structure do
@@ -318,14 +315,12 @@ db_namespace = namespace :db do
 
     # desc "Recreate the test database from an existent schema.rb file"
     task load_schema: %w(db:test:purge) do
-      begin
-        should_reconnect = ActiveRecord::Base.connection_pool.active_connection?
-        ActiveRecord::Schema.verbose = false
-        ActiveRecord::Tasks::DatabaseTasks.load_schema ActiveRecord::Base.configurations["test"], :ruby, ENV["SCHEMA"], "test"
-      ensure
-        if should_reconnect
-          ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[ActiveRecord::Tasks::DatabaseTasks.env])
-        end
+      should_reconnect = ActiveRecord::Base.connection_pool.active_connection?
+      ActiveRecord::Schema.verbose = false
+      ActiveRecord::Tasks::DatabaseTasks.load_schema ActiveRecord::Base.configurations["test"], :ruby, ENV["SCHEMA"], "test"
+    ensure
+      if should_reconnect
+        ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[ActiveRecord::Tasks::DatabaseTasks.env])
       end
     end
 
@@ -341,7 +336,7 @@ db_namespace = namespace :db do
 
     # desc 'Load the test schema'
     task prepare: :load_config do
-      unless ActiveRecord::Base.configurations.blank?
+      if ActiveRecord::Base.configurations.present?
         db_namespace["test:load"].invoke
       end
     end
@@ -371,7 +366,7 @@ namespace :railties do
       end
 
       ActiveRecord::Migration.copy(ActiveRecord::Tasks::DatabaseTasks.migrations_paths.first, railties,
-                                    on_skip: on_skip, on_copy: on_copy)
+                                   on_skip: on_skip, on_copy: on_copy)
     end
   end
 end

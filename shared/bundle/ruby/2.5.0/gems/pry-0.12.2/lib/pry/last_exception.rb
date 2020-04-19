@@ -31,17 +31,13 @@ class Pry::LastException < BasicObject
   # @return [String]
   #  returns the path to a file for the current backtrace. see {#bt_index}.
   #
-  def file
-    @file
-  end
+  attr_reader :file
 
   #
   # @return [Fixnum]
   #  returns the line for the current backtrace. see {#bt_index}.
   #
-  def line
-    @line
-  end
+  attr_reader :line
 
   # @return [Exception]
   #   returns the wrapped exception
@@ -52,7 +48,7 @@ class Pry::LastException < BasicObject
 
   def bt_source_location_for(index)
     backtrace[index] =~ /(.*):(\d+)/
-    [$1, $2.to_i]
+    [Regexp.last_match(1), Regexp.last_match(2).to_i]
   end
 
   def inc_bt_index

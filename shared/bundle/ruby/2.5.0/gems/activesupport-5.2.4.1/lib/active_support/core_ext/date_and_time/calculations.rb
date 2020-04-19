@@ -11,9 +11,9 @@ module DateAndTime
       thursday: 3,
       friday: 4,
       saturday: 5,
-      sunday: 6
-    }
-    WEEKEND_DAYS = [ 6, 0 ]
+      sunday: 6,
+    }.freeze
+    WEEKEND_DAYS = [6, 0].freeze
 
     # Returns a new date/time representing yesterday.
     def yesterday
@@ -355,20 +355,21 @@ module DateAndTime
     end
 
     private
-      def first_hour(date_or_time)
-        date_or_time.acts_like?(:time) ? date_or_time.beginning_of_day : date_or_time
-      end
 
-      def last_hour(date_or_time)
-        date_or_time.acts_like?(:time) ? date_or_time.end_of_day : date_or_time
-      end
+    def first_hour(date_or_time)
+      date_or_time.acts_like?(:time) ? date_or_time.beginning_of_day : date_or_time
+    end
 
-      def days_span(day)
-        (DAYS_INTO_WEEK[day] - DAYS_INTO_WEEK[Date.beginning_of_week]) % 7
-      end
+    def last_hour(date_or_time)
+      date_or_time.acts_like?(:time) ? date_or_time.end_of_day : date_or_time
+    end
 
-      def copy_time_to(other)
-        other.change(hour: hour, min: min, sec: sec, nsec: try(:nsec))
-      end
+    def days_span(day)
+      (DAYS_INTO_WEEK[day] - DAYS_INTO_WEEK[Date.beginning_of_week]) % 7
+    end
+
+    def copy_time_to(other)
+      other.change(hour: hour, min: min, sec: sec, nsec: try(:nsec))
+    end
   end
 end

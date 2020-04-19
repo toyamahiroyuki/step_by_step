@@ -1,22 +1,22 @@
 # encoding: utf-8
+
 require_relative 'scanner'
 
 module Crass
-
   # Tokenizes a CSS string.
   #
   # 4. http://dev.w3.org/csswg/css-syntax/#tokenization
   class Tokenizer
-    RE_COMMENT_CLOSE   = /\*\//
-    RE_DIGIT           = /[0-9]+/
-    RE_ESCAPE          = /\\[^\n]/
-    RE_HEX             = /[0-9A-Fa-f]{1,6}/
-    RE_NAME            = /[0-9A-Za-z_\u0080-\u{10ffff}-]+/
-    RE_NAME_START      = /[A-Za-z_\u0080-\u{10ffff}]+/
-    RE_NON_PRINTABLE   = /[\u0000-\u0008\u000b\u000e-\u001f\u007f]+/
-    RE_NUMBER_DECIMAL  = /\.[0-9]+/
-    RE_NUMBER_EXPONENT = /[Ee][+-]?[0-9]+/
-    RE_NUMBER_SIGN     = /[+-]/
+    RE_COMMENT_CLOSE   = /\*\//.freeze
+    RE_DIGIT           = /[0-9]+/.freeze
+    RE_ESCAPE          = /\\[^\n]/.freeze
+    RE_HEX             = /[0-9A-Fa-f]{1,6}/.freeze
+    RE_NAME            = /[0-9A-Za-z_\u0080-\u{10ffff}-]+/.freeze
+    RE_NAME_START      = /[A-Za-z_\u0080-\u{10ffff}]+/.freeze
+    RE_NON_PRINTABLE   = /[\u0000-\u0008\u000b\u000e-\u001f\u007f]+/.freeze
+    RE_NUMBER_DECIMAL  = /\.[0-9]+/.freeze
+    RE_NUMBER_EXPONENT = /[Ee][+-]?[0-9]+/.freeze
+    RE_NUMBER_SIGN     = /[+-]/.freeze
 
     RE_NUMBER_STR = /\A
       (?<sign> [+-]?)
@@ -28,13 +28,13 @@ module Crass
         (?<exponent_sign> [+-]?)
         (?<exponent> [0-9]*)
       )?
-    \z/x
+    \z/x.freeze
 
-    RE_QUOTED_URL_START    = /\A[\n\u0009\u0020]?["']/
-    RE_UNICODE_RANGE_START = /\+(?:[0-9A-Fa-f]|\?)/
-    RE_UNICODE_RANGE_END   = /-[0-9A-Fa-f]/
-    RE_WHITESPACE          = /[\n\u0009\u0020]+/
-    RE_WHITESPACE_ANCHORED = /\A[\n\u0009\u0020]+\z/
+    RE_QUOTED_URL_START    = /\A[\n\u0009\u0020]?["']/.freeze
+    RE_UNICODE_RANGE_START = /\+(?:[0-9A-Fa-f]|\?)/.freeze
+    RE_UNICODE_RANGE_END   = /-[0-9A-Fa-f]/.freeze
+    RE_WHITESPACE          = /[\n\u0009\u0020]+/.freeze
+    RE_WHITESPACE_ANCHORED = /\A[\n\u0009\u0020]+\z/.freeze
 
     # -- Class Methods ---------------------------------------------------------
 
@@ -93,8 +93,8 @@ module Crass
       when :'#'
         if @s.peek =~ RE_NAME || valid_escape?(@s.peek(2))
           create_token(:hash,
-            :type  => start_identifier?(@s.peek(3)) ? :id : :unrestricted,
-            :value => consume_name)
+                       :type => start_identifier?(@s.peek(3)) ? :id : :unrestricted,
+                       :value => consume_name)
         else
           create_token(:delim, :value => char)
         end
@@ -201,8 +201,8 @@ module Crass
         else
           # Parse error.
           create_token(:delim,
-            :error => true,
-            :value => char)
+                       :error => true,
+                       :value => char)
         end
 
       when :']'
@@ -273,7 +273,7 @@ module Crass
     #
     # 4.3.15. http://dev.w3.org/csswg/css-syntax/#consume-the-remnants-of-a-bad-url
     def consume_bad_url
-      text = String.new
+      text = ''
 
       until @s.eos?
         if valid_escape?
@@ -373,7 +373,7 @@ module Crass
     #
     # 4.3.12. http://dev.w3.org/csswg/css-syntax/#consume-a-name
     def consume_name
-      result = String.new
+      result = ''
 
       until @s.eos?
         if match = @s.scan(RE_NAME)
@@ -405,7 +405,7 @@ module Crass
     #
     # 4.3.13. http://dev.w3.org/csswg/css-syntax/#consume-a-number
     def consume_number
-      repr = String.new
+      repr = ''
       type = :integer
 
       repr << @s.consume if @s.peek =~ RE_NUMBER_SIGN
@@ -441,24 +441,24 @@ module Crass
 
       if start_identifier?(@s.peek(3))
         create_token(:dimension,
-          :repr => repr,
-          :type => type,
-          :unit => consume_name,
-          :value => value)
+                     :repr => repr,
+                     :type => type,
+                     :unit => consume_name,
+                     :value => value)
 
       elsif @s.peek == '%'
         @s.consume
 
         create_token(:percentage,
-          :repr => repr,
-          :type => type,
-          :value => value)
+                     :repr => repr,
+                     :type => type,
+                     :value => value)
 
       else
         create_token(:number,
-          :repr => repr,
-          :type => type,
-          :value => value)
+                     :repr => repr,
+                     :type => type,
+                     :value => value)
       end
     end
 
@@ -468,7 +468,7 @@ module Crass
     # 4.3.5. http://dev.w3.org/csswg/css-syntax/#consume-a-string-token
     def consume_string(ending = nil)
       ending = @s.current if ending.nil?
-      value  = String.new
+      value  = ''
 
       until @s.eos?
         case char = @s.consume
@@ -479,8 +479,8 @@ module Crass
           # Parse error.
           @s.reconsume
           return create_token(:bad_string,
-            :error => true,
-            :value => value)
+                              :error => true,
+                              :value => value)
 
         when '\\'
           case @s.peek
@@ -508,7 +508,7 @@ module Crass
     #
     # 4.3.7. http://dev.w3.org/csswg/css-syntax/#consume-a-unicode-range-token
     def consume_unicode_range
-      value = @s.scan(RE_HEX) || String.new
+      value = @s.scan(RE_HEX) || ''
 
       while value.length < 6
         break unless @s.peek == '?'
@@ -540,7 +540,7 @@ module Crass
     #
     # 4.3.6. http://dev.w3.org/csswg/css-syntax/#consume-a-url-token
     def consume_url
-      value = String.new
+      value = ''
 
       @s.scan(RE_WHITESPACE)
 
@@ -562,8 +562,8 @@ module Crass
         when '"', "'", '(', RE_NON_PRINTABLE
           # Parse error.
           return create_token(:bad_url,
-            :error => true,
-            :value => value + consume_bad_url)
+                              :error => true,
+                              :value => value + consume_bad_url)
 
         when '\\'
           if valid_escape?
@@ -571,9 +571,8 @@ module Crass
           else
             # Parse error.
             return create_token(:bad_url,
-              :error => true,
-              :value => value + consume_bad_url
-            )
+                                :error => true,
+                                :value => value + consume_bad_url)
           end
 
         else
@@ -616,8 +615,8 @@ module Crass
     def create_token(type, properties = {})
       {
         :node => type,
-        :pos  => @s.marker,
-        :raw  => @s.marked
+        :pos => @s.marker,
+        :raw => @s.marked,
       }.merge!(properties)
     end
 
@@ -626,8 +625,8 @@ module Crass
     # 3.3. http://dev.w3.org/csswg/css-syntax/#input-preprocessing
     def preprocess(input)
       input = input.to_s.encode('UTF-8',
-        :invalid => :replace,
-        :undef   => :replace)
+                                :invalid => :replace,
+                                :undef => :replace)
 
       input.gsub!(/(?:\r\n|[\r\f])/, "\n")
       input.gsub!("\u0000", "\ufffd")
@@ -704,5 +703,4 @@ module Crass
       !!(text[0] == '\\' && text[1] != "\n")
     end
   end
-
 end

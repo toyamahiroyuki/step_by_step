@@ -293,14 +293,14 @@ module ActiveRecord
       end
 
       # Begins the transaction (and turns off auto-committing).
-      def begin_db_transaction()    end
+      def begin_db_transaction() end
 
       def transaction_isolation_levels
         {
           read_uncommitted: "READ UNCOMMITTED",
-          read_committed:   "READ COMMITTED",
-          repeatable_read:  "REPEATABLE READ",
-          serializable:     "SERIALIZABLE"
+          read_committed: "READ COMMITTED",
+          repeatable_read: "REPEATABLE READ",
+          serializable: "SERIALIZABLE",
         }
       end
 
@@ -312,7 +312,7 @@ module ActiveRecord
       end
 
       # Commits the transaction (and turns on auto-committing).
-      def commit_db_transaction()   end
+      def commit_db_transaction() end
 
       # Rolls back the transaction (and turns on auto-committing). Must be
       # done if the transaction block raises an exception or returns false.
@@ -427,114 +427,115 @@ module ActiveRecord
       alias join_to_delete join_to_update
 
       private
-        def default_insert_value(column)
-          Arel.sql("DEFAULT")
-        end
 
-        def build_fixture_sql(fixtures, table_name)
-          columns = schema_cache.columns_hash(table_name)
+      def default_insert_value(column)
+        Arel.sql("DEFAULT")
+      end
 
-          values = fixtures.map do |fixture|
-            fixture = fixture.stringify_keys
+      def build_fixture_sql(fixtures, table_name)
+        columns = schema_cache.columns_hash(table_name)
 
-            unknown_columns = fixture.keys - columns.keys
-            if unknown_columns.any?
-              raise Fixture::FixtureError, %(table "#{table_name}" has no columns named #{unknown_columns.map(&:inspect).join(', ')}.)
+        values = fixtures.map do |fixture|
+          fixture = fixture.stringify_keys
+
+          unknown_columns = fixture.keys - columns.keys
+          if unknown_columns.any?
+            raise Fixture::FixtureError, %(table "#{table_name}" has no columns named #{unknown_columns.map(&:inspect).join(', ')}.)
+          end
+
+          columns.map do |name, column|
+            if fixture.key?(name)
+              type = lookup_cast_type_from_column(column)
+              bind = Relation::QueryAttribute.new(name, fixture[name], type)
+              with_yaml_fallback(bind.value_for_database)
+            else
+              default_insert_value(column)
             end
-
-            columns.map do |name, column|
-              if fixture.key?(name)
-                type = lookup_cast_type_from_column(column)
-                bind = Relation::QueryAttribute.new(name, fixture[name], type)
-                with_yaml_fallback(bind.value_for_database)
-              else
-                default_insert_value(column)
-              end
-            end
-          end
-
-          table = Arel::Table.new(table_name)
-          manager = Arel::InsertManager.new
-          manager.into(table)
-          columns.each_key { |column| manager.columns << table[column] }
-          manager.values = manager.create_values_list(values)
-
-          manager.to_sql
-        end
-
-        def combine_multi_statements(total_sql)
-          total_sql.join(";\n")
-        end
-
-        # Returns a subquery for the given key using the join information.
-        def subquery_for(key, select)
-          subselect = select.clone
-          subselect.projections = [key]
-          subselect
-        end
-
-        # Returns an ActiveRecord::Result instance.
-        def select(sql, name = nil, binds = [])
-          exec_query(sql, name, binds, prepare: false)
-        end
-
-        def select_prepared(sql, name = nil, binds = [])
-          exec_query(sql, name, binds, prepare: true)
-        end
-
-        def sql_for_insert(sql, pk, id_value, sequence_name, binds)
-          [sql, binds]
-        end
-
-        def last_inserted_id(result)
-          single_value_from_rows(result.rows)
-        end
-
-        def single_value_from_rows(rows)
-          row = rows.first
-          row && row.first
-        end
-
-        def arel_from_relation(relation)
-          if relation.is_a?(Relation)
-            relation.arel
-          else
-            relation
           end
         end
 
-        # Fixture value is quoted by Arel, however scalar values
-        # are not quotable. In this case we want to convert
-        # the column value to YAML.
-        def with_yaml_fallback(value)
-          if value.is_a?(Hash) || value.is_a?(Array)
-            YAML.dump(value)
-          else
-            value
-          end
+        table = Arel::Table.new(table_name)
+        manager = Arel::InsertManager.new
+        manager.into(table)
+        columns.each_key { |column| manager.columns << table[column] }
+        manager.values = manager.create_values_list(values)
+
+        manager.to_sql
+      end
+
+      def combine_multi_statements(total_sql)
+        total_sql.join(";\n")
+      end
+
+      # Returns a subquery for the given key using the join information.
+      def subquery_for(key, select)
+        subselect = select.clone
+        subselect.projections = [key]
+        subselect
+      end
+
+      # Returns an ActiveRecord::Result instance.
+      def select(sql, name = nil, binds = [])
+        exec_query(sql, name, binds, prepare: false)
+      end
+
+      def select_prepared(sql, name = nil, binds = [])
+        exec_query(sql, name, binds, prepare: true)
+      end
+
+      def sql_for_insert(sql, pk, id_value, sequence_name, binds)
+        [sql, binds]
+      end
+
+      def last_inserted_id(result)
+        single_value_from_rows(result.rows)
+      end
+
+      def single_value_from_rows(rows)
+        row = rows.first
+        row && row.first
+      end
+
+      def arel_from_relation(relation)
+        if relation.is_a?(Relation)
+          relation.arel
+        else
+          relation
+        end
+      end
+
+      # Fixture value is quoted by Arel, however scalar values
+      # are not quotable. In this case we want to convert
+      # the column value to YAML.
+      def with_yaml_fallback(value)
+        if value.is_a?(Hash) || value.is_a?(Array)
+          YAML.dump(value)
+        else
+          value
+        end
+      end
+
+      class PartialQueryCollector
+        def initialize
+          @parts = []
+          @binds = []
         end
 
-        class PartialQueryCollector
-          def initialize
-            @parts = []
-            @binds = []
-          end
-
-          def <<(str)
-            @parts << str
-            self
-          end
-
-          def add_bind(obj)
-            @binds << obj
-            @parts << Arel::Nodes::BindParam.new(1)
-            self
-          end
-
-          def value
-            [@parts, @binds]
-          end
+        def <<(str)
+          @parts << str
+          self
         end
+
+        def add_bind(obj)
+          @binds << obj
+          @parts << Arel::Nodes::BindParam.new(1)
+          self
+        end
+
+        def value
+          [@parts, @binds]
+        end
+      end
     end
   end
 end

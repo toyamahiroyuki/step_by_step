@@ -2,9 +2,9 @@
 
 require "minitest/autorun"
 
-if defined? Encoding then
+if defined? Encoding
   e = Encoding.default_external
-  if e != Encoding::UTF_8 then
+  if e != Encoding::UTF_8
     warn ""
     warn ""
     warn "NOTE: External encoding #{e} is not UTF-8. Tests WILL fail."
@@ -14,9 +14,9 @@ if defined? Encoding then
   end
 end
 
-SomeError = Class.new Exception
+SomeError = Class.new StandardError
 
-unless defined? MyModule then
+unless defined? MyModule
   module MyModule; end
   class AnError < StandardError; include MyModule; end
 end
@@ -55,7 +55,7 @@ class TestMinitestAssertions < Minitest::Test
                  "expected #{@assertion_count} assertions to be fired during the test, not #{@tc.assertions}")
   end
 
-  def assert_deprecated name
+  def assert_deprecated(name)
     dep = /DEPRECATED: #{name}. From #{__FILE__}:\d+(?::.*)?/
     dep = "" if $-w.nil?
 
@@ -64,7 +64,7 @@ class TestMinitestAssertions < Minitest::Test
     end
   end
 
-  def assert_triggered expected, klass = Minitest::Assertion
+  def assert_triggered(expected, klass = Minitest::Assertion)
     e = assert_raises klass do
       yield
     end
@@ -74,10 +74,10 @@ class TestMinitestAssertions < Minitest::Test
     msg.gsub!(/(\d\.\d{6})\d+/, '\1xxx') # normalize: ruby version, impl, platform
 
     assert_msg = Regexp === expected ? :assert_match : :assert_equal
-    self.send assert_msg, expected, msg
+    send assert_msg, expected, msg
   end
 
-  def assert_unexpected expected
+  def assert_unexpected(expected)
     expected = Regexp.new expected if String === expected
 
     assert_triggered expected, Minitest::UnexpectedError do
@@ -85,7 +85,7 @@ class TestMinitestAssertions < Minitest::Test
     end
   end
 
-  def clean s
+  def clean(s)
     s.gsub(/^ {6,10}/, "")
   end
 
@@ -189,7 +189,9 @@ class TestMinitestAssertions < Minitest::Test
 
   def test_assert_equal_different_hex
     c = Class.new do
-      def initialize s; @name = s; end
+      def initialize(s)
+        @name = s
+      end
     end
 
     o1 = c.new "a"
@@ -244,7 +246,7 @@ class TestMinitestAssertions < Minitest::Test
     assert_triggered msg do
       o1 = "blah" * 10
       o2 = "blah" * 10
-      def o1.== _
+      def o1.==(_)
         false
       end
       @tc.assert_equal o1, o2
@@ -287,7 +289,7 @@ class TestMinitestAssertions < Minitest::Test
   end
 
   def test_assert_equal_does_not_allow_lhs_nil
-    if Minitest::VERSION =~ /^6/ then
+    if Minitest::VERSION =~ /^6/
       warn "Time to strip the MT5 test"
 
       @assertion_count += 1
@@ -344,43 +346,47 @@ class TestMinitestAssertions < Minitest::Test
     end
   end
 
-  def test_assert_equal_string_encodings
-    msg = <<-EOM.gsub(/^ {10}/, "")
-          --- expected
-          +++ actual
-          @@ -1,3 +1,3 @@
-          -# encoding: UTF-8
-          -#    valid: false
-          +# encoding: ASCII-8BIT
-          +#    valid: true
-           "bad-utf8-\\xF1.txt"
-          EOM
+  unless RUBY18
+    def test_assert_equal_string_encodings
+      msg = <<-EOM.gsub(/^ {10}/, "")
+            --- expected
+            +++ actual
+            @@ -1,3 +1,3 @@
+            -# encoding: UTF-8
+            -#    valid: false
+            +# encoding: ASCII-8BIT
+            +#    valid: true
+             "bad-utf8-\\xF1.txt"
+            EOM
 
-    assert_triggered msg do
-      x = "bad-utf8-\xF1.txt"
-      y = x.dup.force_encoding "binary" # TODO: switch to .b when 1.9 dropped
-      @tc.assert_equal x, y
+      assert_triggered msg do
+        x = "bad-utf8-\xF1.txt"
+        y = x.dup.force_encoding "binary" # TODO: switch to .b when 1.9 dropped
+        @tc.assert_equal x, y
+      end
     end
-  end unless RUBY18
+  end
 
-  def test_assert_equal_string_encodings_both_different
-    msg = <<-EOM.gsub(/^ {10}/, "")
-          --- expected
-          +++ actual
-          @@ -1,3 +1,3 @@
-          -# encoding: US-ASCII
-          -#    valid: false
-          +# encoding: ASCII-8BIT
-          +#    valid: true
-           "bad-utf8-\\xF1.txt"
-          EOM
+  unless RUBY18
+    def test_assert_equal_string_encodings_both_different
+      msg = <<-EOM.gsub(/^ {10}/, "")
+            --- expected
+            +++ actual
+            @@ -1,3 +1,3 @@
+            -# encoding: US-ASCII
+            -#    valid: false
+            +# encoding: ASCII-8BIT
+            +#    valid: true
+             "bad-utf8-\\xF1.txt"
+            EOM
 
-    assert_triggered msg do
-      x = "bad-utf8-\xF1.txt".force_encoding "ASCII"
-      y = x.dup.force_encoding "binary" # TODO: switch to .b when 1.9 dropped
-      @tc.assert_equal x, y
+      assert_triggered msg do
+        x = "bad-utf8-\xF1.txt".force_encoding "ASCII"
+        y = x.dup.force_encoding "binary" # TODO: switch to .b when 1.9 dropped
+        @tc.assert_equal x, y
+      end
     end
-  end unless RUBY18
+  end
 
   def test_assert_equal_unescape_newlines
     msg = <<-'EOM'.gsub(/^ {10}/, "") # NOTE single quotes on heredoc
@@ -394,7 +400,7 @@ class TestMinitestAssertions < Minitest::Test
 
     assert_triggered msg do
       exp = "hello\nworld"
-      act = 'hello\nworld'      # notice single quotes
+      act = 'hello\nworld' # notice single quotes
 
       @tc.assert_equal exp, act
     end
@@ -435,7 +441,7 @@ class TestMinitestAssertions < Minitest::Test
   end
 
   def test_assert_in_epsilon_triggered_negative_case
-    x = (RUBY18 and not maglev?) ? "0.1" : "0.100000xxx"
+    x = (RUBY18 && !maglev?) ? "0.1" : "0.100000xxx"
     y = "0.1"
     assert_triggered "Expected |-1.1 - -1| (#{x}) to be <= #{y}." do
       @tc.assert_in_epsilon(-1.1, -1, 0.1)
@@ -488,7 +494,9 @@ class TestMinitestAssertions < Minitest::Test
     @assertion_count = 2
 
     obj = Object.new
-    def obj.to_str; "blah" end
+    def obj.to_str
+      "blah"
+    end
 
     @tc.assert_match "blah", obj
   end
@@ -497,7 +505,9 @@ class TestMinitestAssertions < Minitest::Test
     @assertion_count = 2
 
     pattern = Object.new
-    def pattern.=~ _; true end
+    def pattern.=~(_)
+      true
+    end
 
     @tc.assert_match pattern, 5
   end
@@ -506,8 +516,13 @@ class TestMinitestAssertions < Minitest::Test
     @assertion_count = 2
 
     pattern = Object.new
-    def pattern.=~ _; false end
-    def pattern.inspect; "[Object]" end
+    def pattern.=~(_)
+      false
+    end
+
+    def pattern.inspect
+      "[Object]"
+    end
 
     assert_triggered "Expected [Object] to match 5." do
       @tc.assert_match pattern, 5
@@ -537,7 +552,9 @@ class TestMinitestAssertions < Minitest::Test
 
   def test_assert_operator_bad_object
     bad = Object.new
-    def bad.== _; true end
+    def bad.==(_)
+      true
+    end
 
     @tc.assert_operator bad, :equal?, bad
   end
@@ -722,6 +739,7 @@ class TestMinitestAssertions < Minitest::Test
       end
     end
   end
+
   def test_assert_predicate
     @tc.assert_predicate "", :empty?
   end
@@ -808,11 +826,9 @@ class TestMinitestAssertions < Minitest::Test
 
     assert_triggered "skipped", Minitest::Skip do
       @tc.assert_raises ArgumentError do
-        begin
-          raise "blah"
-        rescue
-          skip "skipped"
-        end
+        raise "blah"
+      rescue
+        skip "skipped"
       end
     end
   end
@@ -1052,7 +1068,7 @@ class TestMinitestAssertions < Minitest::Test
     non_verbose do
       out, err = capture_io do
         puts "hi"
-        $stderr.puts "bye!"
+        warn "bye!"
       end
 
       assert_equal "hi\n", out
@@ -1082,13 +1098,17 @@ class TestMinitestAssertions < Minitest::Test
 
     # These don't have corresponding refutes _on purpose_. They're
     # useless and will never be added, so don't bother.
-    ignores = %w[assert_output assert_raises assert_send
-                 assert_silent assert_throws assert_mock]
+    ignores = %w(
+      assert_output assert_raises assert_send
+      assert_silent assert_throws assert_mock
+    )
 
     # These are test/unit methods. I'm not actually sure why they're still here
-    ignores += %w[assert_no_match assert_not_equal assert_not_nil
-                  assert_not_same assert_nothing_raised
-                  assert_nothing_thrown assert_raise]
+    ignores += %w(
+      assert_no_match assert_not_equal assert_not_nil
+      assert_not_same assert_nothing_raised
+      assert_nothing_thrown assert_raise
+    )
 
     asserts = methods.grep(/^assert/).sort - ignores
     refutes = methods.grep(/^refute/).sort - ignores
@@ -1123,7 +1143,7 @@ class TestMinitestAssertions < Minitest::Test
     y, m, d = t.year, t.month, t.day
 
     assert_silent do
-      @tc.fail_after y, m, d+1, "remove the deprecations"
+      @tc.fail_after y, m, d + 1, "remove the deprecations"
     end
 
     assert_triggered "remove the deprecations" do
@@ -1189,7 +1209,7 @@ class TestMinitestAssertions < Minitest::Test
   end
 
   def test_refute_in_epsilon
-    @tc.refute_in_epsilon 10_000, 9990-1
+    @tc.refute_in_epsilon 10_000, 9990 - 1
   end
 
   def test_refute_in_epsilon_triggered
@@ -1244,7 +1264,9 @@ class TestMinitestAssertions < Minitest::Test
   def test_refute_match_matcher_object
     @assertion_count = 2
     pattern = Object.new
-    def pattern.=~ _; false end
+    def pattern.=~(_)
+      false
+    end
     @tc.refute_match pattern, 5
   end
 
@@ -1252,8 +1274,13 @@ class TestMinitestAssertions < Minitest::Test
     @assertion_count = 2
 
     pattern = Object.new
-    def pattern.=~ _; true end
-    def pattern.inspect; "[Object]" end
+    def pattern.=~(_)
+      true
+    end
+
+    def pattern.inspect
+      "[Object]"
+    end
 
     assert_triggered "Expected [Object] to not match 5." do
       @tc.refute_match pattern, 5
@@ -1283,7 +1310,9 @@ class TestMinitestAssertions < Minitest::Test
 
   def test_refute_operator_bad_object
     bad = Object.new
-    def bad.== _; true end
+    def bad.==(_)
+      true
+    end
 
     @tc.refute_operator true, :equal?, bad
   end
@@ -1353,11 +1382,11 @@ class TestMinitestAssertions < Minitest::Test
     end
 
     assert_triggered "not ready yet", Minitest::Skip do
-      @tc.skip_until y, m, d+1, "not ready yet"
+      @tc.skip_until y, m, d + 1, "not ready yet"
     end
   end
 
-  def util_msg exp, act, msg = nil
+  def util_msg(exp, act, msg = nil)
     s = "Expected: #{exp.inspect}\n  Actual: #{act.inspect}"
     s = "#{msg}.\n#{s}" if msg
     s
@@ -1374,20 +1403,20 @@ class TestMinitestAssertions < Minitest::Test
 end
 
 class TestMinitestAssertionHelpers < Minitest::Test
-  def assert_mu_pp exp, input, raw = false
+  def assert_mu_pp(exp, input, raw = false)
     act = mu_pp input
 
-    if String === input && !raw then
+    if String === input && !raw
       assert_equal "\"#{exp}\"", act
     else
       assert_equal exp, act
     end
   end
 
-  def assert_mu_pp_for_diff exp, input, raw = false
+  def assert_mu_pp_for_diff(exp, input, raw = false)
     act = mu_pp_for_diff input
 
-    if String === input && !raw then
+    if String === input && !raw
       assert_equal "\"#{exp}\"", act
     else
       assert_equal exp, act
@@ -1401,7 +1430,7 @@ class TestMinitestAssertionHelpers < Minitest::Test
 
     o1 = "blah" * 10
     o2 = "blah" * 10
-    def o1.== _
+    def o1.==(_)
       false
     end
 
@@ -1478,7 +1507,7 @@ class TestMinitestAssertionHelpers < Minitest::Test
 
   def test_mu_pp
     assert_mu_pp 42.inspect,            42
-    assert_mu_pp %w[a b c].inspect,     %w[a b c]
+    assert_mu_pp %w(a b c).inspect,     %w(a b c)
     assert_mu_pp "A B",     "A B"
     assert_mu_pp "A\\nB",   "A\nB"
     assert_mu_pp "A\\\\nB", 'A\nB' # notice single quotes

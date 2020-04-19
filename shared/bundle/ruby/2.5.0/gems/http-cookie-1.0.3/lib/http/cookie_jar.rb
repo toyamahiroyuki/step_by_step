@@ -10,9 +10,9 @@ class HTTP::CookieJar
     def const_missing(name)
       case name.to_s
       when /\A([A-Za-z]+)Store\z/
-        file = 'http/cookie_jar/%s_store' % $1.downcase
+        file = 'http/cookie_jar/%s_store' % Regexp.last_match(1).downcase
       when /\A([A-Za-z]+)Saver\z/
-        file = 'http/cookie_jar/%s_saver' % $1.downcase
+        file = 'http/cookie_jar/%s_saver' % Regexp.last_match(1).downcase
       end
       begin
         require file
@@ -136,7 +136,7 @@ class HTTP::CookieJar
   def empty?(url = nil)
     if url
       each(url) { return false }
-      return true
+      true
     else
       @store.empty?
     end
@@ -153,7 +153,7 @@ class HTTP::CookieJar
   # If (and only if) the `uri` option is given, last access time of
   # each cookie is updated to the current time.
   def each(uri = nil, &block) # :yield: cookie
-    block_given? or return enum_for(__method__, uri)
+    block_given? || (return enum_for(__method__, uri))
 
     if uri
       uri = URI(uri)
@@ -182,15 +182,15 @@ class HTTP::CookieJar
   # See HTTP::Cookie.parse for available options.
   def parse(set_cookie, origin, options = nil) # :yield: cookie
     if block_given?
-      HTTP::Cookie.parse(set_cookie, origin, options).tap { |cookies|
-        cookies.select! { |cookie|
+      HTTP::Cookie.parse(set_cookie, origin, options).tap do |cookies|
+        cookies.select! do |cookie|
           yield(cookie) && add(cookie)
-        }
-      }
+        end
+      end
     else
-      HTTP::Cookie.parse(set_cookie, origin, options) { |cookie|
+      HTTP::Cookie.parse(set_cookie, origin, options) do |cookie|
         add(cookie)
-      }
+      end
     end
   end
 
@@ -258,9 +258,9 @@ class HTTP::CookieJar
     if writable.respond_to?(:write)
       saver.save(writable, self)
     else
-      File.open(writable, 'w') { |io|
+      File.open(writable, 'w') do |io|
         saver.save(io, self)
-      }
+      end
     end
 
     self
@@ -321,9 +321,9 @@ class HTTP::CookieJar
     if readable.respond_to?(:write)
       saver.load(readable, self)
     else
-      File.open(readable, 'r') { |io|
+      File.open(readable, 'r') do |io|
         saver.load(io, self)
-      }
+      end
     end
 
     self

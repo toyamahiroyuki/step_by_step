@@ -3,7 +3,6 @@
 require 'i18n/backend/base'
 
 module I18n
-
   begin
     require 'oj'
     class JSON
@@ -11,6 +10,7 @@ module I18n
         def encode(value)
           Oj::Rails.encode(value)
         end
+
         def decode(value)
           Oj.load(value)
         end
@@ -72,9 +72,10 @@ module I18n
       module Implementation
         attr_accessor :store
 
-        include Base, Flatten
+        include Flatten
+        include Base
 
-        def initialize(store, subtrees=true)
+        def initialize(store, subtrees = true)
           @store, @subtrees = store, subtrees
         end
 
@@ -109,7 +110,7 @@ module I18n
           locales
         end
 
-      protected
+        protected
 
         # Queries the translations from the key-value store and converts
         # them into a hash such as the one returned from loading the
@@ -118,9 +119,9 @@ module I18n
           @translations = @store.keys.clone.map do |main_key|
             main_value = JSON.decode(@store[main_key])
             main_key.to_s.split(".").reverse.inject(main_value) do |value, key|
-              {key.to_sym => value}
+              { key.to_sym => value }
             end
-          end.inject{|hash, elem| hash.deep_merge!(elem)}.deep_symbolize_keys
+          end.inject { |hash, elem| hash.deep_merge!(elem) }.deep_symbolize_keys
         end
 
         def init_translations
@@ -168,7 +169,7 @@ module I18n
         end
 
         def has_key?(key)
-          @subtree && @subtree.has_key?(key) || self[key]
+          @subtree && @subtree.key?(key) || self[key]
         end
 
         def [](key)

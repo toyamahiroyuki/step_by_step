@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class SelectCore < Arel::Nodes::Node
@@ -23,14 +24,14 @@ module Arel
         @source.left
       end
 
-      def from= value
+      def from=(value)
         @source.left = value
       end
 
       alias :froms= :from=
       alias :froms :from
 
-      def initialize_copy other
+      def initialize_copy(other)
         super
         @source      = @source.clone if @source
         @projections = @projections.clone
@@ -43,20 +44,20 @@ module Arel
       def hash
         [
           @source, @top, @set_quantifier, @projections,
-          @wheres, @groups, @havings, @windows
+          @wheres, @groups, @havings, @windows,
         ].hash
       end
 
-      def eql? other
+      def eql?(other)
         self.class == other.class &&
-          self.source == other.source &&
-          self.top == other.top &&
-          self.set_quantifier == other.set_quantifier &&
-          self.projections == other.projections &&
-          self.wheres == other.wheres &&
-          self.groups == other.groups &&
-          self.havings == other.havings &&
-          self.windows == other.windows
+          source == other.source &&
+          top == other.top &&
+          set_quantifier == other.set_quantifier &&
+          projections == other.projections &&
+          wheres == other.wheres &&
+          groups == other.groups &&
+          havings == other.havings &&
+          windows == other.windows
       end
       alias :== :eql?
     end

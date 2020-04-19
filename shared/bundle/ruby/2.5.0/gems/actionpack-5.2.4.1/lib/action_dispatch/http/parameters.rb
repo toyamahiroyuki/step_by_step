@@ -11,14 +11,14 @@ module ActionDispatch
         Mime[:json].symbol => -> (raw_post) {
           data = ActiveSupport::JSON.decode(raw_post)
           data.is_a?(Hash) ? data : { _json: data }
-        }
-      }
+        },
+      }.freeze
 
       # Raised when raw data from the request cannot be parsed by the parser
       # defined for request's content MIME type.
       class ParseError < StandardError
         def initialize
-          super($!.message)
+          super($ERROR_INFO.message)
         end
       end
 
@@ -73,7 +73,7 @@ module ActionDispatch
 
         set_header PARAMETERS_KEY, parameters
       rescue Rack::Utils::ParameterTypeError, Rack::Utils::InvalidParameterError => e
-        raise ActionController::BadRequest.new("Invalid path parameters: #{e.message}")
+        raise ActionController::BadRequest, "Invalid path parameters: #{e.message}"
       end
 
       # Returns a hash with the \parameters used to form the \path of the request.
@@ -86,41 +86,41 @@ module ActionDispatch
 
       private
 
-        def set_binary_encoding(params, controller, action)
-          return params unless controller && controller.valid_encoding?
+      def set_binary_encoding(params, controller, action)
+        return params unless controller && controller.valid_encoding?
 
-          if binary_params_for?(controller, action)
-            ActionDispatch::Request::Utils.each_param_value(params) do |param|
-              param.force_encoding ::Encoding::ASCII_8BIT
-            end
-          end
-          params
-        end
-
-        def binary_params_for?(controller, action)
-          controller_class_for(controller).binary_params_for?(action)
-        rescue NameError
-          false
-        end
-
-        def parse_formatted_parameters(parsers)
-          return yield if content_length.zero? || content_mime_type.nil?
-
-          strategy = parsers.fetch(content_mime_type.symbol) { return yield }
-
-          begin
-            strategy.call(raw_post)
-          rescue # JSON or Ruby code block errors.
-            my_logger = logger || ActiveSupport::Logger.new($stderr)
-            my_logger.debug "Error occurred while parsing request parameters.\nContents:\n\n#{raw_post}"
-
-            raise ParseError
+        if binary_params_for?(controller, action)
+          ActionDispatch::Request::Utils.each_param_value(params) do |param|
+            param.force_encoding ::Encoding::ASCII_8BIT
           end
         end
+        params
+      end
 
-        def params_parsers
-          ActionDispatch::Request.parameter_parsers
+      def binary_params_for?(controller, action)
+        controller_class_for(controller).binary_params_for?(action)
+      rescue NameError
+        false
+      end
+
+      def parse_formatted_parameters(parsers)
+        return yield if content_length.zero? || content_mime_type.nil?
+
+        strategy = parsers.fetch(content_mime_type.symbol) { return yield }
+
+        begin
+          strategy.call(raw_post)
+        rescue # JSON or Ruby code block errors.
+          my_logger = logger || ActiveSupport::Logger.new($stderr)
+          my_logger.debug "Error occurred while parsing request parameters.\nContents:\n\n#{raw_post}"
+
+          raise ParseError
         end
+      end
+
+      def params_parsers
+        ActionDispatch::Request.parameter_parsers
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 class TargetsController < ApplicationController
-    before_action :authenticate_user!
-    before_action :create_loan_item_per_month, only: %i(new index edit)
+  before_action :authenticate_user!
+  before_action :create_loan_item_per_month, only: %i(new index edit)
 
   def new
     @target = Target.new
@@ -14,7 +14,7 @@ class TargetsController < ApplicationController
 
       if @targets.empty? && @loans.empty?
 
-         flash[:target] = "貯金とローンを登録しよう"
+        flash[:target] = "貯金とローンを登録しよう"
       else
       end
     else

@@ -11,7 +11,7 @@ class Pry
     else
       '~/.config/pry/pryrc'
     end
-  LOCAL_RC_FILE = "./.pryrc"
+  LOCAL_RC_FILE = "./.pryrc".freeze
 
   class << self
     extend Pry::Forwardable
@@ -121,19 +121,17 @@ class Pry
   end
 
   def self.load_win32console
-    begin
-      require 'win32console'
-      # The mswin and mingw versions of pry require win32console, so this should
-      # only fail on jruby (where win32console doesn't work).
-      # Instead we'll recommend ansicon, which does.
-    rescue LoadError
-      warn <<-WARNING if Pry.config.windows_console_warning
+    require 'win32console'
+    # The mswin and mingw versions of pry require win32console, so this should
+    # only fail on jruby (where win32console doesn't work).
+    # Instead we'll recommend ansicon, which does.
+  rescue LoadError
+    warn <<-WARNING if Pry.config.windows_console_warning
 For a better Pry experience on Windows, please use ansicon:
   https://github.com/adoxa/ansicon
 If you use an alternative to ansicon and don't want to see this warning again,
 you can add "Pry.config.windows_console_warning = false" to your pryrc.
       WARNING
-    end
   end
 
   # Do basic setup for initial session including: loading pryrc, plugins,
@@ -232,7 +230,7 @@ you can add "Pry.config.windows_console_warning = false" to your pryrc.
   def self.view_clip(obj, options = {})
     max = options.fetch :max_length, 60
     id = options.fetch :id, false
-    if obj.kind_of?(Module) && obj.name.to_s != "" && obj.name.to_s.length <= max
+    if obj.is_a?(Module) && obj.name.to_s != "" && obj.name.to_s.length <= max
       obj.name.to_s
     elsif Pry.main == obj
       # special-case to support jruby.
@@ -280,7 +278,7 @@ you can add "Pry.config.windows_console_warning = false" to your pryrc.
       target: TOPLEVEL_BINDING,
       show_output: true,
       output: Pry.config.output,
-      commands: Pry.config.commands
+      commands: Pry.config.commands,
     }.merge!(options)
 
     # :context for compatibility with <= 0.9.11.4
@@ -293,8 +291,8 @@ you can add "Pry.config.windows_console_warning = false" to your pryrc.
   end
 
   def self.default_editor_for_platform
-    return ENV['VISUAL'] if ENV['VISUAL'] and not ENV['VISUAL'].empty?
-    return ENV['EDITOR'] if ENV['EDITOR'] and not ENV['EDITOR'].empty?
+    return ENV['VISUAL'] if ENV['VISUAL'].present?
+    return ENV['EDITOR'] if ENV['EDITOR'].present?
     return 'notepad' if Helpers::Platform.windows?
 
     %w(editor nano vi).detect do |editor|
@@ -386,8 +384,8 @@ Readline version #{Readline::VERSION} detected - will not auto_resize! correctly
     @toplevel_binding
   end
 
-  def self.toplevel_binding=(binding)
-    @toplevel_binding = binding
+  class << self
+    attr_writer :toplevel_binding
   end
 
   def self.in_critical_section?

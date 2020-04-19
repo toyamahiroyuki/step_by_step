@@ -49,7 +49,7 @@ module I18n
         def available_locales
           init_translations unless initialized?
           translations.inject([]) do |locales, (locale, data)|
-            locales << locale unless data.size <= 1 && (data.empty? || data.has_key?(:i18n))
+            locales << locale unless data.size <= 1 && (data.empty? || data.key?(:i18n))
             locales
           end
         end
@@ -74,7 +74,7 @@ module I18n
           @translations ||= {}
         end
 
-      protected
+        protected
 
         def init_translations
           load_translations
@@ -92,9 +92,9 @@ module I18n
 
           keys.inject(translations) do |result, _key|
             return nil unless result.is_a?(Hash)
-            unless result.has_key?(_key)
+            unless result.key?(_key)
               _key = _key.to_s.to_sym
-              return nil unless result.has_key?(_key)
+              return nil unless result.key?(_key)
             end
             result = result[_key]
             result = resolve(locale, _key, result, options.merge(:scope => nil)) if result.is_a?(Symbol)

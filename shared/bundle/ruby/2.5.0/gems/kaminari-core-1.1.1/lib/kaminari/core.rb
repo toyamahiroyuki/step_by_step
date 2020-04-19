@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Kaminari
 end
 
@@ -6,7 +7,7 @@ end
 begin
   require 'rails'
 rescue LoadError
-  #do nothing
+  # do nothing
 end
 
 # load Kaminari components

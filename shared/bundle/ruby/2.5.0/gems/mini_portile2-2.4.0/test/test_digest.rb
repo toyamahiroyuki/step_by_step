@@ -40,7 +40,7 @@ class TestDigest < TestCase
       :url => "http://localhost:#{webrick.config[:Port]}/#{ERB::Util.url_encode(File.basename(tar_path))}",
       key => "0011223344556677",
     }
-    assert_raises(RuntimeError){ @recipe.download }
+    assert_raises(RuntimeError) { @recipe.download }
   end
 
   def test_sha256
@@ -99,8 +99,8 @@ KEY
       :url => "file://#{data_file}",
       :gpg => {
         :key => public_key,
-        :signature_url => "file://#{data_file}.asc"
-      }
+        :signature_url => "file://#{data_file}.asc",
+      },
     }
     @recipe.download
   end
@@ -111,8 +111,8 @@ KEY
     @recipe.files << {
       :url => "file://#{data_file}",
       :gpg => {
-        :key => public_key
-      }
+        :key => public_key,
+      },
     }
     @recipe.download
   end
@@ -124,12 +124,12 @@ KEY
       :url => "file://#{data_file}",
       :gpg => {
         :key => public_key,
-        :signature_url => "file://#{data_file}.invalid.asc"
-      }
+        :signature_url => "file://#{data_file}.invalid.asc",
+      },
     }
-    exception = assert_raises(RuntimeError){
+    exception = assert_raises(RuntimeError) do
       @recipe.download
-    }
+    end
     assert_equal("signature mismatch", exception.message)
   end
 
@@ -140,10 +140,10 @@ KEY
       :url => "file://#{data_file}",
       :gpg => {
         :key => "thisisaninvalidkey",
-        :signature_url => "file://#{data_file}.asc"
-      }
+        :signature_url => "file://#{data_file}.asc",
+      },
     }
-    exception = assert_raises(RuntimeError){ @recipe.download }
+    exception = assert_raises(RuntimeError) { @recipe.download }
     assert_equal("invalid gpg key provided", exception.message)
   end
 
@@ -205,11 +205,10 @@ KEY
       :url => "file://#{data_file}",
       :gpg => {
         :key => key,
-        :signature_url => "file://#{data_file}.asc"
-      }
+        :signature_url => "file://#{data_file}.asc",
+      },
     }
-    exception = assert_raises(RuntimeError){ @recipe.download }
+    exception = assert_raises(RuntimeError) { @recipe.download }
     assert_equal("signature mismatch", exception.message)
   end
 end
-

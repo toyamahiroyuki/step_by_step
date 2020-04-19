@@ -5,7 +5,6 @@ require 'puma/plugin'
 require 'puma/const'
 
 module Puma
-
   module ConfigDefault
     DefaultRackup = "config.ru"
 
@@ -84,7 +83,7 @@ module Puma
     end
 
     def finalize_values
-      @default_options.each do |k,v|
+      @default_options.each do |k, v|
         if v.respond_to? :call
           @default_options[k] = v.call
         end
@@ -128,8 +127,8 @@ module Puma
   class Configuration
     include ConfigDefault
 
-    def initialize(user_options={}, default_options = {}, &block)
-      default_options = self.puma_default_options.merge(default_options)
+    def initialize(user_options = {}, default_options = {}, &block)
+      default_options = puma_default_options.merge(default_options)
 
       @options     = UserFileDefaultOptions.new(user_options, default_options)
       @plugins     = PluginLoader.new
@@ -186,7 +185,7 @@ module Puma
         :rackup => DefaultRackup,
         :logger => STDOUT,
         :persistent_timeout => Const::PERSISTENT_TIMEOUT,
-        :first_data_timeout => Const::FIRST_DATA_TIMEOUT
+        :first_data_timeout => Const::FIRST_DATA_TIMEOUT,
       }
     end
 
@@ -282,7 +281,7 @@ module Puma
       require 'tmpdir'
 
       t = (Time.now.to_f * 1000).to_i
-      "#{Dir.tmpdir}/puma-status-#{t}-#{$$}"
+      "#{Dir.tmpdir}/puma-status-#{t}-#{$PROCESS_ID}"
     end
 
     private
@@ -353,7 +352,7 @@ module Puma
         token = (0..count).to_a.map { rand(255).to_s(16) }.join
       end
 
-      return token
+      token
     end
   end
 end

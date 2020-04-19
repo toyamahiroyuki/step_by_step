@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require './lib/builder/version'
 
 PKG_VERSION = Builder::VERSION
@@ -12,19 +13,18 @@ PKG_FILES = Dir[
 ]
 
 Gem::Specification.new do |s|
-
   #### Basic information.
 
   s.name = 'builder'
   s.version = PKG_VERSION
   s.summary = "Builders for MarkUp."
-  s.description = %{\
+  s.description = %(\
 Builder provides a number of builder objects that make creating structured data
 simple to do.  Currently the following builder objects are supported:
 
 * XML Markup
 * XML Events
-}
+)
 
   s.files = PKG_FILES
   s.require_path = 'lib'
@@ -34,8 +34,8 @@ simple to do.  Currently the following builder objects are supported:
   s.has_rdoc = true
   # s.extra_rdoc_files = rd.rdoc_files.reject { |fn| fn =~ /\.rb$/ }.to_a
   s.rdoc_options <<
-    '--title' <<  'Builder -- Easy XML Building' <<
-    '--main' << 'README.rdoc' <<
+    '--title' << 'Builder -- Easy XML Building' \
+    '--main' << 'README.rdoc' \
     '--line-numbers'
 
   s.authors = ["Jim Weirich", "Aaron Patterson"]

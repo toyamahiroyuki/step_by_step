@@ -17,7 +17,7 @@ module Rack
   # Your application's +call+ should end returning Response#finish.
   class Response
     def self.[](status, headers, body)
-      self.new(body, status, headers)
+      new(body, status, headers)
     end
 
     CHUNKED = 'chunked'
@@ -43,7 +43,7 @@ module Rack
       @status = status.to_i
       @headers = Utils::HeaderHash[headers]
 
-      @writer = self.method(:append)
+      @writer = method(:append)
 
       @block = nil
 
@@ -82,18 +82,18 @@ module Rack
         delete_header CONTENT_TYPE
         delete_header CONTENT_LENGTH
         close
-        return [@status, @headers, []]
+        [@status, @headers, []]
       else
         if block_given?
           @block = block
-          return [@status, @headers, self]
+          [@status, @headers, self]
         else
-          return [@status, @headers, @body]
+          [@status, @headers, @body]
         end
       end
     end
 
-    alias to_a finish           # For *response
+    alias to_a finish # For *response
 
     def each(&callback)
       @body.each(&callback)
@@ -120,40 +120,104 @@ module Rack
     end
 
     def empty?
-      @block == nil && @body.empty?
+      @block.nil? && @body.empty?
     end
 
-    def has_header?(key);   headers.key? key;   end
-    def get_header(key);    headers[key];       end
-    def set_header(key, v); headers[key] = v;   end
-    def delete_header(key); headers.delete key; end
+    def has_header?(key)
+      headers.key? key
+    end
+
+    def get_header(key)
+      headers[key]
+    end
+
+    def set_header(key, v)
+      headers[key] = v
+    end
+
+    def delete_header(key)
+      headers.delete key
+    end
 
     alias :[] :get_header
     alias :[]= :set_header
 
     module Helpers
-      def invalid?;             status < 100 || status >= 600;        end
+      def invalid?
+        status < 100 || status >= 600
+      end
 
-      def informational?;       status >= 100 && status < 200;        end
-      def successful?;          status >= 200 && status < 300;        end
-      def redirection?;         status >= 300 && status < 400;        end
-      def client_error?;        status >= 400 && status < 500;        end
-      def server_error?;        status >= 500 && status < 600;        end
+      def informational?
+        status >= 100 && status < 200
+      end
 
-      def ok?;                  status == 200;                        end
-      def created?;             status == 201;                        end
-      def accepted?;            status == 202;                        end
-      def no_content?;          status == 204;                        end
-      def moved_permanently?;   status == 301;                        end
-      def bad_request?;         status == 400;                        end
-      def unauthorized?;        status == 401;                        end
-      def forbidden?;           status == 403;                        end
-      def not_found?;           status == 404;                        end
-      def method_not_allowed?;  status == 405;                        end
-      def precondition_failed?; status == 412;                        end
-      def unprocessable?;       status == 422;                        end
+      def successful?
+        status >= 200 && status < 300
+      end
 
-      def redirect?;            [301, 302, 303, 307, 308].include? status; end
+      def redirection?
+        status >= 300 && status < 400
+      end
+
+      def client_error?
+        status >= 400 && status < 500
+      end
+
+      def server_error?
+        status >= 500 && status < 600
+      end
+
+      def ok?
+        status == 200
+      end
+
+      def created?
+        status == 201
+      end
+
+      def accepted?
+        status == 202
+      end
+
+      def no_content?
+        status == 204
+      end
+
+      def moved_permanently?
+        status == 301
+      end
+
+      def bad_request?
+        status == 400
+      end
+
+      def unauthorized?
+        status == 401
+      end
+
+      def forbidden?
+        status == 403
+      end
+
+      def not_found?
+        status == 404
+      end
+
+      def method_not_allowed?
+        status == 405
+      end
+
+      def precondition_failed?
+        status == 412
+      end
+
+      def unprocessable?
+        status == 422
+      end
+
+      def redirect?
+        [301, 302, 303, 307, 308].include? status
+      end
 
       def include?(header)
         has_header? header
@@ -258,7 +322,7 @@ module Rack
         set_header ETAG, v
       end
 
-    protected
+      protected
 
       def buffered_body!
         return if @buffered
@@ -272,7 +336,7 @@ module Rack
         else
           # Turn the user supplied body into a buffered array:
           body = @body
-          @body = Array.new
+          @body = []
 
           body.each do |part|
             @writer.call(part.to_s)
@@ -292,7 +356,7 @@ module Rack
           set_header(CONTENT_LENGTH, @length.to_s)
         end
 
-        return chunk
+        chunk
       end
     end
 
@@ -309,10 +373,21 @@ module Rack
         @headers = headers
       end
 
-      def has_header?(key);   headers.key? key;   end
-      def get_header(key);    headers[key];       end
-      def set_header(key, v); headers[key] = v;   end
-      def delete_header(key); headers.delete key; end
+      def has_header?(key)
+        headers.key? key
+      end
+
+      def get_header(key)
+        headers[key]
+      end
+
+      def set_header(key, v)
+        headers[key] = v
+      end
+
+      def delete_header(key)
+        headers.delete key
+      end
     end
   end
 end

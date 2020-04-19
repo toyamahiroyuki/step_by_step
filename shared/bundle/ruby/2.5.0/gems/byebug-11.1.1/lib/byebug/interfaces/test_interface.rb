@@ -45,7 +45,7 @@ module Byebug
       [
         "Input:", input.join("\n"),
         "Output:", output.join("\n"),
-        "Error:", error.join("\n")
+        "Error:", error.join("\n"),
       ].join("\n")
     end
 

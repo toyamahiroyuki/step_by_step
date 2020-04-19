@@ -90,7 +90,7 @@ class TestMimeMagic < Minitest::Test
     load 'mimemagic/overlay.rb'
     %w(msoffice rubyxl gdocs).each do |variant|
       file = "test/files/application.vnd.openxmlformats-officedocument.spreadsheetml{#{variant}}.sheet"
-      mimes = %w[application/vnd.openxmlformats-officedocument.spreadsheetml.sheet application/zip]
+      mimes = %w(application/vnd.openxmlformats-officedocument.spreadsheetml.sheet application/zip)
       assert_equal mimes, MimeMagic.all_by_magic(File.read(file)).map(&:type)
     end
   end
@@ -109,10 +109,12 @@ class TestMimeMagic < Minitest::Test
 
   def test_process_magic
     MimeMagic.add('application/mimemagic-test',
-                  magic: [[0, 'MAGICTEST'], # MAGICTEST at position 0
-                             [1, 'MAGICTEST'], # MAGICTEST at position 1
-                             [9..12, 'MAGICTEST'], # MAGICTEST starting at position 9 to 12
-                             [2, 'MAGICTEST', [[0, 'X'], [0, 'Y']]]]) # MAGICTEST at position 2 and (X at 0 or Y at 0)
+                  magic: [
+                    [0, 'MAGICTEST'], # MAGICTEST at position 0
+                    [1, 'MAGICTEST'], # MAGICTEST at position 1
+                    [9..12, 'MAGICTEST'], # MAGICTEST starting at position 9 to 12
+                    [2, 'MAGICTEST', [[0, 'X'], [0, 'Y']]],
+                  ]) # MAGICTEST at position 2 and (X at 0 or Y at 0)
 
     assert_equal 'application/mimemagic-test', MimeMagic.by_magic('MAGICTEST').to_s
     assert_equal 'application/mimemagic-test', MimeMagic.by_magic('XMAGICTEST').to_s
@@ -125,16 +127,16 @@ class TestMimeMagic < Minitest::Test
     assert_equal 'application/mimemagic-test', MimeMagic.by_magic('Y MAGICTEST').to_s
     assert_nil MimeMagic.by_magic('Z MAGICTEST')
 
-    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new 'MAGICTEST').to_s
-    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new 'XMAGICTEST').to_s
-    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new ' MAGICTEST').to_s
-    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new '123456789MAGICTEST').to_s
-    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new '123456789ABMAGICTEST').to_s
-    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new '123456789ABCMAGICTEST').to_s
-    assert_nil MimeMagic.by_magic(StringIO.new '123456789ABCDMAGICTEST')
-    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new 'X MAGICTEST').to_s
-    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new 'Y MAGICTEST').to_s
-    assert_nil MimeMagic.by_magic(StringIO.new 'Z MAGICTEST')
+    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new('MAGICTEST')).to_s
+    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new('XMAGICTEST')).to_s
+    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new(' MAGICTEST')).to_s
+    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new('123456789MAGICTEST')).to_s
+    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new('123456789ABMAGICTEST')).to_s
+    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new('123456789ABCMAGICTEST')).to_s
+    assert_nil MimeMagic.by_magic(StringIO.new('123456789ABCDMAGICTEST'))
+    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new('X MAGICTEST')).to_s
+    assert_equal 'application/mimemagic-test', MimeMagic.by_magic(StringIO.new('Y MAGICTEST')).to_s
+    assert_nil MimeMagic.by_magic(StringIO.new('Z MAGICTEST'))
   end
 
   class IOObject

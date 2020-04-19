@@ -4,53 +4,53 @@ require 'tmpdir'
 module TestHTTPCookieJar
   class TestAutoloading < Test::Unit::TestCase
     def test_nonexistent_store
-      assert_raises(NameError) {
+      assert_raises(NameError) do
         HTTP::CookieJar::NonexistentStore
-      }
+      end
     end
 
     def test_erroneous_store
-      Dir.mktmpdir { |dir|
+      Dir.mktmpdir do |dir|
         Dir.mkdir(File.join(dir, 'http'))
         Dir.mkdir(File.join(dir, 'http', 'cookie_jar'))
         rb = File.join(dir, 'http', 'cookie_jar', 'erroneous_store.rb')
         File.open(rb, 'w').close
         $LOAD_PATH.unshift(dir)
 
-        assert_raises(NameError) {
+        assert_raises(NameError) do
           HTTP::CookieJar::ErroneousStore
-        }
+        end
         if RUBY_VERSION >= "1.9"
           assert_includes $LOADED_FEATURES, rb
         else
           assert_includes $LOADED_FEATURES, rb[(dir.size + 1)..-1]
         end
-      }
+      end
     end
 
     def test_nonexistent_saver
-      assert_raises(NameError) {
+      assert_raises(NameError) do
         HTTP::CookieJar::NonexistentSaver
-      }
+      end
     end
 
     def test_erroneous_saver
-      Dir.mktmpdir { |dir|
+      Dir.mktmpdir do |dir|
         Dir.mkdir(File.join(dir, 'http'))
         Dir.mkdir(File.join(dir, 'http', 'cookie_jar'))
         rb = File.join(dir, 'http', 'cookie_jar', 'erroneous_saver.rb')
         File.open(rb, 'w').close
         $LOAD_PATH.unshift(dir)
 
-        assert_raises(NameError) {
+        assert_raises(NameError) do
           HTTP::CookieJar::ErroneousSaver
-        }
+        end
         if RUBY_VERSION >= "1.9"
           assert_includes $LOADED_FEATURES, rb
         else
           assert_includes $LOADED_FEATURES, rb[(dir.size + 1)..-1]
         end
-      }
+      end
     end
   end
 
@@ -60,17 +60,17 @@ module TestHTTPCookieJar
         :store => :hash,
         :gc_threshold => 1500, # increased by 10 for shorter test time
       }
-      new_options  = default_options.merge(options || {})
+      new_options = default_options.merge(options || {})
       new_options2 = new_options.merge(options2 || {})
       @store_type = new_options[:store]
       @gc_threshold = new_options[:gc_threshold]
-      @jar  = HTTP::CookieJar.new(new_options)
+      @jar = HTTP::CookieJar.new(new_options)
       @jar2 = HTTP::CookieJar.new(new_options2)
     end
 
-    #def hash_store?
+    # def hash_store?
     #  @store_type == :hash
-    #end
+    # end
 
     def mozilla_store?
       @store_type == :mozilla
@@ -78,13 +78,13 @@ module TestHTTPCookieJar
 
     def cookie_values(options = {})
       {
-        :name     => 'Foo',
-        :value    => 'Bar',
-        :path     => '/',
-        :expires  => Time.at(Time.now.to_i + 10 * 86400), # to_i is important here
+        :name => 'Foo',
+        :value => 'Bar',
+        :path => '/',
+        :expires => Time.at(Time.now.to_i + 10 * 86400), # to_i is important here
         :for_domain => true,
-        :domain   => 'rubyforge.org',
-        :origin   => 'http://rubyforge.org/'
+        :domain => 'rubyforge.org',
+        :origin => 'http://rubyforge.org/',
       }.merge(options)
     end
 
@@ -128,7 +128,8 @@ module TestHTTPCookieJar
       url = URI.parse('http://rubyforge.org/')
 
       @jar.add(HTTP::Cookie.new(
-          cookie_values(:domain => 'rubyforge.org', :for_domain => false)))
+        cookie_values(:domain => 'rubyforge.org', :for_domain => false)
+      ))
 
       assert_equal(1, @jar.cookies(url).length)
 
@@ -149,7 +150,7 @@ module TestHTTPCookieJar
       assert_equal(1, @jar.cookies(url).length)
 
       @jar.add HTTP::Cookie.new(values.merge(:domain => 'RuByForge.Org',
-          :name   => 'aaron'))
+                                             :name => 'aaron'))
 
       assert_equal(2, @jar.cookies(url).length)
 
@@ -199,21 +200,21 @@ module TestHTTPCookieJar
       now = Time.now
 
       cookies = [
-        { :value => 'a', :path => '/', },
+        { :value => 'a', :path => '/' },
         { :value => 'b', :path => '/abc/def/', :created_at => now - 1 },
         { :value => 'c', :path => '/abc/def/', :domain => 'www.rubyforge.org', :origin => 'http://www.rubyforge.org/abc/def/', :created_at => now },
         { :value => 'd', :path => '/abc/' },
-      ].map { |attrs|
+      ].map do |attrs|
         HTTP::Cookie.new(cookie_values(attrs))
-      }
+      end
 
       url = URI 'http://www.rubyforge.org/abc/def/ghi'
 
-      cookies.permutation(cookies.size) { |shuffled|
+      cookies.permutation(cookies.size) do |shuffled|
         @jar.clear
         shuffled.each { |cookie| @jar.add(cookie) }
-        assert_equal %w[b c d a], @jar.cookies(url).map { |cookie| cookie.value }
-      }
+        assert_equal %w(b c d a), @jar.cookies(url).map { |cookie| cookie.value }
+      end
     end
 
     def test_fall_back_rules_for_local_domains
@@ -244,15 +245,15 @@ module TestHTTPCookieJar
     end
 
     def test_add_rejects_cookies_with_unknown_domain_or_path
-      cookie = HTTP::Cookie.new(cookie_values.reject { |k,v| [:origin, :domain].include?(k) })
-      assert_raises(ArgumentError) {
+      cookie = HTTP::Cookie.new(cookie_values.reject { |k, v| [:origin, :domain].include?(k) })
+      assert_raises(ArgumentError) do
         @jar.add(cookie)
-      }
+      end
 
-      cookie = HTTP::Cookie.new(cookie_values.reject { |k,v| [:origin, :path].include?(k) })
-      assert_raises(ArgumentError) {
+      cookie = HTTP::Cookie.new(cookie_values.reject { |k, v| [:origin, :path].include?(k) })
+      assert_raises(ArgumentError) do
         @jar.add(cookie)
-      }
+      end
     end
 
     def test_add_does_not_reject_cookies_from_a_nested_subdomain
@@ -361,8 +362,8 @@ module TestHTTPCookieJar
       # Add one cookie with an expiration date in the future
       cookie = HTTP::Cookie.new(cookie_values(:origin => url))
       s_cookie = HTTP::Cookie.new(cookie_values(:name => 'Bar',
-          :expires => nil,
-          :origin => url))
+                                                :expires => nil,
+                                                :origin => url))
 
       @jar.add(cookie)
       @jar.add(s_cookie)
@@ -387,7 +388,7 @@ module TestHTTPCookieJar
     end
 
     def test_save_load_signature
-      Dir.mktmpdir { |dir|
+      Dir.mktmpdir do |dir|
         filename = File.join(dir, "cookies.yml")
 
         @jar.save(filename, :format => :cookiestxt, :session => true)
@@ -400,18 +401,18 @@ module TestHTTPCookieJar
         @jar.save(filename, :session => true)
         @jar.save(filename)
 
-        assert_raises(ArgumentError) {
-          @jar.save()
-        }
-        assert_raises(ArgumentError) {
+        assert_raises(ArgumentError) do
+          @jar.save
+        end
+        assert_raises(ArgumentError) do
           @jar.save(filename, :nonexistent)
-        }
-        assert_raises(TypeError) {
+        end
+        assert_raises(TypeError) do
           @jar.save(filename, { :format => :cookiestxt }, { :session => true })
-        }
-        assert_raises(ArgumentError) {
+        end
+        assert_raises(ArgumentError) do
           @jar.save(filename, :cookiestxt, { :session => true }, { :format => :cookiestxt })
-        }
+        end
 
         @jar.load(filename, :format => :cookiestxt, :linefeed => "\n")
         @jar.load(filename, :format => :cookiestxt, :linefeed => "\n")
@@ -422,19 +423,19 @@ module TestHTTPCookieJar
         @jar.load(filename, :cookiestxt)
         @jar.load(filename, :linefeed => "\n")
         @jar.load(filename)
-        assert_raises(ArgumentError) {
-          @jar.load()
-        }
-        assert_raises(ArgumentError) {
+        assert_raises(ArgumentError) do
+          @jar.load
+        end
+        assert_raises(ArgumentError) do
           @jar.load(filename, :nonexistent)
-        }
-        assert_raises(TypeError) {
+        end
+        assert_raises(TypeError) do
           @jar.load(filename, { :format => :cookiestxt }, { :linefeed => "\n" })
-        }
-        assert_raises(ArgumentError) {
+        end
+        assert_raises(ArgumentError) do
           @jar.load(filename, :cookiestxt, { :linefeed => "\n" }, { :format => :cookiestxt })
-        }
-      }
+        end
+      end
     end
 
     def test_save_session_cookies_yaml
@@ -443,7 +444,7 @@ module TestHTTPCookieJar
       # Add one cookie with an expiration date in the future
       cookie = HTTP::Cookie.new(cookie_values)
       s_cookie = HTTP::Cookie.new(cookie_values(:name => 'Bar',
-          :expires => nil))
+                                                :expires => nil))
 
       @jar.add(cookie)
       @jar.add(s_cookie)
@@ -468,17 +469,17 @@ module TestHTTPCookieJar
       cookie = HTTP::Cookie.new(cookie_values)
       expires = cookie.expires
       s_cookie = HTTP::Cookie.new(cookie_values(:name => 'Bar',
-          :expires => nil))
+                                                :expires => nil))
       cookie2 = HTTP::Cookie.new(cookie_values(:name => 'Baz',
-          :value => 'Foo#Baz',
-          :path => '/foo/',
-          :for_domain => false))
+                                               :value => 'Foo#Baz',
+                                               :path => '/foo/',
+                                               :for_domain => false))
       h_cookie = HTTP::Cookie.new(cookie_values(:name => 'Quux',
-          :value => 'Foo#Quux',
-          :httponly => true))
+                                                :value => 'Foo#Quux',
+                                                :httponly => true))
       ma_cookie = HTTP::Cookie.new(cookie_values(:name => 'Maxage',
-          :value => 'Foo#Maxage',
-          :max_age => 15000))
+                                                 :value => 'Foo#Maxage',
+                                                 :max_age => 15000))
       @jar.add(cookie)
       @jar.add(s_cookie)
       @jar.add(cookie2)
@@ -494,10 +495,10 @@ module TestHTTPCookieJar
         content = File.read(filename)
 
         filename2 = File.join(dir, "cookies2.txt")
-        open(filename2, 'w') { |w|
+        open(filename2, 'w') do |w|
           w.puts '# HTTP Cookie File'
           @jar.save(w, :cookiestxt, :header => nil)
-        }
+        end
         assert_equal content, File.read(filename2)
 
         assert_match(/^\.rubyforge\.org\t.*\tFoo\t/, content)
@@ -507,7 +508,7 @@ module TestHTTPCookieJar
         @jar2.load(filename, :cookiestxt) # HACK test the format
         cookies = @jar2.cookies(url)
         assert_equal(4, cookies.length)
-        cookies.each { |cookie|
+        cookies.each do |cookie|
           case cookie.name
           when 'Foo'
             assert_equal 'Bar', cookie.value
@@ -536,7 +537,7 @@ module TestHTTPCookieJar
           else
             raise
           end
-        }
+        end
       end
 
       assert_equal(5, @jar.cookies(url).length)
@@ -588,7 +589,7 @@ module TestHTTPCookieJar
       assert_equal(1, @jar.cookies(url).length)
 
       # Expire the second cookie
-      @jar.add(HTTP::Cookie.new(cookie_values( :name => 'Baz', :expires => Time.now - (10 * 86400))))
+      @jar.add(HTTP::Cookie.new(cookie_values(:name => 'Baz', :expires => Time.now - (10 * 86400))))
       assert_equal(0, @jar.cookies(url).length)
     end
 
@@ -636,7 +637,7 @@ module TestHTTPCookieJar
       assert_equal(1, @jar.cookies(url).length)
 
       # Add a second cookie
-      @jar.add(HTTP::Cookie.new(values.merge( :name => 'Baz' )))
+      @jar.add(HTTP::Cookie.new(values.merge(:name => 'Baz')))
       assert_equal(2, @jar.cookies(url).length)
 
       # Make sure we don't get the cookie in a different path
@@ -644,12 +645,12 @@ module TestHTTPCookieJar
       assert_equal(0, @jar.cookies(URI('http://rubyforge.org/')).length)
 
       # Expire the first cookie
-      @jar.add(HTTP::Cookie.new(values.merge( :expires => Time.now - (10 * 86400))))
+      @jar.add(HTTP::Cookie.new(values.merge(:expires => Time.now - (10 * 86400))))
       assert_equal(1, @jar.cookies(url).length)
 
       # Expire the second cookie
-      @jar.add(HTTP::Cookie.new(values.merge( :name => 'Baz',
-            :expires => Time.now - (10 * 86400))))
+      @jar.add(HTTP::Cookie.new(values.merge(:name => 'Baz',
+                                             :expires => Time.now - (10 * 86400))))
       assert_equal(0, @jar.cookies(url).length)
     end
 
@@ -682,8 +683,8 @@ module TestHTTPCookieJar
       @jar.add(nscookie)
       @jar.add(sscookie)
 
-      assert_equal('Foo1',      @jar.cookies(nurl).map { |c| c.name }.sort.join(' ') )
-      assert_equal('Foo1 Foo2', @jar.cookies(surl).map { |c| c.name }.sort.join(' ') )
+      assert_equal('Foo1',      @jar.cookies(nurl).map { |c| c.name }.sort.join(' '))
+      assert_equal('Foo1 Foo2', @jar.cookies(surl).map { |c| c.name }.sort.join(' '))
     end
 
     def test_delete
@@ -731,18 +732,18 @@ module TestHTTPCookieJar
       limit_per_domain = HTTP::Cookie::MAX_COOKIES_PER_DOMAIN
       uri = URI('http://www.example.org/')
       date = Time.at(Time.now.to_i + 86400)
-      (1..(limit_per_domain + 1)).each { |i|
+      (1..(limit_per_domain + 1)).each do |i|
         @jar << HTTP::Cookie.new(cookie_values(
-            :name => 'Foo%d' % i,
-            :value => 'Bar%d' % i,
-            :domain => uri.host,
-            :for_domain => true,
-            :path => '/dir%d/' % (i / 2),
-            :origin => uri
-            )).tap { |cookie|
+          :name => 'Foo%d' % i,
+          :value => 'Bar%d' % i,
+          :domain => uri.host,
+          :for_domain => true,
+          :path => '/dir%d/' % (i / 2),
+          :origin => uri
+        )).tap do |cookie|
           cookie.created_at = i == 42 ? date - i : date
-        }
-      }
+        end
+      end
       assert_equal limit_per_domain + 1, @jar.to_a.size
       @jar.cleanup
       count = @jar.to_a.size
@@ -755,22 +756,22 @@ module TestHTTPCookieJar
 
       n = hlimit / limit_per_domain * 2
 
-      (1..n).each { |i|
-        (1..(limit_per_domain + 1)).each { |j|
+      (1..n).each do |i|
+        (1..(limit_per_domain + 1)).each do |j|
           uri = URI('http://www%d.example.jp/' % i)
           @jar << HTTP::Cookie.new(cookie_values(
-              :name => 'Baz%d' % j,
-              :value => 'www%d.example.jp' % j,
-              :domain => uri.host,
-              :for_domain => true,
-              :path => '/dir%d/' % (i / 2),
-              :origin => uri
-              )).tap { |cookie|
+            :name => 'Baz%d' % j,
+            :value => 'www%d.example.jp' % j,
+            :domain => uri.host,
+            :for_domain => true,
+            :path => '/dir%d/' % (i / 2),
+            :origin => uri
+          )).tap do |cookie|
             cookie.created_at = i == j ? date - i : date
-          }
+          end
           count += 1
-        }
-      }
+        end
+      end
 
       assert_send [count, :>, slimit]
       assert_send [@jar.to_a.size, :<=, slimit]
@@ -789,8 +790,8 @@ module TestHTTPCookieJar
       ].join(', ')
 
       cookies = @jar.parse(set_cookie, 'http://rubyforge.org/')
-      assert_equal %w[Akinori Japan Tokyo], cookies.map { |c| c.value }
-      assert_equal %w[Tokyo Japan Akinori], @jar.to_a.sort_by { |c| c.name }.map { |c| c.value }
+      assert_equal %w(Akinori Japan Tokyo), cookies.map { |c| c.value }
+      assert_equal %w(Tokyo Japan Akinori), @jar.to_a.sort_by { |c| c.name }.map { |c| c.value }
     end
 
     def test_parse_with_block
@@ -801,8 +802,8 @@ module TestHTTPCookieJar
       ].join(', ')
 
       cookies = @jar.parse(set_cookie, 'http://rubyforge.org/') { |c| c.name != 'city' }
-      assert_equal %w[Akinori Japan], cookies.map { |c| c.value }
-      assert_equal %w[Japan Akinori], @jar.to_a.sort_by { |c| c.name }.map { |c| c.value }
+      assert_equal %w(Akinori Japan), cookies.map { |c| c.value }
+      assert_equal %w(Japan Akinori), @jar.to_a.sort_by { |c| c.name }.map { |c| c.value }
     end
 
     def test_expire_by_each_and_cleanup
@@ -822,19 +823,19 @@ module TestHTTPCookieJar
         expires -= 1
       end
 
-      0.upto(2) { |i|
+      0.upto(2) do |i|
         c = HTTP::Cookie.new('Foo%d' % (3 - i), 'Bar', :expires => expires + i, :origin => uri)
         @jar  << c
         @jar2 << c
-      }
+      end
 
-      assert_equal %w[Foo1 Foo2], @jar.cookies.map(&:name)
-      assert_equal %w[Foo1 Foo2], @jar2.cookies(uri).map(&:name)
+      assert_equal %w(Foo1 Foo2), @jar.cookies.map(&:name)
+      assert_equal %w(Foo1 Foo2), @jar2.cookies(uri).map(&:name)
 
       sleep_until time + 1
 
-      assert_equal %w[Foo1], @jar.cookies.map(&:name)
-      assert_equal %w[Foo1], @jar2.cookies(uri).map(&:name)
+      assert_equal %w(Foo1), @jar.cookies.map(&:name)
+      assert_equal %w(Foo1), @jar2.cookies(uri).map(&:name)
 
       sleep_until time + 2
 
@@ -853,9 +854,9 @@ module TestHTTPCookieJar
       jar = HTTP::CookieJar.new(:store => :hash)
       assert_instance_of HTTP::CookieJar::HashStore, jar.store
 
-      assert_raises(ArgumentError) {
+      assert_raises(ArgumentError) do
         jar = HTTP::CookieJar.new(:store => :nonexistent)
-      }
+      end
 
       jar = HTTP::CookieJar.new(:store => HTTP::CookieJar::HashStore.new)
       assert_instance_of HTTP::CookieJar::HashStore, jar.store
@@ -868,118 +869,120 @@ module TestHTTPCookieJar
       assert_not_send [
         @jar.store,
         :equal?,
-        jar.store
+        jar.store,
       ]
       assert_not_send [
         @jar.store.instance_variable_get(:@jar),
         :equal?,
-        jar.store.instance_variable_get(:@jar)
+        jar.store.instance_variable_get(:@jar),
       ]
       assert_equal @jar.cookies, jar.cookies
     end
   end
 
-  class WithMozillaStore < Test::Unit::TestCase
-    include CommonTests
-
-    def setup
-      super(
-        { :store => :mozilla, :filename => ":memory:" },
-        { :store => :mozilla, :filename => ":memory:" })
-    end
-
-    def add_and_delete(jar)
-      jar.parse("name=Akinori; Domain=rubyforge.org; Expires=Sun, 08 Aug 2076 19:00:00 GMT; Path=/",
-                'http://rubyforge.org/')
-      jar.parse("country=Japan; Domain=rubyforge.org; Expires=Sun, 08 Aug 2076 19:00:00 GMT; Path=/",
-                'http://rubyforge.org/')
-      jar.delete(HTTP::Cookie.new("name", :domain => 'rubyforge.org'))
-    end
-
-    def test_clone
-      assert_raises(TypeError) {
-        @jar.clone
-      }
-    end
-
-    def test_close
-      add_and_delete(@jar)
-
-      assert_not_send [@jar.store, :closed?]
-      @jar.store.close
-      assert_send [@jar.store, :closed?]
-      @jar.store.close	# should do nothing
-      assert_send [@jar.store, :closed?]
-    end
-
-    def test_finalizer
-      db = nil
-      loop {
-        jar = HTTP::CookieJar.new(:store => :mozilla, :filename => ':memory:')
-        add_and_delete(jar)
-        db = jar.store.instance_variable_get(:@db)
-        class << db
-          alias close_orig close
-          def close
-            STDERR.print "[finalizer is called]"
-            STDERR.flush
-            close_orig
-          end
-        end
-        break
-      }
-    end
-
-    def test_upgrade_mozillastore
-      Dir.mktmpdir { |dir|
-        filename = File.join(dir, 'cookies.sqlite')
-
-        sqlite = SQLite3::Database.new(filename)
-        sqlite.execute(<<-'SQL')
-          CREATE TABLE moz_cookies (
-            id INTEGER PRIMARY KEY,
-            name TEXT,
-            value TEXT,
-            host TEXT,
-            path TEXT,
-            expiry INTEGER,
-            isSecure INTEGER,
-            isHttpOnly INTEGER)
-        SQL
-        sqlite.execute(<<-'SQL')
-          PRAGMA user_version = 1
-        SQL
-
-        begin
-          st_insert = sqlite.prepare(<<-'SQL')
-            INSERT INTO moz_cookies (
-              id, name, value, host, path, expiry, isSecure, isHttpOnly
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          SQL
-
-          st_insert.execute(1, 'name1', 'value1', '.example.co.jp', '/', 2312085765, 0, 0)
-          st_insert.execute(2, 'name1', 'value2', '.example.co.jp', '/', 2312085765, 0, 0)
-          st_insert.execute(3, 'name1', 'value3', 'www.example.co.jp', '/', 2312085765, 0, 0)
-        ensure
-          st_insert.close if st_insert
-        end
-
-        sqlite.close
-        jar = HTTP::CookieJar.new(:store => :mozilla, :filename => filename)
-
-        assert_equal 2, jar.to_a.size
-        assert_equal 2, jar.cookies('http://www.example.co.jp/').size
-
-        cookie, *rest = jar.cookies('http://host.example.co.jp/')
-        assert_send [rest, :empty?]
-        assert_equal 'value2', cookie.value
-      }
-    end
-  end if begin
+  if begin
     require 'sqlite3'
     true
-  rescue LoadError
-    STDERR.puts 'sqlite3 missing?'
-    false
+     rescue LoadError
+       warn 'sqlite3 missing?'
+       false
+  end
+    class WithMozillaStore < Test::Unit::TestCase
+      include CommonTests
+
+      def setup
+        super(
+          { :store => :mozilla, :filename => ":memory:" },
+          { :store => :mozilla, :filename => ":memory:" })
+      end
+
+      def add_and_delete(jar)
+        jar.parse("name=Akinori; Domain=rubyforge.org; Expires=Sun, 08 Aug 2076 19:00:00 GMT; Path=/",
+                  'http://rubyforge.org/')
+        jar.parse("country=Japan; Domain=rubyforge.org; Expires=Sun, 08 Aug 2076 19:00:00 GMT; Path=/",
+                  'http://rubyforge.org/')
+        jar.delete(HTTP::Cookie.new("name", :domain => 'rubyforge.org'))
+      end
+
+      def test_clone
+        assert_raises(TypeError) do
+          @jar.clone
+        end
+      end
+
+      def test_close
+        add_and_delete(@jar)
+
+        assert_not_send [@jar.store, :closed?]
+        @jar.store.close
+        assert_send [@jar.store, :closed?]
+        @jar.store.close # should do nothing
+        assert_send [@jar.store, :closed?]
+      end
+
+      def test_finalizer
+        db = nil
+        loop do
+          jar = HTTP::CookieJar.new(:store => :mozilla, :filename => ':memory:')
+          add_and_delete(jar)
+          db = jar.store.instance_variable_get(:@db)
+          class << db
+            alias close_orig close
+            def close
+              STDERR.print "[finalizer is called]"
+              STDERR.flush
+              close_orig
+            end
+          end
+          break
+        end
+      end
+
+      def test_upgrade_mozillastore
+        Dir.mktmpdir do |dir|
+          filename = File.join(dir, 'cookies.sqlite')
+
+          sqlite = SQLite3::Database.new(filename)
+          sqlite.execute(<<-'SQL')
+            CREATE TABLE moz_cookies (
+              id INTEGER PRIMARY KEY,
+              name TEXT,
+              value TEXT,
+              host TEXT,
+              path TEXT,
+              expiry INTEGER,
+              isSecure INTEGER,
+              isHttpOnly INTEGER)
+          SQL
+          sqlite.execute(<<-'SQL')
+            PRAGMA user_version = 1
+          SQL
+
+          begin
+            st_insert = sqlite.prepare(<<-'SQL')
+              INSERT INTO moz_cookies (
+                id, name, value, host, path, expiry, isSecure, isHttpOnly
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            SQL
+
+            st_insert.execute(1, 'name1', 'value1', '.example.co.jp', '/', 2312085765, 0, 0)
+            st_insert.execute(2, 'name1', 'value2', '.example.co.jp', '/', 2312085765, 0, 0)
+            st_insert.execute(3, 'name1', 'value3', 'www.example.co.jp', '/', 2312085765, 0, 0)
+          ensure
+            st_insert.close if st_insert
+          end
+
+          sqlite.close
+          jar = HTTP::CookieJar.new(:store => :mozilla, :filename => filename)
+
+          assert_equal 2, jar.to_a.size
+          assert_equal 2, jar.cookies('http://www.example.co.jp/').size
+
+          cookie, *rest = jar.cookies('http://host.example.co.jp/')
+          assert_send [rest, :empty?]
+          assert_equal 'value2', cookie.value
+        end
+      end
+    end
   end
 end

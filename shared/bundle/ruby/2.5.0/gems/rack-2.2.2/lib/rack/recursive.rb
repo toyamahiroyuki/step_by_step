@@ -9,7 +9,7 @@ module Rack
   #   raise ForwardRequest.new("/not-found")
   #
 
-  class ForwardRequest < Exception
+  class ForwardRequest < StandardError
     attr_reader :url, :env
 
     def initialize(url, env = {})

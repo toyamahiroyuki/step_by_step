@@ -1,6 +1,5 @@
 module Concurrent
   module Synchronization
-
     # @!visibility private
     # TODO (pitr-ch 04-Dec-2016): should be in edge
     class Lock < LockableObject

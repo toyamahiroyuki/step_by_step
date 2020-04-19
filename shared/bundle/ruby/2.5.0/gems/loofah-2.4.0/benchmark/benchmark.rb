@@ -23,7 +23,7 @@ def compare_scrub_methods
 end
 
 module TestSet
-  def test_set options={}
+  def test_set(options = {})
     scale = options[:rehearse] ? 10 : 1
     puts self.class.name
 

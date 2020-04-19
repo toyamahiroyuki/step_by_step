@@ -17,7 +17,7 @@ class Pry
 
     def process(cmd)
       if cmd =~ /^cd\s*(.*)/i
-        process_cd parse_destination($1)
+        process_cd parse_destination(Regexp.last_match(1))
       else
         pass_block(cmd)
         if command_block
@@ -38,12 +38,10 @@ class Pry
     end
 
     def process_cd(dest)
-      begin
-        state.old_pwd = Dir.pwd
-        Dir.chdir(File.expand_path(path_from_cd_path(dest) || dest))
-      rescue Errno::ENOENT
-        raise CommandError, "No such directory: #{dest}"
-      end
+      state.old_pwd = Dir.pwd
+      Dir.chdir(File.expand_path(path_from_cd_path(dest) || dest))
+    rescue Errno::ENOENT
+      raise CommandError, "No such directory: #{dest}"
     end
 
     def cd_path_env
@@ -63,7 +61,7 @@ class Pry
         end
       end
 
-      return nil
+      nil
     end
 
     def special_case_path?(dest)

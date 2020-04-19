@@ -25,11 +25,9 @@ class Pry
   # may be convenient when working with enormous objects and
   # pretty_print is too slow
   SIMPLE_PRINT = proc do |output, value|
-    begin
-      output.puts value.inspect
-    rescue RescuableException
-      output.puts "unknown"
-    end
+    output.puts value.inspect
+  rescue RescuableException
+    output.puts "unknown"
   end
 
   # useful when playing with truly enormous objects

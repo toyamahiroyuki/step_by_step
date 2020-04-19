@@ -29,8 +29,13 @@ module ActiveSupport
             @registry[local_cache_key] = value
           end
 
-          def self.set_cache_for(l, v); instance.set_cache_for l, v; end
-          def self.cache_for(l); instance.cache_for l; end
+          def self.set_cache_for(l, v)
+            instance.set_cache_for l, v
+          end
+
+          def self.cache_for(l)
+            instance.cache_for l
+          end
         end
 
         # Simple memory backed cache. This cache is not thread safe and is intended only
@@ -89,7 +94,8 @@ module ActiveSupport
         def middleware
           @middleware ||= Middleware.new(
             "ActiveSupport::Cache::Strategy::LocalCache",
-            local_cache_key)
+            local_cache_key
+          )
         end
 
         def clear(options = nil) # :nodoc:
@@ -119,75 +125,76 @@ module ActiveSupport
         end
 
         private
-          def read_entry(key, options)
-            if cache = local_cache
-              cache.fetch_entry(key) { super }
-            else
-              super
-            end
-          end
 
-          def read_multi_entries(keys, options)
-            return super unless local_cache
-
-            local_entries = local_cache.read_multi_entries(keys, options)
-            missed_keys = keys - local_entries.keys
-
-            if missed_keys.any?
-              local_entries.merge!(super(missed_keys, options))
-            else
-              local_entries
-            end
-          end
-
-          def write_entry(key, entry, options)
-            if options[:unless_exist]
-              local_cache.delete_entry(key, options) if local_cache
-            else
-              local_cache.write_entry(key, entry, options) if local_cache
-            end
-
+        def read_entry(key, options)
+          if cache = local_cache
+            cache.fetch_entry(key) { super }
+          else
             super
           end
+        end
 
-          def delete_entry(key, options)
+        def read_multi_entries(keys, options)
+          return super unless local_cache
+
+          local_entries = local_cache.read_multi_entries(keys, options)
+          missed_keys = keys - local_entries.keys
+
+          if missed_keys.any?
+            local_entries.merge!(super(missed_keys, options))
+          else
+            local_entries
+          end
+        end
+
+        def write_entry(key, entry, options)
+          if options[:unless_exist]
             local_cache.delete_entry(key, options) if local_cache
-            super
+          else
+            local_cache.write_entry(key, entry, options) if local_cache
           end
 
-          def write_cache_value(name, value, options)
-            name = normalize_key(name, options)
-            cache = local_cache
-            cache.mute do
-              if value
-                cache.write(name, value, options)
-              else
-                cache.delete(name, options)
-              end
+          super
+        end
+
+        def delete_entry(key, options)
+          local_cache.delete_entry(key, options) if local_cache
+          super
+        end
+
+        def write_cache_value(name, value, options)
+          name = normalize_key(name, options)
+          cache = local_cache
+          cache.mute do
+            if value
+              cache.write(name, value, options)
+            else
+              cache.delete(name, options)
             end
           end
+        end
 
-          def local_cache_key
-            @local_cache_key ||= "#{self.class.name.underscore}_local_cache_#{object_id}".gsub(/[\/-]/, "_").to_sym
-          end
+        def local_cache_key
+          @local_cache_key ||= "#{self.class.name.underscore}_local_cache_#{object_id}".gsub(/[\/-]/, "_").to_sym
+        end
 
-          def local_cache
-            LocalCacheRegistry.cache_for(local_cache_key)
-          end
+        def local_cache
+          LocalCacheRegistry.cache_for(local_cache_key)
+        end
 
-          def bypass_local_cache
-            use_temporary_local_cache(nil) { yield }
-          end
+        def bypass_local_cache
+          use_temporary_local_cache(nil) { yield }
+        end
 
-          def use_temporary_local_cache(temporary_cache)
-            save_cache = LocalCacheRegistry.cache_for(local_cache_key)
-            begin
-              LocalCacheRegistry.set_cache_for(local_cache_key, temporary_cache)
-              yield
-            ensure
-              LocalCacheRegistry.set_cache_for(local_cache_key, save_cache)
-            end
+        def use_temporary_local_cache(temporary_cache)
+          save_cache = LocalCacheRegistry.cache_for(local_cache_key)
+          begin
+            LocalCacheRegistry.set_cache_for(local_cache_key, temporary_cache)
+            yield
+          ensure
+            LocalCacheRegistry.set_cache_for(local_cache_key, save_cache)
           end
+        end
       end
     end
   end

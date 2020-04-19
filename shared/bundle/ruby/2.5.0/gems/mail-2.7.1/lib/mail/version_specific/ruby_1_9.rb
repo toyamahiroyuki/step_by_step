@@ -28,12 +28,12 @@ module Mail
 
       def pick_encoding(charset)
         charset = case charset
-        when /ansi_x3.110-1983/
-          'ISO-8859-1'
-        when /Windows-?1258/i # Windows-1258 is similar to 1252
-          "Windows-1252"
-        else
-          charset
+                  when /ansi_x3.110-1983/
+                    'ISO-8859-1'
+                  when /Windows-?1258/i # Windows-1258 is similar to 1252
+                    "Windows-1252"
+                  else
+                    charset
         end
         Mail::Ruby19.pick_encoding(charset)
       end
@@ -46,25 +46,25 @@ module Mail
 
     # Escapes any parenthesis in a string that are unescaped this uses
     # a Ruby 1.9.1 regexp feature of negative look behind
-    def Ruby19.escape_paren( str )
+    def Ruby19.escape_paren(str)
       re = /(?<!\\)([\(\)])/          # Only match unescaped parens
       str.gsub(re) { |s| '\\' + s }
     end
 
-    def Ruby19.paren( str )
-      str = $1 if str =~ /^\((.*)?\)$/
-      str = escape_paren( str )
+    def Ruby19.paren(str)
+      str = Regexp.last_match(1) if str =~ /^\((.*)?\)$/
+      str = escape_paren(str)
       '(' + str + ')'
     end
 
-    def Ruby19.escape_bracket( str )
+    def Ruby19.escape_bracket(str)
       re = /(?<!\\)([\<\>])/          # Only match unescaped brackets
       str.gsub(re) { |s| '\\' + s }
     end
 
-    def Ruby19.bracket( str )
-      str = $1 if str =~ /^\<(.*)?\>$/
-      str = escape_bracket( str )
+    def Ruby19.bracket(str)
+      str = Regexp.last_match(1) if str =~ /^\<(.*)?\>$/
+      str = escape_bracket(str)
       '<' + str + '>'
     end
 
@@ -72,19 +72,19 @@ module Mail
       if !str.end_with?("=") && str.length % 4 != 0
         str = str.ljust((str.length + 3) & ~3, "=")
       end
-      str.unpack( 'm' ).first
+      str.unpack('m').first
     end
 
     def Ruby19.encode_base64(str)
-      [str].pack( 'm' )
+      [str].pack('m')
     end
 
     def Ruby19.has_constant?(klass, string)
-      klass.const_defined?( string, false )
+      klass.const_defined?(string, false)
     end
 
     def Ruby19.get_constant(klass, string)
-      klass.const_get( string )
+      klass.const_get(string)
     end
 
     def Ruby19.transcode_charset(str, from_encoding, to_encoding = Encoding::UTF_8)
@@ -97,7 +97,7 @@ module Mail
     # From Ruby stdlib Net::IMAP
     def Ruby19.encode_utf7(string)
       string.gsub(/(&)|[^\x20-\x7e]+/) do
-        if $1
+        if Regexp.last_match(1)
           "&-"
         else
           base64 = [$&.encode(Encoding::UTF_16BE)].pack("m0")
@@ -108,8 +108,8 @@ module Mail
 
     def Ruby19.decode_utf7(utf7)
       utf7.gsub(/&([^-]+)?-/n) do
-        if $1
-          ($1.tr(",", "/") + "===").unpack("m")[0].encode(Encoding::UTF_8, Encoding::UTF_16BE)
+        if Regexp.last_match(1)
+          (Regexp.last_match(1).tr(",", "/") + "===").unpack("m")[0].encode(Encoding::UTF_8, Encoding::UTF_16BE)
         else
           "&"
         end
@@ -130,7 +130,7 @@ module Mail
       end
       transcode_to_scrubbed_utf8(str)
     rescue Encoding::UndefinedConversionError, ArgumentError, Encoding::ConverterNotFoundError
-      warn "Encoding conversion failed #{$!}"
+      warn "Encoding conversion failed #{$ERROR_INFO}"
       str.dup.force_encoding(Encoding::UTF_8)
     end
 
@@ -154,7 +154,7 @@ module Mail
       end
       transcode_to_scrubbed_utf8(str)
     rescue Encoding::UndefinedConversionError, ArgumentError, Encoding::ConverterNotFoundError
-      warn "Encoding conversion failed #{$!}"
+      warn "Encoding conversion failed #{$ERROR_INFO}"
       str.dup.force_encoding(Encoding::UTF_8)
     end
 
@@ -163,7 +163,7 @@ module Mail
       str = charset_encoder.encode(str, encoding) if encoding
       transcode_to_scrubbed_utf8(str)
     rescue Encoding::UndefinedConversionError, ArgumentError, Encoding::ConverterNotFoundError
-      warn "Encoding conversion failed #{$!}"
+      warn "Encoding conversion failed #{$ERROR_INFO}"
       str.dup.force_encoding(Encoding::UTF_8)
     end
 
@@ -187,57 +187,57 @@ module Mail
       charset = charset.to_s
       encoding = case charset.downcase
 
-      # ISO-8859-8-I etc. http://en.wikipedia.org/wiki/ISO-8859-8-I
-      when /^iso[-_]?8859-(\d+)(-i)?$/
-        "ISO-8859-#{$1}"
+                 # ISO-8859-8-I etc. http://en.wikipedia.org/wiki/ISO-8859-8-I
+                 when /^iso[-_]?8859-(\d+)(-i)?$/
+                   "ISO-8859-#{Regexp.last_match(1)}"
 
-      # ISO-8859-15, ISO-2022-JP and alike
-      when /^iso[-_]?(\d{4})-?(\w{1,2})$/
-        "ISO-#{$1}-#{$2}"
+                 # ISO-8859-15, ISO-2022-JP and alike
+                 when /^iso[-_]?(\d{4})-?(\w{1,2})$/
+                   "ISO-#{Regexp.last_match(1)}-#{Regexp.last_match(2)}"
 
-      # "ISO-2022-JP-KDDI"  and alike
-      when /^iso[-_]?(\d{4})-?(\w{1,2})-?(\w*)$/
-        "ISO-#{$1}-#{$2}-#{$3}"
+                 # "ISO-2022-JP-KDDI"  and alike
+                 when /^iso[-_]?(\d{4})-?(\w{1,2})-?(\w*)$/
+                   "ISO-#{Regexp.last_match(1)}-#{Regexp.last_match(2)}-#{Regexp.last_match(3)}"
 
-      # UTF-8, UTF-32BE and alike
-      when /^utf[\-_]?(\d{1,2})?(\w{1,2})$/
-        "UTF-#{$1}#{$2}".gsub(/\A(UTF-(?:16|32))\z/, '\\1BE')
+                 # UTF-8, UTF-32BE and alike
+                 when /^utf[\-_]?(\d{1,2})?(\w{1,2})$/
+                   "UTF-#{Regexp.last_match(1)}#{Regexp.last_match(2)}".gsub(/\A(UTF-(?:16|32))\z/, '\\1BE')
 
-      # Windows-1252 and alike
-      when /^windows-?(.*)$/
-        "Windows-#{$1}"
+                 # Windows-1252 and alike
+                 when /^windows-?(.*)$/
+                   "Windows-#{Regexp.last_match(1)}"
 
-      when '8bit'
-        Encoding::ASCII_8BIT
+                 when '8bit'
+                   Encoding::ASCII_8BIT
 
-      # alternatives/misspellings of us-ascii seen in the wild
-      when /^iso[-_]?646(-us)?$/, 'us=ascii'
-        Encoding::ASCII
+                 # alternatives/misspellings of us-ascii seen in the wild
+                 when /^iso[-_]?646(-us)?$/, 'us=ascii'
+                   Encoding::ASCII
 
-      # Microsoft-specific alias for MACROMAN
-      when 'macintosh'
-        Encoding::MACROMAN
+                 # Microsoft-specific alias for MACROMAN
+                 when 'macintosh'
+                   Encoding::MACROMAN
 
-      # Microsoft-specific alias for CP949 (Korean)
-      when 'ks_c_5601-1987'
-        Encoding::CP949
+                 # Microsoft-specific alias for CP949 (Korean)
+                 when 'ks_c_5601-1987'
+                   Encoding::CP949
 
-      # Wrongly written Shift_JIS (Japanese)
-      when 'shift-jis'
-        Encoding::Shift_JIS
+                 # Wrongly written Shift_JIS (Japanese)
+                 when 'shift-jis'
+                   Encoding::Shift_JIS
 
-      # GB2312 (Chinese charset) is a subset of GB18030 (its replacement)
-      when 'gb2312'
-        Encoding::GB18030
+                 # GB2312 (Chinese charset) is a subset of GB18030 (its replacement)
+                 when 'gb2312'
+                   Encoding::GB18030
 
-      when 'cp-850'
-        Encoding::CP850
+                 when 'cp-850'
+                   Encoding::CP850
 
-      when 'latin2'
-        Encoding::ISO_8859_2
+                 when 'latin2'
+                   Encoding::ISO_8859_2
 
-      else
-        charset
+                 else
+                   charset
       end
 
       convert_to_encoding(encoding)

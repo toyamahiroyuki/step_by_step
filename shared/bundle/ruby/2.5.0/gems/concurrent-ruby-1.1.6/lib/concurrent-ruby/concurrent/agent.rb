@@ -6,7 +6,6 @@ require 'concurrent/concern/observable'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # `Agent` is inspired by Clojure's [agent](http://clojure.org/agents)
   # function. An agent is a shared, mutable variable providing independent,
   # uncoordinated, *asynchronous* change of individual values. Best used when
@@ -284,7 +283,7 @@ module Concurrent
     #   @return [Boolean] true if the action is successfully enqueued
     #   @raise [Concurrent::Agent::Error] if the Agent is {#failed?}
     def send!(*args, &action)
-      raise Error.new unless send(*args, &action)
+      raise Error unless send(*args, &action)
       true
     end
 
@@ -299,7 +298,7 @@ module Concurrent
     # @!macro agent_send
     # @!macro send_bang_return_and_raise
     def send_off!(*args, &action)
-      raise Error.new unless send_off(*args, &action)
+      raise Error unless send_off(*args, &action)
       true
     end
 
@@ -316,7 +315,7 @@ module Concurrent
     # @param [Concurrent::ExecutorService] executor the executor on which the
     #   action is to be dispatched
     def send_via!(executor, *args, &action)
-      raise Error.new unless send_via(executor, *args, &action)
+      raise Error unless send_via(executor, *args, &action)
       true
     end
 
@@ -423,7 +422,7 @@ module Concurrent
     def restart(new_value, opts = {})
       clear_actions = opts.fetch(:clear_actions, false)
       synchronize do
-        raise Error.new('agent is not failed') unless failed?
+        raise Error, 'agent is not failed' unless failed?
         raise ValidationError unless ns_validate(new_value)
         @current.value = new_value
         @error.value   = nil
@@ -434,7 +433,6 @@ module Concurrent
     end
 
     class << self
-
       # Blocks the current thread (indefinitely!) until all actions dispatched
       # thus far to all the given Agents, from this thread or nested by the
       # given Agents, have occurred. Will block when any of the agents are
@@ -491,23 +489,23 @@ module Concurrent
       @error_handler = opts[:error_handler]
 
       if @error_mode && !ERROR_MODES.include?(@error_mode)
-        raise ArgumentError.new('unrecognized error mode')
+        raise ArgumentError, 'unrecognized error mode'
       elsif @error_mode.nil?
         @error_mode = @error_handler ? :continue : :fail
       end
 
       @error_handler ||= DEFAULT_ERROR_HANDLER
-      @validator     = opts.fetch(:validator, DEFAULT_VALIDATOR)
-      @current       = Concurrent::AtomicReference.new(initial)
-      @error         = Concurrent::AtomicReference.new(nil)
-      @caller        = Concurrent::ThreadLocalVar.new(nil)
-      @queue         = []
+      @validator = opts.fetch(:validator, DEFAULT_VALIDATOR)
+      @current = Concurrent::AtomicReference.new(initial)
+      @error = Concurrent::AtomicReference.new(nil)
+      @caller = Concurrent::ThreadLocalVar.new(nil)
+      @queue = []
 
       self.observers = Collection::CopyOnNotifyObserverSet.new
     end
 
     def enqueue_action_job(action, args, executor)
-      raise ArgumentError.new('no action given') unless action
+      raise ArgumentError, 'no action given' unless action
       job = Job.new(action, args, executor, @caller.value || Thread.current.object_id)
       synchronize { ns_enqueue_job(job) }
     end
@@ -517,7 +515,7 @@ module Concurrent
         if (index = ns_find_last_job_for_thread)
           job = Job.new(AWAIT_ACTION, [latch], Concurrent.global_immediate_executor,
                         Thread.current.object_id)
-          ns_enqueue_job(job, index+1)
+          ns_enqueue_job(job, index + 1)
         else
           latch.count_down
           true

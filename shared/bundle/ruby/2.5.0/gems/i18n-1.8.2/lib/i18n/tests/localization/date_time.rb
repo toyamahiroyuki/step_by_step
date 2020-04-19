@@ -83,20 +83,20 @@ module I18n
 
         protected
 
-          def setup_datetime_translations
-            # time translations might have been set up in Tests::Api::Localization::Time
-            I18n.backend.store_translations :de, {
-              :time => {
-                :formats => {
-                  :default => "%a, %d. %b %Y %H:%M:%S %z",
-                  :short => "%d. %b %H:%M",
-                  :long => "%d. %B %Y %H:%M"
-                },
-                :am => 'am',
-                :pm => 'pm'
-              }
-            }
-          end
+        def setup_datetime_translations
+          # time translations might have been set up in Tests::Api::Localization::Time
+          I18n.backend.store_translations :de, {
+            :time => {
+              :formats => {
+                :default => "%a, %d. %b %Y %H:%M:%S %z",
+                :short => "%d. %b %H:%M",
+                :long => "%d. %B %Y %H:%M",
+              },
+              :am => 'am',
+              :pm => 'pm',
+            },
+          }
+        end
       end
     end
   end

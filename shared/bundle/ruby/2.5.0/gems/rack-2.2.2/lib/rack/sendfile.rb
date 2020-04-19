@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Rack
-
   # = Sendfile
   #
   # The Sendfile middleware intercepts responses whose body is being
@@ -140,6 +139,7 @@ module Rack
     end
 
     private
+
     def variation(env)
       @variation ||
         env['sendfile.type'] ||

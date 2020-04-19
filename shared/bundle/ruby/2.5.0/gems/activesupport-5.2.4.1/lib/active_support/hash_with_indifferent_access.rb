@@ -190,7 +190,7 @@ module ActiveSupport
       super(convert_key(key), *extras)
     end
 
-    if Hash.new.respond_to?(:dig)
+    if {}.respond_to?(:dig)
       # Same as <tt>Hash#dig</tt> where the key passed as argument can be
       # either a string or a symbol:
       #
@@ -239,9 +239,11 @@ module ActiveSupport
     #   hash.fetch_values('a', 'b') # => ["x", "y"]
     #   hash.fetch_values('a', 'c') { |key| 'z' } # => ["x", "z"]
     #   hash.fetch_values('a', 'c') # => KeyError: key not found: "c"
-    def fetch_values(*indices, &block)
-      indices.collect { |key| fetch(key, &block) }
-    end if Hash.method_defined?(:fetch_values)
+    if Hash.method_defined?(:fetch_values)
+      def fetch_values(*indices, &block)
+        indices.collect { |key| fetch(key, &block) }
+      end
+    end
 
     # Returns a shallow copy of the hash.
     #
@@ -294,16 +296,34 @@ module ActiveSupport
       super(convert_key(key))
     end
 
-    def stringify_keys!; self end
-    def deep_stringify_keys!; self end
-    def stringify_keys; dup end
-    def deep_stringify_keys; dup end
+    def stringify_keys!
+      self
+    end
+
+    def deep_stringify_keys!
+      self
+    end
+
+    def stringify_keys
+      dup
+    end
+
+    def deep_stringify_keys
+      dup
+    end
     undef :symbolize_keys!
     undef :deep_symbolize_keys!
-    def symbolize_keys; to_hash.symbolize_keys! end
+    def symbolize_keys
+      to_hash.symbolize_keys!
+    end
     alias_method :to_options, :symbolize_keys
-    def deep_symbolize_keys; to_hash.deep_symbolize_keys! end
-    def to_options!; self end
+    def deep_symbolize_keys
+      to_hash.deep_symbolize_keys!
+    end
+
+    def to_options!
+      self
+    end
 
     def select(*args, &block)
       return to_enum(:select) unless block_given?
@@ -349,7 +369,7 @@ module ActiveSupport
 
     # Convert to a regular hash with string keys.
     def to_hash
-      _new_hash = Hash.new
+      _new_hash = {}
       set_defaults(_new_hash)
 
       each do |key, value|
@@ -359,34 +379,35 @@ module ActiveSupport
     end
 
     private
-      def convert_key(key) # :doc:
-        key.kind_of?(Symbol) ? key.to_s : key
-      end
 
-      def convert_value(value, options = {}) # :doc:
-        if value.is_a? Hash
-          if options[:for] == :to_hash
-            value.to_hash
-          else
-            value.nested_under_indifferent_access
-          end
-        elsif value.is_a?(Array)
-          if options[:for] != :assignment || value.frozen?
-            value = value.dup
-          end
-          value.map! { |e| convert_value(e, options) }
-        else
-          value
-        end
-      end
+    def convert_key(key) # :doc:
+      key.is_a?(Symbol) ? key.to_s : key
+    end
 
-      def set_defaults(target) # :doc:
-        if default_proc
-          target.default_proc = default_proc.dup
+    def convert_value(value, options = {}) # :doc:
+      if value.is_a? Hash
+        if options[:for] == :to_hash
+          value.to_hash
         else
-          target.default = default
+          value.nested_under_indifferent_access
         end
+      elsif value.is_a?(Array)
+        if options[:for] != :assignment || value.frozen?
+          value = value.dup
+        end
+        value.map! { |e| convert_value(e, options) }
+      else
+        value
       end
+    end
+
+    def set_defaults(target) # :doc:
+      if default_proc
+        target.default_proc = default_proc.dup
+      else
+        target.default = default
+      end
+    end
   end
 end
 

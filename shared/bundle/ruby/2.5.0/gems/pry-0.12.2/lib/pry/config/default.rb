@@ -115,10 +115,10 @@ class Pry
           Pry::InputCompleter
         },
         gist: proc {
-          Pry::Config.from_hash({inspecter: proc(&:pretty_inspect)}, nil)
+          Pry::Config.from_hash({ inspecter: proc(&:pretty_inspect) }, nil)
         },
         history: proc {
-          Pry::Config.from_hash({should_save: true, should_load: true}, nil).tap do |history|
+          Pry::Config.from_hash({ should_save: true, should_load: true }, nil).tap do |history|
             history_file =
               if File.exist?(File.expand_path('~/.pry_history'))
                 '~/.pry_history'
@@ -134,7 +134,7 @@ class Pry
         },
         exec_string: proc {
           ""
-        }
+        },
       })
 
       def initialize

@@ -16,14 +16,14 @@ def main
 
   etld_data_date = File.mtime(dat_file)
 
-  File.open(dat_file, 'r:utf-8') { |dat|
+  File.open(dat_file, 'r:utf-8') do |dat|
     etld_data = parse(dat)
-    File.open(rb_file, 'w:utf-8') { |rb|
-      File.open(erb_file, 'r:utf-8') { |erb|
+    File.open(rb_file, 'w:utf-8') do |rb|
+      File.open(erb_file, 'r:utf-8') do |erb|
         rb.print ERB.new(erb.read).result(binding)
-      }
-    }
-  }
+      end
+    end
+  end
 end
 
 def normalize_hostname(domain)
@@ -31,9 +31,9 @@ def normalize_hostname(domain)
 end
 
 def parse(f)
-  {}.tap { |table|
+  {}.tap do |table|
     tlds = Set[]
-    f.each_line { |line|
+    f.each_line do |line|
       line.sub!(%r{//.*}, '')
       line.strip!
       next if line.empty?
@@ -42,13 +42,13 @@ def parse(f)
         # ignore .local
         next
       when /^([^!*]+)$/
-        domain = normalize_hostname($1)
+        domain = normalize_hostname(Regexp.last_match(1))
         value = 0
       when /^\*\.([^!*]+)$/
-        domain = normalize_hostname($1)
+        domain = normalize_hostname(Regexp.last_match(1))
         value = -1
       when /^\!([^!*]+)$/
-        domain = normalize_hostname($1)
+        domain = normalize_hostname(Regexp.last_match(1))
         value = 1
       else
         raise "syntax error: #{line}"
@@ -56,8 +56,8 @@ def parse(f)
       tld = domain.match(/(?:^|\.)([^.]+)$/)[1]
       table[tld] ||= 1
       table[domain] = value
-    }
-  }
+    end
+  end
 end
 
-main()
+main

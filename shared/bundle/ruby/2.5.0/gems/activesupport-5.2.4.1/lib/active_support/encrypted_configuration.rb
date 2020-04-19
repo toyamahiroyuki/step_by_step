@@ -13,7 +13,7 @@ module ActiveSupport
 
     def initialize(config_path:, key_path:, env_key:, raise_if_missing_key:)
       super content_path: config_path, key_path: key_path,
-        env_key: env_key, raise_if_missing_key: raise_if_missing_key
+            env_key: env_key, raise_if_missing_key: raise_if_missing_key
     end
 
     # Allow a config to be started without a file present
@@ -34,16 +34,17 @@ module ActiveSupport
     end
 
     private
-      def options
-        @options ||= ActiveSupport::InheritableOptions.new(config)
-      end
 
-      def serialize(config)
-        config.present? ? YAML.dump(config) : ""
-      end
+    def options
+      @options ||= ActiveSupport::InheritableOptions.new(config)
+    end
 
-      def deserialize(config)
-        YAML.load(config).presence || {}
-      end
+    def serialize(config)
+      config.present? ? YAML.dump(config) : ""
+    end
+
+    def deserialize(config)
+      YAML.load(config).presence || {}
+    end
   end
 end

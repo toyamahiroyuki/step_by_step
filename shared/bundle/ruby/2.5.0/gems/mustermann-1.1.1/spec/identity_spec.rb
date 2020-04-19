@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'mustermann/identity'
 
@@ -11,7 +12,6 @@ describe Mustermann::Identity do
 
     it { should respond_to(:expand)       }
     it { should respond_to(:to_templates) }
-
 
     it { should     generate_template('')              }
     it { should     expand.to('')                      }

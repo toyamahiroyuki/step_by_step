@@ -61,40 +61,36 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data'
 
-
-
-
-#Javascripts
+# Javascripts
 gem 'jquery-rails'
 
-#Fullcalender(Javascriptsが必要)
+# Fullcalender(Javascriptsが必要)
 gem 'fullcalendar-rails'
 gem 'momentjs-rails'
 
-#chart.js
+# chart.js
 gem 'chart-js-rails', '~> 0.1.4'
 
-#Devise
+# Devise
 gem 'devise'
 
-#Refile
+# Refile
 gem 'refile', require: 'refile/rails', github: 'manfe/refile'
 gem 'refile-mini_magick'
 
-
-#Bootostrap
+# Bootostrap
 gem 'bootstrap-sass', '~> 3.3.6'
 
-#Pry-byebug
+# Pry-byebug
 gem 'pry-byebug'
 
-#ransack
+# ransack
 gem 'ransack'
 
-#Kamenari
-gem 'kaminari','~> 1.1.1'
+# Kamenari
+gem 'kaminari', '~> 1.1.1'
 
-#deproy
+# deproy
 gem 'dotenv-rails'
 group :production do
   gem 'mysql2'

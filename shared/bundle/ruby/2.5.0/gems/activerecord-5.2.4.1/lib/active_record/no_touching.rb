@@ -38,9 +38,10 @@ module ActiveRecord
       end
 
       private
-        def klasses
-          Thread.current[:no_touching_classes] ||= []
-        end
+
+      def klasses
+        Thread.current[:no_touching_classes] ||= []
+      end
     end
 
     def no_touching?

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class BindParam < Node
@@ -10,7 +11,7 @@ module Arel
       end
 
       def hash
-        [self.class, self.value].hash
+        [self.class, value].hash
       end
 
       def eql?(other)

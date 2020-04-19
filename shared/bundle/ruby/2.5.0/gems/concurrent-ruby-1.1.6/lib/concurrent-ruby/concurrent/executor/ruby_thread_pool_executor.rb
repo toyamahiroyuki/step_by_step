@@ -5,12 +5,10 @@ require 'concurrent/executor/ruby_executor_service'
 require 'concurrent/utility/monotonic_time'
 
 module Concurrent
-
   # @!macro thread_pool_executor
   # @!macro thread_pool_options
   # @!visibility private
   class RubyThreadPoolExecutor < RubyExecutorService
-
     # @!macro thread_pool_executor_constant_default_max_pool_size
     DEFAULT_MAX_POOL_SIZE      = 2_147_483_647 # java.lang.Integer::MAX_VALUE
 
@@ -115,12 +113,12 @@ module Concurrent
       @idletime        = opts.fetch(:idletime, DEFAULT_THREAD_IDLETIMEOUT).to_i
       @max_queue       = opts.fetch(:max_queue, DEFAULT_MAX_QUEUE_SIZE).to_i
       @fallback_policy = opts.fetch(:fallback_policy, :abort)
-      raise ArgumentError.new("#{@fallback_policy} is not a valid fallback policy") unless FALLBACK_POLICIES.include?(@fallback_policy)
+      raise ArgumentError, "#{@fallback_policy} is not a valid fallback policy" unless FALLBACK_POLICIES.include?(@fallback_policy)
 
-      raise ArgumentError.new("`max_threads` cannot be less than #{DEFAULT_MIN_POOL_SIZE}") if @max_length < DEFAULT_MIN_POOL_SIZE
-      raise ArgumentError.new("`max_threads` cannot be greater than #{DEFAULT_MAX_POOL_SIZE}") if @max_length > DEFAULT_MAX_POOL_SIZE
-      raise ArgumentError.new("`min_threads` cannot be less than #{DEFAULT_MIN_POOL_SIZE}") if @min_length < DEFAULT_MIN_POOL_SIZE
-      raise ArgumentError.new("`min_threads` cannot be more than `max_threads`") if min_length > max_length
+      raise ArgumentError, "`max_threads` cannot be less than #{DEFAULT_MIN_POOL_SIZE}" if @max_length < DEFAULT_MIN_POOL_SIZE
+      raise ArgumentError, "`max_threads` cannot be greater than #{DEFAULT_MAX_POOL_SIZE}" if @max_length > DEFAULT_MAX_POOL_SIZE
+      raise ArgumentError, "`min_threads` cannot be less than #{DEFAULT_MIN_POOL_SIZE}" if @min_length < DEFAULT_MIN_POOL_SIZE
+      raise ArgumentError, "`min_threads` cannot be more than `max_threads`" if min_length > max_length
 
       @pool                 = [] # all workers
       @ready                = [] # used as a stash (most idle worker is at the start)
@@ -130,7 +128,7 @@ module Concurrent
       @completed_task_count = 0
       @largest_length       = 0
       @workers_counter      = 0
-      @ruby_pid             = $$ # detects if Ruby has forked
+      @ruby_pid             = $PROCESS_ID # detects if Ruby has forked
 
       @gc_interval  = opts.fetch(:gc_interval, @idletime / 2.0).to_i # undocumented
       @next_gc_time = Concurrent.monotonic_time + @gc_interval
@@ -193,7 +191,7 @@ module Concurrent
       end
     rescue ThreadError
       # Raised when the operating system refuses to create the new thread
-      return false
+      false
     end
 
     # tries to enqueue task
@@ -277,7 +275,7 @@ module Concurrent
     end
 
     def ns_reset_if_forked
-      if $$ != @ruby_pid
+      if $PROCESS_ID != @ruby_pid
         @queue.clear
         @ready.clear
         @pool.clear
@@ -285,7 +283,7 @@ module Concurrent
         @completed_task_count = 0
         @largest_length       = 0
         @workers_counter      = 0
-        @ruby_pid             = $$
+        @ruby_pid             = $PROCESS_ID
       end
     end
 
@@ -323,7 +321,6 @@ module Concurrent
           last_message = Concurrent.monotonic_time
           catch(:stop) do
             loop do
-
               case message = my_queue.pop
               when :idle_test
                 if (Concurrent.monotonic_time - last_message) > my_idletime

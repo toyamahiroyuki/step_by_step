@@ -14,12 +14,13 @@ module ActionView
       end
 
       private
-        def require_engine # :doc:
-          @required ||= begin
-            require "builder"
-            true
-          end
+
+      def require_engine # :doc:
+        @required ||= begin
+          require "builder"
+          true
         end
+      end
     end
   end
 end

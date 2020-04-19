@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/ast/expander'
 require 'mustermann/caster'
 require 'mustermann'
@@ -19,7 +20,7 @@ module Mustermann
     # @param [Symbol] additional_values behavior when encountering additional values, see {#expand}.
     # @param [Hash] options used when creating/expanding patterns, see {Mustermann.new}.
     def initialize(*patterns, additional_values: :raise, **options, &block)
-      unless additional_values == :raise or additional_values == :ignore or additional_values == :append
+      unless (additional_values == :raise) || (additional_values == :ignore) || (additional_values == :append)
         raise ArgumentError, "Illegal value %p for additional_values" % additional_values
       end
 
@@ -157,13 +158,13 @@ module Mustermann
     # @see Object#==
     def ==(other)
       return false unless other.class == self.class
-      other.patterns == patterns and other.additional_values == additional_values
+      (other.patterns == patterns) && (other.additional_values == additional_values)
     end
 
     # @see Object#eql?
     def eql?(other)
       return false unless other.class == self.class
-      other.patterns.eql? patterns and other.additional_values.eql? additional_values
+      other.patterns.eql?(patterns) && other.additional_values.eql?(additional_values)
     end
 
     # @see Object#hash
@@ -193,9 +194,9 @@ module Mustermann
     end
 
     def append(uri, values)
-      return uri unless values and values.any?
+      return uri unless values && values.any?
       entries = values.map { |pair| pair.map { |e| @api_expander.escape(e, also_escape: /[\/\?#\&\=%]/) }.join(?=) }
-      "#{ uri }#{ uri[??]??&:?? }#{ entries.join(?&) }"
+      "#{uri}#{uri[??] ? ?& : ??}#{entries.join(?&)}"
     end
 
     def map_values(values)

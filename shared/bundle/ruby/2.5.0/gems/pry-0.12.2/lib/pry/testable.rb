@@ -1,6 +1,6 @@
 # good idea ???
 # if you're testing pry plugin you should require pry by yourself, no?
-require 'pry' if not defined?(Pry)
+require 'pry' if !defined?(Pry)
 
 module Pry::Testable
   extend self
@@ -43,9 +43,9 @@ module Pry::Testable
     collison_warning: false,
     history: {
       should_load: false,
-      should_save: false
-    }
-  }
+      should_save: false,
+    },
+  }.freeze
   private_constant :TEST_DEFAULTS
 
   #

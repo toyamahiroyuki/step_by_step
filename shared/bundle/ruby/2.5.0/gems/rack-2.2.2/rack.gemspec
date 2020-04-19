@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
     "bug_tracker_uri" => "https://github.com/rack/rack/issues",
     "changelog_uri" => "https://github.com/rack/rack/blob/master/CHANGELOG.md",
     "documentation_uri" => "https://rubydoc.info/github/rack/rack",
-    "source_code_uri"   => "https://github.com/rack/rack"
+    "source_code_uri" => "https://github.com/rack/rack",
   }
 
   s.add_development_dependency 'minitest', "~> 5.0"

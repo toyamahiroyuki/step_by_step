@@ -21,8 +21,8 @@ module I18n
       module Compiler
         extend self
 
-        TOKENIZER                    = /(%%\{[^\}]+\}|%\{[^\}]+\})/
-        INTERPOLATION_SYNTAX_PATTERN = /(%)?(%\{([^\}]+)\})/
+        TOKENIZER                    = /(%%\{[^\}]+\}|%\{[^\}]+\})/.freeze
+        INTERPOLATION_SYNTAX_PATTERN = /(%)?(%\{([^\}]+)\})/.freeze
 
         def compile_if_an_interpolation(string)
           if interpolated_str?(string)
@@ -37,10 +37,11 @@ module I18n
         end
 
         def interpolated_str?(str)
-          str.kind_of?(::String) && str =~ INTERPOLATION_SYNTAX_PATTERN
+          str.is_a?(::String) && str =~ INTERPOLATION_SYNTAX_PATTERN
         end
 
         protected
+
         # tokenize("foo %{bar} baz %%{buz}") # => ["foo ", "%{bar}", " baz ", "%%{buz}"]
         def tokenize(str)
           str.split(TOKENIZER)
@@ -87,7 +88,7 @@ module I18n
         end
 
         def escape_plain_str(str)
-          str.gsub(/"|\\|#/) {|x| "\\#{x}"}
+          str.gsub(/"|\\|#/) { |x| "\\#{x}" }
         end
 
         def escape_key_sym(key)
@@ -112,10 +113,11 @@ module I18n
       end
 
       protected
+
       def compile_all_strings_in(data)
         data.each_value do |value|
           Compiler.compile_if_an_interpolation(value)
-          compile_all_strings_in(value) if value.kind_of?(Hash)
+          compile_all_strings_in(value) if value.is_a?(Hash)
         end
       end
     end

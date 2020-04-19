@@ -12,66 +12,66 @@ module Puma::Rack
         opts.separator "Ruby options:"
 
         lineno = 1
-        opts.on("-e", "--eval LINE", "evaluate a LINE of code") { |line|
+        opts.on("-e", "--eval LINE", "evaluate a LINE of code") do |line|
           eval line, TOPLEVEL_BINDING, "-e", lineno
           lineno += 1
-        }
+        end
 
-        opts.on("-b", "--builder BUILDER_LINE", "evaluate a BUILDER_LINE of code as a builder script") { |line|
+        opts.on("-b", "--builder BUILDER_LINE", "evaluate a BUILDER_LINE of code as a builder script") do |line|
           options[:builder] = line
-        }
+        end
 
-        opts.on("-d", "--debug", "set debugging flags (set $DEBUG to true)") {
+        opts.on("-d", "--debug", "set debugging flags (set $DEBUG to true)") do
           options[:debug] = true
-        }
-        opts.on("-w", "--warn", "turn warnings on for your script") {
+        end
+        opts.on("-w", "--warn", "turn warnings on for your script") do
           options[:warn] = true
-        }
-        opts.on("-q", "--quiet", "turn off logging") {
+        end
+        opts.on("-q", "--quiet", "turn off logging") do
           options[:quiet] = true
-        }
+        end
 
         opts.on("-I", "--include PATH",
-                "specify $LOAD_PATH (may be used more than once)") { |path|
+                "specify $LOAD_PATH (may be used more than once)") do |path|
           (options[:include] ||= []).concat(path.split(":"))
-        }
+        end
 
         opts.on("-r", "--require LIBRARY",
-                "require the library, before executing your script") { |library|
+                "require the library, before executing your script") do |library|
           options[:require] = library
-        }
+        end
 
         opts.separator ""
         opts.separator "Rack options:"
-        opts.on("-s", "--server SERVER", "serve using SERVER (thin/puma/webrick/mongrel)") { |s|
+        opts.on("-s", "--server SERVER", "serve using SERVER (thin/puma/webrick/mongrel)") do |s|
           options[:server] = s
-        }
+        end
 
-        opts.on("-o", "--host HOST", "listen on HOST (default: localhost)") { |host|
+        opts.on("-o", "--host HOST", "listen on HOST (default: localhost)") do |host|
           options[:Host] = host
-        }
+        end
 
-        opts.on("-p", "--port PORT", "use PORT (default: 9292)") { |port|
+        opts.on("-p", "--port PORT", "use PORT (default: 9292)") do |port|
           options[:Port] = port
-        }
+        end
 
-        opts.on("-O", "--option NAME[=VALUE]", "pass VALUE to the server as option NAME. If no VALUE, sets it to true. Run '#{$0} -s SERVER -h' to get a list of options for SERVER") { |name|
+        opts.on("-O", "--option NAME[=VALUE]", "pass VALUE to the server as option NAME. If no VALUE, sets it to true. Run '#{$PROGRAM_NAME} -s SERVER -h' to get a list of options for SERVER") do |name|
           name, value = name.split('=', 2)
           value = true if value.nil?
           options[name.to_sym] = value
-        }
+        end
 
-        opts.on("-E", "--env ENVIRONMENT", "use ENVIRONMENT for defaults (default: development)") { |e|
+        opts.on("-E", "--env ENVIRONMENT", "use ENVIRONMENT for defaults (default: development)") do |e|
           options[:environment] = e
-        }
+        end
 
-        opts.on("-D", "--daemonize", "run daemonized in the background") { |d|
+        opts.on("-D", "--daemonize", "run daemonized in the background") do |d|
           options[:daemonize] = d ? true : false
-        }
+        end
 
-        opts.on("-P", "--pid FILE", "file to store PID") { |f|
+        opts.on("-P", "--pid FILE", "file to store PID") do |f|
           options[:pid] = ::File.expand_path(f)
-        }
+        end
 
         opts.separator ""
         opts.separator "Common options:"
@@ -101,26 +101,24 @@ module Puma::Rack
     end
 
     def handler_opts(options)
-      begin
-        info = []
-        server = Rack::Handler.get(options[:server]) || Rack::Handler.default(options)
-        if server && server.respond_to?(:valid_options)
-          info << ""
-          info << "Server-specific options for #{server.name}:"
+      info = []
+      server = Rack::Handler.get(options[:server]) || Rack::Handler.default(options)
+      if server && server.respond_to?(:valid_options)
+        info << ""
+        info << "Server-specific options for #{server.name}:"
 
-          has_options = false
-          server.valid_options.each do |name, description|
-            next if name.to_s =~ /^(Host|Port)[^a-zA-Z]/ # ignore handler's host and port options, we do our own.
+        has_options = false
+        server.valid_options.each do |name, description|
+          next if name.to_s =~ /^(Host|Port)[^a-zA-Z]/ # ignore handler's host and port options, we do our own.
 
-            info << "  -O %-21s %s" % [name, description]
-            has_options = true
-          end
-          return "" if !has_options
+          info << "  -O %-21s %s" % [name, description]
+          has_options = true
         end
-        info.join("\n")
-      rescue NameError
-        return "Warning: Could not find handler specified (#{options[:server] || 'default'}) to determine handler-specific options"
+        return "" if !has_options
       end
+      info.join("\n")
+    rescue NameError
+      "Warning: Could not find handler specified (#{options[:server] || 'default'}) to determine handler-specific options"
     end
   end
 
@@ -159,7 +157,7 @@ module Puma::Rack
       if config =~ /\.ru$/
         cfgfile = ::File.read(config)
         if cfgfile[/^#\\(.*)/] && opts
-          options = opts.parse! $1.split(/\s+/)
+          options = opts.parse! Regexp.last_match(1).split(/\s+/)
         end
         cfgfile.sub!(/^__END__\n.*\Z/m, '')
         app = new_from_string cfgfile, config
@@ -167,15 +165,15 @@ module Puma::Rack
         require config
         app = Object.const_get(::File.basename(config, '.rb').capitalize)
       end
-      return app, options
+      [app, options]
     end
 
-    def self.new_from_string(builder_script, file="(rackup)")
+    def self.new_from_string(builder_script, file = "(rackup)")
       eval "Puma::Rack::Builder.new {\n" + builder_script + "\n}.to_app",
-        TOPLEVEL_BINDING, file, 0
+           TOPLEVEL_BINDING, file, 0
     end
 
-    def initialize(default_app = nil,&block)
+    def initialize(default_app = nil, &block)
       @use, @map, @run, @warmup = [], nil, default_app, nil
 
       # Conditionally load rack now, so that any rack middlewares,
@@ -189,7 +187,7 @@ module Puma::Rack
     end
 
     def self.app(default_app = nil, &block)
-      self.new(default_app, &block).to_app
+      new(default_app, &block).to_app
     end
 
     # Specifies middleware to use in a stack.
@@ -246,7 +244,7 @@ module Puma::Rack
     #
     #   use SomeMiddleware
     #   run MyApp
-    def warmup(prc=nil, &block)
+    def warmup(prc = nil, &block)
       @warmup = prc || block
     end
 
@@ -277,7 +275,7 @@ module Puma::Rack
     def to_app
       app = @map ? generate_map(@run, @map) : @run
       fail "missing run or map statement" unless app
-      app = @use.reverse.inject(app) { |a,e| e[a] }
+      app = @use.reverse.inject(app) { |a, e| e[a] }
       @warmup.call(app) if @warmup
       app
     end
@@ -291,8 +289,8 @@ module Puma::Rack
     def generate_map(default_app, mapping)
       require 'puma/rack/urlmap'
 
-      mapped = default_app ? {'/' => default_app} : {}
-      mapping.each { |r,b| mapped[r] = self.class.new(default_app, &b).to_app }
+      mapped = default_app ? { '/' => default_app } : {}
+      mapping.each { |r, b| mapped[r] = self.class.new(default_app, &b).to_app }
       URLMap.new(mapped)
     end
   end

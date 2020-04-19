@@ -10,10 +10,9 @@ require 'socket'
 
 module Puma
   class ControlCLI
+    COMMANDS = %w(halt restart phased-restart start stats status stop reload-worker-directory gc gc-stats).freeze
 
-    COMMANDS = %w{halt restart phased-restart start stats status stop reload-worker-directory gc gc-stats}
-
-    def initialize(argv, stdout=STDOUT, stderr=STDERR)
+    def initialize(argv, stdout = STDOUT, stderr = STDERR)
       @state = nil
       @quiet = false
       @pidfile = nil
@@ -76,15 +75,15 @@ module Puma
       @command = argv.shift
 
       unless @config_file == '-'
-        if @config_file.nil? and File.exist?('config/puma.rb')
+        if @config_file.nil? && File.exist?('config/puma.rb')
           @config_file = 'config/puma.rb'
         end
 
         if @config_file
           config = Puma::Configuration.new({ config_files: [@config_file] }, {})
           config.load
-          @state              ||= config.options[:state]
-          @control_url        ||= config.options[:control_url]
+          @state ||= config.options[:state]
+          @control_url ||= config.options[:control_url]
           @control_auth_token ||= config.options[:control_auth_token]
           @pidfile            ||= config.options[:pidfile]
         end
@@ -132,12 +131,12 @@ module Puma
 
       # create server object by scheme
       server = case uri.scheme
-                when "tcp"
-                  TCPSocket.new uri.host, uri.port
-                when "unix"
-                  UNIXSocket.new "#{uri.host}#{uri.path}"
-                else
-                  raise "Invalid scheme: #{uri.scheme}"
+               when "tcp"
+                 TCPSocket.new uri.host, uri.port
+               when "unix"
+                 UNIXSocket.new "#{uri.host}#{uri.path}"
+               else
+                 raise "Invalid scheme: #{uri.scheme}"
                 end
 
       if @command == "status"
@@ -146,7 +145,7 @@ module Puma
         url = "/#{@command}"
 
         if @control_auth_token
-          url = url + "?token=#{@control_auth_token}"
+          url += "?token=#{@control_auth_token}"
         end
 
         server << "GET #{url} HTTP/1.0\r\n\r\n"
@@ -161,7 +160,7 @@ module Puma
           raise "Server sent empty response"
         end
 
-        (@http,@code,@message) = response.first.split(" ",3)
+        (@http, @code, @message) = response.first.split(" ", 3)
 
         if @code == "403"
           raise "Unauthorized access to server (wrong auth token)"
@@ -184,7 +183,6 @@ module Puma
       end
 
       begin
-
         case @command
         when "restart"
           Process.kill "SIGUSR2", @pid
@@ -238,13 +236,14 @@ module Puma
       exit 1
     end
 
-  private
+    private
+
     def start
       require 'puma/cli'
 
       run_args = []
 
-      run_args += ["-S", @state]  if @state
+      run_args += ["-S", @state] if @state
       run_args += ["-q"] if @quiet
       run_args += ["--pidfile", @pidfile] if @pidfile
       run_args += ["--control-url", @control_url] if @control_url
@@ -254,7 +253,7 @@ module Puma
       events = Puma::Events.new @stdout, @stderr
 
       # replace $0 because puma use it to generate restart command
-      puma_cmd = $0.gsub(/pumactl$/, 'puma')
+      puma_cmd = $PROGRAM_NAME.gsub(/pumactl$/, 'puma')
       $0 = puma_cmd if File.exist?(puma_cmd)
 
       cli = Puma::CLI.new run_args, events

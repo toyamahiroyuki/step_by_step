@@ -7,7 +7,7 @@ module I18n
     # The only configuration value that is not global and scoped to thread is :locale.
     # It defaults to the default_locale.
     def locale
-      defined?(@locale) && @locale != nil ? @locale : default_locale
+      defined?(@locale) && !@locale.nil? ? @locale : default_locale
     end
 
     # Sets the current locale pseudo-globally, i.e. in the Thread.current hash.
@@ -62,7 +62,7 @@ module I18n
 
     # Returns true if the available_locales have been initialized
     def available_locales_initialized?
-      ( !!defined?(@@available_locales) && !!@@available_locales )
+      (!!defined?(@@available_locales) && !!@@available_locales)
     end
 
     # Clears the available locales set so it can be recomputed again after I18n

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Kaminari
   module Helpers
     PARAM_KEY_BLACKLIST = [:authenticity_token, :commit, :utf8, :_method, :script_name].freeze
@@ -53,7 +54,7 @@ module Kaminari
           #   from: {other: "params", user: {name: "yuki", page: 1}}
           #     to: {other: "params", user: {name: "yuki", page: nil}}
           #   (when @param_name == "user[page]")
-          @param_name.to_s.scan(/[\w\.]+/)[0..-2].inject(page_params){|h, k| h[k] }[$&] = nil
+          @param_name.to_s.scan(/[\w\.]+/)[0..-2].inject(page_params) { |h, k| h[k] }[$&] = nil
         end
 
         page_params
@@ -61,10 +62,10 @@ module Kaminari
 
       def partial_path
         [
-         @views_prefix,
-         "kaminari",
-         @theme,
-         self.class.name.demodulize.underscore
+          @views_prefix,
+          "kaminari",
+          @theme,
+          self.class.name.demodulize.underscore,
         ].compact.join("/")
       end
     end
@@ -75,10 +76,12 @@ module Kaminari
       def page
         raise 'Override page with the actual page value to be a Page.'
       end
+
       # the link's href
       def url
         page_url_for page
       end
+
       def to_s(locals = {}) #:nodoc:
         locals[:url] = url
         super locals
@@ -92,6 +95,7 @@ module Kaminari
       def page
         @options[:page]
       end
+
       def to_s(locals = {}) #:nodoc:
         locals[:page] = page
         super locals

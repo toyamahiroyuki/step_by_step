@@ -51,8 +51,8 @@ class IntegrationTestAdHoc < Loofah::TestCase
     def test_css_sanitization
       html = "<p style='background-color: url(\"http://foo.com/\") ; background-color: #000 ;' />"
       sane = Nokogiri::HTML(Loofah.scrub_fragment(html, :escape).to_xml)
-      assert_match %r/#000/, sane.inner_html
-      refute_match %r/foo\.com/, sane.inner_html
+      assert_match %r{#000}, sane.inner_html
+      refute_match %r{foo\.com}, sane.inner_html
     end
 
     def test_fragment_with_no_tags
@@ -84,7 +84,7 @@ class IntegrationTestAdHoc < Loofah::TestCase
 
     def test_document_whitewash_on_microsofty_markup
       whitewashed = Loofah.document(MSWORD_HTML).scrub!(:whitewash)
-      assert_match %r(<p>Foo <b>BOLD</b></p>), whitewashed.to_s
+      assert_match %r{<p>Foo <b>BOLD</b></p>}, whitewashed.to_s
       assert_equal "<p>Foo <b>BOLD</b></p>", whitewashed.xpath("/html/body/*").to_s
     end
 

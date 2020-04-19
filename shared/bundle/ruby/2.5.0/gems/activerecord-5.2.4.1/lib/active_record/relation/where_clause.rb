@@ -54,11 +54,11 @@ module ActiveRecord
           end
         end
 
-        equalities.map { |node|
+        equalities.map do |node|
           name = node.left.name.to_s
           value = extract_node_value(node.right)
           [name, value]
-        }.to_h
+        end.to_h
       end
 
       def ast
@@ -80,107 +80,108 @@ module ActiveRecord
 
       protected
 
-        attr_reader :predicates
+      attr_reader :predicates
 
-        def referenced_columns
-          @referenced_columns ||= begin
-            equality_nodes = predicates.select { |n| equality_node?(n) }
-            Set.new(equality_nodes, &:left)
-          end
+      def referenced_columns
+        @referenced_columns ||= begin
+          equality_nodes = predicates.select { |n| equality_node?(n) }
+          Set.new(equality_nodes, &:left)
         end
+      end
 
       private
-        def equalities(predicates)
-          equalities = []
 
-          predicates.each do |node|
-            case node
-            when Arel::Nodes::Equality
-              equalities << node
-            when Arel::Nodes::And
-              equalities.concat equalities(node.children)
-            end
-          end
+      def equalities(predicates)
+        equalities = []
 
-          equalities
-        end
-
-        def predicates_unreferenced_by(other)
-          predicates.reject do |n|
-            equality_node?(n) && other.referenced_columns.include?(n.left)
-          end
-        end
-
-        def equality_node?(node)
-          node.respond_to?(:operator) && node.operator == :==
-        end
-
-        def inverted_predicates
-          predicates.map { |node| invert_predicate(node) }
-        end
-
-        def invert_predicate(node)
+        predicates.each do |node|
           case node
-          when NilClass
-            raise ArgumentError, "Invalid argument for .where.not(), got nil."
-          when Arel::Nodes::In
-            Arel::Nodes::NotIn.new(node.left, node.right)
           when Arel::Nodes::Equality
-            Arel::Nodes::NotEqual.new(node.left, node.right)
-          when String
-            Arel::Nodes::Not.new(Arel::Nodes::SqlLiteral.new(node))
-          else
-            Arel::Nodes::Not.new(node)
+            equalities << node
+          when Arel::Nodes::And
+            equalities.concat equalities(node.children)
           end
         end
 
-        def except_predicates(columns)
-          predicates.reject do |node|
-            case node
-            when Arel::Nodes::Between, Arel::Nodes::In, Arel::Nodes::NotIn, Arel::Nodes::Equality, Arel::Nodes::NotEqual, Arel::Nodes::LessThan, Arel::Nodes::LessThanOrEqual, Arel::Nodes::GreaterThan, Arel::Nodes::GreaterThanOrEqual
-              subrelation = (node.left.kind_of?(Arel::Attributes::Attribute) ? node.left : node.right)
-              columns.include?(subrelation.name.to_s)
-            end
-          end
-        end
+        equalities
+      end
 
-        def predicates_with_wrapped_sql_literals
-          non_empty_predicates.map do |node|
-            case node
-            when Arel::Nodes::SqlLiteral, ::String
-              wrap_sql_literal(node)
-            else node
-            end
-          end
+      def predicates_unreferenced_by(other)
+        predicates.reject do |n|
+          equality_node?(n) && other.referenced_columns.include?(n.left)
         end
+      end
 
-        ARRAY_WITH_EMPTY_STRING = [""]
-        def non_empty_predicates
-          predicates - ARRAY_WITH_EMPTY_STRING
+      def equality_node?(node)
+        node.respond_to?(:operator) && node.operator == :==
+      end
+
+      def inverted_predicates
+        predicates.map { |node| invert_predicate(node) }
+      end
+
+      def invert_predicate(node)
+        case node
+        when NilClass
+          raise ArgumentError, "Invalid argument for .where.not(), got nil."
+        when Arel::Nodes::In
+          Arel::Nodes::NotIn.new(node.left, node.right)
+        when Arel::Nodes::Equality
+          Arel::Nodes::NotEqual.new(node.left, node.right)
+        when String
+          Arel::Nodes::Not.new(Arel::Nodes::SqlLiteral.new(node))
+        else
+          Arel::Nodes::Not.new(node)
         end
+      end
 
-        def wrap_sql_literal(node)
-          if ::String === node
-            node = Arel.sql(node)
-          end
-          Arel::Nodes::Grouping.new(node)
-        end
-
-        def extract_node_value(node)
+      def except_predicates(columns)
+        predicates.reject do |node|
           case node
-          when Array
-            node.map { |v| extract_node_value(v) }
-          when Arel::Nodes::Casted, Arel::Nodes::Quoted
-            node.val
-          when Arel::Nodes::BindParam
-            value = node.value
-            if value.respond_to?(:value_before_type_cast)
-              value.value_before_type_cast
-            else
-              value
-            end
+          when Arel::Nodes::Between, Arel::Nodes::In, Arel::Nodes::NotIn, Arel::Nodes::Equality, Arel::Nodes::NotEqual, Arel::Nodes::LessThan, Arel::Nodes::LessThanOrEqual, Arel::Nodes::GreaterThan, Arel::Nodes::GreaterThanOrEqual
+            subrelation = (node.left.is_a?(Arel::Attributes::Attribute) ? node.left : node.right)
+            columns.include?(subrelation.name.to_s)
           end
         end
+      end
+
+      def predicates_with_wrapped_sql_literals
+        non_empty_predicates.map do |node|
+          case node
+          when Arel::Nodes::SqlLiteral, ::String
+            wrap_sql_literal(node)
+          else node
+          end
+        end
+      end
+
+      ARRAY_WITH_EMPTY_STRING = [""].freeze
+      def non_empty_predicates
+        predicates - ARRAY_WITH_EMPTY_STRING
+      end
+
+      def wrap_sql_literal(node)
+        if ::String === node
+          node = Arel.sql(node)
+        end
+        Arel::Nodes::Grouping.new(node)
+      end
+
+      def extract_node_value(node)
+        case node
+        when Array
+          node.map { |v| extract_node_value(v) }
+        when Arel::Nodes::Casted, Arel::Nodes::Quoted
+          node.val
+        when Arel::Nodes::BindParam
+          value = node.value
+          if value.respond_to?(:value_before_type_cast)
+            value.value_before_type_cast
+          else
+            value
+          end
+        end
+      end
     end
   end
 end

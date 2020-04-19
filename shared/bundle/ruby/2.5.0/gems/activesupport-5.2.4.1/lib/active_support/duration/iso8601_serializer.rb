@@ -15,7 +15,7 @@ module ActiveSupport
       # Builds and returns output string.
       def serialize
         parts, sign = normalize
-        return "PT0S".freeze if parts.empty?
+        return "PT0S" if parts.empty?
 
         output = "P".dup
         output << "#{parts[:years]}Y"   if parts.key?(:years)
@@ -34,22 +34,22 @@ module ActiveSupport
 
       private
 
-        # Return pair of duration's parts and whole duration sign.
-        # Parts are summarized (as they can become repetitive due to addition, etc).
-        # Zero parts are removed as not significant.
-        # If all parts are negative it will negate all of them and return minus as a sign.
-        def normalize
-          parts = @duration.parts.each_with_object(Hash.new(0)) do |(k, v), p|
-            p[k] += v  unless v.zero?
-          end
-          # If all parts are negative - let's make a negative duration
-          sign = ""
-          if parts.values.all? { |v| v < 0 }
-            sign = "-"
-            parts.transform_values!(&:-@)
-          end
-          [parts, sign]
+      # Return pair of duration's parts and whole duration sign.
+      # Parts are summarized (as they can become repetitive due to addition, etc).
+      # Zero parts are removed as not significant.
+      # If all parts are negative it will negate all of them and return minus as a sign.
+      def normalize
+        parts = @duration.parts.each_with_object(Hash.new(0)) do |(k, v), p|
+          p[k] += v unless v.zero?
         end
+        # If all parts are negative - let's make a negative duration
+        sign = ""
+        if parts.values.all? { |v| v < 0 }
+          sign = "-"
+          parts.transform_values!(&:-@)
+        end
+        [parts, sign]
+      end
     end
   end
 end

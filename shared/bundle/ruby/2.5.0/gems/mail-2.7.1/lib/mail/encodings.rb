@@ -74,7 +74,7 @@ module Mail
     def Encodings.param_encode(str)
       case
       when str.ascii_only? && str =~ TOKEN_UNSAFE
-        %Q{"#{str}"}
+        %Q("#{str}")
       when str.ascii_only?
         str
       else
@@ -129,7 +129,7 @@ module Mail
       # Split on white-space boundaries with capture, so we capture the white-space as well
       lines.each do |line|
         line.gsub!(ENCODED_VALUE) do |string|
-          case $2
+          case Regexp.last_match(2)
           when *B_VALUES then b_value_decode(string)
           when *Q_VALUES then q_value_decode(string)
           end
@@ -139,7 +139,7 @@ module Mail
 
     # Takes an encoded string of the format =?<encoding>?[QB]?<string>?=
     def Encodings.unquote_and_convert_to(str, to_encoding)
-      output = value_decode( str ).to_s # output is already converted to UTF-8
+      output = value_decode(str).to_s # output is already converted to UTF-8
 
       if 'utf8' == to_encoding.to_s.downcase.gsub("-", "")
         output
@@ -174,7 +174,7 @@ module Mail
     end
 
     def Encodings.encode_non_usascii(address, charset)
-      return address if address.ascii_only? or charset.nil?
+      return address if address.ascii_only? || charset.nil?
 
       # With KCODE=u we can't use regexps on other encodings. Go ASCII.
       with_ascii_kcode do
@@ -188,8 +188,8 @@ module Mail
           if word.ascii_only?
             word
           else
-            previous_non_ascii = i>0 && tokens[i-1] && !tokens[i-1].ascii_only?
-            if previous_non_ascii #why are we adding an extra space here?
+            previous_non_ascii = i > 0 && tokens[i - 1] && !tokens[i - 1].ascii_only?
+            if previous_non_ascii # why are we adding an extra space here?
               word = " #{word}"
             end
             Encodings.b_value_encode(word, charset)
@@ -286,7 +286,7 @@ module Mail
     # Omit unencoded space after an encoded-word.
     def Encodings.collapse_adjacent_encodings(str)
       results = []
-      last_encoded = nil  # Track whether to preserve or drop whitespace
+      last_encoded = nil # Track whether to preserve or drop whitespace
 
       lines = str.split(FULL_ENCODED_VALUE)
       lines.each_slice(2) do |unencoded, encoded|

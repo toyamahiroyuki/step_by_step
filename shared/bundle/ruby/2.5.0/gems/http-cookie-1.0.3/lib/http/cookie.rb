@@ -24,13 +24,13 @@ class HTTP::Cookie
   # :stopdoc:
   UNIX_EPOCH = Time.at(0)
 
-  PERSISTENT_PROPERTIES = %w[
+  PERSISTENT_PROPERTIES = %w(
     name        value
     domain      for_domain  path
     secure      httponly
     expires     max_age
     created_at  accessed_at
-  ]
+  ).freeze
   # :startdoc:
 
   # The cookie name.  It may not be nil or empty.
@@ -129,7 +129,7 @@ class HTTP::Cookie
   #
   def initialize(*args)
     @origin = @domain = @path =
-      @expires = @max_age = nil
+                @expires = @max_age = nil
     @for_domain = @secure = @httponly = false
     @session = true
     @created_at = @accessed_at = Time.now
@@ -146,8 +146,8 @@ class HTTP::Cookie
         args.pop
         self.name, value = args
       else
-        argc == 2 or
-          raise ArgumentError, "wrong number of arguments (#{argc} for 1-3)"
+        (argc == 2) ||
+          raise(ArgumentError, "wrong number of arguments (#{argc} for 1-3)")
         self.name, self.value = args
         return
       end
@@ -156,7 +156,7 @@ class HTTP::Cookie
     end
     for_domain = false
     domain = max_age = origin = nil
-    attr_hash.each_pair { |okey, val|
+    attr_hash.each_pair do |okey, val|
       case key ||= okey
       when :name
         self.name = val
@@ -195,7 +195,7 @@ class HTTP::Cookie
         warn "invalid keyword ignored: #{okey.inspect}" if $VERBOSE
         next
       end
-    }
+    end
     if @name.nil?
       raise ArgumentError, "name must be specified"
     end
@@ -227,7 +227,7 @@ class HTTP::Cookie
     #         path_match?('/admin', '/admin/') == true
     #         path_match?('/admin', '/admin/index') == true
     def path_match?(base_path, target_path)
-      base_path.start_with?('/') or return false
+      base_path.start_with?('/') || (return false)
       # RFC 6265 5.1.4
       bsize = base_path.size
       tsize = target_path.size
@@ -277,9 +277,9 @@ class HTTP::Cookie
       end
       origin = URI(origin)
 
-      [].tap { |cookies|
-        Scanner.new(set_cookie, logger).scan_set_cookie { |name, value, attrs|
-          break if name.nil? || name.empty?
+      [].tap do |cookies|
+        Scanner.new(set_cookie, logger).scan_set_cookie do |name, value, attrs|
+          break if name.blank?
 
           begin
             cookie = new(name, value)
@@ -288,42 +288,40 @@ class HTTP::Cookie
             next
           end
           cookie.created_at = created_at if created_at
-          attrs.each { |aname, avalue|
-            begin
-              case aname
-              when 'domain'
-                cookie.for_domain = true
-                # The following may negate @for_domain if the value is
-                # an eTLD or IP address, hence this order.
-                cookie.domain = avalue
-              when 'path'
-                cookie.path = avalue
-              when 'expires'
-                # RFC 6265 4.1.2.2
-                # The Max-Age attribute has precedence over the Expires
-                # attribute.
-                cookie.expires = avalue unless cookie.max_age
-              when 'max-age'
-                cookie.max_age = avalue
-              when 'secure'
-                cookie.secure = avalue
-              when 'httponly'
-                cookie.httponly = avalue
-              end
-            rescue => e
-              logger.warn("Couldn't parse #{aname} '#{avalue}': #{e}") if logger
+          attrs.each do |aname, avalue|
+            case aname
+            when 'domain'
+              cookie.for_domain = true
+              # The following may negate @for_domain if the value is
+              # an eTLD or IP address, hence this order.
+              cookie.domain = avalue
+            when 'path'
+              cookie.path = avalue
+            when 'expires'
+              # RFC 6265 4.1.2.2
+              # The Max-Age attribute has precedence over the Expires
+              # attribute.
+              cookie.expires = avalue unless cookie.max_age
+            when 'max-age'
+              cookie.max_age = avalue
+            when 'secure'
+              cookie.secure = avalue
+            when 'httponly'
+              cookie.httponly = avalue
             end
-          }
+          rescue => e
+            logger.warn("Couldn't parse #{aname} '#{avalue}': #{e}") if logger
+          end
 
           cookie.origin = origin
 
-          cookie.acceptable? or next
+          cookie.acceptable? || next
 
           yield cookie if block_given?
 
           cookies << cookie
-        }
-      }
+        end
+      end
     end
 
     # Takes an array of cookies and returns a string for use in the
@@ -336,20 +334,20 @@ class HTTP::Cookie
     # pairs.  The first appearance takes precedence if multiple pairs
     # with the same name occur.
     def cookie_value_to_hash(cookie_value)
-      {}.tap { |hash|
-        Scanner.new(cookie_value).scan_cookie { |name, value|
+      {}.tap do |hash|
+        Scanner.new(cookie_value).scan_cookie do |name, value|
           hash[name] ||= value
-        }
-      }
+        end
+      end
     end
   end
 
   attr_reader :name
 
   # See #name.
-  def name= name
-    name = (String.try_convert(name) or
-      raise TypeError, "#{name.class} is not a String")
+  def name=(name)
+    name = (String.try_convert(name) ||
+      raise(TypeError, "#{name.class} is not a String"))
     if name.empty?
       raise ArgumentError, "cookie name cannot be empty"
     elsif name.match(/[\x00-\x20\x7F,;\\"=]/)
@@ -364,13 +362,13 @@ class HTTP::Cookie
   attr_reader :value
 
   # See #value.
-  def value= value
+  def value=(value)
     if value.nil?
       self.expires = UNIX_EPOCH
       return @value = ''
     end
-    value = (String.try_convert(value) or
-      raise TypeError, "#{value.class} is not a String")
+    value = (String.try_convert(value) ||
+      raise(TypeError, "#{value.class} is not a String"))
     if value.match(/[\x00-\x1F\x7F]/)
       raise ArgumentError, "invalid cookie value"
     end
@@ -383,7 +381,7 @@ class HTTP::Cookie
   attr_reader :domain
 
   # See #domain.
-  def domain= domain
+  def domain=(domain)
     case domain
     when nil
       @for_domain = false
@@ -397,8 +395,8 @@ class HTTP::Cookie
     when DomainName
       @domain_name = domain
     else
-      domain = (String.try_convert(domain) or
-        raise TypeError, "#{domain.class} is not a String")
+      domain = (String.try_convert(domain) ||
+        raise(TypeError, "#{domain.class} is not a String"))
       if domain.start_with?('.')
         for_domain = true
         domain = domain[1..-1]
@@ -408,7 +406,7 @@ class HTTP::Cookie
       end
       # Do we really need to support this?
       if domain.match(/\A([^:]+):[0-9]+\z/)
-        domain = $1
+        domain = Regexp.last_match(1)
       end
       @domain_name = DomainName.new(domain)
     end
@@ -441,19 +439,19 @@ class HTTP::Cookie
   attr_reader :path
 
   # See #path.
-  def path= path
-    path = (String.try_convert(path) or
-      raise TypeError, "#{path.class} is not a String")
+  def path=(path)
+    path = (String.try_convert(path) ||
+      raise(TypeError, "#{path.class} is not a String"))
     @path = path.start_with?('/') ? path : '/'
   end
 
   attr_reader :origin
 
   # See #origin.
-  def origin= origin
+  def origin=(origin)
     return origin if origin == @origin
-    @origin.nil? or
-      raise ArgumentError, "origin cannot be changed once it is set"
+    @origin.nil? ||
+      raise(ArgumentError, "origin cannot be changed once it is set")
     # Delay setting @origin because #domain= or #path= may fail
     origin = URI(origin)
     if URI::HTTP === origin
@@ -483,11 +481,11 @@ class HTTP::Cookie
   alias session? session
 
   def expires
-    @expires or @created_at && @max_age ? @created_at + @max_age : nil
+    @expires || @created_at && @max_age ? @created_at + @max_age : nil
   end
 
   # See #expires.
-  def expires= t
+  def expires=(t)
     case t
     when nil, Time
     else
@@ -504,14 +502,14 @@ class HTTP::Cookie
   attr_reader :max_age
 
   # See #max_age.
-  def max_age= sec
+  def max_age=(sec)
     case sec
     when Integer, nil
     else
-      str = String.try_convert(sec) or
-        raise TypeError, "#{sec.class} is not an Integer or String"
-      /\A-?\d+\z/.match(str) or
-        raise ArgumentError, "invalid Max-Age: #{sec.inspect}"
+      (str = String.try_convert(sec)) ||
+        raise(TypeError, "#{sec.class} is not an Integer or String")
+      /\A-?\d+\z/.match(str) ||
+        raise(ArgumentError, "invalid Max-Age: #{sec.inspect}")
       sec = str.to_i
     end
     @expires = nil
@@ -556,7 +554,7 @@ class HTTP::Cookie
     case
     when host.hostname == @domain
       true
-    when @for_domain  # !host-only-flag
+    when @for_domain # !host-only-flag
       host.cookie_domain?(@domain_name)
     else
       @domain.nil?
@@ -633,14 +631,14 @@ class HTTP::Cookie
   end
 
   def inspect
-    '#<%s:' % self.class << PERSISTENT_PROPERTIES.map { |key|
+    '#<%s:' % self.class << PERSISTENT_PROPERTIES.map do |key|
       '%s=%s' % [key, instance_variable_get(:"@#{key}").inspect]
-    }.join(', ') << ' origin=%s>' % [@origin ? @origin.to_s : 'nil']
+    end.join(', ') << ' origin=%s>' % [@origin ? @origin.to_s : 'nil']
   end
 
   # Compares the cookie with another.  When there are many cookies with
   # the same name for a URL, the value of the smallest must be used.
-  def <=> other
+  def <=>(other)
     # RFC 6265 5.4
     # Precedence: 1. longer path  2. older creation
     (@name <=> other.name).nonzero? ||
@@ -657,9 +655,9 @@ class HTTP::Cookie
 
   # YAML serialization helper for Psych.
   def encode_with(coder)
-    PERSISTENT_PROPERTIES.each { |key|
+    PERSISTENT_PROPERTIES.each do |key|
       coder[key.to_s] = instance_variable_get(:"@#{key}")
-    }
+    end
   end
 
   # YAML deserialization helper for Syck.
@@ -671,7 +669,7 @@ class HTTP::Cookie
   def yaml_initialize(tag, map)
     expires = nil
     @origin = nil
-    map.each { |key, value|
+    map.each do |key, value|
       case key
       when 'expires'
         # avoid clobbering max_age
@@ -679,7 +677,7 @@ class HTTP::Cookie
       when *PERSISTENT_PROPERTIES
         __send__(:"#{key}=", value)
       end
-    }
-    self.expires = expires if self.max_age.nil?
+    end
+    self.expires = expires if max_age.nil?
   end
 end

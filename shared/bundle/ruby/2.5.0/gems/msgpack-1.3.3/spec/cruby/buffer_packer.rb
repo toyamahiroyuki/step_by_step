@@ -1,4 +1,5 @@
 # encoding: ascii-8bit
+
 require 'spec_helper'
 
 require 'stringio'
@@ -26,4 +27,3 @@ describe Packer do
     packer.buffer.object_id.should == o1
   end
 end
-

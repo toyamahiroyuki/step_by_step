@@ -8,7 +8,6 @@ require 'uri/common'
 # Relevant commit:
 # https://github.com/ruby/ruby/commit/edb7cdf1eabaff78dfa5ffedfbc2e91b29fa9ca1
 
-
 module URI
   begin
     256.times do |i|
@@ -18,7 +17,7 @@ module URI
     TBLENCWWWCOMP_.freeze
 
     256.times do |i|
-      h, l = i>>4, i&15
+      h, l = i >> 4, i & 15
       TBLDECWWWCOMP_['%%%X%X' % [h, l]] = i.chr
       TBLDECWWWCOMP_['%%%x%X' % [h, l]] = i.chr
       TBLDECWWWCOMP_['%%%X%x' % [h, l]] = i.chr

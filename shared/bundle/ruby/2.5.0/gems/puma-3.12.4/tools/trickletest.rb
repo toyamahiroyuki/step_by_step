@@ -2,11 +2,11 @@ require 'socket'
 require 'stringio'
 
 def do_test(st, chunk)
-  s = TCPSocket.new('127.0.0.1',ARGV[0].to_i);
+  s = TCPSocket.new('127.0.0.1', ARGV[0].to_i)
   req = StringIO.new(st)
   nout = 0
   randstop = rand(st.length / 10)
-  STDERR.puts "stopping after: #{randstop}"
+  warn "stopping after: #{randstop}"
 
   begin
     while data = req.read(chunk)
@@ -14,12 +14,12 @@ def do_test(st, chunk)
       s.flush
       sleep 0.1
       if nout > randstop
-        STDERR.puts "BANG! after #{nout} bytes."
+        warn "BANG! after #{nout} bytes."
         break
       end
     end
   rescue Object => e
-    STDERR.puts "ERROR: #{e}"
+    warn "ERROR: #{e}"
   ensure
     s.close
   end
@@ -42,4 +42,4 @@ ARGV[1].to_i.times do
   threads << t
 end
 
-threads.each {|t|  t.join}
+threads.each { |t| t.join }

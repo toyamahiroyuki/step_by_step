@@ -39,17 +39,17 @@ module ActionView
 
       private
 
-        def object_has_errors?
-          object.respond_to?(:errors) && object.errors.respond_to?(:[]) && error_message.present?
-        end
+      def object_has_errors?
+        object.respond_to?(:errors) && object.errors.respond_to?(:[]) && error_message.present?
+      end
 
-        def select_markup_helper?(type)
-          ["optgroup", "option"].include?(type)
-        end
+      def select_markup_helper?(type)
+        ["optgroup", "option"].include?(type)
+      end
 
-        def tag_generate_errors?(options)
-          options["type"] != "hidden"
-        end
+      def tag_generate_errors?(options)
+        options["type"] != "hidden"
+      end
     end
   end
 end

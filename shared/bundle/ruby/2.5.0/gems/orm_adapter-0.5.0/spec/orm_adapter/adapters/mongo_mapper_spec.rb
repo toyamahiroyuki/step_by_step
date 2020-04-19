@@ -1,13 +1,16 @@
 require 'spec_helper'
 require 'orm_adapter/example_app_shared'
 
-if !defined?(MongoMapper) || !(Mongo::Connection.new.db('orm_adapter_spec') rescue nil)
+if !defined?(MongoMapper) || !(begin
+                                 Mongo::Connection.new.db('orm_adapter_spec')
+                               rescue
+                                 nil
+                               end)
   puts "** require 'mongo_mapper' and start mongod to run the specs in #{__FILE__}"
 else
 
   MongoMapper.connection = Mongo::Connection.new
   MongoMapper.database = "orm_adapter_spec"
-
 
   module MongoMapperOrmSpec
     class User
@@ -25,9 +28,8 @@ else
 
     # here be the specs!
     describe MongoMapper::Document::OrmAdapter do
-
       before do
-        MongoMapper.database.collections.each do | coll |
+        MongoMapper.database.collections.each do |coll|
           coll.remove unless coll.name =~ /system/
         end
       end

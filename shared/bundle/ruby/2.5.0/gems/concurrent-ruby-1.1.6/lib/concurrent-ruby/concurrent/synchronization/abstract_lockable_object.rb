@@ -1,9 +1,7 @@
 module Concurrent
   module Synchronization
-
     # @!visibility private
     class AbstractLockableObject < Synchronization::Object
-
       protected
 
       # @!macro synchronization_object_method_synchronize
@@ -92,7 +90,6 @@ module Concurrent
       def ns_broadcast
         raise NotImplementedError
       end
-
     end
   end
 end

@@ -66,8 +66,9 @@ module ActionController
     end
 
     private
-      def interactive_browser_request?
-        request.get? && request.format == Mime[:html] && !request.xhr?
-      end
+
+    def interactive_browser_request?
+      request.get? && request.format == Mime[:html] && !request.xhr?
+    end
   end
 end

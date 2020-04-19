@@ -164,7 +164,7 @@ class MIME::Type
              comp ? -1 : 1 # complete < incomplete
            elsif (obs = obsolete?) != other.obsolete?
              obs ? 1 : -1 # current < obsolete
-           elsif obs and ((ui = use_instead) != (oui = other.use_instead))
+           elsif obs && ((ui = use_instead) != (oui = other.use_instead))
              if ui.nil?
                1
              elsif oui.nil?
@@ -183,7 +183,7 @@ class MIME::Type
   # Returns +true+ if the +other+ object is a MIME::Type and the content types
   # match.
   def eql?(other)
-    other.kind_of?(MIME::Type) and self == other
+    other.is_a?(MIME::Type) && (self == other)
   end
 
   # Returns the whole MIME content-type string.
@@ -290,9 +290,9 @@ class MIME::Type
 
   ##
   def encoding=(enc) # :nodoc:
-    if enc.nil? or enc == :default
+    if enc.nil? || (enc == :default)
       @encoding = default_encoding
-    elsif BINARY_ENCODINGS.include?(enc) or ASCII_ENCODINGS.include?(enc)
+    elsif BINARY_ENCODINGS.include?(enc) || ASCII_ENCODINGS.include?(enc)
       @encoding = enc
     else
       fail InvalidEncoding, enc
@@ -373,10 +373,10 @@ class MIME::Type
 
   # The decoded cross-reference URL list for this MIME::Type.
   def xref_urls
-    xrefs.flat_map { |type, values|
+    xrefs.flat_map do |type, values|
       name = :"xref_url_for_#{type.tr('-', '_')}"
-      respond_to?(name, true) and xref_map(values, name) or values.to_a
-    }
+      respond_to?(name, true) && xref_map(values, name) || values.to_a
+    end
   end
 
   # Indicates whether the MIME type has been registered with IANA.
@@ -439,8 +439,8 @@ class MIME::Type
   # This method should be considered a private implementation detail.
   def encode_with(coder)
     coder['content-type'] = @content_type
-    coder['docs'] = @docs unless @docs.nil? or @docs.empty?
-    coder['friendly'] = @friendly unless @friendly.nil? or @friendly.empty?
+    coder['docs'] = @docs if @docs.present?
+    coder['friendly'] = @friendly if @friendly.present?
     coder['encoding'] = @encoding
     coder['extensions'] = @extensions.to_a unless @extensions.empty?
     coder['preferred-extension'] = @preferred_extension if @preferred_extension
@@ -501,9 +501,9 @@ class MIME::Type
     # Converts a provided +content_type+ into a translation key suitable for
     # use with the I18n library.
     def i18n_key(content_type)
-      simplify_matchdata(match(content_type), joiner: '.') { |e|
+      simplify_matchdata(match(content_type), joiner: '.') do |e|
         e.gsub!(I18N_RE, '-')
-      }
+      end
     end
 
     # Return a +MatchData+ object of the +content_type+ against pattern of
@@ -522,12 +522,12 @@ class MIME::Type
     def simplify_matchdata(matchdata, remove_x = false, joiner: '/')
       return nil unless matchdata
 
-      matchdata.captures.map { |e|
+      matchdata.captures.map do |e|
         e.downcase!
         e.sub!(/^x-/, '') if remove_x
         yield e if block_given?
         e
-      }.join(joiner)
+      end.join(joiner)
     end
   end
 

@@ -5,9 +5,9 @@ require "active_support/core_ext/module/attribute_accessors"
 module ActionDispatch
   module Http
     module URL
-      IP_HOST_REGEXP  = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
-      HOST_REGEXP     = /(^[^:]+:\/\/)?(\[[^\]]+\]|[^:]+)(?::(\d+$))?/
-      PROTOCOL_REGEXP = /^([^:]+)(:)?(\/\/)?$/
+      IP_HOST_REGEXP  = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.freeze
+      HOST_REGEXP     = /(^[^:]+:\/\/)?(\[[^\]]+\]|[^:]+)(?::(\d+$))?/.freeze
+      PROTOCOL_REGEXP = /^([^:]+)(:)?(\/\/)?$/.freeze
 
       mattr_accessor :tld_length, default: 1
 
@@ -67,7 +67,7 @@ module ActionDispatch
         end
 
         def path_for(options)
-          path = options[:script_name].to_s.chomp("/".freeze)
+          path = options[:script_name].to_s.chomp("/")
           path << options[:path] if options.key?(:path)
 
           add_trailing_slash(path) if options[:trailing_slash]
@@ -126,9 +126,9 @@ module ActionDispatch
           end
 
           result << host
-          normalize_port(port, protocol) { |normalized_port|
+          normalize_port(port, protocol) do |normalized_port|
             result << ":#{normalized_port}"
-          }
+          end
 
           result.concat path
         end
@@ -144,7 +144,7 @@ module ActionDispatch
           when false, "//"
             "//"
           when PROTOCOL_REGEXP
-            "#{$1}://"
+            "#{Regexp.last_match(1)}://"
           else
             raise ArgumentError, "Invalid :protocol option: #{protocol.inspect}"
           end
@@ -231,7 +231,7 @@ module ActionDispatch
       #   req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:8080'
       #   req.host # => "example.com"
       def host
-        raw_host_with_port.sub(/:\d+$/, "".freeze)
+        raw_host_with_port.sub(/:\d+$/, "")
       end
 
       # Returns a \host:\port string for this request, such as "example.com" or
@@ -260,7 +260,7 @@ module ActionDispatch
       def port
         @port ||= begin
           if raw_host_with_port =~ /:(\d+)$/
-            $1.to_i
+            Regexp.last_match(1).to_i
           else
             standard_port
           end

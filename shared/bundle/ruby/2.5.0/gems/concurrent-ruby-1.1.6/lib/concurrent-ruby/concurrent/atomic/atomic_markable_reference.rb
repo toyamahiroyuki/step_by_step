@@ -5,7 +5,6 @@ module Concurrent
   # @see http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicMarkableReference.html
   #   java.util.concurrent.atomic.AtomicMarkableReference
   class AtomicMarkableReference < ::Concurrent::Synchronization::Object
-
     attr_atomic(:reference)
     private :reference, :reference=, :swap_reference, :compare_and_set_reference, :update_reference
 
@@ -129,7 +128,7 @@ module Concurrent
       unless compare_and_set old_val, new_val, old_mark, new_mark
         fail ::Concurrent::ConcurrentUpdateError,
              'AtomicMarkableReference: Update failed due to race condition.',
-             'Note: If you would like to guarantee an update, please use ' +
+             'Note: If you would like to guarantee an update, please use ' \
                  'the `AtomicMarkableReference#update` method.'
       end
 

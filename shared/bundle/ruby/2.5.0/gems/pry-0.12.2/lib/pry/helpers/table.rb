@@ -23,7 +23,7 @@ class Pry
 
     def self.tablify(things, line_length, config = Pry.config)
       table = Table.new(things, { column_count: things.size }, config)
-      table.column_count -= 1 until 1 == table.column_count or
+      table.column_count -= 1 until (1 == table.column_count) ||
         table.fits_on_line?(line_length)
       table
     end
@@ -40,11 +40,11 @@ class Pry
         rows_to_s.join("\n")
       end
 
-      def rows_to_s style = :color_on
+      def rows_to_s(style = :color_on)
         widths = columns.map { |e| _max_width(e) }
         @rows_without_colors.map do |r|
           padded = []
-          r.each_with_index do |e,i|
+          r.each_with_index do |e, i|
             next unless e
 
             item = e.ljust(widths[i])
@@ -55,31 +55,36 @@ class Pry
         end
       end
 
-      def items= items
+      def items=(items)
         @items = items
         _rebuild_colorless_cache
         _recolumn
         items
       end
 
-      def column_count= n
+      def column_count=(n)
         @column_count = n
         _recolumn
       end
 
-      def fits_on_line? line_length
-        _max_width(rows_to_s :no_color) <= line_length
+      def fits_on_line?(line_length)
+        _max_width(rows_to_s(:no_color)) <= line_length
       end
 
       def columns
         @rows_without_colors.transpose
       end
 
-      def ==(other); items == other.to_a end
+      def ==(other)
+        items == other.to_a
+      end
 
-      def to_a; items.to_a end
+      def to_a
+        items.to_a
+      end
 
       private
+
       def _max_width(things)
         things.compact.map(&:size).max || 0
       end
@@ -105,10 +110,9 @@ class Pry
         end
       end
 
-      def _recall_color_for thing
+      def _recall_color_for(thing)
         @colorless_cache[thing]
       end
     end
-
   end
 end

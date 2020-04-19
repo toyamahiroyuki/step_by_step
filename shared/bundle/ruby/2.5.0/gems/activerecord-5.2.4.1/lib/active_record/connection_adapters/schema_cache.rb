@@ -72,9 +72,9 @@ module ActiveRecord
       # Get the columns for a table as a hash, key is the column name
       # value is the column object.
       def columns_hash(table_name)
-        @columns_hash[table_name] ||= Hash[columns(table_name).map { |col|
+        @columns_hash[table_name] ||= Hash[columns(table_name).map do |col|
           [col.name, col]
-        }]
+        end]
       end
 
       # Clears out internal caches
@@ -110,9 +110,9 @@ module ActiveRecord
 
       private
 
-        def prepare_data_sources
-          connection.data_sources.each { |source| @data_sources[source] = true }
-        end
+      def prepare_data_sources
+        connection.data_sources.each { |source| @data_sources[source] = true }
+      end
     end
   end
 end

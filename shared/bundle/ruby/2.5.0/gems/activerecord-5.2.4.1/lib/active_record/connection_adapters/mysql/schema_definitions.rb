@@ -61,7 +61,7 @@ module ActiveRecord
             options[:limit] ||= 8
             options[:primary_key] = true
           when /\Aunsigned_(?<type>.+)\z/
-            type = $~[:type].to_sym
+            type = $LAST_MATCH_INFO[:type].to_sym
             options[:unsigned] = true
           end
 
@@ -69,14 +69,15 @@ module ActiveRecord
         end
 
         private
-          def aliased_types(name, fallback)
-            fallback
-          end
 
-          def integer_like_primary_key_type(type, options)
-            options[:auto_increment] = true
-            type
-          end
+        def aliased_types(name, fallback)
+          fallback
+        end
+
+        def integer_like_primary_key_type(type, options)
+          options[:auto_increment] = true
+          type
+        end
       end
 
       class Table < ActiveRecord::ConnectionAdapters::Table

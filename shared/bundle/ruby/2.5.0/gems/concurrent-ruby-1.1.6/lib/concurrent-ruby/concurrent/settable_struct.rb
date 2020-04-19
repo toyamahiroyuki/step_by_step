@@ -3,7 +3,6 @@ require 'concurrent/errors'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # An thread-safe, write-once variation of Ruby's standard `Struct`.
   # Each member can have its value set at most once, either at construction
   # or any time thereafter. Attempting to assign a value to a member
@@ -76,11 +75,11 @@ module Concurrent
       if member.is_a? Integer
         length = synchronize { @values.length }
         if member >= length
-          raise IndexError.new("offset #{member} too large for struct(size:#{length})")
+          raise IndexError, "offset #{member} too large for struct(size:#{length})"
         end
         synchronize do
           unless @values[member].nil?
-            raise Concurrent::ImmutabilityError.new('struct member has already been set')
+            raise Concurrent::ImmutabilityError, 'struct member has already been set'
           end
           @values[member] = value
         end
@@ -88,7 +87,7 @@ module Concurrent
         send("#{member}=", value)
       end
     rescue NoMethodError
-      raise NameError.new("no member '#{member}' in struct")
+      raise NameError, "no member '#{member}' in struct"
     end
 
     private
@@ -105,7 +104,7 @@ module Concurrent
     def self.new(*args, &block)
       clazz_name = nil
       if args.length == 0
-        raise ArgumentError.new('wrong number of arguments (0 for 1+)')
+        raise ArgumentError, 'wrong number of arguments (0 for 1+)'
       elsif args.length > 0 && args.first.is_a?(String)
         clazz_name = args.shift
       end
@@ -124,7 +123,7 @@ module Concurrent
             clazz.send(:define_method, "#{member}=") do |value|
               synchronize do
                 unless @values[index].nil?
-                  raise Concurrent::ImmutabilityError.new('struct member has already been set')
+                  raise Concurrent::ImmutabilityError, 'struct member has already been set'
                 end
                 @values[index] = value
               end

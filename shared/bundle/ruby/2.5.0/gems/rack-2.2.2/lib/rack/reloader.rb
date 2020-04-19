@@ -7,7 +7,6 @@
 require 'pathname'
 
 module Rack
-
   # High performant source reloader
   #
   # This class acts as Rack middleware.
@@ -36,9 +35,9 @@ module Rack
     end
 
     def call(env)
-      if @cooldown and Time.now > @last + @cooldown
+      if @cooldown && (Time.now > @last + @cooldown)
         if Thread.list.size > 1
-          @reload_mutex.synchronize{ reload! }
+          @reload_mutex.synchronize { reload! }
         else
           reload!
         end
@@ -69,10 +68,10 @@ module Rack
 
     module Stat
       def rotation
-        files = [$0, *$LOADED_FEATURES].uniq
+        files = [$PROGRAM_NAME, *$LOADED_FEATURES].uniq
         paths = ['./', *$LOAD_PATH].uniq
 
-        files.map{|file|
+        files.map do |file|
           next if /\.(so|bundle)$/.match?(file) # cannot reload compiled files
 
           found, stat = figure_path(file, paths)
@@ -81,7 +80,7 @@ module Rack
           @cache[file] = found
 
           yield(found, mtime)
-        }.compact
+        end.compact
       end
 
       # Takes a relative or absolute +file+ name, a couple possible +paths+ that
@@ -89,7 +88,7 @@ module Rack
       # path.
       def figure_path(file, paths)
         found = @cache[file]
-        found = file if !found and Pathname.new(file).absolute?
+        found = file if !found && Pathname.new(file).absolute?
         found, stat = safe_stat(found)
         return found, stat if found
 
@@ -99,7 +98,7 @@ module Rack
           return ::File.expand_path(found), stat if found
         end
 
-        return false, false
+        [false, false]
       end
 
       def safe_stat(file)
@@ -107,7 +106,7 @@ module Rack
         stat = ::File.stat(file)
         return file, stat if stat.file?
       rescue Errno::ENOENT, Errno::ENOTDIR, Errno::ESRCH
-        @cache.delete(file) and false
+        @cache.delete(file) && false
       end
     end
   end

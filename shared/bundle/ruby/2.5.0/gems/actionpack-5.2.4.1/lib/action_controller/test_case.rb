@@ -58,7 +58,7 @@ module ActionController
       self.session_options = TestSession::DEFAULT_OPTIONS.dup
       @controller_class = controller_class
       @custom_param_parsers = {
-        xml: lambda { |raw_post| Hash.from_xml(raw_post)["hash"] }
+        xml: lambda { |raw_post| Hash.from_xml(raw_post)["hash"] },
       }
     end
 
@@ -159,9 +159,9 @@ module ActionController
 
     private
 
-      def params_parsers
-        super.merge @custom_param_parsers
-      end
+    def params_parsers
+      super.merge @custom_param_parsers
+    end
   end
 
   class LiveTestResponse < Live::Response
@@ -209,9 +209,9 @@ module ActionController
 
     private
 
-      def load!
-        @id
-      end
+    def load!
+      @id
+    end
   end
 
   # Superclass for ActionController functional tests. Functional tests allow you to
@@ -599,30 +599,30 @@ module ActionController
 
       private
 
-        def scrub_env!(env)
-          env.delete_if { |k, v| k =~ /^(action_dispatch|rack)\.request/ }
-          env.delete_if { |k, v| k =~ /^action_dispatch\.rescue/ }
-          env.delete "action_dispatch.request.query_parameters"
-          env.delete "action_dispatch.request.request_parameters"
-          env["rack.input"] = StringIO.new
-          env.delete "CONTENT_LENGTH"
-          env.delete "RAW_POST_DATA"
-          env
-        end
+      def scrub_env!(env)
+        env.delete_if { |k, v| k =~ /^(action_dispatch|rack)\.request/ }
+        env.delete_if { |k, v| k =~ /^action_dispatch\.rescue/ }
+        env.delete "action_dispatch.request.query_parameters"
+        env.delete "action_dispatch.request.request_parameters"
+        env["rack.input"] = StringIO.new
+        env.delete "CONTENT_LENGTH"
+        env.delete "RAW_POST_DATA"
+        env
+      end
 
-        def document_root_element
-          html_document.root
-        end
+      def document_root_element
+        html_document.root
+      end
 
-        def check_required_ivars
-          # Sanity check for required instance variables so we can give an
-          # understandable error message.
-          [:@routes, :@controller, :@request, :@response].each do |iv_name|
-            if !instance_variable_defined?(iv_name) || instance_variable_get(iv_name).nil?
-              raise "#{iv_name} is nil: make sure you set it in your test's setup method."
-            end
+      def check_required_ivars
+        # Sanity check for required instance variables so we can give an
+        # understandable error message.
+        [:@routes, :@controller, :@request, :@response].each do |iv_name|
+          if !instance_variable_defined?(iv_name) || instance_variable_get(iv_name).nil?
+            raise "#{iv_name} is nil: make sure you set it in your test's setup method."
           end
         end
+      end
     end
 
     include Behavior

@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+
 require 'active_support/core_ext/module'
 module Kaminari
   # Kind of Array that can paginate
   class PaginatableArray < Array
     include Kaminari::ConfigurationMethods::ClassMethods
 
-    ENTRY = 'entry'.freeze
+    ENTRY = 'entry'
 
     attr_internal_accessor :limit_value, :offset_value
 

@@ -24,11 +24,11 @@ class Pry
       @original_code_object = code_object
 
       if !obj_name && code_object.c_module? && !opts[:all]
-        result = "Warning: You're inside an object, whose class is defined by means\n" +
-                 "         of the C Ruby API. Pry cannot display the information for\n" +
+        result = "Warning: You're inside an object, whose class is defined by means\n" \
+                 "         of the C Ruby API. Pry cannot display the information for\n" \
                  "         this class."
         if code_object.candidates.any?
-          result += "\n         However, you can view monkey-patches applied to this class.\n" +
+          result += "\n         However, you can view monkey-patches applied to this class.\n" \
                     "         Just execute the same command with the '--all' switch."
         end
       elsif show_all_modules?(code_object)
@@ -154,7 +154,7 @@ class Pry
       {
         owner: "\n#{bold("Owner:")} #{code_object.owner || "N/A"}\n",
         visibility: "#{bold("Visibility:")} #{code_object.visibility}",
-        signature: "\n#{bold("Signature:")} #{code_object.signature}"
+        signature: "\n#{bold("Signature:")} #{code_object.signature}",
       }.merge(header_options) { |key, old, new| (new && old).to_s }
     end
 
@@ -162,7 +162,7 @@ class Pry
       {
         owner: true,
         visibility: true,
-        signature: nil
+        signature: nil,
       }
     end
 
@@ -199,7 +199,7 @@ class Pry
 
     def complete(input)
       if input =~ /([^ ]*)#([a-z0-9_]*)\z/
-        prefix, search = [$1, $2]
+        prefix, search = [Regexp.last_match(1), Regexp.last_match(2)]
         methods = begin
                     Pry::Method.all_from_class(binding.eval(prefix))
                   rescue RescuableException

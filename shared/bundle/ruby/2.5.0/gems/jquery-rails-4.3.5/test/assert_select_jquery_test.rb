@@ -6,7 +6,7 @@ class AssertSelectJQueryTest < ActiveSupport::TestCase
   include Rails::Dom::Testing::Assertions::SelectorAssertions
   attr_reader :response
 
-  JAVASCRIPT_TEST_OUTPUT = <<-JS
+  JAVASCRIPT_TEST_OUTPUT = <<-JS.freeze
     $("#card").show("blind", 1000);
     $("#id").html('<div><p>something</p></div>');
     $('#card').html('<div><p>something else</p></div>');

@@ -13,14 +13,14 @@ def java?
   /java/ === RUBY_PLATFORM
 end
 
-BUILD_DIR = "build"
+BUILD_DIR = "build".freeze
 BUILD_EXT_DIR = File.join(BUILD_DIR, "#{RbConfig::CONFIG['arch']}", 'ffi_c', RUBY_VERSION)
 
 def gem_spec
   @gem_spec ||= Gem::Specification.load('ffi.gemspec')
 end
 
-TEST_DEPS = []
+TEST_DEPS = [].freeze
 if RUBY_PLATFORM == "java"
   RSpec::Core::RakeTask.new(:spec) do |config|
     config.rspec_opts = YAML.load_file 'spec/spec.opts'
@@ -34,7 +34,7 @@ else
 end
 
 desc "Build all packages"
-task :package => %w[ gem:java gem:windows ]
+task :package => %w(gem:java gem:windows)
 
 CLOBBER.include 'lib/ffi/types.conf'
 CLOBBER.include 'pkg'
@@ -53,8 +53,7 @@ CLEAN.include 'lib/2.*'
 task :distclean => :clobber
 
 desc "Test the extension"
-task :test => [ :spec ]
-
+task :test => [:spec]
 
 namespace :bench do
   ITER = ENV['ITER'] ? ENV['ITER'].to_i : 100000
@@ -62,12 +61,12 @@ namespace :bench do
   bench_files = Dir["bench/bench_*.rb"].reject { |f| f == "bench/bench_helper.rb" }
   bench_files.each do |bench|
     task File.basename(bench, ".rb")[6..-1] => TEST_DEPS do
-      sh %{#{Gem.ruby} #{bench_libs} #{bench} #{ITER}}
+      sh %(#{Gem.ruby} #{bench_libs} #{bench} #{ITER})
     end
   end
   task :all => TEST_DEPS do
     bench_files.each do |bench|
-      sh %{#{Gem.ruby} #{bench_libs} #{bench}}
+      sh %(#{Gem.ruby} #{bench_libs} #{bench})
     end
   end
 end
@@ -78,7 +77,6 @@ task 'spec:specdoc' => TEST_DEPS
 task :default => :spec
 
 namespace 'java' do
-
   java_gem_spec = Gem::Specification.new do |s|
     s.name = gem_spec.name
     s.version = gem_spec.version
@@ -104,11 +102,11 @@ task 'gem:java' => 'java:gem'
 unless java?
   require 'rake/extensiontask'
   Rake::ExtensionTask.new('ffi_c', gem_spec) do |ext|
-    ext.name = 'ffi_c'                                        # indicate the name of the extension.
+    ext.name = 'ffi_c' # indicate the name of the extension.
     # ext.lib_dir = BUILD_DIR                                 # put binaries into this folder.
     ext.tmp_dir = BUILD_DIR                                   # temporary folder used during compilation.
     ext.cross_compile = true                                  # enable cross compilation (requires cross compile toolchain)
-    ext.cross_platform = %w[i386-mingw32 x64-mingw32]                     # forces the Windows platform instead of the default one
+    ext.cross_platform = %w(i386-mingw32 x64-mingw32) # forces the Windows platform instead of the default one
     ext.cross_compiling do |spec|
       spec.files.reject! { |path| File.fnmatch?('ext/*', path) }
     end
@@ -144,7 +142,7 @@ LIBFFI_GIT_FILES = `git --git-dir ext/ffi_c/libffi/.git ls-files -z`.split("\x0"
 
 # Generate files in gemspec but not in libffi's git repo by running autogen.sh
 gem_spec.files.select do |f|
-  f =~ /ext\/ffi_c\/libffi\/(.*)/ && !LIBFFI_GIT_FILES.include?($1)
+  f =~ /ext\/ffi_c\/libffi\/(.*)/ && !LIBFFI_GIT_FILES.include?(Regexp.last_match(1))
 end.each do |f|
   file f => "ext/ffi_c/libffi/autogen.sh" do
     chdir "ext/ffi_c/libffi" do
@@ -167,8 +165,8 @@ file types_conf => File.join("lib", "ffi", "version.rb") do |task|
   require 'fileutils'
   require 'ffi/tools/types_generator'
   options = {}
-  FileUtils.mkdir_p(File.dirname(task.name), { :mode => 0755 })
-  File.open(task.name, File::CREAT|File::TRUNC|File::RDWR, 0644) do |f|
+  FileUtils.mkdir_p(File.dirname(task.name), { :mode => 0o755 })
+  File.open(task.name, File::CREAT | File::TRUNC | File::RDWR, 0o644) do |f|
     f.puts FFI::TypesGenerator.generate(options)
   end
   File.open(logfile, 'w') do |log|

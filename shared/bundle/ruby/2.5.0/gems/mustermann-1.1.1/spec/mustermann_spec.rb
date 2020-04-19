@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'mustermann'
 require 'mustermann/extension'
@@ -21,6 +22,7 @@ describe Mustermann do
 
     context "pattern argument" do
       subject(:pattern) { Mustermann.new('') }
+
       example { Mustermann.new(pattern).should be == pattern }
       example { Mustermann.new(pattern, type: :rails).should be_a(Mustermann::Sinatra) }
     end
@@ -31,7 +33,14 @@ describe Mustermann do
     end
 
     context "argument implementing #to_pattern" do
-      subject(:pattern) { Class.new { def to_pattern(**o) Mustermann.new('foo', **o) end }.new }
+      subject(:pattern) do
+        Class.new do
+          def to_pattern(**o)
+            Mustermann.new('foo', **o)
+                    end
+        end .new
+      end
+
       example { Mustermann.new(pattern)               .should be_a(Mustermann::Sinatra) }
       example { Mustermann.new(pattern, type: :rails) .should be_a(Mustermann::Rails) }
       example { Mustermann.new(pattern).to_s.should be == 'foo' }

@@ -2,7 +2,6 @@ require 'set'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # A `TVar` is a transactional variable - a single-element container that
   # is used as part of a transaction - see `Concurrent::atomically`.
   #
@@ -21,15 +20,15 @@ module Concurrent
 
     # Get the value of a `TVar`.
     def value
-      Concurrent::atomically do
-        Transaction::current.read(self)
+      Concurrent.atomically do
+        Transaction.current.read(self)
       end
     end
 
     # Set the value of a `TVar`.
     def value=(value)
-      Concurrent::atomically do
-        Transaction::current.write(self, value)
+      Concurrent.atomically do
+        Transaction.current.write(self, value)
       end
     end
 
@@ -57,7 +56,6 @@ module Concurrent
     def unsafe_lock # :nodoc:
       @lock
     end
-
   end
 
   # Run a block that reads and writes `TVar`s as a single atomic transaction.
@@ -91,11 +89,11 @@ module Concurrent
   #     b.value += 10
   #   end
   def atomically
-    raise ArgumentError.new('no block given') unless block_given?
+    raise ArgumentError, 'no block given' unless block_given?
 
     # Get the current transaction
 
-    transaction = Transaction::current
+    transaction = Transaction.current
 
     # Are we not already in a transaction (not nested)?
 
@@ -106,11 +104,10 @@ module Concurrent
         # Retry loop
 
         loop do
-
           # Create a new transaction
 
           transaction = Transaction.new
-          Transaction::current = transaction
+          Transaction.current = transaction
 
           # Run the block, aborting on exceptions
 
@@ -137,7 +134,7 @@ module Concurrent
       ensure
         # Clear the current transaction
 
-        Transaction::current = nil
+        Transaction.current = nil
       end
     else
       # Nested transaction - flatten it and just run the block
@@ -148,12 +145,12 @@ module Concurrent
 
   # Abort a currently running transaction - see `Concurrent::atomically`.
   def abort_transaction
-    raise Transaction::AbortError.new
+    raise Transaction::AbortError
   end
 
   # Leave a transaction without committing or aborting - see `Concurrent::atomically`.
   def leave_transaction
-    raise Transaction::LeaveError.new
+    raise Transaction::LeaveError
   end
 
   module_function :atomically, :abort_transaction, :leave_transaction
@@ -161,7 +158,6 @@ module Concurrent
   private
 
   class Transaction
-
     ABORTED = ::Object.new
 
     ReadLogEntry = Struct.new(:tvar, :version)
@@ -175,9 +171,9 @@ module Concurrent
     end
 
     def read(tvar)
-      Concurrent::abort_transaction unless valid?
+      Concurrent.abort_transaction unless valid?
 
-      if @write_log.has_key? tvar
+      if @write_log.key? tvar
         @write_log[tvar]
       else
         @read_log.push(ReadLogEntry.new(tvar, tvar.unsafe_version))
@@ -188,19 +184,19 @@ module Concurrent
     def write(tvar, value)
       # Have we already written to this TVar?
 
-      unless @write_log.has_key? tvar
+      unless @write_log.key? tvar
         # Try to lock the TVar
 
         unless tvar.unsafe_lock.try_lock
           # Someone else is writing to this TVar - abort
-          Concurrent::abort_transaction
+          Concurrent.abort_transaction
         end
 
         # If we previously wrote to it, check the version hasn't changed
 
         @read_log.each do |log_entry|
-          if log_entry.tvar == tvar and tvar.unsafe_version > log_entry.version
-            Concurrent::abort_transaction
+          if (log_entry.tvar == tvar) && (tvar.unsafe_version > log_entry.version)
+            Concurrent.abort_transaction
           end
         end
       end
@@ -229,7 +225,7 @@ module Concurrent
 
     def valid?
       @read_log.each do |log_entry|
-        unless @write_log.has_key? log_entry.tvar
+        unless @write_log.key? log_entry.tvar
           if log_entry.tvar.unsafe_version > log_entry.version
             return false
           end
@@ -252,7 +248,5 @@ module Concurrent
     def self.current=(transaction)
       Thread.current[:current_tvar_transaction] = transaction
     end
-
   end
-
 end

@@ -404,7 +404,7 @@ module ActionView
         selected, disabled = extract_selected_and_disabled(selected)
         select_deselect = {
           selected: extract_values_from_collection(collection, value_method, selected),
-          disabled: extract_values_from_collection(collection, value_method, disabled)
+          disabled: extract_values_from_collection(collection, value_method, disabled),
         }
 
         options_for_select(options, select_deselect)
@@ -461,9 +461,10 @@ module ActionView
       def option_groups_from_collection_for_select(collection, group_method, group_label_method, option_key_method, option_value_method, selected_key = nil)
         collection.map do |group|
           option_tags = options_from_collection_for_select(
-            value_for_collection(group, group_method), option_key_method, option_value_method, selected_key)
+            value_for_collection(group, group_method), option_key_method, option_value_method, selected_key
+          )
 
-          content_tag("optgroup".freeze, option_tags, label: value_for_collection(group, group_label_method))
+          content_tag("optgroup", option_tags, label: value_for_collection(group, group_label_method))
         end.join.html_safe
       end
 
@@ -535,7 +536,7 @@ module ActionView
         body = "".html_safe
 
         if prompt
-          body.safe_concat content_tag("option".freeze, prompt_text(prompt), value: "")
+          body.safe_concat content_tag("option", prompt_text(prompt), value: "")
         end
 
         grouped_options.each do |container|
@@ -548,7 +549,7 @@ module ActionView
           end
 
           html_attributes = { label: label }.merge!(html_attributes)
-          body.safe_concat content_tag("optgroup".freeze, options_for_select(container, selected_key), html_attributes)
+          body.safe_concat content_tag("optgroup", options_for_select(container, selected_key), html_attributes)
         end
 
         body
@@ -576,7 +577,7 @@ module ActionView
         zone_options = "".html_safe
 
         zones = model.all
-        convert_zones = lambda { |list| list.map { |z| [ z.to_s, z.name ] } }
+        convert_zones = lambda { |list| list.map { |z| [z.to_s, z.name] } }
 
         if priority_zones
           if priority_zones.is_a?(Regexp)
@@ -584,10 +585,10 @@ module ActionView
           end
 
           zone_options.safe_concat options_for_select(convert_zones[priority_zones], selected)
-          zone_options.safe_concat content_tag("option".freeze, "-------------", value: "", disabled: true)
+          zone_options.safe_concat content_tag("option", "-------------", value: "", disabled: true)
           zone_options.safe_concat "\n"
 
-          zones = zones - priority_zones
+          zones -= priority_zones
         end
 
         zone_options.safe_concat options_for_select(convert_zones[zones], selected)
@@ -758,56 +759,57 @@ module ActionView
       end
 
       private
-        def option_html_attributes(element)
-          if Array === element
-            element.select { |e| Hash === e }.reduce({}, :merge!)
-          else
-            {}
-          end
-        end
 
-        def option_text_and_value(option)
-          # Options are [text, value] pairs or strings used for both.
-          if !option.is_a?(String) && option.respond_to?(:first) && option.respond_to?(:last)
-            option = option.reject { |e| Hash === e } if Array === option
-            [option.first, option.last]
-          else
-            [option, option]
-          end
+      def option_html_attributes(element)
+        if Array === element
+          element.select { |e| Hash === e }.reduce({}, :merge!)
+        else
+          {}
         end
+      end
 
-        def option_value_selected?(value, selected)
-          Array(selected).include? value
+      def option_text_and_value(option)
+        # Options are [text, value] pairs or strings used for both.
+        if !option.is_a?(String) && option.respond_to?(:first) && option.respond_to?(:last)
+          option = option.reject { |e| Hash === e } if Array === option
+          [option.first, option.last]
+        else
+          [option, option]
         end
+      end
 
-        def extract_selected_and_disabled(selected)
-          if selected.is_a?(Proc)
-            [selected, nil]
-          else
-            selected = Array.wrap(selected)
-            options = selected.extract_options!.symbolize_keys
-            selected_items = options.fetch(:selected, selected)
-            [selected_items, options[:disabled]]
-          end
-        end
+      def option_value_selected?(value, selected)
+        Array(selected).include? value
+      end
 
-        def extract_values_from_collection(collection, value_method, selected)
-          if selected.is_a?(Proc)
-            collection.map do |element|
-              element.send(value_method) if selected.call(element)
-            end.compact
-          else
-            selected
-          end
+      def extract_selected_and_disabled(selected)
+        if selected.is_a?(Proc)
+          [selected, nil]
+        else
+          selected = Array.wrap(selected)
+          options = selected.extract_options!.symbolize_keys
+          selected_items = options.fetch(:selected, selected)
+          [selected_items, options[:disabled]]
         end
+      end
 
-        def value_for_collection(item, value)
-          value.respond_to?(:call) ? value.call(item) : item.send(value)
+      def extract_values_from_collection(collection, value_method, selected)
+        if selected.is_a?(Proc)
+          collection.map do |element|
+            element.send(value_method) if selected.call(element)
+          end.compact
+        else
+          selected
         end
+      end
 
-        def prompt_text(prompt)
-          prompt.kind_of?(String) ? prompt : I18n.translate("helpers.select.prompt", default: "Please select")
-        end
+      def value_for_collection(item, value)
+        value.respond_to?(:call) ? value.call(item) : item.send(value)
+      end
+
+      def prompt_text(prompt)
+        prompt.is_a?(String) ? prompt : I18n.translate("helpers.select.prompt", default: "Please select")
+      end
     end
 
     class FormBuilder

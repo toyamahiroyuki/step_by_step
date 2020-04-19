@@ -11,13 +11,11 @@ if Concurrent.on_truffleruby? && !defined?(TruffleRuby::AtomicReference)
 end
 
 module Concurrent
-
   # Define update methods that use direct paths
   #
   # @!visibility private
   # @!macro internal_implementation_note
   module AtomicDirectUpdate
-
     # @!macro atomic_reference_method_update
     #
     #   Pass the current value to the given block, replacing it
@@ -137,7 +135,6 @@ module Concurrent
   #   @!method try_update!
   #     @!macro atomic_reference_method_try_update!
 
-
   # @!macro internal_implementation_note
   class ConcurrentUpdateError < ThreadError
     # frozen pre-allocated backtrace to speed ConcurrentUpdateError
@@ -193,7 +190,6 @@ module Concurrent
 
   # @!macro atomic_reference
   class AtomicReference < AtomicReferenceImplementation
-
     # @return [String] Short string representation.
     def to_s
       format '%s value:%s>', super[0..-2], get

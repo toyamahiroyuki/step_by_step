@@ -5,7 +5,7 @@ module Nokogiri
     class EntityLookup
       ###
       # Look up entity with +name+
-      def [] name
+      def [](name)
         (val = get(name)) && val.value
       end
     end

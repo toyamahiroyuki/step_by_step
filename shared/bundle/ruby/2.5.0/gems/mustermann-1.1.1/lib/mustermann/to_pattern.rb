@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann'
 
 module Mustermann
@@ -19,7 +20,7 @@ module Mustermann
   #
   # By default included into String, Symbol, Regexp, Array and {Mustermann::Pattern}.
   module ToPattern
-    PRIMITIVES = [String, Symbol, Array, Regexp, Mustermann::Pattern]
+    PRIMITIVES = [String, Symbol, Array, Regexp, Mustermann::Pattern].freeze
     private_constant :PRIMITIVES
 
     # Converts the object into a {Mustermann::Pattern}.
@@ -39,7 +40,7 @@ module Mustermann
     # @param [Hash] options The options hash.
     # @return [Mustermann::Pattern] pattern corresponding to object.
     def to_pattern(**options)
-      input   = self if PRIMITIVES.any? { |p| self.is_a? p }
+      input   = self if PRIMITIVES.any? { |p| is_a? p }
       input ||= __getobj__ if respond_to?(:__getobj__)
       Mustermann.new(input || to_s, **options)
     end

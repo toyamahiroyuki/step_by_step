@@ -29,8 +29,8 @@ end
 
 module Enumerable
   def combine
-    masks = inject([[], 1]){|(ar, m), e| [ar << m, m << 1 ] }[0]
-    all = masks.inject(0){ |al, m| al|m }
+    masks = inject([[], 1]) { |(ar, m), e| [ar << m, m << 1] }[0]
+    all = masks.inject(0) { |al, m| al | m }
 
     result = []
     for i in 1..all do

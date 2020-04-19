@@ -15,8 +15,8 @@ module ActiveStorage
     isolate_namespace ActiveStorage
 
     config.active_storage = ActiveSupport::OrderedOptions.new
-    config.active_storage.previewers = [ ActiveStorage::Previewer::PopplerPDFPreviewer, ActiveStorage::Previewer::MuPDFPreviewer, ActiveStorage::Previewer::VideoPreviewer ]
-    config.active_storage.analyzers = [ ActiveStorage::Analyzer::ImageAnalyzer, ActiveStorage::Analyzer::VideoAnalyzer ]
+    config.active_storage.previewers = [ActiveStorage::Previewer::PopplerPDFPreviewer, ActiveStorage::Previewer::MuPDFPreviewer, ActiveStorage::Previewer::VideoPreviewer]
+    config.active_storage.analyzers = [ActiveStorage::Analyzer::ImageAnalyzer, ActiveStorage::Analyzer::VideoAnalyzer]
     config.active_storage.paths = ActiveSupport::OrderedOptions.new
 
     config.active_storage.variable_content_types = %w(
@@ -93,10 +93,10 @@ module ActiveStorage
             require "erb"
 
             YAML.load(ERB.new(config_file.read).result) || {}
-          rescue Psych::SyntaxError => e
-            raise "YAML syntax error occurred while parsing #{config_file}. " \
-                  "Please note that YAML must be consistently indented using spaces. Tabs are not allowed. " \
-                  "Error: #{e.message}"
+                                                                                  rescue Psych::SyntaxError => e
+                                                                                    raise "YAML syntax error occurred while parsing #{config_file}. " \
+                                                                                          "Please note that YAML must be consistently indented using spaces. Tabs are not allowed. " \
+                                                                                          "Error: #{e.message}"
           end
 
           ActiveStorage::Blob.service =

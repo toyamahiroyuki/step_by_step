@@ -21,35 +21,35 @@ class Pry
     attr_reader :stack
 
     # The amount of spaces to insert for each indent level.
-    SPACES = '  '
+    SPACES = '  '.freeze
 
     # Hash containing all the tokens that should increase the indentation
     # level. The keys of this hash are open tokens, the values the matching
     # tokens that should prevent a line from being indented if they appear on
     # the same line.
     OPEN_TOKENS = {
-      'def'    => 'end',
-      'class'  => 'end',
+      'def' => 'end',
+      'class' => 'end',
       'module' => 'end',
-      'do'     => 'end',
-      'if'     => 'end',
+      'do' => 'end',
+      'if' => 'end',
       'unless' => 'end',
-      'while'  => 'end',
-      'until'  => 'end',
-      'for'    => 'end',
-      'case'   => 'end',
-      'begin'  => 'end',
-      '['      => ']',
-      '{'      => '}',
-      '('      => ')'
-    }
+      'while' => 'end',
+      'until' => 'end',
+      'for' => 'end',
+      'case' => 'end',
+      'begin' => 'end',
+      '[' => ']',
+      '{' => '}',
+      '(' => ')',
+    }.freeze
 
     # Which tokens can either be open tokens, or appear as modifiers on
     # a single-line.
-    SINGLELINE_TOKENS = %w(if while until unless rescue)
+    SINGLELINE_TOKENS = %w(if while until unless rescue).freeze
 
     # Which tokens can be followed by an optional "do" keyword.
-    OPTIONAL_DO_TOKENS = %w(for while until)
+    OPTIONAL_DO_TOKENS = %w(for while until).freeze
 
     # Collection of token types that should be ignored. Without this list
     # keywords such as "class" inside strings would cause the code to be
@@ -57,8 +57,10 @@ class Pry
     #
     # :pre_constant and :preserved_constant are the CodeRay 0.9.8 and 1.0.0
     # classifications of "true", "false", and "nil".
-    IGNORE_TOKENS = [:space, :content, :string, :method, :ident,
-                     :constant, :pre_constant, :predefined_constant]
+    IGNORE_TOKENS = [
+      :space, :content, :string, :method, :ident,
+      :constant, :pre_constant, :predefined_constant,
+    ].freeze
 
     # Tokens that indicate the end of a statement (i.e. that, if they appear
     # directly before an "if" indicates that that if applies to the same line,
@@ -66,14 +68,16 @@ class Pry
     #
     # :reserved and :keywords are the CodeRay 0.9.8 and 1.0.0 respectively
     # classifications of "super", "next", "return", etc.
-    STATEMENT_END_TOKENS = IGNORE_TOKENS + [:regexp, :integer, :float,
-                                            :keyword, :delimiter, :reserved,
-                                            :instance_variable,
-                                            :class_variable, :global_variable]
+    STATEMENT_END_TOKENS = IGNORE_TOKENS + [
+      :regexp, :integer, :float,
+      :keyword, :delimiter, :reserved,
+      :instance_variable,
+      :class_variable, :global_variable,
+    ]
 
     # Collection of tokens that should appear dedented even though they
     # don't affect the surrounding code.
-    MIDWAY_TOKENS = %w(when else elsif ensure rescue)
+    MIDWAY_TOKENS = %w(when else elsif ensure rescue).freeze
 
     # Clean the indentation of a fragment of ruby.
     #
@@ -166,7 +170,7 @@ class Pry
 
       @indent_level = prefix
 
-      return output
+      output
     end
 
     # Get the indentation for the start of the next line.
@@ -193,7 +197,6 @@ class Pry
     # @return [Array[Integer]]
     #
     def indentation_delta(tokens)
-
       # We need to keep track of whether we've seen a "for" on this line because
       # if the line ends with "do" then that "do" should be discounted (i.e. we're
       # only opening one level not two) To do this robustly we want to keep track
@@ -214,7 +217,7 @@ class Pry
       # If the list of tokens contains a matching closing token the line should
       # not be indented (and thus we should return true).
       tokens.each do |token, kind|
-        is_singleline_if = (SINGLELINE_TOKENS.include?(token)) && end_of_statement?(last_token, last_kind)
+        is_singleline_if = SINGLELINE_TOKENS.include?(token) && end_of_statement?(last_token, last_kind)
         is_optional_do = (token == "do" && seen_for_at.include?(add_after - 1))
 
         last_token, last_kind = token, kind unless kind == :space
@@ -247,7 +250,7 @@ class Pry
         end
       end
 
-      return [remove_before, add_after]
+      [remove_before, add_after]
     end
 
     # If the code just before an "if" or "while" token on a line looks like the end of a statement,

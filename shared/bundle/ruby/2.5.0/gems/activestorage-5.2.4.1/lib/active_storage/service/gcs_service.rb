@@ -17,16 +17,14 @@ module ActiveStorage
 
     def upload(key, io, checksum: nil, content_type: nil, disposition: nil, filename: nil)
       instrument :upload, key: key, checksum: checksum do
-        begin
-          # GCS's signed URLs don't include params such as response-content-type response-content_disposition
-          # in the signature, which means an attacker can modify them and bypass our effort to force these to
-          # binary and attachment when the file's content type requires it. The only way to force them is to
-          # store them as object's metadata.
-          content_disposition = content_disposition_with(type: disposition, filename: filename) if disposition && filename
-          bucket.create_file(io, key, md5: checksum, content_type: content_type, content_disposition: content_disposition)
-        rescue Google::Cloud::InvalidArgumentError
-          raise ActiveStorage::IntegrityError
-        end
+        # GCS's signed URLs don't include params such as response-content-type response-content_disposition
+        # in the signature, which means an attacker can modify them and bypass our effort to force these to
+        # binary and attachment when the file's content type requires it. The only way to force them is to
+        # store them as object's metadata.
+        content_disposition = content_disposition_with(type: disposition, filename: filename) if disposition && filename
+        bucket.create_file(io, key, md5: checksum, content_type: content_type, content_disposition: content_disposition)
+      rescue Google::Cloud::InvalidArgumentError
+        raise ActiveStorage::IntegrityError
       end
     end
 
@@ -66,22 +64,18 @@ module ActiveStorage
 
     def delete(key)
       instrument :delete, key: key do
-        begin
-          file_for(key).delete
-        rescue Google::Cloud::NotFoundError
-          # Ignore files already deleted
-        end
+        file_for(key).delete
+      rescue Google::Cloud::NotFoundError
+        # Ignore files already deleted
       end
     end
 
     def delete_prefixed(prefix)
       instrument :delete_prefixed, prefix: prefix do
         bucket.files(prefix: prefix).all do |file|
-          begin
-            file.delete
-          rescue Google::Cloud::NotFoundError
-            # Ignore concurrently-deleted files
-          end
+          file.delete
+        rescue Google::Cloud::NotFoundError
+          # Ignore concurrently-deleted files
         end
       end
     end
@@ -98,7 +92,7 @@ module ActiveStorage
       instrument :url, key: key do |payload|
         generated_url = file_for(key).signed_url expires: expires_in, query: {
           "response-content-disposition" => content_disposition_with(type: disposition, filename: filename),
-          "response-content-type" => content_type
+          "response-content-type" => content_type,
         }
 
         payload[:url] = generated_url
@@ -122,18 +116,19 @@ module ActiveStorage
     end
 
     private
-      attr_reader :config
 
-      def file_for(key)
-        bucket.file(key, skip_lookup: true)
-      end
+    attr_reader :config
 
-      def bucket
-        @bucket ||= client.bucket(config.fetch(:bucket))
-      end
+    def file_for(key)
+      bucket.file(key, skip_lookup: true)
+    end
 
-      def client
-        @client ||= Google::Cloud::Storage.new(config.except(:bucket))
-      end
+    def bucket
+      @bucket ||= client.bucket(config.fetch(:bucket))
+    end
+
+    def client
+      @client ||= Google::Cloud::Storage.new(config.except(:bucket))
+    end
   end
 end

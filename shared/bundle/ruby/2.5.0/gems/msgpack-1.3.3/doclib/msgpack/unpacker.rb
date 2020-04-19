@@ -1,5 +1,4 @@
 module MessagePack
-
   #
   # MessagePack::Unpacker is a class to deserialize objects.
   #
@@ -179,5 +178,4 @@ module MessagePack
     def reset
     end
   end
-
 end

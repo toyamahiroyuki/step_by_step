@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/ast/node'
 require 'mustermann/error'
 require 'ruby2_keywords'
@@ -103,7 +104,7 @@ module Mustermann
       #
       # @!visibility private
       def decorator_for(node)
-        factory = node.class.ancestors.inject(nil) { |d,a| d || self.class.dispatch_table[a.name] }
+        factory = node.class.ancestors.inject(nil) { |d, a| d || self.class.dispatch_table[a.name] }
         raise error_class, "#{self.class}: Cannot translate #{node.class}" unless factory
         factory.new(node, self)
       end

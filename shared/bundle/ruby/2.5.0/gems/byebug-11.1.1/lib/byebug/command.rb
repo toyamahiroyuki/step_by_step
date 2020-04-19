@@ -78,11 +78,11 @@ module Byebug
       # Name of the command, as executed by the user.
       #
       def to_s
-        name
-          .split("::")
-          .map { |n| n.gsub(/Command$/, "").downcase if /Command$/.match?(n) }
-          .compact
-          .join(" ")
+        name.
+          split("::").
+          map { |n| n.gsub(/Command$/, "").downcase if /Command$/.match?(n) }.
+          compact.
+          join(" ")
       end
 
       def columnize(width)

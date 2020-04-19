@@ -11,13 +11,13 @@ class ActiveStorage::Filename::Parameters #:nodoc:
     "#{ascii}; #{utf8}"
   end
 
-  TRADITIONAL_ESCAPED_CHAR = /[^ A-Za-z0-9!#$+.^_`|~-]/
+  TRADITIONAL_ESCAPED_CHAR = /[^ A-Za-z0-9!#$+.^_`|~-]/.freeze
 
   def ascii
     'filename="' + percent_escape(I18n.transliterate(filename.sanitized), TRADITIONAL_ESCAPED_CHAR) + '"'
   end
 
-  RFC_5987_ESCAPED_CHAR = /[^A-Za-z0-9!#$&+.^_`|~-]/
+  RFC_5987_ESCAPED_CHAR = /[^A-Za-z0-9!#$&+.^_`|~-]/.freeze
 
   def utf8
     "filename*=UTF-8''" + percent_escape(filename.sanitized, RFC_5987_ESCAPED_CHAR)
@@ -28,9 +28,10 @@ class ActiveStorage::Filename::Parameters #:nodoc:
   end
 
   private
-    def percent_escape(string, pattern)
-      string.gsub(pattern) do |char|
-        char.bytes.map { |byte| "%%%02X" % byte }.join
-      end
+
+  def percent_escape(string, pattern)
+    string.gsub(pattern) do |char|
+      char.bytes.map { |byte| "%%%02X" % byte }.join
     end
+  end
 end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mail/check_delivery_params'
 
 module Mail
@@ -39,9 +40,9 @@ module Mail
   #   mail.deliver!
   class Sendmail
     DEFAULTS = {
-      :location   => '/usr/sbin/sendmail',
-      :arguments  => '-i'
-    }
+      :location => '/usr/sbin/sendmail',
+      :arguments => '-i',
+    }.freeze
 
     attr_accessor :settings
 

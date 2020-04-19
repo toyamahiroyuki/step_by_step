@@ -45,9 +45,9 @@ module ActiveRecord
     def calculate(operation, _column_name)
       case operation
       when :count, :sum
-        group_values.any? ? Hash.new : 0
+        group_values.any? ? {} : 0
       when :average, :minimum, :maximum
-        group_values.any? ? Hash.new : nil
+        group_values.any? ? {} : nil
       end
     end
 
@@ -61,8 +61,8 @@ module ActiveRecord
 
     private
 
-      def exec_queries
-        @records = [].freeze
-      end
+    def exec_queries
+      @records = [].freeze
+    end
   end
 end

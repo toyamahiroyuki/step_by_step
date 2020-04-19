@@ -29,17 +29,17 @@ class Pry
       @output_result_ranges = []
 
       opt.on :l, :lines, "Restrict to a subset of lines. Takes a line number or range",
-                         optional_argument: true, as: Range, default: 1..-1
+             optional_argument: true, as: Range, default: 1..-1
       opt.on :o, :out,   "Select lines from Pry's output result history. Takes an index or range",
-      optional_argument: true, as: Range, default: -5..-1 do |r|
+             optional_argument: true, as: Range, default: -5..-1 do |r|
         output_result_ranges << (r || (-5..-1))
       end
-      opt.on :i, :in,    "Select lines from Pry's input expression history. Takes an index or range",
-      optional_argument: true, as: Range, default: -5..-1 do |r|
+      opt.on :i, :in, "Select lines from Pry's input expression history. Takes an index or range",
+             optional_argument: true, as: Range, default: -5..-1 do |r|
         input_expression_ranges << (r || (-5..-1))
       end
       opt.on :s, :super, "Select the 'super' method. Can be repeated to traverse the ancestors",
-                         as: :count
+             as: :count
       opt.on :d, :doc,   "Select lines from the code object's documentation"
     end
 
@@ -118,8 +118,10 @@ class Pry
     private
 
     def bad_option_combination?
-      [opts.present?(:in), opts.present?(:out),
-       !args.empty?].count(true) > 1
+      [
+        opts.present?(:in), opts.present?(:out),
+        !args.empty?,
+      ].count(true) > 1
     end
 
     def pry_array_content_as_string(array, ranges, &block)
@@ -135,7 +137,7 @@ class Pry
     end
 
     def code_object_doc
-      (code_object && code_object.doc) or could_not_locate(obj_name)
+      (code_object && code_object.doc) || could_not_locate(obj_name)
     end
 
     def code_object_source_or_file

@@ -20,7 +20,6 @@ if Puma::IS_JRUBY
 end
 
 module Puma
-
   class ConnectionError < RuntimeError; end
 
   # An instance of this class represents a unique request from a client.
@@ -38,7 +37,7 @@ module Puma
     include Puma::Const
     extend  Puma::Delegation
 
-    def initialize(io, env=nil)
+    def initialize(io, env = nil)
       @io = io
       @to_io = io.to_io
       @proto_env = env
@@ -94,7 +93,7 @@ module Puma
       @timeout_at = Time.now + val
     end
 
-    def reset(fast_check=true)
+    def reset(fast_check = true)
       @parser.reset
       @read_header = true
       @env = @proto_env.dup
@@ -110,7 +109,7 @@ module Puma
           return setup_body
         elsif @parsed_bytes >= MAX_HEADER
           raise HttpParserError,
-            "HEADER is longer than allowed, aborting client early."
+                "HEADER is longer than allowed, aborting client early."
         end
 
         return false
@@ -121,11 +120,9 @@ module Puma
     end
 
     def close
-      begin
-        @io.close
-      rescue IOError
-        Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
-      end
+      @io.close
+    rescue IOError
+      Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
     end
 
     # The object used for a request with no body. All requests with
@@ -141,13 +138,13 @@ module Puma
       @body.binmode
       @tempfile = @body
 
-      return decode_chunk(body)
+      decode_chunk(body)
     end
 
     def decode_chunk(chunk)
       if @partial_part_left > 0
         if @partial_part_left <= chunk.size
-          @body << chunk[0..(@partial_part_left-3)] # skip the \r\n
+          @body << chunk[0..(@partial_part_left - 3)] # skip the \r\n
           chunk = chunk[@partial_part_left..-1]
         else
           @body << chunk
@@ -159,7 +156,7 @@ module Puma
       if @prev_chunk.empty?
         io = StringIO.new(chunk)
       else
-        io = StringIO.new(@prev_chunk+chunk)
+        io = StringIO.new(@prev_chunk + chunk)
         @prev_chunk = ""
       end
 
@@ -204,7 +201,7 @@ module Puma
         end
       end
 
-      return false
+      false
     end
 
     def read_chunked_body
@@ -277,14 +274,14 @@ module Puma
       else
         # The body[0,0] trick is to get an empty string in the same
         # encoding as body.
-        @body = StringIO.new body[0,0]
+        @body = StringIO.new body[0, 0]
       end
 
       @body.write body
 
       @body_remain = remain
 
-      return false
+      false
     end
 
     def try_to_finish
@@ -318,7 +315,7 @@ module Puma
         return setup_body
       elsif @parsed_bytes >= MAX_HEADER
         raise HttpParserError,
-          "HEADER is longer than allowed, aborting client early."
+              "HEADER is longer than allowed, aborting client early."
       end
 
       false
@@ -331,7 +328,7 @@ module Puma
         begin
           data = @io.sysread_nonblock(CHUNK_SIZE)
         rescue OpenSSL::SSL::SSLError => e
-          return false if e.kind_of? IO::WaitReadable
+          return false if e.is_a? IO::WaitReadable
           raise e
         end
 
@@ -355,7 +352,7 @@ module Puma
           return setup_body
         elsif @parsed_bytes >= MAX_HEADER
           raise HttpParserError,
-            "HEADER is longer than allowed, aborting client early."
+                "HEADER is longer than allowed, aborting client early."
         end
 
         false
@@ -364,7 +361,7 @@ module Puma
       def eagerly_finish
         return true if @ready
 
-        if @io.kind_of? OpenSSL::SSL::SSLSocket
+        if @io.is_a? OpenSSL::SSL::SSLSocket
           return true if jruby_start_try_to_finish
         end
 
@@ -437,24 +434,18 @@ module Puma
     end
 
     def write_400
-      begin
-        @io << ERROR_400_RESPONSE
-      rescue StandardError
-      end
+      @io << ERROR_400_RESPONSE
+    rescue StandardError
     end
 
     def write_408
-      begin
-        @io << ERROR_408_RESPONSE
-      rescue StandardError
-      end
+      @io << ERROR_408_RESPONSE
+    rescue StandardError
     end
 
     def write_500
-      begin
-        @io << ERROR_500_RESPONSE
-      rescue StandardError
-      end
+      @io << ERROR_500_RESPONSE
+    rescue StandardError
     end
 
     def peerip

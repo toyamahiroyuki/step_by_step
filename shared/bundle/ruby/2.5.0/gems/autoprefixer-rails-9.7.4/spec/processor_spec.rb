@@ -17,9 +17,9 @@ describe AutoprefixerRails::Processor do
 
     it "doesn't raise error during processing" do
       processor = AutoprefixerRails::Processor.new
-      expect {
+      expect do
         processor.process("")
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 end

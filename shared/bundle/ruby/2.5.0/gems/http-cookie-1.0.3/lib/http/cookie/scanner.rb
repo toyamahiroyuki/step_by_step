@@ -4,16 +4,16 @@ require 'time'
 
 class HTTP::Cookie::Scanner < StringScanner
   # Whitespace.
-  RE_WSP = /[ \t]+/
+  RE_WSP = /[ \t]+/.freeze
 
   # A pattern that matches a cookie name or attribute name which may
   # be empty, capturing trailing whitespace.
-  RE_NAME = /(?!#{RE_WSP})[^,;\\"=]*/
+  RE_NAME = /(?!#{RE_WSP})[^,;\\"=]*/.freeze
 
-  RE_BAD_CHAR = /([\x00-\x20\x7F",;\\])/
+  RE_BAD_CHAR = /([\x00-\x20\x7F",;\\])/.freeze
 
   # A pattern that matches the comma in a (typically date) value.
-  RE_COOKIE_COMMA = /,(?=#{RE_WSP}?#{RE_NAME}=)/
+  RE_COOKIE_COMMA = /,(?=#{RE_WSP}?#{RE_NAME}=)/.freeze
 
   def initialize(string, logger = nil)
     @logger = logger
@@ -32,7 +32,7 @@ class HTTP::Cookie::Scanner < StringScanner
   end
 
   def scan_dquoted
-    ''.tap { |s|
+    ''.tap do |s|
       case
       when skip(/"/)
         break
@@ -41,17 +41,17 @@ class HTTP::Cookie::Scanner < StringScanner
       when scan(/[^"\\]+/)
         s << matched
       end until eos?
-    }
+    end
   end
 
   def scan_name
-    scan(RE_NAME).tap { |s|
+    scan(RE_NAME).tap do |s|
       s.rstrip! if s
-    }
+    end
   end
 
   def scan_value(comma_as_separator = false)
-    ''.tap { |s|
+    ''.tap do |s|
       case
       when scan(/[^,;"]+/)
         s << matched
@@ -67,7 +67,7 @@ class HTTP::Cookie::Scanner < StringScanner
         s << getch
       end until eos?
       s.rstrip!
-    }
+    end
   end
 
   def scan_name_value(comma_as_separator = false)
@@ -86,17 +86,17 @@ class HTTP::Cookie::Scanner < StringScanner
       Time.strptime(
         '%02d %s %04d %02d:%02d:%02d UTC' % [day_of_month, month, year, *time],
         '%d %b %Y %T %Z'
-      ).tap { |date|
-        date.day == day_of_month or return nil
-      }
+      ).tap do |date|
+        (date.day == day_of_month) || (return nil)
+      end
     end
   else
     def tuple_to_time(day_of_month, month, year, time)
       Time.parse(
         '%02d %s %04d %02d:%02d:%02d UTC' % [day_of_month, month, year, *time]
-      ).tap { |date|
-        date.day == day_of_month or return nil
-      }
+      ).tap do |date|
+        (date.day == day_of_month) || (return nil)
+      end
     end
   end
   private :tuple_to_time
@@ -105,26 +105,26 @@ class HTTP::Cookie::Scanner < StringScanner
     # RFC 6265 5.1.1
     time = day_of_month = month = year = nil
 
-    s.split(/[\x09\x20-\x2F\x3B-\x40\x5B-\x60\x7B-\x7E]+/).each { |token|
+    s.split(/[\x09\x20-\x2F\x3B-\x40\x5B-\x60\x7B-\x7E]+/).each do |token|
       case
       when time.nil? && token.match(/\A(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?=\D|\z)/)
         sec =
-          if $3
-            $3.to_i
+          if Regexp.last_match(3)
+            Regexp.last_match(3).to_i
           else
             # violation of the RFC
             @logger.warn("Time lacks the second part: #{token}") if @logger
             0
           end
-        time = [$1.to_i, $2.to_i, sec]
+        time = [Regexp.last_match(1).to_i, Regexp.last_match(2).to_i, sec]
       when day_of_month.nil? && token.match(/\A(\d{1,2})(?=\D|\z)/)
-        day_of_month = $1.to_i
+        day_of_month = Regexp.last_match(1).to_i
       when month.nil? && token.match(/\A(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i)
-        month = $1.capitalize
+        month = Regexp.last_match(1).capitalize
       when year.nil? && token.match(/\A(\d{2,4})(?=\D|\z)/)
-        year = $1.to_i
+        year = Regexp.last_match(1).to_i
       end
-    }
+    end
 
     if day_of_month.nil? || month.nil? || year.nil? || time.nil?
       return nil
@@ -184,14 +184,14 @@ class HTTP::Cookie::Scanner < StringScanner
         case aname
         when 'expires'
           # RFC 6265 5.2.1
-          avalue &&= parse_cookie_date(avalue) or next
+          (avalue &&= parse_cookie_date(avalue)) || next
         when 'max-age'
           # RFC 6265 5.2.2
           next unless /\A-?\d+\z/.match(avalue)
         when 'domain'
           # RFC 6265 5.2.3
           # An empty value SHOULD be ignored.
-          next if avalue.nil? || avalue.empty?
+          next if avalue.blank?
         when 'path'
           # RFC 6265 5.2.4
           # A relative path must be ignored rather than normalizing it

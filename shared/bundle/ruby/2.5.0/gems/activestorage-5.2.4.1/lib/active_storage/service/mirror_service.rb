@@ -41,15 +41,16 @@ module ActiveStorage
     end
 
     private
-      def each_service(&block)
-        [ primary, *mirrors ].each(&block)
-      end
 
-      def perform_across_services(method, *args)
-        # FIXME: Convert to be threaded
-        each_service.collect do |service|
-          service.public_send method, *args
-        end
+    def each_service(&block)
+      [primary, *mirrors].each(&block)
+    end
+
+    def perform_across_services(method, *args)
+      # FIXME: Convert to be threaded
+      each_service.collect do |service|
+        service.public_send method, *args
       end
+    end
   end
 end

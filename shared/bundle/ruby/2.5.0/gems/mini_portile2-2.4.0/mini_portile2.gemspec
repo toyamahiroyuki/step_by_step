@@ -1,4 +1,5 @@
 # coding: utf-8
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'mini_portile2/version'
@@ -17,14 +18,14 @@ Gem::Specification.new do |spec|
   spec.licenses      = ['MIT']
 
   begin
-    spec.files         = `git ls-files -z`.split("\x0")
+    spec.files = `git ls-files -z`.split("\x0")
   rescue Exception => e
     warn "WARNING: could not set spec.files: #{e.class}: #{e}"
   end
 
   # omit the `examples` directory from the gem, because it's large and
   # not necessary to be packaged in the gem.
-  example_files      = spec.files.grep(%r{^examples/})
+  example_files = spec.files.grep(%r{^examples/})
   spec.files -= example_files
 
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

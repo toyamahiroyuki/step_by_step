@@ -1,4 +1,3 @@
-
 if ENV['SIMPLE_COV']
   require 'simplecov'
   SimpleCov.start do

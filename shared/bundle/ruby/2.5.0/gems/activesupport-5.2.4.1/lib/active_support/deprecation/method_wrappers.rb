@@ -57,7 +57,7 @@ module ActiveSupport
 
         method_names.each do |method_name|
           if target_module.method_defined?(method_name) || target_module.private_method_defined?(method_name)
-            aliased_method, punctuation = method_name.to_s.sub(/([?!=])$/, ""), $1
+            aliased_method, punctuation = method_name.to_s.sub(/([?!=])$/, ""), Regexp.last_match(1)
             with_method = "#{aliased_method}_with_deprecation#{punctuation}"
             without_method = "#{aliased_method}_without_deprecation#{punctuation}"
 

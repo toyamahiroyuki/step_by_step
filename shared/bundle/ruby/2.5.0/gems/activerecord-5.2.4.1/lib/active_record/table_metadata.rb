@@ -13,7 +13,7 @@ module ActiveRecord
     def resolve_column_aliases(hash)
       new_hash = hash.dup
       hash.each do |key, _|
-        if (key.is_a?(Symbol)) && klass.attribute_alias?(key)
+        if key.is_a?(Symbol) && klass.attribute_alias?(key)
           new_hash[klass.attribute_alias(key)] = new_hash.delete(key)
         end
       end
@@ -77,6 +77,6 @@ module ActiveRecord
     # Workaround for Ruby 2.2 "private attribute?" warning.
     protected
 
-      attr_reader :klass, :arel_table, :association
+    attr_reader :klass, :arel_table, :association
   end
 end

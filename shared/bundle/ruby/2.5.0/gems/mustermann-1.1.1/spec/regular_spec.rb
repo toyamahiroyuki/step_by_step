@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'timeout'
 require 'mustermann/regular'
@@ -39,9 +40,8 @@ describe Mustermann::Regular do
     it { should match('/foo%2Fbar') .capturing foo: 'foo%2Fbar' }
   end
 
-
   context 'with Regexp::EXTENDED' do
-    let(:pattern) {
+    let(:pattern) do
       %r{
         \/compare\/ # match any URL beginning with \/compare\/
         (.+)      # extract the full path (including any directories)
@@ -50,8 +50,9 @@ describe Mustermann::Regular do
         \.{2,3}   # match .. or ...
         (.+)      # match the second SHA1
       }x
-    }
-    example { expect { Timeout.timeout(1){ Mustermann::Regular.new(pattern) }}.not_to raise_error }
+    end
+
+    example { expect { Timeout.timeout(1) { Mustermann::Regular.new(pattern) } }.not_to raise_error }
     it { expect(Mustermann::Regular.new(pattern)).to match('/compare/foo/bar..baz') }
   end
 
@@ -111,8 +112,8 @@ describe Mustermann::Regular do
     end
 
     describe :peek_params do
-      example { pattern.peek_params("foo bar/blah")   .should be == [{"name" => "foo bar"}, "foo bar".size] }
-      example { pattern.peek_params("foo%20bar/blah") .should be == [{"name" => "foo bar"}, "foo%20bar".size] }
+      example { pattern.peek_params("foo bar/blah")   .should be == [{ "name" => "foo bar" }, "foo bar".size] }
+      example { pattern.peek_params("foo%20bar/blah") .should be == [{ "name" => "foo bar" }, "foo%20bar".size] }
       example { pattern.peek_params("/foo bar")       .should be_nil }
     end
   end

@@ -332,7 +332,7 @@ module Nokogiri
         end
 
         @ns = { :pending => ns.to_s }
-        return self
+        self
       end
 
       ###
@@ -358,13 +358,13 @@ module Nokogiri
         if @context && @context.respond_to?(method)
           @context.send(method, *args, &block)
         else
-          node = @doc.create_element(method.to_s.sub(/[_!]$/, ""), *args) { |n|
+          node = @doc.create_element(method.to_s.sub(/[_!]$/, ""), *args) do |n|
             # Set up the namespace
             if @ns.is_a? Nokogiri::XML::Namespace
               n.namespace = @ns
               @ns = nil
             end
-          }
+          end
 
           if @ns.is_a? Hash
             node.namespace = node.namespace_definitions.find { |x| x.prefix == @ns[:pending] }
@@ -416,10 +416,10 @@ module Nokogiri
           opts = args.last.is_a?(Hash) ? args.pop : {}
           case method.to_s
           when /^(.*)!$/
-            @node["id"] = $1
+            @node["id"] = Regexp.last_match(1)
             @node.content = args.first if args.first
           when /^(.*)=/
-            @node[$1] = args.first
+            @node[Regexp.last_match(1)] = args.first
           else
             @node["class"] =
               ((@node["class"] || "").split(/\s/) + [method.to_s]).join(" ")

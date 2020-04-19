@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 require 'mail/parsers/content_transfer_encoding_parser'
 
 module Mail

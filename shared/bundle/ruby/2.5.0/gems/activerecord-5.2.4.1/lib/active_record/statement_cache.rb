@@ -43,9 +43,9 @@ module ActiveRecord
     class PartialQuery < Query # :nodoc:
       def initialize(values)
         @values = values
-        @indexes = values.each_with_index.find_all { |thing, i|
+        @indexes = values.each_with_index.find_all do |thing, i|
           Arel::Nodes::BindParam === thing
-        }.map(&:last)
+        end.map(&:last)
       end
 
       def sql_for(binds, connection)
@@ -65,7 +65,9 @@ module ActiveRecord
     end
 
     class Params # :nodoc:
-      def bind; Substitute.new; end
+      def bind
+        Substitute.new
+      end
     end
 
     class BindMap # :nodoc:
@@ -116,6 +118,6 @@ module ActiveRecord
 
     protected
 
-      attr_reader :query_builder, :bind_map, :klass
+    attr_reader :query_builder, :bind_map, :klass
   end
 end

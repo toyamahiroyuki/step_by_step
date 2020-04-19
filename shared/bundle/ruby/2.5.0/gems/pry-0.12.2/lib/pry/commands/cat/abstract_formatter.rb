@@ -5,6 +5,7 @@ class Pry
       include Pry::Helpers::BaseHelpers
 
       private
+
       def decorate(content)
         content.code_type = code_type
         content.between(*between_lines).

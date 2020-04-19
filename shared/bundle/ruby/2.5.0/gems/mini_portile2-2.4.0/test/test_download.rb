@@ -13,7 +13,11 @@ describe "recipe download" do
       connections.times do
         conn = server.accept
         request_count += 1
-        conn.puts "CONNECTION SUCESSFULLY MADE" rescue SystemCallError
+        begin
+          conn.puts "CONNECTION SUCESSFULLY MADE"
+        rescue
+          SystemCallError
+        end
         conn.close
       end
     end

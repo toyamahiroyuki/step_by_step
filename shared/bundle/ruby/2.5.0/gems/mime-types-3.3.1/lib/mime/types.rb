@@ -131,9 +131,9 @@ class MIME::Types
                 @type_variants[MIME::Type.simplified(type_id)]
               end
 
-    prune_matches(matches, complete, registered).sort { |a, b|
+    prune_matches(matches, complete, registered).sort do |a, b|
       a.priority_compare(b)
-    }
+    end
   end
 
   # Return the list of MIME::Types which belongs to the file based on its
@@ -149,11 +149,11 @@ class MIME::Types
   #   puts MIME::Types.type_for(%w(citydesk.xml citydesk.gif))
   #     => [application/xml, image/gif, text/xml]
   def type_for(filename)
-    Array(filename).flat_map { |fn|
+    Array(filename).flat_map do |fn|
       @extension_index[fn.chomp.downcase[/\.?([^.]*?)$/, 1]]
-    }.compact.inject(Set.new, :+).sort { |a, b|
+    end.compact.inject(Set.new, :+).sort do |a, b|
       a.priority_compare(b)
-    }
+    end
   end
   alias of type_for
 
@@ -163,7 +163,7 @@ class MIME::Types
   # The last parameter may be the value <tt>:silent</tt> or +true+ which
   # will suppress duplicate MIME type warnings.
   def add(*types)
-    quiet = ((types.last == :silent) or (types.last == true))
+    quiet = ((types.last == :silent) || (types.last == true))
 
     types.each do |mime_type|
       case mime_type
@@ -184,7 +184,7 @@ class MIME::Types
   # already known, a warning will be displayed. The +quiet+ parameter may be a
   # truthy value to suppress that warning.
   def add_type(type, quiet = false)
-    if !quiet and @type_variants[type.simplified].include?(type)
+    if !quiet && @type_variants[type.simplified].include?(type)
       MIME::Types.logger.warn <<-WARNING
 Type #{type} is already registered as a variant of #{type.simplified}.
       WARNING
@@ -217,9 +217,9 @@ Type #{type} is already registered as a variant of #{type.simplified}.
   end
 
   def match(pattern)
-    @type_variants.select { |k, _|
+    @type_variants.select do |k, _|
       k =~ pattern
-    }.values.inject(Set.new, :+)
+    end.values.inject(Set.new, :+)
   end
 end
 

@@ -4,7 +4,7 @@ require 'viiite'
 require 'msgpack'
 
 data_plain = MessagePack.pack({
-    'message' => '127.0.0.1 - - [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 "http://www.example.com/start.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"'
+  'message' => '127.0.0.1 - - [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 "http://www.example.com/start.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"',
 })
 data_structure = MessagePack.pack({
   'remote_host' => '127.0.0.1',
@@ -40,7 +40,7 @@ Viiite.bench do |b|
         end
         ths.push t
       end
-      sum = ths.reduce(0){|r,t| r + t.value }
+      sum = ths.reduce(0) { |r, t| r + t.value }
       puts "MessagePack.unpack, plain, #{threads} threads: #{sum} times, #{sum / seconds} times/second."
     end
 
@@ -60,7 +60,7 @@ Viiite.bench do |b|
         end
         ths.push t
       end
-      sum = ths.reduce(0){|r,t| r + t.value }
+      sum = ths.reduce(0) { |r, t| r + t.value }
       puts "MessagePack.unpack, structured, #{threads} threads: #{sum} times, #{sum / seconds} times/second."
     end
   end

@@ -45,23 +45,23 @@ module Rack
         rack_input.set_encoding(Encoding::BINARY)
 
         env.update(
-          RACK_VERSION      => Rack::VERSION,
-          RACK_INPUT        => rack_input,
-          RACK_ERRORS       => $stderr,
-          RACK_MULTITHREAD  => true,
+          RACK_VERSION => Rack::VERSION,
+          RACK_INPUT => rack_input,
+          RACK_ERRORS => $stderr,
+          RACK_MULTITHREAD => true,
           RACK_MULTIPROCESS => true,
-          RACK_RUNONCE      => false,
-          RACK_URL_SCHEME   => ["yes", "on", "1"].include?(env[HTTPS]) ? "https" : "http"
+          RACK_RUNONCE => false,
+          RACK_URL_SCHEME => ["yes", "on", "1"].include?(env[HTTPS]) ? "https" : "http"
         )
 
         status, headers, body = app.call(env)
         begin
           socket.write("Status: #{status}\r\n")
           headers.each do |k, vs|
-            vs.split("\n").each { |v| socket.write("#{k}: #{v}\r\n")}
+            vs.split("\n").each { |v| socket.write("#{k}: #{v}\r\n") }
           end
           socket.write("\r\n")
-          body.each {|s| socket.write(s)}
+          body.each { |s| socket.write(s) }
         ensure
           body.close if body.respond_to? :close
         end

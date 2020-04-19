@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann'
 require 'mustermann/regexp_based'
 require 'strscan'
@@ -20,7 +21,7 @@ module Mustermann
     # @return (see Mustermann::Pattern#initialize)
     # @see (see Mustermann::Pattern#initialize)
     def initialize(string, check_anchors: true, **options)
-      string = $1 if string.to_s =~ /\A\(\?\-mix\:(.*)\)\Z/ && string.inspect == "/#$1/"
+      string = Regexp.last_match(1) if string.to_s =~ /\A\(\?\-mix\:(.*)\)\Z/ && string.inspect == "/#{Regexp.last_match(1)}/"
       string = string.source.gsub!(/(?<!\\)(?:\s|#.*$)/, '') if extended_regexp?(string)
       @check_anchors = check_anchors
       super(string, **options)
@@ -42,7 +43,7 @@ module Mustermann
     end
 
     def extended_regexp?(string)
-      not (Regexp.new(string).options & Regexp::EXTENDED).zero?
+      !(Regexp.new(string).options & Regexp::EXTENDED).zero?
     end
 
     private :compile, :check_anchors, :extended_regexp?

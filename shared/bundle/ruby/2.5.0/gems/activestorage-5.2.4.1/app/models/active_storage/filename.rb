@@ -11,7 +11,7 @@ class ActiveStorage::Filename
     # Returns a Filename instance based on the given filename. If the filename is a Filename, it is
     # returned unmodified. If it is a String, it is passed to ActiveStorage::Filename.new.
     def wrap(filename)
-      filename.kind_of?(self) ? filename : new(filename)
+      filename.is_a?(self) ? filename : new(filename)
     end
   end
 
@@ -73,7 +73,7 @@ class ActiveStorage::Filename
     to_s
   end
 
-  def to_json
+  def to_json(*_args)
     to_s
   end
 

@@ -157,15 +157,15 @@ class Hash
   def as_json(options = nil) #:nodoc:
     # create a subset of the hash by applying :only or :except
     subset = if options
-      if attrs = options[:only]
-        slice(*Array(attrs))
-      elsif attrs = options[:except]
-        except(*Array(attrs))
-      else
-        self
-      end
-    else
-      self
+               if attrs = options[:only]
+                 slice(*Array(attrs))
+               elsif attrs = options[:except]
+                 except(*Array(attrs))
+               else
+                 self
+               end
+             else
+               self
     end
 
     Hash[subset.map { |k, v| [k.to_s, options ? v.as_json(options.dup) : v.as_json] }]

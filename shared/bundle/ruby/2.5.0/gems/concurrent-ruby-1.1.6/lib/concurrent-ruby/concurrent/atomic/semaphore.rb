@@ -2,7 +2,6 @@ require 'concurrent/atomic/mutex_semaphore'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   ###################################################################
 
   # @!macro semaphore_method_initialize

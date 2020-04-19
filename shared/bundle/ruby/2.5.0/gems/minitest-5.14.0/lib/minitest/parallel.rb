@@ -1,11 +1,9 @@
 module Minitest
   module Parallel #:nodoc:
-
     ##
     # The engine used to run multiple tests in parallel.
 
     class Executor
-
       ##
       # The size of the pool of workers.
 
@@ -14,7 +12,7 @@ module Minitest
       ##
       # Create a parallel test executor of with +size+ workers.
 
-      def initialize size
+      def initialize(size)
         @size  = size
         @queue = Queue.new
         @pool  = nil
@@ -24,7 +22,7 @@ module Minitest
       # Start the executor
 
       def start
-        @pool  = size.times.map {
+        @pool = size.times.map do
           Thread.new(@queue) do |queue|
             Thread.current.abort_on_exception = true
             while (job = queue.pop)
@@ -34,13 +32,15 @@ module Minitest
               reporter.synchronize { reporter.record result }
             end
           end
-        }
+        end
       end
 
       ##
       # Add a job to the queue
 
-      def << work; @queue << work; end
+      def <<(work)
+        @queue << work
+      end
 
       ##
       # Shuts down the pool of workers by signalling them to quit and
@@ -54,10 +54,13 @@ module Minitest
     end
 
     module Test # :nodoc:
-      def _synchronize; Minitest::Test.io_lock.synchronize { yield }; end # :nodoc:
+      # :nodoc:
+      def _synchronize
+        Minitest::Test.io_lock.synchronize { yield }
+      end
 
       module ClassMethods # :nodoc:
-        def run_one_method klass, method_name, reporter
+        def run_one_method(klass, method_name, reporter)
           Minitest.parallel_executor << [klass, method_name, reporter]
         end
 

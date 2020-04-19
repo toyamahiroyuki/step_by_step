@@ -12,7 +12,7 @@ module Rack
   # like sendfile on the +path+.
 
   class Files
-    ALLOWED_VERBS = %w[GET HEAD OPTIONS]
+    ALLOWED_VERBS = %w(GET HEAD OPTIONS).freeze
     ALLOW_HEADER = ALLOWED_VERBS.join(', ')
     MULTIPART_BOUNDARY = 'AaB03x'
 
@@ -52,11 +52,11 @@ module Rack
 
       available = begin
         ::File.file?(path) && ::File.readable?(path)
-      rescue SystemCallError
-        # Not sure in what conditions this exception can occur, but this
-        # is a safe way to handle such an error.
-        # :nocov:
-        false
+                  rescue SystemCallError
+                    # Not sure in what conditions this exception can occur, but this
+                    # is a safe way to handle such an error.
+                    # :nocov:
+                    false
         # :nocov:
       end
 
@@ -161,7 +161,7 @@ module Rack
       end
 
       def multipart_heading(range)
-<<-EOF
+        <<-EOF
 \r
 --#{MULTIPART_BOUNDARY}\r
 Content-Type: #{options[:mime_type]}\r
@@ -195,11 +195,11 @@ EOF
       [
         status,
         {
-          CONTENT_TYPE   => "text/plain",
+          CONTENT_TYPE => "text/plain",
           CONTENT_LENGTH => body.size.to_s,
-          "X-Cascade" => "pass"
+          "X-Cascade" => "pass",
         }.merge!(headers),
-        [body]
+        [body],
       ]
     end
 

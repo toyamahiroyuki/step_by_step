@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'arel/errors'
 
 require 'arel/crud'
@@ -26,7 +27,7 @@ require 'arel/nodes'
 module Arel
   VERSION = '9.0.0'
 
-  def self.sql raw_sql
+  def self.sql(raw_sql)
     Arel::Nodes::SqlLiteral.new raw_sql
   end
 

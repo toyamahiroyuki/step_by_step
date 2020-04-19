@@ -79,89 +79,90 @@ module ActiveRecord
         end
 
         private
-          def lookup_cast_type(sql_type)
-            super(query_value("SELECT #{quote(sql_type)}::regtype::oid", "SCHEMA").to_i)
-          end
 
-          def _quote(value)
-            case value
-            when OID::Xml::Data
-              "xml '#{quote_string(value.to_s)}'"
-            when OID::Bit::Data
-              if value.binary?
-                "B'#{value}'"
-              elsif value.hex?
-                "X'#{value}'"
-              end
-            when Float
-              if value.infinite? || value.nan?
-                "'#{value}'"
-              else
-                super
-              end
-            when OID::Array::Data
-              _quote(encode_array(value))
-            when Range
-              _quote(encode_range(value))
+        def lookup_cast_type(sql_type)
+          super(query_value("SELECT #{quote(sql_type)}::regtype::oid", "SCHEMA").to_i)
+        end
+
+        def _quote(value)
+          case value
+          when OID::Xml::Data
+            "xml '#{quote_string(value.to_s)}'"
+          when OID::Bit::Data
+            if value.binary?
+              "B'#{value}'"
+            elsif value.hex?
+              "X'#{value}'"
+            end
+          when Float
+            if value.infinite? || value.nan?
+              "'#{value}'"
             else
               super
             end
+          when OID::Array::Data
+            _quote(encode_array(value))
+          when Range
+            _quote(encode_range(value))
+          else
+            super
           end
+        end
 
-          def _type_cast(value)
-            case value
-            when Type::Binary::Data
-              # Return a bind param hash with format as binary.
-              # See https://deveiate.org/code/pg/PG/Connection.html#method-i-exec_prepared-doc
-              # for more information
-              { value: value.to_s, format: 1 }
-            when OID::Xml::Data, OID::Bit::Data
-              value.to_s
-            when OID::Array::Data
-              encode_array(value)
-            when Range
-              encode_range(value)
-            else
-              super
-            end
+        def _type_cast(value)
+          case value
+          when Type::Binary::Data
+            # Return a bind param hash with format as binary.
+            # See https://deveiate.org/code/pg/PG/Connection.html#method-i-exec_prepared-doc
+            # for more information
+            { value: value.to_s, format: 1 }
+          when OID::Xml::Data, OID::Bit::Data
+            value.to_s
+          when OID::Array::Data
+            encode_array(value)
+          when Range
+            encode_range(value)
+          else
+            super
           end
+        end
 
-          def encode_array(array_data)
-            encoder = array_data.encoder
-            values = type_cast_array(array_data.values)
+        def encode_array(array_data)
+          encoder = array_data.encoder
+          values = type_cast_array(array_data.values)
 
-            result = encoder.encode(values)
-            if encoding = determine_encoding_of_strings_in_array(values)
-              result.force_encoding(encoding)
-            end
-            result
+          result = encoder.encode(values)
+          if encoding = determine_encoding_of_strings_in_array(values)
+            result.force_encoding(encoding)
           end
+          result
+        end
 
-          def encode_range(range)
-            "[#{type_cast_range_value(range.first)},#{type_cast_range_value(range.last)}#{range.exclude_end? ? ')' : ']'}"
-          end
+        def encode_range(range)
+          "[#{type_cast_range_value(range.first)},#{type_cast_range_value(range.last)}#{range.exclude_end? ? ')' : ']'}"
+        end
 
-          def determine_encoding_of_strings_in_array(value)
-            case value
-            when ::Array then determine_encoding_of_strings_in_array(value.first)
-            when ::String then value.encoding
-            end
+        def determine_encoding_of_strings_in_array(value)
+          case value
+          when ::Array then determine_encoding_of_strings_in_array(value.first)
+          when ::String then value.encoding
           end
+        end
 
-          def type_cast_array(values)
-            case values
-            when ::Array then values.map { |item| type_cast_array(item) }
-            else _type_cast(values)
-            end
+        def type_cast_array(values)
+          case values
+          when ::Array then values.map { |item| type_cast_array(item) }
+          else _type_cast(values)
           end
+        end
 
-          def type_cast_range_value(value)
-            infinity?(value) ? "" : type_cast(value)
-          end
+        def type_cast_range_value(value)
+          infinity?(value) ? "" : type_cast(value)
+        end
 
-          def infinity?(value)
-            value.respond_to?(:infinite?) && value.infinite?
-          end
+        def infinity?(value)
+          value.respond_to?(:infinite?) && value.infinite?
+        end
       end
     end
   end

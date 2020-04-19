@@ -9,7 +9,6 @@ module MiniMagick
   # @private
   #
   class Shell
-
     def run(command, options = {})
       stdout, stderr, status = execute(command, stdin: options[:stdin])
 
@@ -53,8 +52,16 @@ module MiniMagick
         begin
           Timeout.timeout(MiniMagick.timeout) { thread.join }
         rescue Timeout::Error
-          Process.kill("TERM", thread.pid) rescue nil
-          Process.waitpid(thread.pid)      rescue nil
+          begin
+            Process.kill("TERM", thread.pid)
+          rescue
+            nil
+          end
+          begin
+            Process.waitpid(thread.pid)
+          rescue
+            nil
+          end
           raise Timeout::Error, "MiniMagick command timed out: #{command}"
         end
 
@@ -76,6 +83,5 @@ module MiniMagick
       MiniMagick.logger.debug "[%.2fs] %s" % [duration, command]
       value
     end
-
   end
 end

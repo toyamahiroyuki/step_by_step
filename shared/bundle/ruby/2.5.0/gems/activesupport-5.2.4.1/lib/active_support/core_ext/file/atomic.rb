@@ -27,12 +27,12 @@ class File
       temp_file.close
 
       old_stat = if exist?(file_name)
-        # Get original file permissions
-        stat(file_name)
-      else
-        # If not possible, probe which are the default permissions in the
-        # destination directory.
-        probe_stat_in(dirname(file_name))
+                   # Get original file permissions
+                   stat(file_name)
+                 else
+                   # If not possible, probe which are the default permissions in the
+                   # destination directory.
+                   probe_stat_in(dirname(file_name))
       end
 
       if old_stat
@@ -58,7 +58,7 @@ class File
       ".permissions_check",
       Thread.current.object_id,
       Process.pid,
-      rand(1000000)
+      rand(1000000),
     ].join(".")
 
     file_name = join(dir, basename)

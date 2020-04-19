@@ -4,7 +4,7 @@ module Rack
   # Rack::MediaType parse media type and parameters out of content_type string
 
   class MediaType
-    SPLIT_PATTERN = %r{\s*[;,]\s*}
+    SPLIT_PATTERN = %r{\s*[;,]\s*}.freeze
 
     class << self
       # The media type (type/subtype) portion of the CONTENT_TYPE header
@@ -35,9 +35,9 @@ module Rack
 
       private
 
-        def strip_doublequotes(str)
-          (str.start_with?('"') && str.end_with?('"')) ? str[1..-2] : str
-        end
+      def strip_doublequotes(str)
+        (str.start_with?('"') && str.end_with?('"')) ? str[1..-2] : str
+      end
     end
   end
 end

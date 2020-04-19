@@ -12,8 +12,8 @@ class Pry
         :pager,
         :editor,
         :memory_size,
-        :extra_sticky_locals
-      ]
+        :extra_sticky_locals,
+      ].freeze
 
       def config_shortcut(*names)
         names.each do |name|

@@ -4,7 +4,6 @@ module Rack
   module Auth
     module Digest
       class Params < Hash
-
         def self.parse(str)
           Params[*split_header_value(str).map do |param|
             k, v = param.split('=', 2)
@@ -13,7 +12,7 @@ module Rack
         end
 
         def self.dequote(str) # From WEBrick::HTTPUtils
-          ret = (/\A"(.*)"\Z/ =~ str) ? $1 : str.dup
+          ret = (/\A"(.*)"\Z/ =~ str) ? Regexp.last_match(1) : str.dup
           ret.gsub!(/\\(.)/, "\\1")
           ret
         end
@@ -36,7 +35,7 @@ module Rack
           super k.to_s, v.to_s
         end
 
-        UNQUOTED = ['nc', 'stale']
+        UNQUOTED = ['nc', 'stale'].freeze
 
         def to_s
           map do |k, v|
@@ -47,7 +46,6 @@ module Rack
         def quote(str) # From WEBrick::HTTPUtils
           '"' + str.gsub(/[\\\"]/o, "\\\1") + '"'
         end
-
       end
     end
   end

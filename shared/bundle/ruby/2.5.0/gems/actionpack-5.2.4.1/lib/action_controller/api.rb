@@ -136,8 +136,8 @@ module ActionController
 
       # Params wrapper should come before instrumentation so they are
       # properly showed in logs
-      ParamsWrapper
-    ]
+      ParamsWrapper,
+    ].freeze
 
     MODULES.each do |mod|
       include mod

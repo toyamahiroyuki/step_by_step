@@ -157,7 +157,7 @@ module ActiveModel
         if args.all? { |arg| arg.is_a?(Symbol) }
           options.each_key do |k|
             unless VALID_OPTIONS_FOR_VALIDATE.include?(k)
-              raise ArgumentError.new("Unknown key: #{k.inspect}. Valid keys are: #{VALID_OPTIONS_FOR_VALIDATE.map(&:inspect).join(', ')}. Perhaps you meant to call `validates` instead of `validate`?")
+              raise ArgumentError, "Unknown key: #{k.inspect}. Valid keys are: #{VALID_OPTIONS_FOR_VALIDATE.map(&:inspect).join(', ')}. Perhaps you meant to call `validates` instead of `validate`?"
             end
           end
         end
@@ -403,7 +403,7 @@ module ActiveModel
     #   end
     alias :read_attribute_for_validation :send
 
-  private
+    private
 
     def run_validations!
       _run_validate_callbacks
@@ -411,7 +411,7 @@ module ActiveModel
     end
 
     def raise_validation_error # :doc:
-      raise(ValidationError.new(self))
+      raise ValidationError, self
     end
   end
 

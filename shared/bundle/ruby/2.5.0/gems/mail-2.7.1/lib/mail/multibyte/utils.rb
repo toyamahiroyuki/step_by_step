@@ -37,7 +37,7 @@ module Mail #:nodoc:
 
     # Verifies the encoding of the string and raises an exception when it's not valid
     def self.verify!(string)
-      raise EncodingError.new("Found characters with invalid encoding") unless verify(string)
+      raise EncodingError, "Found characters with invalid encoding" unless verify(string)
     end
 
     if 'string'.respond_to?(:force_encoding)

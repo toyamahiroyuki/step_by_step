@@ -18,7 +18,7 @@ module Dotenv
                               # recursively)
             \)                # require closing paren
           )
-        /x
+        /x.freeze
 
         def call(value, _env, _is_load)
           # Process interpolated shell commands

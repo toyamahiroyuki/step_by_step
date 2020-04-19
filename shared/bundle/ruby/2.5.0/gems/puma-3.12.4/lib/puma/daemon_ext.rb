@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Process
-
   # This overrides the default version because it is broken if it
   # exists.
 
@@ -11,7 +10,7 @@ module Process
     end
   end
 
-  def self.daemon(nochdir=false, noclose=false)
+  def self.daemon(nochdir = false, noclose = false)
     exit if fork                     # Parent exits, child continues.
 
     Process.setsid                   # Become session leader.

@@ -1,4 +1,5 @@
 # encoding: ascii-8bit
+
 require 'spec_helper'
 
 describe MessagePack::ExtensionValue do
@@ -56,18 +57,18 @@ describe MessagePack::ExtensionValue do
 
   describe '#to_msgpack' do
     it 'serializes very short payload' do
-      ext = MessagePack::ExtensionValue.new(1, "a"*2).to_msgpack
-      ext.should == "\xd5\x01" + "a"*2
+      ext = MessagePack::ExtensionValue.new(1, "a" * 2).to_msgpack
+      ext.should == "\xd5\x01" + "a" * 2
     end
 
     it 'serializes short payload' do
-      ext = MessagePack::ExtensionValue.new(1, "a"*18).to_msgpack
-      ext.should == "\xc7\x12\x01" + "a"*18
+      ext = MessagePack::ExtensionValue.new(1, "a" * 18).to_msgpack
+      ext.should == "\xc7\x12\x01" + "a" * 18
     end
 
     it 'serializes long payload' do
-      ext = MessagePack::ExtensionValue.new(1, "a"*65540).to_msgpack
-      ext.should == "\xc9\x00\x01\x00\x04\x01" + "a"*65540
+      ext = MessagePack::ExtensionValue.new(1, "a" * 65540).to_msgpack
+      ext.should == "\xc9\x00\x01\x00\x04\x01" + "a" * 65540
     end
 
     it 'with a packer serializes to a packer' do

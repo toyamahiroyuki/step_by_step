@@ -1,11 +1,10 @@
-
 class NilClass
   #
   # Same as MessagePack.to_msgpack(self[, packer]).
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -15,7 +14,7 @@ class TrueClass
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -25,7 +24,7 @@ class FalseClass
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -35,7 +34,7 @@ class Fixnum < Integer
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -45,7 +44,7 @@ class Bignum < Integer
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -55,7 +54,7 @@ class Float < Numeric
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -65,7 +64,7 @@ class String
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -75,7 +74,7 @@ class Array
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -85,7 +84,7 @@ class Hash
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
 
@@ -95,7 +94,6 @@ class Symbol
   #
   # @return [String] serialized data
   #
-  def to_msgpack(packer=nil)
+  def to_msgpack(packer = nil)
   end
 end
-

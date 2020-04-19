@@ -31,7 +31,7 @@ module Nokogiri
   class << self
     ###
     # Parse XML.  Convenience method for Nokogiri::XML::Document.parse
-    def XML thing, url = nil, encoding = nil, options = XML::ParseOptions::DEFAULT_XML, &block
+    def XML(thing, url = nil, encoding = nil, options = XML::ParseOptions::DEFAULT_XML, &block)
       Nokogiri::XML::Document.parse(thing, url, encoding, options, &block)
     end
   end
@@ -40,15 +40,14 @@ module Nokogiri
     # Original C14N 1.0 spec canonicalization
     XML_C14N_1_0 =       0
     # Exclusive C14N 1.0 spec canonicalization
-    XML_C14N_EXCLUSIVE_1_0 =     1
+    XML_C14N_EXCLUSIVE_1_0 = 1
     # C14N 1.1 spec canonicalization
     XML_C14N_1_1 = 2
     class << self
       ###
       # Parse an XML document using the Nokogiri::XML::Reader API.  See
       # Nokogiri::XML::Reader for mor information
-      def Reader string_or_io, url = nil, encoding = nil, options = ParseOptions::STRICT
-
+      def Reader(string_or_io, url = nil, encoding = nil, options = ParseOptions::STRICT)
         options = Nokogiri::XML::ParseOptions.new(options) if Integer === options
         # Give the options to the user
         yield options if block_given?
@@ -61,13 +60,13 @@ module Nokogiri
 
       ###
       # Parse XML.  Convenience method for Nokogiri::XML::Document.parse
-      def parse thing, url = nil, encoding = nil, options = ParseOptions::DEFAULT_XML, &block
+      def parse(thing, url = nil, encoding = nil, options = ParseOptions::DEFAULT_XML, &block)
         Document.parse(thing, url, encoding, options, &block)
       end
 
       ####
       # Parse a fragment from +string+ in to a NodeSet.
-      def fragment string
+      def fragment(string)
         XML::DocumentFragment.parse(string)
       end
     end

@@ -1,16 +1,17 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class Binary < Arel::Nodes::Node
       attr_accessor :left, :right
 
-      def initialize left, right
+      def initialize(left, right)
         super()
         @left  = left
         @right = right
       end
 
-      def initialize_copy other
+      def initialize_copy(other)
         super
         @left  = @left.clone if @left
         @right = @right.clone if @right
@@ -20,15 +21,15 @@ module Arel
         [self.class, @left, @right].hash
       end
 
-      def eql? other
+      def eql?(other)
         self.class == other.class &&
-          self.left == other.left &&
-          self.right == other.right
+          left == other.left &&
+          right == other.right
       end
       alias :== :eql?
     end
 
-    %w{
+    %w(
       As
       Assignment
       Between
@@ -44,7 +45,7 @@ module Arel
       UnionAll
       Intersect
       Except
-    }.each do |name|
+    ).each do |name|
       const_set name, Class.new(Binary)
     end
   end

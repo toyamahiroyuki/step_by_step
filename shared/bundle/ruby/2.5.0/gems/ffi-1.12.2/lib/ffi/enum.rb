@@ -31,15 +31,13 @@
 #
 
 module FFI
-
   # An instance of this class permits to manage {Enum}s. In fact, Enums is a collection of {Enum}s.
   class Enums
-
     # @return [nil]
     def initialize
-      @all_enums = Array.new
-      @tagged_enums = Hash.new
-      @symbol_map = Hash.new
+      @all_enums = []
+      @tagged_enums = {}
+      @symbol_map = {}
     end
 
     # @param [Enum] enum
@@ -54,7 +52,7 @@ module FFI
     # @return [Enum]
     # Find a {Enum} in collection.
     def find(query)
-      if @tagged_enums.has_key?(query)
+      if @tagged_enums.key?(query)
         @tagged_enums[query]
       else
         @all_enums.detect { |enum| enum.symbols.include?(query) }
@@ -66,7 +64,6 @@ module FFI
     def __map_symbol(symbol)
       @symbol_map[symbol]
     end
-
   end
 
   # Represents a C enum.
@@ -95,22 +92,22 @@ module FFI
     #   @param [nil, Enumerable] info symbols and values for new Enum
     #   @param [nil, Symbol] tag name of new Enum
     def initialize(*args)
-      @native_type = args.first.kind_of?(FFI::Type) ? args.shift : Type::INT
+      @native_type = args.first.is_a?(FFI::Type) ? args.shift : Type::INT
       info, @tag = *args
-      @kv_map = Hash.new
+      @kv_map = {}
       unless info.nil?
         last_cst = nil
         value = 0
         info.each do |i|
           case i
           when Symbol
-            raise ArgumentError, "duplicate enum key" if @kv_map.has_key?(i)
+            raise ArgumentError, "duplicate enum key" if @kv_map.key?(i)
             @kv_map[i] = value
             last_cst = i
             value += 1
           when Integer
             @kv_map[last_cst] = i
-            value = i+1
+            value = i + 1
           end
         end
       end
@@ -155,11 +152,11 @@ module FFI
     # @return [Integer] value of a enum symbol
     def to_native(val, ctx)
       @kv_map[val] || if val.is_a?(Integer)
-        val
-      elsif val.respond_to?(:to_int)
-        val.to_int
-      else
-        raise ArgumentError, "invalid enum value, #{val.inspect}"
+                        val
+                      elsif val.respond_to?(:to_int)
+                        val.to_int
+                      else
+                        raise ArgumentError, "invalid enum value, #{val.inspect}"
       end
     end
 
@@ -182,7 +179,6 @@ module FFI
   # Contrary to classical enums, bitmask values are usually combined
   # when used.
   class Bitmask < Enum
-
     # @overload initialize(info, tag=nil)
     #   @param [nil, Enumerable] info symbols and bit rank for new Bitmask
     #   @param [nil, Symbol] tag name of new Bitmask
@@ -191,23 +187,23 @@ module FFI
     #   @param [nil, Enumerable] info symbols and bit rank for new Bitmask
     #   @param [nil, Symbol] tag name of new Bitmask
     def initialize(*args)
-      @native_type = args.first.kind_of?(FFI::Type) ? args.shift : Type::INT
+      @native_type = args.first.is_a?(FFI::Type) ? args.shift : Type::INT
       info, @tag = *args
-      @kv_map = Hash.new
+      @kv_map = {}
       unless info.nil?
         last_cst = nil
         value = 0
         info.each do |i|
           case i
           when Symbol
-            raise ArgumentError, "duplicate bitmask key" if @kv_map.has_key?(i)
+            raise ArgumentError, "duplicate bitmask key" if @kv_map.key?(i)
             @kv_map[i] = 1 << value
             last_cst = i
             value += 1
           when Integer
-            raise ArgumentError, "bitmask index should be positive" if i<0
+            raise ArgumentError, "bitmask index should be positive" if i < 0
             @kv_map[last_cst] = 1 << i
-            value = i+1
+            value = i + 1
           end
         end
       end
@@ -240,7 +236,7 @@ module FFI
       when Symbol
         flat_query.inject(0) do |val, o|
           v = @kv_map[o]
-          if v then val |= v else val end
+          v ? (val |= v) : val
         end
       when Integer, ->(o) { o.respond_to?(:to_int) }
         val = flat_query.inject(0) { |mask, o| mask |= o.to_int }
@@ -287,10 +283,10 @@ module FFI
       # Similar to Enum behavior.
       remainder = val ^ list.inject(0) do |tmp, o|
         v = @kv_map[o]
-        if v then tmp |= v else tmp end
+        v ? (tmp |= v) : tmp
       end
       list.push remainder unless remainder == 0
-      return list
+      list
     end
   end
 end

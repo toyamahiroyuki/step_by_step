@@ -77,7 +77,7 @@ module Nokogiri
 
       alias :self_closing? :empty_element?
 
-      def initialize source, url = nil, encoding = nil # :nodoc:
+      def initialize(source, url = nil, encoding = nil) # :nodoc:
         @source   = source
         @errors   = []
         @encoding = encoding
@@ -87,9 +87,9 @@ module Nokogiri
       ###
       # Get a list of attributes for the current node.
       def attributes
-        Hash[attribute_nodes.map { |node|
+        Hash[attribute_nodes.map do |node|
           [node.name, node.to_s]
-        }].merge(namespaces || {})
+        end].merge(namespaces || {})
       end
 
       ###
@@ -103,7 +103,7 @@ module Nokogiri
       ###
       # Move the cursor through the document yielding the cursor to the block
       def each
-        while cursor = self.read
+        while cursor = read
           yield cursor
         end
       end

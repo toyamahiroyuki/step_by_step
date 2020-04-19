@@ -41,12 +41,12 @@ module Rack
     end
 
     DEFAULT_ENV = {
-      RACK_VERSION      => Rack::VERSION,
-      RACK_INPUT        => StringIO.new,
-      RACK_ERRORS       => StringIO.new,
-      RACK_MULTITHREAD  => true,
+      RACK_VERSION => Rack::VERSION,
+      RACK_INPUT => StringIO.new,
+      RACK_ERRORS => StringIO.new,
+      RACK_MULTITHREAD => true,
       RACK_MULTIPROCESS => true,
-      RACK_RUNONCE      => false,
+      RACK_RUNONCE => false,
     }.freeze
 
     def initialize(app)
@@ -54,19 +54,39 @@ module Rack
     end
 
     # Make a GET request and return a MockResponse. See #request.
-    def get(uri, opts = {})     request(GET, uri, opts)     end
+    def get(uri, opts = {})
+      request(GET, uri, opts)
+    end
+
     # Make a POST request and return a MockResponse. See #request.
-    def post(uri, opts = {})    request(POST, uri, opts)    end
+    def post(uri, opts = {})
+      request(POST, uri, opts)
+    end
+
     # Make a PUT request and return a MockResponse. See #request.
-    def put(uri, opts = {})     request(PUT, uri, opts)     end
+    def put(uri, opts = {})
+      request(PUT, uri, opts)
+    end
+
     # Make a PATCH request and return a MockResponse. See #request.
-    def patch(uri, opts = {})   request(PATCH, uri, opts)   end
+    def patch(uri, opts = {})
+      request(PATCH, uri, opts)
+    end
+
     # Make a DELETE request and return a MockResponse. See #request.
-    def delete(uri, opts = {})  request(DELETE, uri, opts)  end
+    def delete(uri, opts = {})
+      request(DELETE, uri, opts)
+    end
+
     # Make a HEAD request and return a MockResponse. See #request.
-    def head(uri, opts = {})    request(HEAD, uri, opts)    end
+    def head(uri, opts = {})
+      request(HEAD, uri, opts)
+    end
+
     # Make an OPTIONS request and return a MockResponse. See #request.
-    def options(uri, opts = {}) request(OPTIONS, uri, opts) end
+    def options(uri, opts = {})
+      request(OPTIONS, uri, opts)
+    end
 
     # Make a request using the given request method for the given
     # uri to the rack application and return a MockResponse.
@@ -111,8 +131,8 @@ module Rack
       env[REQUEST_METHOD]  = (opts[:method] ? opts[:method].to_s.upcase : GET).b
       env[SERVER_NAME]     = (uri.host || "example.org").b
       env[SERVER_PORT]     = (uri.port ? uri.port.to_s : "80").b
-      env[QUERY_STRING]    = (uri.query.to_s).b
-      env[PATH_INFO]       = ((!uri.path || uri.path.empty?) ? "/" : uri.path).b
+      env[QUERY_STRING]    = uri.query.to_s.b
+      env[PATH_INFO]       = (uri.path.blank? ? "/" : uri.path).b
       env[RACK_URL_SCHEME] = (uri.scheme || "http").b
       env[HTTPS]           = (env[RACK_URL_SCHEME] == "https" ? "on" : "off").b
 
@@ -129,7 +149,7 @@ module Rack
           params = Utils.parse_nested_query(params) if params.is_a?(String)
           params.update(Utils.parse_nested_query(env[QUERY_STRING]))
           env[QUERY_STRING] = Utils.build_nested_query(params)
-        elsif !opts.has_key?(:input)
+        elsif !opts.key?(:input)
           opts["CONTENT_TYPE"] = "application/x-www-form-urlencoded"
           if params.is_a?(Hash)
             if data = Rack::Multipart.build_multipart(params)
@@ -158,9 +178,9 @@ module Rack
 
       env["CONTENT_LENGTH"] ||= env[RACK_INPUT].size.to_s if env[RACK_INPUT].respond_to?(:size)
 
-      opts.each { |field, value|
-        env[field] = value  if String === field
-      }
+      opts.each do |field, value|
+        env[field] = value if String === field
+      end
 
       env
     end
@@ -216,7 +236,7 @@ module Rack
         buffer << chunk
       end
 
-      return buffer
+      buffer
     end
 
     def empty?
@@ -230,8 +250,8 @@ module Rack
     private
 
     def parse_cookies_from_header
-      cookies = Hash.new
-      if original_headers.has_key? 'Set-Cookie'
+      cookies = {}
+      if original_headers.key? 'Set-Cookie'
         set_cookie_header = original_headers.fetch('Set-Cookie')
         set_cookie_header.split("\n").each do |cookie|
           cookie_name, cookie_filling = cookie.split('=', 2)
@@ -252,7 +272,7 @@ module Rack
 
     def identify_cookie_attributes(cookie_filling)
       cookie_bits = cookie_filling.split(';')
-      cookie_attributes = Hash.new
+      cookie_attributes = {}
       cookie_attributes.store('value', cookie_bits[0].strip)
       cookie_bits.each do |bit|
         if bit.include? '='
@@ -268,6 +288,5 @@ module Rack
       end
       cookie_attributes
     end
-
   end
 end

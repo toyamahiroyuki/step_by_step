@@ -76,7 +76,7 @@ module Mustermann
       # @return [Integer] length of the substring
       # @!visibility private
       def length
-        stop - start if start and stop
+        stop - start if start && stop
       end
 
       # @return [Integer] minimum size for a node
@@ -213,7 +213,7 @@ module Mustermann
         # @!visibility private
         def initialize(payload, at_end, **options)
           super(**options)
-          self.head, *self.payload = Array(payload)
+          self.head, *payload = Array(payload)
           self.at_end = at_end
         end
       end

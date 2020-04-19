@@ -2,12 +2,10 @@ require 'concurrent/synchronization'
 require 'concurrent/utility/native_integer'
 
 module Concurrent
-
   # @!macro atomic_fixnum
   # @!visibility private
   # @!macro internal_implementation_note
   class MutexAtomicFixnum < Synchronization::LockableObject
-
     # @!macro atomic_fixnum_method_initialize
     def initialize(initial = 0)
       super()

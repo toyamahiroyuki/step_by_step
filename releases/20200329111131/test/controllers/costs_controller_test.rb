@@ -5,5 +5,4 @@ class CostsControllerTest < ActionDispatch::IntegrationTest
     get costs_index_url
     assert_response :success
   end
-
 end

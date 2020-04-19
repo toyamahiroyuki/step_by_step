@@ -18,7 +18,7 @@ module Puma
       r = @server.running || 0
       t = @server.pool_capacity || 0
       m = @server.max_threads || 0
-      %Q!{ "backlog": #{b}, "running": #{r}, "pool_capacity": #{t}, "max_threads": #{m} }!
+      %Q({ "backlog": #{b}, "running": #{r}, "pool_capacity": #{t}, "max_threads": #{m} })
     end
 
     def restart
@@ -40,7 +40,7 @@ module Puma
     end
 
     def jruby_daemon?
-      daemon? and Puma.jruby?
+      daemon? && Puma.jruby?
     end
 
     def jruby_daemon_start

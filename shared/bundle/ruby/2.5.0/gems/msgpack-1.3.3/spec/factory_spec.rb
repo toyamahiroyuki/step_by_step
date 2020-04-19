@@ -1,4 +1,5 @@
 # encoding: ascii-8bit
+
 require 'spec_helper'
 
 describe MessagePack::Factory do
@@ -27,8 +28,8 @@ describe MessagePack::Factory do
 
     it 'creates unpacker with symbolize_keys option' do
       unpacker = subject.unpacker(symbolize_keys: true)
-      unpacker.feed(MessagePack.pack({'k'=>'v'}))
-      unpacker.read.should == {:k => 'v'}
+      unpacker.feed(MessagePack.pack({ 'k' => 'v' }))
+      unpacker.read.should == { :k => 'v' }
     end
 
     it 'creates unpacker with allow_unknown_ext option' do
@@ -40,7 +41,7 @@ describe MessagePack::Factory do
     it 'creates unpacker without allow_unknown_ext option' do
       unpacker = subject.unpacker
       unpacker.feed(MessagePack::ExtensionValue.new(1, 'a').to_msgpack)
-      expect{ unpacker.read }.to raise_error(MessagePack::UnknownExtTypeError)
+      expect { unpacker.read }.to raise_error(MessagePack::UnknownExtTypeError)
     end
   end
 
@@ -66,7 +67,7 @@ describe MessagePack::Factory do
       subject.register_type(0x00, Symbol)
       subject.freeze
       expect(subject.frozen?).to be_truthy
-      expect{ subject.register_type(0x01, Array) }.to raise_error(RuntimeError, "can't modify frozen Factory")
+      expect { subject.register_type(0x01, Array) }.to raise_error(RuntimeError, "can't modify frozen Factory")
     end
   end
 
@@ -162,7 +163,7 @@ describe MessagePack::Factory do
       expect(subject.type_registered?(0x00, :both)).to be_falsy
       expect(subject.type_registered?(0x00, :packer)).to be_falsy
       expect(subject.type_registered?(0x00, :unpacker)).to be_falsy
-      expect{ subject.type_registered?(0x00, :something) }.to raise_error(ArgumentError)
+      expect { subject.type_registered?(0x00, :something) }.to raise_error(ArgumentError)
     end
 
     it 'returns true if specified type or class is already registered' do
@@ -212,8 +213,8 @@ describe MessagePack::Factory do
     end
 
     it 'registers custom proc objects' do
-      pk = lambda {|obj| [obj.a + obj.b].pack('C') }
-      uk = lambda {|data| ::MyType.new(data.unpack('C').first, -1) }
+      pk = lambda { |obj| [obj.a + obj.b].pack('C') }
+      uk = lambda { |data| ::MyType.new(data.unpack('C').first, -1) }
       subject.register_type(0x7f, ::MyType, packer: pk, unpacker: uk)
 
       data = subject.packer.write(src).to_s
@@ -248,24 +249,32 @@ describe MessagePack::Factory do
         end
         stub_const('Mod', mod)
       end
+
       let(:factory) { described_class.new }
+
       before { factory.register_type(0x01, Mod) }
 
       describe "packing an object whose class included the module" do
         subject { factory.packer.pack(value).to_s }
-        before { stub_const('Value', Class.new{ include Mod }) }
+
+        before { stub_const('Value', Class.new { include Mod }) }
+
         let(:value) { Value.new }
+
         it { is_expected.to eq "\xC7\x0F\x01value_msgpacked" }
       end
 
       describe "packing an object which has been extended by the module" do
         subject { factory.packer.pack(object).to_s }
+
         let(:object) { Object.new.extend Mod }
+
         it { is_expected.to eq "\xC7\x0F\x01value_msgpacked" }
       end
 
       describe "unpacking with the module" do
         subject { factory.unpacker.feed("\xC7\x06\x01module").unpack }
+
         it { is_expected.to eq "unpacked module" }
       end
     end
@@ -300,7 +309,7 @@ describe MessagePack::Factory do
           class Symbol
             alias_method :to_msgpack_ext_orig, :to_msgpack_ext
             def to_msgpack_ext
-              self.to_s.codepoints.to_a.pack('n*')
+              to_s.codepoints.to_a.pack('n*')
             end
           end
 
@@ -314,10 +323,6 @@ describe MessagePack::Factory do
 
         before { subject.register_type(0x00, ::Symbol) }
 
-        it 'lets symbols survive a roundtrip' do
-          expect(symbol_after_roundtrip).to be :symbol
-        end
-
         after do
           class Symbol
             alias_method :to_msgpack_ext, :to_msgpack_ext_orig
@@ -326,6 +331,10 @@ describe MessagePack::Factory do
           class << Symbol
             alias_method :from_msgpack_ext, :from_msgpack_ext_orig
           end
+        end
+
+        it 'lets symbols survive a roundtrip' do
+          expect(symbol_after_roundtrip).to be :symbol
         end
       end
     end
@@ -351,7 +360,7 @@ describe MessagePack::Factory do
 
     require_relative 'exttypes'
 
-    it 'should be referred by MessagePack.pack and MessagePack.unpack' do
+    it 'is referred by MessagePack.pack and MessagePack.unpack' do
       MessagePack::DefaultFactory.register_type(DummyTimeStamp1::TYPE, DummyTimeStamp1)
       MessagePack::DefaultFactory.register_type(DummyTimeStamp2::TYPE, DummyTimeStamp2, packer: :serialize, unpacker: :deserialize)
 

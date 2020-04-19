@@ -25,10 +25,10 @@ def openbsd?
 end
 
 def nix?
-  ! (windows? || solaris? || darwin?)
+  !(windows? || solaris? || darwin?)
 end
 
-def sh_export_path path
+def sh_export_path(path)
   # because libxslt 1.1.29 configure.in uses AC_PATH_TOOL which treats ":"
   # as a $PATH separator, we need to convert windows paths from
   #
@@ -51,7 +51,7 @@ end
 
 def do_help
   print <<HELP
-usage: ruby #{$0} [options]
+usage: ruby #{$PROGRAM_NAME} [options]
 
     --disable-clean
         Do not clean out intermediate files after successful build.
@@ -110,14 +110,14 @@ def do_clean
   exit! 0
 end
 
-def package_config pkg, options={}
+def package_config(pkg, options = {})
   package = pkg_config(pkg)
   return package if package
 
   begin
     require 'rubygems'
-    gem 'pkg-config', (gem_ver='~> 1.1')
-    require 'pkg-config' and message("Using pkg-config gem version #{PKGConfig::VERSION}\n")
+    gem 'pkg-config', (gem_ver = '~> 1.1')
+    require('pkg-config') && message("Using pkg-config gem version #{PKGConfig::VERSION}\n")
   rescue LoadError
     message "pkg-config could not be used to find #{pkg}\nPlease install either `pkg-config` or the pkg-config gem per\n\n    gem install pkg-config -v #{gem_ver.inspect}\n\n"
   else
@@ -127,24 +127,24 @@ def package_config pkg, options={}
     ldflags = PKGConfig.libs_only_L(pkg)
     libs    = PKGConfig.libs_only_l(pkg)
 
-    Logging::message "PKGConfig package configuration for %s\n", pkg
-    Logging::message "cflags: %s\nldflags: %s\nlibs: %s\n\n", cflags, ldflags, libs
+    Logging.message "PKGConfig package configuration for %s\n", pkg
+    Logging.message "cflags: %s\nldflags: %s\nlibs: %s\n\n", cflags, ldflags, libs
 
     [cflags, ldflags, libs]
   end
 end
 
 def nokogiri_try_compile
-  try_compile "int main() {return 0;}", "", {werror: true}
+  try_compile "int main() {return 0;}", "", { werror: true }
 end
 
-def check_libxml_version version=nil
+def check_libxml_version(version = nil)
   source = if version.nil?
              <<-SRC
 #include <libxml/xmlversion.h>
              SRC
            else
-             version_int = sprintf "%d%2.2d%2.2d", *(version.split("."))
+             version_int = sprintf "%d%2.2d%2.2d", *version.split(".")
              <<-SRC
 #include <libxml/xmlversion.h>
 #if LIBXML_VERSION < #{version_int}
@@ -173,7 +173,7 @@ def preserving_globals
   values = [
     $arg_config,
     $CFLAGS, $CPPFLAGS,
-    $LDFLAGS, $LIBPATH, $libs
+    $LDFLAGS, $LIBPATH, $libs,
   ].map(&:dup)
   yield
 ensure
@@ -212,13 +212,15 @@ end
 def iconv_configure_flags
   # If --with-iconv-dir or --with-opt-dir is given, it should be
   # the first priority
-  %w[iconv opt].each do |name|
+  %w(iconv opt).each do |name|
     if (config = preserving_globals { dir_config(name) }).any? &&
         have_iconv?("--with-#{name}-* flags") { dir_config(name) }
       idirs, ldirs = config.map do |dirs|
-        Array(dirs).flat_map do |dir|
-          dir.split(File::PATH_SEPARATOR)
-        end if dirs
+        if dirs
+          Array(dirs).flat_map do |dir|
+            dir.split(File::PATH_SEPARATOR)
+          end
+        end
       end
 
       return [
@@ -270,7 +272,7 @@ def process_recipe(name, version, static_p, cross_p)
     yield recipe
 
     env = Hash.new do |hash, key|
-      hash[key] = "#{ENV[key]}"  # (ENV[key].dup rescue '')
+      hash[key] = "#{ENV[key]}" # (ENV[key].dup rescue '')
     end
 
     recipe.configure_options.flatten!
@@ -278,7 +280,7 @@ def process_recipe(name, version, static_p, cross_p)
     recipe.configure_options.delete_if do |option|
       case option
       when /\A(\w+)=(.*)\z/
-        env[$1] = $2
+        env[Regexp.last_match(1)] = Regexp.last_match(2)
         true
       else
         false
@@ -306,7 +308,7 @@ def process_recipe(name, version, static_p, cross_p)
     end
 
     if RbConfig::CONFIG['target_cpu'] == 'universal'
-      %w[CFLAGS LDFLAGS].each do |key|
+      %w(CFLAGS LDFLAGS).each do |key|
         unless env[key].include?('-arch')
           env[key] += ' ' + RbConfig::CONFIG['ARCH_FLAG']
         end
@@ -373,7 +375,7 @@ end
 def lib_a(ldflag)
   case ldflag
   when /\A-l(.+)/
-    "lib#{$1}.#{$LIBEXT}"
+    "lib#{Regexp.last_match(1)}.#{$LIBEXT}"
   end
 end
 
@@ -398,8 +400,8 @@ end
 
 if openbsd? && !using_system_libraries?
   if `#{ENV['CC'] || '/usr/bin/cc'} -v 2>&1` !~ /clang/
-    ENV['CC'] ||= find_executable('egcc') or
-      abort "Please install gcc 4.9+ from ports using `pkg_add -v gcc`"
+    (ENV['CC'] ||= find_executable('egcc')) ||
+      abort("Please install gcc 4.9+ from ports using `pkg_add -v gcc`")
   end
   ENV['CFLAGS'] = "#{ENV['CFLAGS']} -I /usr/local/include"
 end
@@ -452,13 +454,13 @@ when using_system_libraries?
   # Using system libraries means we rely on the system libxml2 with
   # regard to the iconv support.
 
-  dir_config('xml2').any?  or package_config('libxml-2.0')
-  dir_config('xslt').any?  or package_config('libxslt')
-  dir_config('exslt').any? or package_config('libexslt')
+  dir_config('xml2').any?  || package_config('libxml-2.0')
+  dir_config('xslt').any?  || package_config('libxslt')
+  dir_config('exslt').any? || package_config('libexslt')
 
-  check_libxml_version or abort "ERROR: cannot discover where libxml2 is located on your system. please make sure `pkg-config` is installed."
-  check_libxml_version("2.6.21") or abort "ERROR: libxml2 version 2.6.21 or later is required!"
-  check_libxml_version("2.9.3") or warn "WARNING: libxml2 version 2.9.3 or later is highly recommended, but proceeding anyway."
+  check_libxml_version || abort("ERROR: cannot discover where libxml2 is located on your system. please make sure `pkg-config` is installed.")
+  check_libxml_version("2.6.21") || abort("ERROR: libxml2 version 2.6.21 or later is required!")
+  check_libxml_version("2.9.3") || warn("WARNING: libxml2 version 2.9.3 or later is highly recommended, but proceeding anyway.")
 
 else
   message "Building nokogiri using packaged libraries.\n"
@@ -472,8 +474,8 @@ else
 
   require 'yaml'
 
-  static_p = enable_config('static', true) or
-    message "Static linking is disabled.\n"
+  (static_p = enable_config('static', true)) ||
+    message("Static linking is disabled.\n")
 
   dir_config('zlib')
 
@@ -483,9 +485,9 @@ else
   if cross_build_p || windows?
     zlib_recipe = process_recipe("zlib", dependencies["zlib"]["version"], static_p, cross_build_p) do |recipe|
       recipe.files = [{
-          url: "http://zlib.net/fossils/#{recipe.name}-#{recipe.version}.tar.gz",
-          sha256: dependencies["zlib"]["sha256"]
-        }]
+        url: "http://zlib.net/fossils/#{recipe.name}-#{recipe.version}.tar.gz",
+        sha256: dependencies["zlib"]["sha256"],
+      }]
       class << recipe
         attr_accessor :cross_build_p
 
@@ -504,7 +506,7 @@ else
 
         def configured?
           Dir.chdir work_path do
-            !! (File.read('win32/Makefile.gcc') =~ /^BINARY_PATH/)
+            !!(File.read('win32/Makefile.gcc') =~ /^BINARY_PATH/)
           end
         end
 
@@ -521,14 +523,14 @@ else
 
     libiconv_recipe = process_recipe("libiconv", dependencies["libiconv"]["version"], static_p, cross_build_p) do |recipe|
       recipe.files = [{
-          url: "http://ftp.gnu.org/pub/gnu/libiconv/#{recipe.name}-#{recipe.version}.tar.gz",
-          sha256: dependencies["libiconv"]["sha256"]
-        }]
+        url: "http://ftp.gnu.org/pub/gnu/libiconv/#{recipe.name}-#{recipe.version}.tar.gz",
+        sha256: dependencies["libiconv"]["sha256"],
+      }]
       recipe.configure_options += [
         "CPPFLAGS=-Wall",
         "CFLAGS=-O2 -g",
         "CXXFLAGS=-O2 -g",
-        "LDFLAGS="
+        "LDFLAGS=",
       ]
     end
   else
@@ -549,16 +551,16 @@ EOM
   end
 
   unless windows?
-    preserving_globals {
+    preserving_globals do
       have_library('z', 'gzdopen', 'zlib.h')
-    } or abort 'zlib is missing; necessary for building libxml2'
+    end || abort('zlib is missing; necessary for building libxml2')
   end
 
   libxml2_recipe = process_recipe("libxml2", dependencies["libxml2"]["version"], static_p, cross_build_p) do |recipe|
     recipe.files = [{
-        url: "http://xmlsoft.org/sources/#{recipe.name}-#{recipe.version}.tar.gz",
-        sha256: dependencies["libxml2"]["sha256"]
-      }]
+      url: "http://xmlsoft.org/sources/#{recipe.name}-#{recipe.version}.tar.gz",
+      sha256: dependencies["libxml2"]["sha256"],
+    }]
     recipe.configure_options += [
       "--without-python",
       "--without-readline",
@@ -567,21 +569,21 @@ EOM
       "--with-c14n",
       "--with-debug",
       "--with-threads",
-      *(darwin? ? ["RANLIB=/usr/bin/ranlib", "AR=/usr/bin/ar"] : "")
+      *(darwin? ? ["RANLIB=/usr/bin/ranlib", "AR=/usr/bin/ar"] : ""),
     ]
   end
 
   libxslt_recipe = process_recipe("libxslt", dependencies["libxslt"]["version"], static_p, cross_build_p) do |recipe|
     recipe.files = [{
-        url: "http://xmlsoft.org/sources/#{recipe.name}-#{recipe.version}.tar.gz",
-        sha256: dependencies["libxslt"]["sha256"]
-      }]
+      url: "http://xmlsoft.org/sources/#{recipe.name}-#{recipe.version}.tar.gz",
+      sha256: dependencies["libxslt"]["sha256"],
+    }]
     recipe.configure_options += [
       "--without-python",
       "--without-crypto",
       "--with-debug",
       "--with-libxml-prefix=#{sh_export_path(libxml2_recipe.path)}",
-      *(darwin? ? ["RANLIB=/usr/bin/ranlib", "AR=/usr/bin/ar"] : "")
+      *(darwin? ? ["RANLIB=/usr/bin/ranlib", "AR=/usr/bin/ar"] : ""),
     ]
   end
 
@@ -589,9 +591,9 @@ EOM
   $LIBPATH = ["#{zlib_recipe.path}/lib"] | $LIBPATH if zlib_recipe
   $LIBPATH = ["#{libiconv_recipe.path}/lib"] | $LIBPATH if libiconv_recipe
 
-  have_lzma = preserving_globals {
+  have_lzma = preserving_globals do
     have_library('lzma')
-  }
+  end
 
   $libs = $libs.shellsplit.tap do |libs|
     [libxml2_recipe, libxslt_recipe].each do |recipe|
@@ -603,10 +605,10 @@ EOM
           case arg
           when /\A-L(.+)\z/
             # Prioritize ports' directories
-            if $1.start_with?(ROOT + '/')
-              $LIBPATH = [$1] | $LIBPATH
+            if Regexp.last_match(1).start_with?(ROOT + '/')
+              $LIBPATH = [Regexp.last_match(1)] | $LIBPATH
             else
-              $LIBPATH = $LIBPATH | [$1]
+              $LIBPATH = $LIBPATH | [Regexp.last_match(1)]
             end
           when /\A-l./
             libs.unshift(arg)
@@ -651,17 +653,17 @@ EOM
 end
 
 {
-  "xml2"  => ['xmlParseDoc',            'libxml/parser.h'],
-  "xslt"  => ['xsltParseStylesheetDoc', 'libxslt/xslt.h'],
-  "exslt" => ['exsltFuncRegister',      'libexslt/exslt.h'],
+  "xml2" => ['xmlParseDoc',            'libxml/parser.h'],
+  "xslt" => ['xsltParseStylesheetDoc', 'libxslt/xslt.h'],
+  "exslt" => ['exsltFuncRegister', 'libexslt/exslt.h'],
 }.each do |lib, (func, header)|
   have_func(func, header) ||
   have_library(lib, func, header) ||
-  have_library("lib#{lib}", func, header) or
+  have_library("lib#{lib}", func, header) ||
     asplode("lib#{lib}")
 end
 
-have_func('xmlHasFeature') or abort "xmlHasFeature() is missing."
+have_func('xmlHasFeature') || abort("xmlHasFeature() is missing.")
 have_func('xmlFirstElementChild')
 have_func('xmlRelaxNGSetParserStructuredErrors')
 have_func('xmlRelaxNGSetParserStructuredErrors')

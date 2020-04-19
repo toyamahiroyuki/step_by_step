@@ -46,7 +46,7 @@ module ActionDispatch
 
           regexps = []
 
-          t.map { |s|
+          t.map do |s|
             if states = @regexp_states[s]
               regexps.concat states.map { |re, v| re === a ? v : nil }
             end
@@ -54,7 +54,7 @@ module ActionDispatch
             if states = @string_states[s]
               states[a]
             end
-          }.compact.concat regexps
+          end.compact.concat regexps
         end
 
         def as_json(options = nil)
@@ -69,16 +69,16 @@ module ActionDispatch
           {
             regexp_states: simple_regexp,
             string_states: @string_states,
-            accepting:     @accepting
+            accepting: @accepting,
           }
         end
 
         def to_svg
-          svg = IO.popen("dot -Tsvg", "w+") { |f|
+          svg = IO.popen("dot -Tsvg", "w+") do |f|
             f.write(to_dot)
             f.close_write
             f.readlines
-          }
+          end
           3.times { svg.shift }
           svg.join.sub(/width="[^"]*"/, "").sub(/height="[^"]*"/, "")
         end
@@ -91,12 +91,12 @@ module ActionDispatch
           states    = "function tt() { return #{to_json}; }"
 
           fun_routes = paths.sample(3).map do |ast|
-            ast.map { |n|
+            ast.map do |n|
               case n
               when Nodes::Symbol
                 case n.left
                 when ":id" then rand(100).to_s
-                when ":format" then %w{ xml json }.sample
+                when ":format" then %w(xml json).sample
                 else
                   "omg"
                 end
@@ -104,7 +104,7 @@ module ActionDispatch
               else
                 nil
               end
-            }.compact.join
+            end.compact.join
           end
 
           stylesheets = [fsm_css]
@@ -133,25 +133,25 @@ module ActionDispatch
         end
 
         def transitions
-          @string_states.flat_map { |from, hash|
+          @string_states.flat_map do |from, hash|
             hash.map { |s, to| [from, s, to] }
-          } + @regexp_states.flat_map { |from, hash|
+          end + @regexp_states.flat_map do |from, hash|
             hash.map { |s, to| [from, s, to] }
-          }
+          end
         end
 
         private
 
-          def states_hash_for(sym)
-            case sym
-            when String
-              @string_states
-            when Regexp
-              @regexp_states
-            else
-              raise ArgumentError, "unknown symbol: %s" % sym.class
-            end
+        def states_hash_for(sym)
+          case sym
+          when String
+            @string_states
+          when Regexp
+            @regexp_states
+          else
+            raise ArgumentError, "unknown symbol: %s" % sym.class
           end
+        end
       end
     end
   end

@@ -32,7 +32,7 @@ module ActionController
         host: request.host,
         port: request.optional_port,
         protocol: request.protocol,
-        _recall: request.path_parameters
+        _recall: request.path_parameters,
       }.merge!(super).freeze
 
       if (same_origin = _routes.equal?(request.routes)) ||
@@ -44,7 +44,7 @@ module ActionController
           options[:original_script_name] = original_script_name
         else
           if same_origin
-            options[:script_name] = request.script_name.empty? ? "".freeze : request.script_name.dup
+            options[:script_name] = request.script_name.empty? ? "" : request.script_name.dup
           else
             options[:script_name] = script_name
           end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mustermann
   # Class for pattern objects that are a concatenation of other patterns.
   # @see Mustermann::Pattern#+
@@ -32,7 +33,7 @@ module Mustermann
 
       # @!visibility private
       def native_concat?(other)
-        other.class == self.class and other.options == options
+        (other.class == self.class) && (other.options == options)
       end
 
       private :native_concat, :native_concat?
@@ -70,7 +71,7 @@ module Mustermann
 
     # @see Mustermann::Pattern#peek_size
     def peek_size(string)
-      pump(string) { |p,s| p.peek_size(s) }
+      pump(string) { |p, s| p.peek_size(s) }
     end
 
     # @see Mustermann::Pattern#peek_match
@@ -115,7 +116,7 @@ module Mustermann
         result, size = yield(pattern, substring)
         return unless result
         results << result
-        size    ||= result
+        size ||= result
         substring = substring[size..-1]
       end
 

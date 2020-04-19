@@ -27,7 +27,7 @@ module ActionDispatch
 
     def assigns(key = nil)
       raise NoMethodError,
-        "assigns has been extracted to a gem. To continue using it,
+            "assigns has been extracted to a gem. To continue using it,
         add `gem 'rails-controller-testing'` to your Gemfile."
     end
 

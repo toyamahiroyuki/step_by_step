@@ -1,5 +1,5 @@
 class CommunicationsController < ApplicationController
-    before_action :authenticate_user!
+  before_action :authenticate_user!
   def new
     if FixedCost.exists?(user_id: current_user.id)
       if Communication.exists?(fixed_cost_id: current_user.fixed_cost.id)

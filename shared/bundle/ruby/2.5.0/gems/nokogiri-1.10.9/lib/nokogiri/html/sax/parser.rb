@@ -28,7 +28,7 @@ module Nokogiri
       class Parser < Nokogiri::XML::SAX::Parser
         ###
         # Parse html stored in +data+ using +encoding+
-        def parse_memory data, encoding = 'UTF-8'
+        def parse_memory(data, encoding = 'UTF-8')
           raise ArgumentError unless data
           return unless data.length > 0
           ctx = ParserContext.memory(data, encoding)
@@ -38,7 +38,7 @@ module Nokogiri
 
         ###
         # Parse given +io+
-        def parse_io io, encoding = 'UTF-8'
+        def parse_io(io, encoding = 'UTF-8')
           check_encoding(encoding)
           @encoding = encoding
           ctx = ParserContext.io(io, ENCODINGS[encoding])
@@ -48,7 +48,7 @@ module Nokogiri
 
         ###
         # Parse a file with +filename+
-        def parse_file filename, encoding = 'UTF-8'
+        def parse_file(filename, encoding = 'UTF-8')
           raise ArgumentError unless filename
           raise Errno::ENOENT unless File.exist?(filename)
           raise Errno::EISDIR if File.directory?(filename)

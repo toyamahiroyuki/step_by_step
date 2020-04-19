@@ -9,8 +9,8 @@ module ActiveModel
     include Comparable
 
     attr_reader :singular, :plural, :element, :collection,
-      :singular_route_key, :route_key, :param_key, :i18n_key,
-      :name
+                :singular_route_key, :route_key, :param_key, :i18n_key,
+                :name
 
     alias_method :cache_key, :collection
 
@@ -192,9 +192,9 @@ module ActiveModel
 
     private
 
-      def _singularize(string)
-        ActiveSupport::Inflector.underscore(string).tr("/".freeze, "_".freeze)
-      end
+    def _singularize(string)
+      ActiveSupport::Inflector.underscore(string).tr("/", "_")
+    end
   end
 
   # == Active \Model \Naming

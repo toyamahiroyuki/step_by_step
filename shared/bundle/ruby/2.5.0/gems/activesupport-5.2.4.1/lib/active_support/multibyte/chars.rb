@@ -63,7 +63,7 @@ module ActiveSupport #:nodoc:
         if /!$/.match?(method)
           self if result
         else
-          result.kind_of?(String) ? chars(result) : result
+          result.is_a?(String) ? chars(result) : result
         end
       end
 
@@ -154,7 +154,7 @@ module ActiveSupport #:nodoc:
       #   "ÉL QUE SE ENTERÓ".mb_chars.titleize.to_s    # => "Él Que Se Enteró"
       #   "日本語".mb_chars.titleize.to_s               # => "日本語"
       def titleize
-        chars(downcase.to_s.gsub(/\b('?\S)/u) { Unicode.upcase($1) })
+        chars(downcase.to_s.gsub(/\b('?\S)/u) { Unicode.upcase(Regexp.last_match(1)) })
       end
       alias_method :titlecase, :titleize
 
@@ -215,21 +215,21 @@ module ActiveSupport #:nodoc:
 
       private
 
-        def translate_offset(byte_offset)
-          return nil if byte_offset.nil?
-          return 0   if @wrapped_string == ""
+      def translate_offset(byte_offset)
+        return nil if byte_offset.nil?
+        return 0   if @wrapped_string == ""
 
-          begin
-            @wrapped_string.byteslice(0...byte_offset).unpack("U*").length
-          rescue ArgumentError
-            byte_offset -= 1
-            retry
-          end
+        begin
+          @wrapped_string.byteslice(0...byte_offset).unpack("U*").length
+        rescue ArgumentError
+          byte_offset -= 1
+          retry
         end
+      end
 
-        def chars(string)
-          self.class.new(string)
-        end
+      def chars(string)
+        self.class.new(string)
+      end
     end
   end
 end

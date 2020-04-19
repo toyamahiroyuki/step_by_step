@@ -20,7 +20,7 @@ module Puma
       argv << :string
       argv << nil
       execlp(cmd, *argv)
-      raise SystemCallError.new(FFI.errno)
+      raise SystemCallError, FFI.errno
     end
 
     PermKey = 'PUMA_DAEMON_PERM'
@@ -78,7 +78,7 @@ module Puma
       ret = fork
       return ret if ret != 0
       execlp(cmd, *argv)
-      raise SystemCallError.new(FFI.errno)
+      raise SystemCallError, FFI.errno
     end
   end
 end

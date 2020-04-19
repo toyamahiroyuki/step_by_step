@@ -40,67 +40,68 @@ module ActiveRecord
         end
 
         private
-          def through_reflection
-            reflection.through_reflection
+
+        def through_reflection
+          reflection.through_reflection
+        end
+
+        def source_reflection
+          reflection.source_reflection
+        end
+
+        def preload_index
+          @preload_index ||= @preloaded_records.each_with_object({}).with_index do |(id, result), index|
+            result[id] = index
           end
+        end
 
-          def source_reflection
-            reflection.source_reflection
-          end
+        def through_scope
+          scope = through_reflection.klass.unscoped
+          options = reflection.options
 
-          def preload_index
-            @preload_index ||= @preloaded_records.each_with_object({}).with_index do |(id, result), index|
-              result[id] = index
-            end
-          end
+          if options[:source_type]
+            scope.where! reflection.foreign_type => options[:source_type]
+          elsif !reflection_scope.where_clause.empty?
+            scope.where_clause = reflection_scope.where_clause
+            values = reflection_scope.values
 
-          def through_scope
-            scope = through_reflection.klass.unscoped
-            options = reflection.options
-
-            if options[:source_type]
-              scope.where! reflection.foreign_type => options[:source_type]
-            elsif !reflection_scope.where_clause.empty?
-              scope.where_clause = reflection_scope.where_clause
-              values = reflection_scope.values
-
-              if includes = values[:includes]
-                scope.includes!(source_reflection.name => includes)
-              else
-                scope.includes!(source_reflection.name)
-              end
-
-              if values[:references] && !values[:references].empty?
-                scope.references!(values[:references])
-              else
-                scope.references!(source_reflection.table_name)
-              end
-
-              if joins = values[:joins]
-                scope.joins!(source_reflection.name => joins)
-              end
-
-              if left_outer_joins = values[:left_outer_joins]
-                scope.left_outer_joins!(source_reflection.name => left_outer_joins)
-              end
-
-              if scope.eager_loading? && order_values = values[:order]
-                scope = scope.order(order_values)
-              end
-            end
-
-            scope unless scope.empty_scope?
-          end
-
-          def target_reflection_scope
-            if preload_scope
-              reflection_scope.merge(preload_scope)
-            elsif reflection.scope
-              reflection_scope
+            if includes = values[:includes]
+              scope.includes!(source_reflection.name => includes)
             else
-              nil
+              scope.includes!(source_reflection.name)
+            end
+
+            if values[:references].present?
+              scope.references!(values[:references])
+            else
+              scope.references!(source_reflection.table_name)
+            end
+
+            if joins = values[:joins]
+              scope.joins!(source_reflection.name => joins)
+            end
+
+            if left_outer_joins = values[:left_outer_joins]
+              scope.left_outer_joins!(source_reflection.name => left_outer_joins)
+            end
+
+            if scope.eager_loading? && order_values = values[:order]
+              scope = scope.order(order_values)
             end
           end
+
+          scope unless scope.empty_scope?
+        end
+
+        def target_reflection_scope
+          if preload_scope
+            reflection_scope.merge(preload_scope)
+          elsif reflection.scope
+            reflection_scope
+          else
+            nil
+          end
+        end
       end
     end
   end

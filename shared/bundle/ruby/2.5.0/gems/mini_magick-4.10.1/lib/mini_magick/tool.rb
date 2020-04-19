@@ -14,9 +14,10 @@ module MiniMagick
   #   end
   #
   class Tool
-
-    CREATION_OPERATORS = %w[xc canvas logo rose gradient radial-gradient plasma
-                            pattern text pango]
+    CREATION_OPERATORS = %w(
+      xc canvas logo rose gradient radial-gradient plasma
+      pattern text pango
+    ).freeze
 
     ##
     # Aside from classic instantiation, it also accepts a block, and then
@@ -171,7 +172,7 @@ module MiniMagick
     #
     def +(*values)
       args[-1] = args[-1].sub(/^-/, '+')
-      self.merge!(values)
+      merge!(values)
       self
     end
 
@@ -244,7 +245,7 @@ module MiniMagick
     #
     def clone(*args)
       self << '-clone'
-      self.merge!(args)
+      merge!(args)
       self
     end
 
@@ -259,7 +260,7 @@ module MiniMagick
     def method_missing(name, *args)
       option = "-#{name.to_s.tr('_', '-')}"
       self << option
-      self.merge!(args)
+      merge!(args)
       self
     end
 
@@ -272,13 +273,12 @@ module MiniMagick
         cli_options = help_page.scan(/^\s+-[a-z\-]+/).map(&:strip)
         if tool.name == "mogrify" && MiniMagick.graphicsmagick?
           # These options were undocumented before 2015-06-14 (see gm bug 302)
-          cli_options |= %w[-box -convolve -gravity -linewidth -mattecolor -render -shave]
+          cli_options |= %w(-box -convolve -gravity -linewidth -mattecolor -render -shave)
         end
 
-        cli_options.map { |o| o[1..-1].tr('-','_') }
+        cli_options.map { |o| o[1..-1].tr('-', '_') }
       )
     end
-
   end
 end
 

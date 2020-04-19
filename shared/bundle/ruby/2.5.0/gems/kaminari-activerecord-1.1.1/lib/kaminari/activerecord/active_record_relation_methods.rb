@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Kaminari
   # Active Record specific page scope methods implementations
   module ActiveRecordRelationMethods
@@ -32,11 +33,11 @@ module Kaminari
       # .group returns an OrderedHash that responds to #count
       c = c.count(column_name)
       @total_count = if c.is_a?(Hash) || c.is_a?(ActiveSupport::OrderedHash)
-        c.count
-     elsif c.respond_to? :count
-       c.count(column_name)
-     else
-       c
+                       c.count
+                     elsif c.respond_to? :count
+                       c.count(column_name)
+                     else
+                       c
       end
     end
 

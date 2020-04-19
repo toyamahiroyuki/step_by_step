@@ -18,7 +18,6 @@
 #     end
 
 module Minitest::Expectations
-
   ##
   # See Minitest::Assertions#assert_empty.
   #

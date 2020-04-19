@@ -1,9 +1,9 @@
 require 'bundler/gem_tasks'
 require 'uri'
 ETLD_DATA_URI  = URI('https://publicsuffix.org/list/public_suffix_list.dat')
-ETLD_DATA_FILE = 'data/public_suffix_list.dat'
-ETLD_DATA_RB   = 'lib/domain_name/etld_data.rb'
-VERSION_RB     = 'lib/domain_name/version.rb'
+ETLD_DATA_FILE = 'data/public_suffix_list.dat'.freeze
+ETLD_DATA_RB   = 'lib/domain_name/etld_data.rb'.freeze
+VERSION_RB     = 'lib/domain_name/version.rb'.freeze
 
 task :default => :test
 
@@ -33,12 +33,12 @@ task :etld_data do
     File.write(ETLD_DATA_FILE, data)
     File.utime Time.now, date, ETLD_DATA_FILE
     if new_version = DomainName::VERSION.dup.sub!(/\b\d{8}\b/, date.strftime('%Y%m%d'))
-      File.open(VERSION_RB, 'r+') { |rb|
+      File.open(VERSION_RB, 'r+') do |rb|
         content = rb.read
         rb.rewind
         rb.write(content.sub(/(?<=^  VERSION = ')#{Regexp.quote(DomainName::VERSION)}(?='$)/, new_version))
         rb.truncate(rb.tell)
-      }
+      end
     end
     Rake::Task[ETLD_DATA_RB].execute
   rescue OpenURI::HTTPError => e
@@ -52,7 +52,7 @@ end
 
 namespace :etld_data do
   task :commit do
-    if system(*%W[git diff --exit-code --quiet], ETLD_DATA_FILE)
+    if system(*%W(git diff --exit-code --quiet), ETLD_DATA_FILE)
       warn "Nothing to commit."
       exit
     end
@@ -75,11 +75,11 @@ namespace :etld_data do
     end
 
     sh 'git', 'commit',
-      'CHANGELOG.md',
-      ETLD_DATA_FILE,
-      ETLD_DATA_RB,
-      VERSION_RB,
-      '-m', 'Update the eTLD database to %s.' % timestamp
+       'CHANGELOG.md',
+       ETLD_DATA_FILE,
+       ETLD_DATA_RB,
+       VERSION_RB,
+       '-m', 'Update the eTLD database to %s.' % timestamp
 
     sh 'git', 'tag', "v#{curr}"
   end
@@ -88,7 +88,7 @@ end
 file ETLD_DATA_RB => [
   ETLD_DATA_FILE,
   ETLD_DATA_RB + '.erb',
-  'tool/gen_etld_data.rb'
+  'tool/gen_etld_data.rb',
 ] do
   ruby 'tool/gen_etld_data.rb'
 end

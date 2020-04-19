@@ -22,7 +22,7 @@ class Array
   def in_groups_of(number, fill_with = nil)
     if number.to_i <= 0
       raise ArgumentError,
-        "Group size must be a positive integer, was #{number.inspect}"
+            "Group size must be a positive integer, was #{number.inspect}"
     end
 
     if fill_with == false

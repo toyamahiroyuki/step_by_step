@@ -62,11 +62,11 @@ module ActiveRecord
           # to ensure special objects (e.g. Active Record models) are dumped correctly
           # using the #as_json hook.
           coder = if class_name_or_coder == ::JSON
-            Coders::JSON
-          elsif [:load, :dump].all? { |x| class_name_or_coder.respond_to?(x) }
-            class_name_or_coder
-          else
-            Coders::YAMLColumn.new(attr_name, class_name_or_coder)
+                    Coders::JSON
+                  elsif [:load, :dump].all? { |x| class_name_or_coder.respond_to?(x) }
+                    class_name_or_coder
+                  else
+                    Coders::YAMLColumn.new(attr_name, class_name_or_coder)
           end
 
           decorate_attribute_type(attr_name, :serialize) do |type|
@@ -80,10 +80,10 @@ module ActiveRecord
 
         private
 
-          def type_incompatible_with_serialize?(type, class_name)
-            type.is_a?(ActiveRecord::Type::Json) && class_name == ::JSON ||
-              type.respond_to?(:type_cast_array, true) && class_name == ::Array
-          end
+        def type_incompatible_with_serialize?(type, class_name)
+          type.is_a?(ActiveRecord::Type::Json) && class_name == ::JSON ||
+            type.respond_to?(:type_cast_array, true) && class_name == ::Array
+        end
       end
     end
   end

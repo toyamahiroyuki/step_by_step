@@ -8,7 +8,7 @@ module ActiveSupport
       # A list of all available normalization forms.
       # See http://www.unicode.org/reports/tr15/tr15-29.html for more
       # information about normalization.
-      NORMALIZATION_FORMS = [:c, :kc, :d, :kd]
+      NORMALIZATION_FORMS = [:c, :kc, :d, :kd].freeze
 
       # The Unicode version that is supported by the implementation
       UNICODE_VERSION = "9.0.0"
@@ -54,7 +54,7 @@ module ActiveSupport
         pos = 0
         marker = 0
         eoc = codepoints.length
-        while (pos < eoc)
+        while pos < eoc
           pos += 1
           previous = codepoints[pos - 1]
           current = codepoints[pos]
@@ -124,7 +124,7 @@ module ActiveSupport
       def reorder_characters(codepoints)
         length = codepoints.length - 1
         pos = 0
-        while pos < length do
+        while pos < length
           cp1, cp2 = database.codepoints[codepoints[pos]], database.codepoints[codepoints[pos + 1]]
           if (cp1.combining_class > cp2.combining_class) && (cp2.combining_class > 0)
             codepoints[pos..pos + 1] = cp2.code, cp1.code
@@ -169,9 +169,17 @@ module ActiveSupport
           lindex = starter_char - HANGUL_LBASE
           # -- Hangul
           if 0 <= lindex && lindex < HANGUL_LCOUNT
-            vindex = codepoints[starter_pos + 1] - HANGUL_VBASE rescue vindex = -1
+            vindex = begin
+                       codepoints[starter_pos + 1] - HANGUL_VBASE
+                     rescue
+                       vindex = -1
+                     end
             if 0 <= vindex && vindex < HANGUL_VCOUNT
-              tindex = codepoints[starter_pos + 2] - HANGUL_TBASE rescue tindex = -1
+              tindex = begin
+                         codepoints[starter_pos + 2] - HANGUL_TBASE
+                       rescue
+                         tindex = -1
+                       end
               if 0 <= tindex && tindex < HANGUL_TCOUNT
                 j = starter_pos + 2
                 eoa -= 2
@@ -194,15 +202,15 @@ module ActiveSupport
               else
                 composition = nil
               end
-              unless composition.nil?
+              if composition.nil?
+                previous_combining_class = current.combining_class
+              else
                 codepoints[starter_pos] = composition
                 starter_char = composition
                 codepoints.delete_at pos
                 eoa -= 1
                 pos -= 1
                 previous_combining_class = -1
-              else
-                previous_combining_class = current.combining_class
               end
             else
               previous_combining_class = current.combining_class
@@ -278,7 +286,7 @@ module ActiveSupport
           compose(reorder_characters(decompose(:compatibility, codepoints)))
         else
           raise ArgumentError, "#{form} is not a valid normalization variant", caller
-        end.pack("U*".freeze)
+        end.pack("U*")
       end
 
       def downcase(string)
@@ -311,7 +319,7 @@ module ActiveSupport
 
       # Holds static data from the Unicode database.
       class UnicodeDatabase
-        ATTRIBUTES = :codepoints, :composition_exclusion, :composition_map, :boundary, :cp1252
+        ATTRIBUTES = [:codepoints, :composition_exclusion, :composition_map, :boundary, :cp1252].freeze
 
         attr_writer(*ATTRIBUTES)
 
@@ -339,16 +347,18 @@ module ActiveSupport
           begin
             @codepoints, @composition_exclusion, @composition_map, @boundary, @cp1252 = File.open(self.class.filename, "rb") { |f| Marshal.load f.read }
           rescue => e
-            raise IOError.new("Couldn't load the Unicode tables for UTF8Handler (#{e.message}), ActiveSupport::Multibyte is unusable")
+            raise IOError, "Couldn't load the Unicode tables for UTF8Handler (#{e.message}), ActiveSupport::Multibyte is unusable"
           end
 
           # Redefine the === method so we can write shorter rules for grapheme cluster breaks
           @boundary.each_key do |k|
-            @boundary[k].instance_eval do
-              def ===(other)
-                detect { |i| i === other } ? true : false
+            if @boundary[k].is_a?(Array)
+              @boundary[k].instance_eval do
+                def ===(other)
+                  detect { |i| i === other } ? true : false
+                end
               end
-            end if @boundary[k].kind_of?(Array)
+            end
           end
 
           # define attr_reader methods for the instance variables
@@ -370,25 +380,25 @@ module ActiveSupport
 
       private
 
-        def apply_mapping(string, mapping)
-          database.codepoints
-          string.each_codepoint.map do |codepoint|
-            cp = database.codepoints[codepoint]
-            if cp && (ncp = cp.send(mapping)) && ncp > 0
-              ncp
-            else
-              codepoint
-            end
-          end.pack("U*")
-        end
+      def apply_mapping(string, mapping)
+        database.codepoints
+        string.each_codepoint.map do |codepoint|
+          cp = database.codepoints[codepoint]
+          if cp && (ncp = cp.send(mapping)) && ncp > 0
+            ncp
+          else
+            codepoint
+          end
+        end.pack("U*")
+      end
 
-        def recode_windows1252_chars(string)
-          string.encode(Encoding::UTF_8, Encoding::Windows_1252, invalid: :replace, undef: :replace)
-        end
+      def recode_windows1252_chars(string)
+        string.encode(Encoding::UTF_8, Encoding::Windows_1252, invalid: :replace, undef: :replace)
+      end
 
-        def database
-          @database ||= UnicodeDatabase.new
-        end
+      def database
+        @database ||= UnicodeDatabase.new
+      end
     end
   end
 end

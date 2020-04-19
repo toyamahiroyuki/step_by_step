@@ -1,5 +1,4 @@
 module MessagePack
-
   class Buffer
     #
     # Creates a MessagePack::Buffer instance.
@@ -107,7 +106,7 @@ module MessagePack
     #
     # @return [String]
     #
-    def read_all(n, buffer=nil)
+    def read_all(n, buffer = nil)
     end
 
     #
@@ -189,5 +188,4 @@ module MessagePack
     def write_to(io)
     end
   end
-
 end

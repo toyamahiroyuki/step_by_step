@@ -1,9 +1,10 @@
 # frozen_string_literal: true
+
 require 'set'
 
 module Loofah
   module Elements
-    STRICT_BLOCK_LEVEL_HTML4 = Set.new %w[
+    STRICT_BLOCK_LEVEL_HTML4 = Set.new %w(
       address
       blockquote
       center
@@ -28,10 +29,10 @@ module Loofah
       pre
       table
       ul
-    ]
+    )
 
     # https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements
-    STRICT_BLOCK_LEVEL_HTML5 = Set.new %w[
+    STRICT_BLOCK_LEVEL_HTML5 = Set.new %w(
       address
       article
       aside
@@ -68,13 +69,14 @@ module Loofah
       tfoot
       ul
       video
-    ]
+    )
 
     STRICT_BLOCK_LEVEL = STRICT_BLOCK_LEVEL_HTML4 + STRICT_BLOCK_LEVEL_HTML5
 
     # The following elements may also be considered block-level
     # elements since they may contain block-level elements
-    LOOSE_BLOCK_LEVEL = Set.new %w[dd
+    LOOSE_BLOCK_LEVEL = Set.new %w(
+      dd
       dt
       frameset
       li
@@ -84,7 +86,7 @@ module Loofah
       th
       thead
       tr
-    ]
+    )
 
     BLOCK_LEVEL = STRICT_BLOCK_LEVEL + LOOSE_BLOCK_LEVEL
   end

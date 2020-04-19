@@ -48,7 +48,7 @@ module ActionDispatch
           when Array
             handle_array params
           when Hash
-            if params.has_key?(:tempfile)
+            if params.key?(:tempfile)
               ActionDispatch::Http::UploadedFile.new(params)
             else
               params.each_with_object({}) do |(key, val), new_hash|

@@ -64,7 +64,7 @@ module Devise
       end
 
       if failed_attributes.any?
-        fail Devise::Models::MissingAttribute.new(failed_attributes)
+        fail Devise::Models::MissingAttribute, failed_attributes
       end
     end
 
@@ -80,7 +80,7 @@ module Devise
       options = modules.extract_options!.dup
 
       selected_modules = modules.map(&:to_sym).uniq.sort_by do |s|
-        Devise::ALL.index(s) || -1  # follow Devise::ALL order
+        Devise::ALL.index(s) || -1 # follow Devise::ALL order
       end
 
       devise_modules_hook! do

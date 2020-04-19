@@ -39,7 +39,7 @@ module ActionView
 
     # Holds accessors for the registered details.
     module Accessors #:nodoc:
-      DEFAULT_PROCS = {}
+      DEFAULT_PROCS = {}.freeze
     end
 
     register_detail(:locale) do
@@ -49,7 +49,7 @@ module ActionView
       locales.uniq!
       locales
     end
-    register_detail(:formats) { ActionView::Base.default_formats || [:html, :text, :js, :css,  :xml, :json] }
+    register_detail(:formats) { ActionView::Base.default_formats || [:html, :text, :js, :css, :xml, :json] }
     register_detail(:variants) { [] }
     register_detail(:handlers) { Template::Handlers.extensions }
 
@@ -93,7 +93,7 @@ module ActionView
         @cache = old_value
       end
 
-    private
+      private
 
       def _set_detail(key, value) # :doc:
         @details = @details.dup if @details_key
@@ -149,7 +149,7 @@ module ActionView
         added_resolvers.times { view_paths.pop }
       end
 
-    private
+      private
 
       def args_for_lookup(name, prefixes, partial, keys, details_options)
         name, prefixes = normalize_name(name, prefixes)
@@ -202,16 +202,16 @@ module ActionView
       # name instead of the prefix.
       def normalize_name(name, prefixes)
         prefixes = prefixes.presence
-        parts    = name.to_s.split("/".freeze)
+        parts    = name.to_s.split("/")
         parts.shift if parts.first.empty?
         name = parts.pop
 
         return name, prefixes || [""] if parts.empty?
 
-        parts    = parts.join("/".freeze)
+        parts    = parts.join("/")
         prefixes = prefixes ? prefixes.map { |p| "#{p}/#{parts}" } : [parts]
 
-        return name, prefixes
+        [name, prefixes]
       end
     end
 
@@ -245,7 +245,7 @@ module ActionView
     # add :html as fallback to :js.
     def formats=(values)
       if values
-        values.concat(default_formats) if values.delete "*/*".freeze
+        values.concat(default_formats) if values.delete "*/*"
         if values == [:js]
           values << :html
           @html_fallback_for_js = true

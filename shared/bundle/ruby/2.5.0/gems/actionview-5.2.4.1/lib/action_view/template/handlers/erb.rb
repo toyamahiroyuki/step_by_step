@@ -38,7 +38,7 @@ module ActionView
           template_source = template.source.dup.force_encoding(Encoding::ASCII_8BIT)
 
           erb = template_source.gsub(ENCODING_TAG, "")
-          encoding = $2
+          encoding = Regexp.last_match(2)
 
           erb.force_encoding valid_encoding(template.source.dup, encoding)
 
@@ -52,7 +52,7 @@ module ActionView
           ).src
         end
 
-      private
+        private
 
         def valid_encoding(string, encoding)
           # If a magic encoding comment was found, tag the

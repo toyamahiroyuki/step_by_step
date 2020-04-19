@@ -3,7 +3,7 @@ require "execjs/runtime"
 module ExecJS
   class MiniRacerRuntime < Runtime
     class Context < Runtime::Context
-      def initialize(runtime, source = "", options={})
+      def initialize(runtime, source = "", options = {})
         source = encode(source)
         @context = ::MiniRacer::Context.new
         translate do
@@ -46,7 +46,7 @@ module ExecJS
             end
           end
         elsif Hash === value
-          value.each do |k,v|
+          value.each do |k, v|
             if MiniRacer::JavaScriptFunction === v
               value.delete k
             else
@@ -62,30 +62,27 @@ module ExecJS
       end
 
       def translate
-        begin
-          strip_functions! yield
-        rescue MiniRacer::RuntimeError => e
-          ex = ProgramError.new e.message
-          if backtrace = e.backtrace
-            backtrace = backtrace.map { |line|
-              if line =~ /JavaScript at/
-                line.sub("JavaScript at ", "")
-                    .sub("<anonymous>", "(execjs)")
-                    .strip
-              else
-                line
-              end
-            }
-            ex.set_backtrace backtrace
+        strip_functions! yield
+      rescue MiniRacer::RuntimeError => e
+        ex = ProgramError.new e.message
+        if backtrace = e.backtrace
+          backtrace = backtrace.map do |line|
+            if line =~ /JavaScript at/
+              line.sub("JavaScript at ", "").
+                sub("<anonymous>", "(execjs)").
+                strip
+            else
+              line
+            end
           end
-          raise ex
-        rescue MiniRacer::ParseError => e
-          ex = RuntimeError.new e.message
-          ex.set_backtrace(["(execjs):1"] + e.backtrace)
-          raise ex
+          ex.set_backtrace backtrace
         end
+        raise ex
+      rescue MiniRacer::ParseError => e
+        ex = RuntimeError.new e.message
+        ex.set_backtrace(["(execjs):1"] + e.backtrace)
+        raise ex
       end
-
     end
 
     def name

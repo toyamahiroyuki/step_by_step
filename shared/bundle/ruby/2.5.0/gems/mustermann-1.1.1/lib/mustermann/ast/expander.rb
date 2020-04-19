@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/ast/translator'
 require 'mustermann/ast/compiler'
 require 'ruby2_keywords'
@@ -93,8 +94,9 @@ module Mustermann
       # @see Mustermann::Pattern#expand
       # @!visibility private
       def expand(values)
-        adjusted = values.each_with_object({}){ |(key, value), new_hash|
-          new_hash[value.instance_of?(Array) ? [key] * value.length : key] = value }
+        adjusted = values.each_with_object({}) do |(key, value), new_hash|
+          new_hash[value.instance_of?(Array) ? [key] * value.length : key] = value
+        end
         keys, pattern, filters = mappings.fetch(adjusted.keys.flatten.sort) { error_for(values) }
         filters.each { |key, filter| adjusted[key] &&= escape(adjusted[key], also_escape: filter) }
         pattern % (adjusted[keys] || adjusted.values_at(*keys))
@@ -138,7 +140,7 @@ module Mustermann
       # @!visibility private
       def add_to(list, result)
         list << [[], ""] if list.empty?
-        list.inject([]) { |l, (k1, p1, f1)| l + result.map { |k2, p2, f2| [k1+k2, p1+p2, f1.merge(f2)] } }
+        list.inject([]) { |l, (k1, p1, f1)| l + result.map { |k2, p2, f2| [k1 + k2, p1 + p2, f1.merge(f2)] } }
       end
     end
   end

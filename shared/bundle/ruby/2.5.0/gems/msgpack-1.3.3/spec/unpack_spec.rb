@@ -1,4 +1,5 @@
 # encoding: ascii-8bit
+
 require 'spec_helper'
 
 require 'stringio'
@@ -8,14 +9,14 @@ end
 
 describe MessagePack do
   it 'MessagePack.unpack symbolize_keys' do
-    symbolized_hash = {:a => 'b', :c => 'd'}
+    symbolized_hash = { :a => 'b', :c => 'd' }
     MessagePack.load(MessagePack.pack(symbolized_hash), :symbolize_keys => true).should == symbolized_hash
     MessagePack.unpack(MessagePack.pack(symbolized_hash), :symbolize_keys => true).should == symbolized_hash
   end
 
   it 'Unpacker#read symbolize_keys' do
     unpacker = MessagePack::Unpacker.new(:symbolize_keys => true)
-    symbolized_hash = {:a => 'b', :c => 'd'}
+    symbolized_hash = { :a => 'b', :c => 'd' }
     unpacker.feed(MessagePack.pack(symbolized_hash)).read.should == symbolized_hash
   end
 

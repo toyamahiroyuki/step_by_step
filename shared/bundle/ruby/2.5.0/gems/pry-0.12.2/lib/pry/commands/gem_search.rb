@@ -8,7 +8,7 @@ class Pry::Command::GemSearch < Pry::ClassCommand
     Search for a gem with the rubygems.org HTTP API
   BANNER
 
-  API_ENDPOINT = 'https://rubygems.org/api/v1/search.json'
+  API_ENDPOINT = 'https://rubygems.org/api/v1/search.json'.freeze
 
   def setup
     require 'json' unless defined?(JSON)
@@ -17,9 +17,9 @@ class Pry::Command::GemSearch < Pry::ClassCommand
 
   def options(opt)
     opt.on :l, :limit, 'Limit the number of results (max: 30)',
-      default: 10,
-      as: Integer,
-      argument: true
+           default: 10,
+           as: Integer,
+           argument: true
   end
 
   def process(str)
@@ -29,7 +29,8 @@ class Pry::Command::GemSearch < Pry::ClassCommand
     _pry_.pager.page list_as_string(gems, opts[:limit])
   end
 
-private
+  private
+
   def list_as_string(gems, limit = 10)
     gems[0..limit - 1].map do |gem|
       name, version, info = gem.values_at 'name', 'version', 'info'

@@ -45,7 +45,7 @@ module ActiveSupport
         begin
           run_callbacks :teardown
         rescue => e
-          self.failures << Minitest::UnexpectedError.new(e)
+          failures << Minitest::UnexpectedError.new(e)
         end
 
         super

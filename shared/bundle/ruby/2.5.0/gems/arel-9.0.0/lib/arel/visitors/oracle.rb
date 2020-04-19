@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class Oracle < Arel::Visitors::ToSql
       private
 
-      def visit_Arel_Nodes_SelectStatement o, collector
+      def visit_Arel_Nodes_SelectStatement(o, collector)
         o = order_hacks(o)
 
         # if need to select first records without ORDER BY and GROUP BY and without DISTINCT
@@ -71,22 +72,22 @@ module Arel
         super
       end
 
-      def visit_Arel_Nodes_Limit o, collector
+      def visit_Arel_Nodes_Limit(o, collector)
         collector
       end
 
-      def visit_Arel_Nodes_Offset o, collector
+      def visit_Arel_Nodes_Offset(o, collector)
         collector << "raw_rnum_ > "
         visit o.expr, collector
       end
 
-      def visit_Arel_Nodes_Except o, collector
+      def visit_Arel_Nodes_Except(o, collector)
         collector << "( "
         collector = infix_value o, collector, " MINUS "
         collector << " )"
       end
 
-      def visit_Arel_Nodes_UpdateStatement o, collector
+      def visit_Arel_Nodes_UpdateStatement(o, collector)
         # Oracle does not allow ORDER BY/LIMIT in UPDATEs.
         if o.orders.any? && o.limit.nil?
           # However, there is no harm in silently eating the ORDER BY clause if no LIMIT has been provided,
@@ -100,7 +101,7 @@ module Arel
 
       ###
       # Hacks for the order clauses specific to Oracle
-      def order_hacks o
+      def order_hacks(o)
         return o if o.orders.empty?
         return o unless o.cores.any? do |core|
           core.projections.any? do |projection|
@@ -144,10 +145,9 @@ module Arel
         array
       end
 
-      def visit_Arel_Nodes_BindParam o, collector
+      def visit_Arel_Nodes_BindParam(o, collector)
         collector.add_bind(o.value) { |i| ":a#{i}" }
       end
-
     end
   end
 end

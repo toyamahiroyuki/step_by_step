@@ -37,9 +37,7 @@ require 'concurrent/synchronization'
 #     *coordinated*, *synchronous*, change of *many* stated. Used when multiple
 #     value must change together, in an all-or-nothing transaction.
 
-
 module Concurrent
-
   # Atoms provide a way to manage shared, synchronous, independent state.
   #
   # An atom is initialized with an initial value and an optional validation
@@ -155,7 +153,7 @@ module Concurrent
     #
     # @raise [ArgumentError] When no block is given.
     def swap(*args)
-      raise ArgumentError.new('no block given') unless block_given?
+      raise ArgumentError, 'no block given' unless block_given?
 
       loop do
         old_value = value

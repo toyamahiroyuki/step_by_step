@@ -29,7 +29,7 @@ module Nokogiri
       #
       # Beware in CRuby, that libxml2 automatically inserts a meta tag
       # into a head element.
-      def meta_encoding= encoding
+      def meta_encoding=(encoding)
         case
         when meta = meta_content_type
           meta['content'] = 'text/html; charset=%s' % encoding
@@ -38,7 +38,7 @@ module Nokogiri
           meta['charset'] = encoding
         else
           meta = XML::Node.new('meta', self)
-          if dtd = internal_subset and dtd.html5_dtd?
+          if (dtd = internal_subset) && dtd.html5_dtd?
             meta['charset'] = encoding
           else
             meta['http-equiv'] = 'Content-Type'
@@ -56,9 +56,9 @@ module Nokogiri
       end
 
       def meta_content_type
-        xpath('//meta[@http-equiv and boolean(@content)]').find { |node|
+        xpath('//meta[@http-equiv and boolean(@content)]').find do |node|
           node['http-equiv'] =~ /\AContent-Type\z/i
-        }
+        end
       end
       private :meta_content_type
 
@@ -66,7 +66,7 @@ module Nokogiri
       # Get the title string of this document.  Return nil if there is
       # no title tag.
       def title
-        title = at('//title') and title.inner_text
+        (title = at('//title')) && title.inner_text
       end
 
       ###
@@ -107,12 +107,12 @@ module Nokogiri
         when html = at('//html')
           head = html.prepend_child(XML::Node.new('head', self))
           head.prepend_child(element)
-        when first = children.find { |node|
-            case node
-            when XML::Element, XML::Text
-              true
-            end
-          }
+        when first = children.find do |node|
+               case node
+               when XML::Element, XML::Text
+                 true
+               end
+             end
           # We reach here only if the underlying document model
           # allows <html>/<head> elements to be omitted and does not
           # automatically supply them.
@@ -139,15 +139,15 @@ module Nokogiri
       #     config.format.as_xml
       #   end
       #
-      def serialize options = {}
+      def serialize(options = {})
         options[:save_with] ||= XML::Node::SaveOptions::DEFAULT_HTML
         super
       end
 
       ####
       # Create a Nokogiri::XML::DocumentFragment from +tags+
-      def fragment tags = nil
-        DocumentFragment.new(self, tags, self.root)
+      def fragment(tags = nil)
+        DocumentFragment.new(self, tags, root)
       end
 
       class << self
@@ -159,8 +159,7 @@ module Nokogiri
         # is a number that sets options in the parser, such as
         # Nokogiri::XML::ParseOptions::RECOVER.  See the constants in
         # Nokogiri::XML::ParseOptions.
-        def parse string_or_io, url = nil, encoding = nil, options = XML::ParseOptions::DEFAULT_HTML
-
+        def parse(string_or_io, url = nil, encoding = nil, options = XML::ParseOptions::DEFAULT_HTML)
           options = Nokogiri::XML::ParseOptions.new(options) if Integer === options
           # Give the options to the user
           yield options if block_given?
@@ -196,7 +195,7 @@ module Nokogiri
           end
 
           # read_memory pukes on empty docs
-          if string_or_io.nil? or string_or_io.empty?
+          if string_or_io.blank?
             return encoding ? new.tap { |i| i.encoding = encoding } : new
           end
 
@@ -218,25 +217,25 @@ module Nokogiri
       class EncodingReader # :nodoc:
         class SAXHandler < Nokogiri::XML::SAX::Document # :nodoc:
           attr_reader :encoding
-          
+
           def initialize
             @encoding = nil
             super()
           end
-    
+
           def start_element(name, attrs = [])
             return unless name == 'meta'
             attr = Hash[attrs]
-            charset = attr['charset'] and
-              @encoding = charset
-            http_equiv = attr['http-equiv'] and
-              http_equiv.match(/\AContent-Type\z/i) and
-              content = attr['content'] and
-              m = content.match(/;\s*charset\s*=\s*([\w-]+)/) and
-              @encoding = m[1]
+            (charset = attr['charset']) &&
+              (@encoding = charset)
+            (http_equiv = attr['http-equiv']) &&
+              http_equiv.match(/\AContent-Type\z/i) &&
+              (content = attr['content']) &&
+              (m = content.match(/;\s*charset\s*=\s*([\w-]+)/)) &&
+              (@encoding = m[1])
           end
         end
-        
+
         class JumpSAXHandler < SAXHandler
           def initialize(jumptag)
             @jumptag = jumptag
@@ -254,20 +253,24 @@ module Nokogiri
           if Nokogiri.jruby? && EncodingReader.is_jruby_without_fix?
             return EncodingReader.detect_encoding_for_jruby_without_fix(chunk)
           end
-          m = chunk.match(/\A(<\?xml[ \t\r\n]+[^>]*>)/) and
-            return Nokogiri.XML(m[1]).encoding
+          (m = chunk.match(/\A(<\?xml[ \t\r\n]+[^>]*>)/)) &&
+            (return Nokogiri.XML(m[1]).encoding)
 
           if Nokogiri.jruby?
-            m = chunk.match(/(<meta\s)(.*)(charset\s*=\s*([\w-]+))(.*)/i) and
-              return m[4]
-            catch(:encoding_found) {
+            (m = chunk.match(/(<meta\s)(.*)(charset\s*=\s*([\w-]+))(.*)/i)) &&
+              (return m[4])
+            catch(:encoding_found) do
               Nokogiri::HTML::SAX::Parser.new(JumpSAXHandler.new(:encoding_found)).parse(chunk)
               nil
-            }
+            end
           else
             handler = SAXHandler.new
             parser = Nokogiri::HTML::SAX::PushParser.new(handler)
-            parser << chunk rescue Nokogiri::SyntaxError
+            begin
+              parser << chunk
+            rescue
+              Nokogiri::SyntaxError
+            end
             handler.encoding
           end
         end
@@ -277,16 +280,16 @@ module Nokogiri
         end
 
         def self.detect_encoding_for_jruby_without_fix(chunk)
-          m = chunk.match(/\A(<\?xml[ \t\r\n]+[^>]*>)/) and
-            return Nokogiri.XML(m[1]).encoding
+          (m = chunk.match(/\A(<\?xml[ \t\r\n]+[^>]*>)/)) &&
+            (return Nokogiri.XML(m[1]).encoding)
 
-          m = chunk.match(/(<meta\s)(.*)(charset\s*=\s*([\w-]+))(.*)/i) and
-            return m[4]
+          (m = chunk.match(/(<meta\s)(.*)(charset\s*=\s*([\w-]+))(.*)/i)) &&
+            (return m[4])
 
-          catch(:encoding_found) {
+          catch(:encoding_found) do
             Nokogiri::HTML::SAX::Parser.new(JumpSAXHandler.new(:encoding_found.to_s)).parse(chunk)
             nil
-          }
+          end
         rescue Nokogiri::SyntaxError, RuntimeError
           # Ignore parser errors that nokogiri may raise
           nil
@@ -307,7 +310,7 @@ module Nokogiri
           # no support for a call without len
 
           if !@firstchunk
-            @firstchunk = @io.read(len) or return nil
+            (@firstchunk = @io.read(len)) || (return nil)
 
             # This implementation expects that the first call from
             # htmlReadIO() is made with a length long enough (~1KB) to
@@ -321,7 +324,7 @@ module Nokogiri
 
           ret = @firstchunk.slice!(0, len)
           if (len -= ret.length) > 0
-            rest = @io.read(len) and ret << rest
+            (rest = @io.read(len)) && ret << rest
           end
           if ret.empty?
             nil

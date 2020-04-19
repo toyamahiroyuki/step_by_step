@@ -21,16 +21,16 @@ module Puma
     #   lilith.local - - [07/Aug/2006 23:58:02 -0400] "GET / HTTP/1.1" 500 -
     #
     #   %{%s - %s [%s] "%s %s%s %s" %d %s\n} %
-    FORMAT = %{%s - %s [%s] "%s %s%s %s" %d %s %0.4f\n}
+    FORMAT = %(%s - %s [%s] "%s %s%s %s" %d %s %0.4f\n)
 
-    HIJACK_FORMAT = %{%s - %s [%s] "%s %s%s %s" HIJACKED -1 %0.4f\n}
+    HIJACK_FORMAT = %(%s - %s [%s] "%s %s%s %s" HIJACKED -1 %0.4f\n)
 
-    CONTENT_LENGTH = 'Content-Length'.freeze
-    PATH_INFO      = 'PATH_INFO'.freeze
-    QUERY_STRING   = 'QUERY_STRING'.freeze
-    REQUEST_METHOD = 'REQUEST_METHOD'.freeze
+    CONTENT_LENGTH = 'Content-Length'
+    PATH_INFO      = 'PATH_INFO'
+    QUERY_STRING   = 'QUERY_STRING'
+    REQUEST_METHOD = 'REQUEST_METHOD'
 
-    def initialize(app, logger=nil)
+    def initialize(app, logger = nil)
       @app = app
       @logger = logger
     end
@@ -64,7 +64,8 @@ module Puma
         env[PATH_INFO],
         env[QUERY_STRING].empty? ? "" : "?#{env[QUERY_STRING]}",
         env["HTTP_VERSION"],
-        now - began_at ]
+        now - began_at,
+      ]
 
       write(msg)
     end
@@ -83,7 +84,8 @@ module Puma
         env["HTTP_VERSION"],
         status.to_s[0..3],
         length,
-        now - began_at ]
+        now - began_at,
+      ]
 
       write(msg)
     end
@@ -101,7 +103,7 @@ module Puma
     end
 
     def extract_content_length(headers)
-      value = headers[CONTENT_LENGTH] or return '-'
+      (value = headers[CONTENT_LENGTH]) || (return '-')
       value.to_s == '0' ? '-' : value
     end
   end

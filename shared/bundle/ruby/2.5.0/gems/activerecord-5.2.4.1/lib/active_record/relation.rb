@@ -3,19 +3,29 @@
 module ActiveRecord
   # = Active Record \Relation
   class Relation
-    MULTI_VALUE_METHODS  = [:includes, :eager_load, :preload, :select, :group,
-                            :order, :joins, :left_outer_joins, :references,
-                            :extending, :unscope]
+    MULTI_VALUE_METHODS = [
+      :includes, :eager_load, :preload, :select, :group,
+      :order, :joins, :left_outer_joins, :references,
+      :extending, :unscope,
+    ].freeze
 
-    SINGLE_VALUE_METHODS = [:limit, :offset, :lock, :readonly, :reordering,
-                            :reverse_order, :distinct, :create_with, :skip_query_cache]
-    CLAUSE_METHODS = [:where, :having, :from]
-    INVALID_METHODS_FOR_DELETE_ALL = [:distinct, :group, :having]
+    SINGLE_VALUE_METHODS = [
+      :limit, :offset, :lock, :readonly, :reordering,
+      :reverse_order, :distinct, :create_with, :skip_query_cache,
+    ].freeze
+    CLAUSE_METHODS = [:where, :having, :from].freeze
+    INVALID_METHODS_FOR_DELETE_ALL = [:distinct, :group, :having].freeze
 
     VALUE_METHODS = MULTI_VALUE_METHODS + SINGLE_VALUE_METHODS + CLAUSE_METHODS
 
     include Enumerable
-    include FinderMethods, Calculations, SpawnMethods, QueryMethods, Batches, Explain, Delegation
+    include Delegation
+    include Explain
+    include Batches
+    include QueryMethods
+    include SpawnMethods
+    include Calculations
+    include FinderMethods
 
     attr_reader :table, :klass, :loaded, :predicate_builder
     alias :model :klass
@@ -389,7 +399,7 @@ module ActiveRecord
         SINGLE_VALUE_METHODS.include?(method) ? value : value.any?
       end
       if invalid_methods.any?
-        raise ActiveRecordError.new("delete_all doesn't support #{invalid_methods.join(', ')}")
+        raise ActiveRecordError, "delete_all doesn't support #{invalid_methods.join(', ')}"
       end
 
       if eager_loading?
@@ -532,98 +542,98 @@ module ActiveRecord
 
     protected
 
-      def load_records(records)
-        @records = records.freeze
-        @loaded = true
-      end
+    def load_records(records)
+      @records = records.freeze
+      @loaded = true
+    end
 
     private
 
-      def has_join_values?
-        joins_values.any? || left_outer_joins_values.any?
-      end
+    def has_join_values?
+      joins_values.any? || left_outer_joins_values.any?
+    end
 
-      def exec_queries(&block)
-        skip_query_cache_if_necessary do
-          @records =
-            if eager_loading?
-              apply_join_dependency do |relation, join_dependency|
-                if ActiveRecord::NullRelation === relation
-                  []
-                else
-                  relation = join_dependency.apply_column_aliases(relation)
-                  rows = connection.select_all(relation.arel, "SQL")
-                  join_dependency.instantiate(rows, &block)
-                end.freeze
-              end
-            else
-              klass.find_by_sql(arel, &block).freeze
+    def exec_queries(&block)
+      skip_query_cache_if_necessary do
+        @records =
+          if eager_loading?
+            apply_join_dependency do |relation, join_dependency|
+              if ActiveRecord::NullRelation === relation
+                []
+              else
+                relation = join_dependency.apply_column_aliases(relation)
+                rows = connection.select_all(relation.arel, "SQL")
+                join_dependency.instantiate(rows, &block)
+              end.freeze
             end
-
-          preload = preload_values
-          preload += includes_values unless eager_loading?
-          preloader = nil
-          preload.each do |associations|
-            preloader ||= build_preloader
-            preloader.preload @records, associations
+          else
+            klass.find_by_sql(arel, &block).freeze
           end
 
-          @records.each(&:readonly!) if readonly_value
-
-          @loaded = true
-          @records
+        preload = preload_values
+        preload += includes_values unless eager_loading?
+        preloader = nil
+        preload.each do |associations|
+          preloader ||= build_preloader
+          preloader.preload @records, associations
         end
-      end
 
-      def skip_query_cache_if_necessary
-        if skip_query_cache_value
-          uncached do
-            yield
-          end
-        else
+        @records.each(&:readonly!) if readonly_value
+
+        @loaded = true
+        @records
+      end
+    end
+
+    def skip_query_cache_if_necessary
+      if skip_query_cache_value
+        uncached do
           yield
         end
+      else
+        yield
       end
+    end
 
-      def build_preloader
-        ActiveRecord::Associations::Preloader.new
-      end
+    def build_preloader
+      ActiveRecord::Associations::Preloader.new
+    end
 
-      def references_eager_loaded_tables?
-        joined_tables = arel.join_sources.map do |join|
-          if join.is_a?(Arel::Nodes::StringJoin)
-            tables_in_string(join.left)
-          else
-            [join.left.table_name, join.left.table_alias]
-          end
+    def references_eager_loaded_tables?
+      joined_tables = arel.join_sources.map do |join|
+        if join.is_a?(Arel::Nodes::StringJoin)
+          tables_in_string(join.left)
+        else
+          [join.left.table_name, join.left.table_alias]
         end
-
-        joined_tables += [table.name, table.table_alias]
-
-        # always convert table names to downcase as in Oracle quoted table names are in uppercase
-        joined_tables = joined_tables.flatten.compact.map(&:downcase).uniq
-
-        (references_values - joined_tables).any?
       end
 
-      def tables_in_string(string)
-        return [] if string.blank?
-        # always convert table names to downcase as in Oracle quoted table names are in uppercase
-        # ignore raw_sql_ that is used by Oracle adapter as alias for limit/offset subqueries
-        string.scan(/([a-zA-Z_][.\w]+).?\./).flatten.map(&:downcase).uniq - ["raw_sql_"]
+      joined_tables += [table.name, table.table_alias]
+
+      # always convert table names to downcase as in Oracle quoted table names are in uppercase
+      joined_tables = joined_tables.flatten.compact.map(&:downcase).uniq
+
+      (references_values - joined_tables).any?
+    end
+
+    def tables_in_string(string)
+      return [] if string.blank?
+      # always convert table names to downcase as in Oracle quoted table names are in uppercase
+      # ignore raw_sql_ that is used by Oracle adapter as alias for limit/offset subqueries
+      string.scan(/([a-zA-Z_][.\w]+).?\./).flatten.map(&:downcase).uniq - ["raw_sql_"]
+    end
+
+    def values_for_create(attributes = nil)
+      result = attributes ? where_values_hash.merge!(attributes) : where_values_hash
+
+      # NOTE: if there are same keys in both create_with and result, create_with should be used.
+      # This is to make sure nested attributes don't get passed to the klass.new,
+      # while keeping the precedence of the duplicate keys in create_with.
+      create_with_value.stringify_keys.each do |k, v|
+        result[k] = v if result.key?(k)
       end
 
-      def values_for_create(attributes = nil)
-        result = attributes ? where_values_hash.merge!(attributes) : where_values_hash
-
-        # NOTE: if there are same keys in both create_with and result, create_with should be used.
-        # This is to make sure nested attributes don't get passed to the klass.new,
-        # while keeping the precedence of the duplicate keys in create_with.
-        create_with_value.stringify_keys.each do |k, v|
-          result[k] = v if result.key?(k)
-        end
-
-        result
-      end
+      result
+    end
   end
 end

@@ -24,7 +24,7 @@ class Object
   #
   # @return [true, false]
   def present?
-    !blank?
+    present?
   end
 
   # Returns the receiver if it's present otherwise returns +nil+.
@@ -102,7 +102,7 @@ class Hash
 end
 
 class String
-  BLANK_RE = /\A[[:space:]]*\z/
+  BLANK_RE = /\A[[:space:]]*\z/.freeze
   ENCODED_BLANKS = Concurrent::Map.new do |h, enc|
     h[enc] = Regexp.new(BLANK_RE.source.encode(enc), BLANK_RE.options | Regexp::FIXEDENCODING)
   end
@@ -127,7 +127,7 @@ class String
       begin
         BLANK_RE.match?(self)
       rescue Encoding::CompatibilityError
-        ENCODED_BLANKS[self.encoding].match?(self)
+        ENCODED_BLANKS[encoding].match?(self)
       end
   end
 end

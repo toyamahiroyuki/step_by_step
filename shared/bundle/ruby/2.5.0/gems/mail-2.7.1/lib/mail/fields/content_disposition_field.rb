@@ -1,10 +1,10 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 require 'mail/fields/common/parameter_hash'
 
 module Mail
   class ContentDispositionField < StructuredField
-
     FIELD_NAME = 'content-disposition'
     CAPITALIZED_FIELD = 'Content-Disposition'
 
@@ -12,7 +12,7 @@ module Mail
       self.charset = charset
       value = ensure_filename_quoted(value)
       super(CAPITALIZED_FIELD, value, charset)
-      self.parse
+      parse
       self
     end
 
@@ -66,6 +66,5 @@ module Mail
       end
       "#{disposition_type}" + p
     end
-
   end
 end

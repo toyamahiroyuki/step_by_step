@@ -19,10 +19,10 @@ module Puma
   # puma server.
   class Launcher
     KEYS_NOT_TO_PERSIST_IN_STATE = [
-       :logger, :lowlevel_error_handler,
-       :before_worker_shutdown, :before_worker_boot, :before_worker_fork,
-       :after_worker_boot, :before_fork, :on_restart
-     ]
+      :logger, :lowlevel_error_handler,
+      :before_worker_shutdown, :before_worker_boot, :before_worker_fork,
+      :after_worker_boot, :before_fork, :on_restart,
+    ].freeze
     # Returns an instance of Launcher
     #
     # +conf+ A Puma::Configuration object indicating how to run the server.
@@ -43,14 +43,14 @@ module Puma
     #     end
     #   end
     #   Puma::Launcher.new(conf, events: Puma::Events.stdio).run
-    def initialize(conf, launcher_args={})
+    def initialize(conf, launcher_args = {})
       @runner        = nil
       @events        = launcher_args[:events] || Events::DEFAULT
       @argv          = launcher_args[:argv] || []
       @original_argv = @argv.dup
       @config        = conf
 
-      @binder        = Binder.new(@events)
+      @binder = Binder.new(@events)
       @binder.import_from_env
 
       @environment = conf.environment
@@ -157,7 +157,7 @@ module Puma
 
     # Begin a phased restart if supported
     def phased_restart
-      unless @runner.respond_to?(:phased_restart) and @runner.phased_restart
+      unless @runner.respond_to?(:phased_restart) && @runner.phased_restart
         log "* phased-restart called but not available, restarting normally."
         return restart
       end
@@ -235,7 +235,7 @@ module Puma
         Dir.chdir(@restart_dir)
         Kernel.exec(*argv)
       else
-        redirects = {:close_others => true}
+        redirects = { :close_others => true }
         @binder.listeners.each_with_index do |(l, io), i|
           ENV["PUMA_INHERIT_#{i}"] = "#{io.to_i}:#{l}"
           redirects[io.to_i] = io.to_i
@@ -261,7 +261,7 @@ module Puma
 
       deps = puma.runtime_dependencies.map do |d|
         spec = Bundler.rubygems.loaded_specs(d.name)
-        "#{d.name}:#{spec.version.to_s}"
+        "#{d.name}:#{spec.version}"
       end
 
       log '* Pruning Bundler environment'
@@ -272,7 +272,7 @@ module Puma
         wild = File.expand_path(File.join(puma_lib_dir, "../bin/puma-wild"))
         args = [Gem.ruby, wild, '-I', dirs.join(':'), deps.join(',')] + @original_argv
         # Ruby 2.0+ defaults to true which breaks socket activation
-        args += [{:close_others => false}] if RUBY_VERSION >= '2.0'
+        args += [{ :close_others => false }] if RUBY_VERSION >= '2.0'
         Kernel.exec(*args)
       end
     end
@@ -302,7 +302,7 @@ module Puma
 
     def title
       buffer  = "puma #{Puma::Const::VERSION} (#{@options[:binds].join(',')})"
-      buffer += " [#{@options[:tag]}]" if @options[:tag] && !@options[:tag].empty?
+      buffer += " [#{@options[:tag]}]" if @options[:tag].present?
       buffer
     end
 
@@ -311,9 +311,7 @@ module Puma
       ENV['RACK_ENV'] = environment
     end
 
-    def environment
-      @environment
-    end
+    attr_reader :environment
 
     def prune_bundler?
       @options[:prune_bundler] && clustered? && !@options[:preload_app]
@@ -327,7 +325,6 @@ module Puma
         File.unlink("#{uri.host}#{uri.path}")
       end
     end
-
 
     def generate_restart_data
       if dir = @options[:directory]
@@ -345,7 +342,7 @@ module Puma
         s_env = File.stat(dir)
         s_pwd = File.stat(Dir.pwd)
 
-        if s_env.ino == s_pwd.ino and (Puma.jruby? or s_env.dev == s_pwd.dev)
+        if (s_env.ino == s_pwd.ino) && (Puma.jruby? || (s_env.dev == s_pwd.dev))
           @restart_dir = dir
         end
       end
@@ -356,16 +353,16 @@ module Puma
       # it the same, otherwise add -S on there because it was
       # picked up in PATH.
       #
-      if File.exist?($0)
-        arg0 = [Gem.ruby, $0]
+      if File.exist?($PROGRAM_NAME)
+        arg0 = [Gem.ruby, $PROGRAM_NAME]
       else
-        arg0 = [Gem.ruby, "-S", $0]
+        arg0 = [Gem.ruby, "-S", $PROGRAM_NAME]
       end
 
       # Detect and reinject -Ilib from the command line, used for testing without bundler
       # cruby has an expanded path, jruby has just "lib"
       lib = File.expand_path "lib"
-      arg0[1,0] = ["-I", lib] if [lib, "lib"].include?($LOAD_PATH[0])
+      arg0[1, 0] = ["-I", lib] if [lib, "lib"].include?($LOAD_PATH[0])
 
       if defined? Puma::WILD_ARGS
         @restart_argv = arg0 + Puma::WILD_ARGS + @original_argv

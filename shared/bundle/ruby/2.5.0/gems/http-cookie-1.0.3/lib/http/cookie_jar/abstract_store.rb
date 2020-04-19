@@ -47,9 +47,9 @@ class HTTP::CookieJar::AbstractStore
     @logger = options[:logger]
     # Initializes each instance variable of the same name as option
     # keyword.
-    default_options.each_pair { |key, default|
+    default_options.each_pair do |key, default|
       instance_variable_set("@#{key}", options.fetch(key, default))
-    }
+    end
   end
 
   # This is an abstract method that each subclass must override.

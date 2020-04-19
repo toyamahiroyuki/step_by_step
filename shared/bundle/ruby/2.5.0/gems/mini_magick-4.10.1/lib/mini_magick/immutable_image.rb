@@ -15,4 +15,4 @@ module MiniMagick
   end
 end
 
-image = MiniMagick::Image.new()
+image = MiniMagick::Image.new

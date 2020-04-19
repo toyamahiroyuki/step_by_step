@@ -4,7 +4,7 @@ class Pry
   # that threads to not conflict with each other. The latest thread to request
   # ownership of the input wins.
   class InputLock
-    class Interrupt < Exception; end
+    class Interrupt < StandardError; end
 
     class << self
       attr_accessor :input_locks

@@ -4,7 +4,7 @@ require 'puma/launcher'
 require 'puma/configuration'
 
 module Puma
-  def self.run(opts={})
+  def self.run(opts = {})
     cfg = Puma::Configuration.new do |user_config|
       if port = opts[:port]
         user_config.port port

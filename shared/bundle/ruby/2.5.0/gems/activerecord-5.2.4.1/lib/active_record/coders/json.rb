@@ -8,7 +8,7 @@ module ActiveRecord
       end
 
       def self.load(json)
-        ActiveSupport::JSON.decode(json) unless json.blank?
+        ActiveSupport::JSON.decode(json) if json.present?
       end
     end
   end

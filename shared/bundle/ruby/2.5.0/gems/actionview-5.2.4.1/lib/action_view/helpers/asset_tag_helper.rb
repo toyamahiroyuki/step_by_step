@@ -89,17 +89,17 @@ module ActionView
         path_options = options.extract!("protocol", "extname", "host", "skip_pipeline").symbolize_keys
         early_hints_links = []
 
-        sources_tags = sources.uniq.map { |source|
+        sources_tags = sources.uniq.map do |source|
           href = path_to_javascript(source, path_options)
           early_hints_links << "<#{href}>; rel=preload; as=script"
           tag_options = {
-            "src" => href
+            "src" => href,
           }.merge!(options)
           if tag_options["nonce"] == true
             tag_options["nonce"] = content_security_policy_nonce
           end
-          content_tag("script".freeze, "", tag_options)
-        }.join("\n").html_safe
+          content_tag("script", "", tag_options)
+        end.join("\n").html_safe
 
         request.send_early_hints("Link" => early_hints_links.join("\n")) if respond_to?(:request) && request
 
@@ -139,16 +139,16 @@ module ActionView
         path_options = options.extract!("protocol", "host", "skip_pipeline").symbolize_keys
         early_hints_links = []
 
-        sources_tags = sources.uniq.map { |source|
+        sources_tags = sources.uniq.map do |source|
           href = path_to_stylesheet(source, path_options)
           early_hints_links << "<#{href}>; rel=preload; as=style"
           tag_options = {
             "rel" => "stylesheet",
             "media" => "screen",
-            "href" => href
+            "href" => href,
           }.merge!(options)
           tag(:link, tag_options)
-        }.join("\n").html_safe
+        end.join("\n").html_safe
 
         request.send_early_hints("Link" => early_hints_links.join("\n")) if respond_to?(:request) && request
 
@@ -184,15 +184,15 @@ module ActionView
       #   # => <link rel="alternate" type="application/rss+xml" title="Example RSS" href="http://www.example.com/feed.rss" />
       def auto_discovery_link_tag(type = :rss, url_options = {}, tag_options = {})
         if !(type == :rss || type == :atom || type == :json) && tag_options[:type].blank?
-          raise ArgumentError.new("You should pass :type tag_option key explicitly, because you have passed #{type} type other than :rss, :atom, or :json.")
+          raise ArgumentError, "You should pass :type tag_option key explicitly, because you have passed #{type} type other than :rss, :atom, or :json."
         end
 
         tag(
           "link",
-          "rel"   => tag_options[:rel] || "alternate",
-          "type"  => tag_options[:type] || Template::Types[type].to_s,
+          "rel" => tag_options[:rel] || "alternate",
+          "type" => tag_options[:type] || Template::Types[type].to_s,
           "title" => tag_options[:title] || type.to_s.upcase,
-          "href"  => url_options.is_a?(Hash) ? url_for(url_options.merge(only_path: false)) : url_options
+          "href" => url_options.is_a?(Hash) ? url_for(url_options.merge(only_path: false)) : url_options
         )
       end
 
@@ -227,7 +227,7 @@ module ActionView
         tag("link", {
           rel: "shortcut icon",
           type: "image/x-icon",
-          href: path_to_image(source, skip_pipeline: options.delete(:skip_pipeline))
+          href: path_to_image(source, skip_pipeline: options.delete(:skip_pipeline)),
         }.merge!(options.symbolize_keys))
       end
 
@@ -279,7 +279,7 @@ module ActionView
           href: href,
           as: as_type,
           type: mime_type,
-          crossorigin: crossorigin
+          crossorigin: crossorigin,
         }.merge!(options.symbolize_keys))
 
         early_hints_link = "<#{href}>; rel=preload; as=#{as_type}"
@@ -375,7 +375,7 @@ module ActionView
       def image_alt(src)
         ActiveSupport::Deprecation.warn("image_alt is deprecated and will be removed from Rails 6.0. You must explicitly set alt text on images.")
 
-        File.basename(src, ".*".freeze).sub(/-[[:xdigit:]]{32,64}\z/, "".freeze).tr("-_".freeze, " ".freeze).capitalize
+        File.basename(src, ".*").sub(/-[[:xdigit:]]{32,64}\z/, "").tr("-_", " ").capitalize
       end
 
       # Returns an HTML video tag for the +sources+. If +sources+ is a string,
@@ -453,59 +453,60 @@ module ActionView
       end
 
       private
-        def multiple_sources_tag_builder(type, sources)
-          options       = sources.extract_options!.symbolize_keys
-          skip_pipeline = options.delete(:skip_pipeline)
-          sources.flatten!
 
-          yield options if block_given?
+      def multiple_sources_tag_builder(type, sources)
+        options       = sources.extract_options!.symbolize_keys
+        skip_pipeline = options.delete(:skip_pipeline)
+        sources.flatten!
 
-          if sources.size > 1
-            content_tag(type, options) do
-              safe_join sources.map { |source| tag("source", src: send("path_to_#{type}", source, skip_pipeline: skip_pipeline)) }
-            end
-          else
-            options[:src] = send("path_to_#{type}", sources.first, skip_pipeline: skip_pipeline)
-            content_tag(type, nil, options)
+        yield options if block_given?
+
+        if sources.size > 1
+          content_tag(type, options) do
+            safe_join sources.map { |source| tag("source", src: send("path_to_#{type}", source, skip_pipeline: skip_pipeline)) }
           end
+        else
+          options[:src] = send("path_to_#{type}", sources.first, skip_pipeline: skip_pipeline)
+          content_tag(type, nil, options)
         end
+      end
 
-        def resolve_image_source(source, skip_pipeline)
-          if source.is_a?(Symbol) || source.is_a?(String)
-            path_to_image(source, skip_pipeline: skip_pipeline)
-          else
-            polymorphic_url(source)
-          end
-        rescue NoMethodError => e
-          raise ArgumentError, "Can't resolve image into URL: #{e}"
+      def resolve_image_source(source, skip_pipeline)
+        if source.is_a?(Symbol) || source.is_a?(String)
+          path_to_image(source, skip_pipeline: skip_pipeline)
+        else
+          polymorphic_url(source)
         end
+      rescue NoMethodError => e
+        raise ArgumentError, "Can't resolve image into URL: #{e}"
+      end
 
-        def extract_dimensions(size)
-          size = size.to_s
-          if /\A\d+x\d+\z/.match?(size)
-            size.split("x")
-          elsif /\A\d+\z/.match?(size)
-            [size, size]
-          end
+      def extract_dimensions(size)
+        size = size.to_s
+        if /\A\d+x\d+\z/.match?(size)
+          size.split("x")
+        elsif /\A\d+\z/.match?(size)
+          [size, size]
         end
+      end
 
-        def check_for_image_tag_errors(options)
-          if options[:size] && (options[:height] || options[:width])
-            raise ArgumentError, "Cannot pass a :size option with a :height or :width option"
-          end
+      def check_for_image_tag_errors(options)
+        if options[:size] && (options[:height] || options[:width])
+          raise ArgumentError, "Cannot pass a :size option with a :height or :width option"
         end
+      end
 
-        def resolve_link_as(extname, mime_type)
-          if extname == "js"
-            "script"
-          elsif extname == "css"
-            "style"
-          elsif extname == "vtt"
-            "track"
-          elsif (type = mime_type.to_s.split("/")[0]) && type.in?(%w(audio video font))
-            type
-          end
+      def resolve_link_as(extname, mime_type)
+        if extname == "js"
+          "script"
+        elsif extname == "css"
+          "style"
+        elsif extname == "vtt"
+          "track"
+        elsif (type = mime_type.to_s.split("/")[0]) && type.in?(%w(audio video font))
+          type
         end
+      end
     end
   end
 end

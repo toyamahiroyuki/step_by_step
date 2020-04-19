@@ -39,7 +39,7 @@ require "active_storage/downloading"
 class ActiveStorage::Variant
   include ActiveStorage::Downloading
 
-  WEB_IMAGE_CONTENT_TYPES = %w( image/png image/jpeg image/jpg image/gif )
+  WEB_IMAGE_CONTENT_TYPES = %w(image/png image/jpeg image/jpg image/gif).freeze
 
   attr_reader :blob, :variation
   delegate :service, to: :blob
@@ -77,56 +77,55 @@ class ActiveStorage::Variant
   end
 
   private
-    def processed?
-      service.exist?(key)
+
+  def processed?
+    service.exist?(key)
+  end
+
+  def process
+    open_image do |image|
+      transform image
+      format image
+      upload image
     end
+  end
 
-    def process
-      open_image do |image|
-        transform image
-        format image
-        upload image
-      end
+  def filename
+    if WEB_IMAGE_CONTENT_TYPES.include?(blob.content_type)
+      blob.filename
+    else
+      ActiveStorage::Filename.new("#{blob.filename.base}.png")
     end
+  end
 
+  def content_type
+    blob.content_type.presence_in(WEB_IMAGE_CONTENT_TYPES) || "image/png"
+  end
 
-    def filename
-      if WEB_IMAGE_CONTENT_TYPES.include?(blob.content_type)
-        blob.filename
-      else
-        ActiveStorage::Filename.new("#{blob.filename.base}.png")
-      end
+  def open_image(&block)
+    image = download_image
+
+    begin
+      yield image
+    ensure
+      image.destroy!
     end
+  end
 
-    def content_type
-      blob.content_type.presence_in(WEB_IMAGE_CONTENT_TYPES) || "image/png"
-    end
+  def download_image
+    require "mini_magick"
+    MiniMagick::Image.create(blob.filename.extension_with_delimiter) { |file| download_blob_to(file) }
+  end
 
+  def transform(image)
+    variation.transform(image)
+  end
 
-    def open_image(&block)
-      image = download_image
+  def format(image)
+    image.format("PNG") unless WEB_IMAGE_CONTENT_TYPES.include?(blob.content_type)
+  end
 
-      begin
-        yield image
-      ensure
-        image.destroy!
-      end
-    end
-
-    def download_image
-      require "mini_magick"
-      MiniMagick::Image.create(blob.filename.extension_with_delimiter) { |file| download_blob_to(file) }
-    end
-
-    def transform(image)
-      variation.transform(image)
-    end
-
-    def format(image)
-      image.format("PNG") unless WEB_IMAGE_CONTENT_TYPES.include?(blob.content_type)
-    end
-
-    def upload(image)
-      File.open(image.path, "r") { |file| service.upload(key, file) }
-    end
+  def upload(image)
+    File.open(image.path, "r") { |file| service.upload(key, file) }
+  end
 end

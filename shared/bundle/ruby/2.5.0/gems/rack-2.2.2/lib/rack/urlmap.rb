@@ -22,9 +22,9 @@ module Rack
 
     def remap(map)
       @known_hosts = Set[]
-      @mapping = map.map { |location, app|
+      @mapping = map.map do |location, app|
         if location =~ %r{\Ahttps?://(.*?)(/.*)}
-          host, location = $1, $2
+          host, location = Regexp.last_match(1), Regexp.last_match(2)
           @known_hosts << host
         else
           host = nil
@@ -38,7 +38,7 @@ module Rack
         match = Regexp.new("^#{Regexp.quote(location).gsub('/', '/+')}(.*)", nil, 'n')
 
         [host, location, match, app]
-      }.sort_by do |(host, location, _, _)|
+      end.sort_by do |(host, location, _, _)|
         [host ? -host.size : Float::INFINITY, -location.size]
       end
     end
@@ -66,7 +66,7 @@ module Rack
         next unless m = match.match(path.to_s)
 
         rest = m[1]
-        next unless !rest || rest.empty? || rest[0] == ?/
+        next unless rest.blank? || rest[0] == ?/
 
         env[SCRIPT_NAME] = (script_name + location)
         env[PATH_INFO] = rest
@@ -82,6 +82,7 @@ module Rack
     end
 
     private
+
     def casecmp?(v1, v2)
       # if both nil, or they're the same string
       return true if v1 == v2

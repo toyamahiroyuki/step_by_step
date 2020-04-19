@@ -1,5 +1,4 @@
 module Concurrent
-
   Error = Class.new(StandardError)
 
   # Raised when errors occur during configuration.
@@ -60,10 +59,10 @@ module Concurrent
 
     def initialize(errors, message = "#{errors.size} errors")
       @errors = errors
-      super [*message,
-             *errors.map { |e| [format('%s (%s)', e.message, e.class), *e.backtrace] }.flatten(1)
-            ].join("\n")
+      super [
+        *message,
+        *errors.map { |e| [format('%s (%s)', e.message, e.class), *e.backtrace] }.flatten(1),
+      ].join("\n")
     end
   end
-
 end

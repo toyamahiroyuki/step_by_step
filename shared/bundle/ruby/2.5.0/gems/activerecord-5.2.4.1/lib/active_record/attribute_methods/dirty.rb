@@ -120,31 +120,32 @@ module ActiveRecord
       end
 
       private
-        def write_attribute_without_type_cast(attr_name, value)
-          name = attr_name.to_s
-          if self.class.attribute_alias?(name)
-            name = self.class.attribute_alias(name)
-          end
-          result = super(name, value)
-          clear_attribute_change(name)
-          result
-        end
 
-        def _update_record(*)
-          affected_rows = partial_writes? ? super(keys_for_partial_write) : super
-          changes_applied
-          affected_rows
+      def write_attribute_without_type_cast(attr_name, value)
+        name = attr_name.to_s
+        if self.class.attribute_alias?(name)
+          name = self.class.attribute_alias(name)
         end
+        result = super(name, value)
+        clear_attribute_change(name)
+        result
+      end
 
-        def _create_record(*)
-          id = partial_writes? ? super(keys_for_partial_write) : super
-          changes_applied
-          id
-        end
+      def _update_record(*)
+        affected_rows = partial_writes? ? super(keys_for_partial_write) : super
+        changes_applied
+        affected_rows
+      end
 
-        def keys_for_partial_write
-          changed_attribute_names_to_save & self.class.column_names
-        end
+      def _create_record(*)
+        id = partial_writes? ? super(keys_for_partial_write) : super
+        changes_applied
+        id
+      end
+
+      def keys_for_partial_write
+        changed_attribute_names_to_save & self.class.column_names
+      end
     end
   end
 end

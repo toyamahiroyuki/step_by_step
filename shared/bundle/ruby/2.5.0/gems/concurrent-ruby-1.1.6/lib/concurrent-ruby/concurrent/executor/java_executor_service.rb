@@ -5,21 +5,20 @@ if Concurrent.on_jruby?
   require 'concurrent/executor/abstract_executor_service'
 
   module Concurrent
-
     # @!macro abstract_executor_service_public_api
     # @!visibility private
     class JavaExecutorService < AbstractExecutorService
       java_import 'java.lang.Runnable'
 
       FALLBACK_POLICY_CLASSES = {
-        abort:       java.util.concurrent.ThreadPoolExecutor::AbortPolicy,
-        discard:     java.util.concurrent.ThreadPoolExecutor::DiscardPolicy,
-        caller_runs: java.util.concurrent.ThreadPoolExecutor::CallerRunsPolicy
+        abort: java.util.concurrent.ThreadPoolExecutor::AbortPolicy,
+        discard: java.util.concurrent.ThreadPoolExecutor::DiscardPolicy,
+        caller_runs: java.util.concurrent.ThreadPoolExecutor::CallerRunsPolicy,
       }.freeze
       private_constant :FALLBACK_POLICY_CLASSES
 
       def post(*args, &task)
-        raise ArgumentError.new('no block given') unless block_given?
+        raise ArgumentError, 'no block given' unless block_given?
         return handle_fallback(*args, &task) unless running?
         @executor.submit Job.new(args, task)
         true
@@ -91,13 +90,12 @@ if Concurrent.on_jruby?
       end
 
       def newThread(runnable)
-        thread = java.util.concurrent.Executors.defaultThreadFactory().newThread(runnable)
+        thread = java.util.concurrent.Executors.defaultThreadFactory.newThread(runnable)
         thread.setDaemon(@daemonize)
-        return thread
+        thread
       end
     end
 
     private_constant :DaemonThreadFactory
-
   end
 end

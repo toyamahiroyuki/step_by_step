@@ -35,14 +35,14 @@ module ActiveRecord
 
       private
 
-        def attributes_with_index
-          attributes.select { |a| !a.reference? && a.has_index? }
-        end
+      def attributes_with_index
+        attributes.select { |a| !a.reference? && a.has_index? }
+      end
 
-        # Used by the migration template to determine the parent name of the model
-        def parent_class_name
-          options[:parent] || "ApplicationRecord"
-        end
+      # Used by the migration template to determine the parent name of the model
+      def parent_class_name
+        options[:parent] || "ApplicationRecord"
+      end
     end
   end
 end

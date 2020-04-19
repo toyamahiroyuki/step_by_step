@@ -203,7 +203,11 @@ class DateTime
   # ActiveSupport::TimeWithZone instances can be compared with a DateTime.
   def <=>(other)
     if other.respond_to? :to_datetime
-      super other.to_datetime rescue nil
+      begin
+        super other.to_datetime
+      rescue
+        nil
+      end
     else
       super
     end

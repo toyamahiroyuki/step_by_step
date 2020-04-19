@@ -6,11 +6,11 @@ module ActiveRecord
   module Tasks # :nodoc:
     class PostgreSQLDatabaseTasks # :nodoc:
       DEFAULT_ENCODING = ENV["CHARSET"] || "utf8"
-      ON_ERROR_STOP_1 = "ON_ERROR_STOP=1".freeze
-      SQL_COMMENT_BEGIN = "--".freeze
+      ON_ERROR_STOP_1 = "ON_ERROR_STOP=1"
+      SQL_COMMENT_BEGIN = "--"
 
       delegate :connection, :establish_connection, :clear_active_connections!,
-        to: ActiveRecord::Base
+               to: ActiveRecord::Base
 
       def initialize(configuration)
         @configuration = configuration
@@ -19,7 +19,7 @@ module ActiveRecord
       def create(master_established = false)
         establish_master_connection unless master_established
         connection.create_database configuration["database"],
-          configuration.merge("encoding" => encoding)
+                                   configuration.merge("encoding" => encoding)
         establish_connection configuration
       rescue ActiveRecord::StatementInvalid => error
         if error.cause.is_a?(PG::DuplicateDatabase)
@@ -63,7 +63,7 @@ module ActiveRecord
 
         args = ["-s", "-x", "-O", "-f", filename]
         args.concat(Array(extra_flags)) if extra_flags
-        unless search_path.blank?
+        if search_path.present?
           args += search_path.split(",").map do |part|
             "--schema=#{part.strip}"
           end
@@ -90,54 +90,52 @@ module ActiveRecord
 
       private
 
-        def configuration
-          @configuration
-        end
+      attr_reader :configuration
 
-        def encoding
-          configuration["encoding"] || DEFAULT_ENCODING
-        end
+      def encoding
+        configuration["encoding"] || DEFAULT_ENCODING
+      end
 
-        def establish_master_connection
-          establish_connection configuration.merge(
-            "database"           => "postgres",
-            "schema_search_path" => "public"
-          )
-        end
+      def establish_master_connection
+        establish_connection configuration.merge(
+          "database" => "postgres",
+          "schema_search_path" => "public"
+        )
+      end
 
-        def set_psql_env
-          ENV["PGHOST"]     = configuration["host"]          if configuration["host"]
-          ENV["PGPORT"]     = configuration["port"].to_s     if configuration["port"]
-          ENV["PGPASSWORD"] = configuration["password"].to_s if configuration["password"]
-          ENV["PGUSER"]     = configuration["username"].to_s if configuration["username"]
-        end
+      def set_psql_env
+        ENV["PGHOST"]     = configuration["host"]          if configuration["host"]
+        ENV["PGPORT"]     = configuration["port"].to_s     if configuration["port"]
+        ENV["PGPASSWORD"] = configuration["password"].to_s if configuration["password"]
+        ENV["PGUSER"]     = configuration["username"].to_s if configuration["username"]
+      end
 
-        def run_cmd(cmd, args, action)
-          fail run_cmd_error(cmd, args, action) unless Kernel.system(cmd, *args)
-        end
+      def run_cmd(cmd, args, action)
+        fail run_cmd_error(cmd, args, action) unless Kernel.system(cmd, *args)
+      end
 
-        def run_cmd_error(cmd, args, action)
-          msg = "failed to execute:\n".dup
-          msg << "#{cmd} #{args.join(' ')}\n\n"
-          msg << "Please check the output above for any errors and make sure that `#{cmd}` is installed in your PATH and has proper permissions.\n\n"
-          msg
-        end
+      def run_cmd_error(cmd, args, action)
+        msg = "failed to execute:\n".dup
+        msg << "#{cmd} #{args.join(' ')}\n\n"
+        msg << "Please check the output above for any errors and make sure that `#{cmd}` is installed in your PATH and has proper permissions.\n\n"
+        msg
+      end
 
-        def remove_sql_header_comments(filename)
-          removing_comments = true
-          tempfile = Tempfile.open("uncommented_structure.sql")
-          begin
-            File.foreach(filename) do |line|
-              unless removing_comments && (line.start_with?(SQL_COMMENT_BEGIN) || line.blank?)
-                tempfile << line
-                removing_comments = false
-              end
+      def remove_sql_header_comments(filename)
+        removing_comments = true
+        tempfile = Tempfile.open("uncommented_structure.sql")
+        begin
+          File.foreach(filename) do |line|
+            unless removing_comments && (line.start_with?(SQL_COMMENT_BEGIN) || line.blank?)
+              tempfile << line
+              removing_comments = false
             end
-          ensure
-            tempfile.close
           end
-          FileUtils.cp(tempfile.path, filename)
+        ensure
+          tempfile.close
         end
+        FileUtils.cp(tempfile.path, filename)
+      end
     end
   end
 end

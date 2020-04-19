@@ -41,27 +41,27 @@ class HTTP::CookieJar::YAMLSaver < HTTP::CookieJar::AbstractSaver
 
     case data
     when Array
-      data.each { |cookie|
+      data.each do |cookie|
         jar.add(cookie)
-      }
+      end
     when Hash
       # backward compatibility with Mechanize::Cookie
-      data.each { |domain, paths|
-        paths.each { |path, names|
-          names.each { |cookie_name, cookie_hash|
+      data.each do |domain, paths|
+        paths.each do |path, names|
+          names.each do |cookie_name, cookie_hash|
             if cookie_hash.respond_to?(:ivars)
               # YAML::Object of Syck
               cookie_hash = cookie_hash.ivars
             end
-            cookie = HTTP::Cookie.new({}.tap { |hash|
-                cookie_hash.each_pair { |key, value|
-                  hash[key.to_sym] = value
-                }
-              })
+            cookie = HTTP::Cookie.new({}.tap do |hash|
+                                        cookie_hash.each_pair do |key, value|
+                                          hash[key.to_sym] = value
+                                        end
+                                      end)
             jar.add(cookie)
-          }
-        }
-      }
+          end
+        end
+      end
     else
       @logger.warn "incompatible YAML cookie data discarded" if @logger
       return

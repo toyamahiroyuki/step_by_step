@@ -110,60 +110,60 @@ module ActiveSupport
 
       private
 
-        PER_ENTRY_OVERHEAD = 240
+      PER_ENTRY_OVERHEAD = 240
 
-        def cached_size(key, entry)
-          key.to_s.bytesize + entry.size + PER_ENTRY_OVERHEAD
-        end
+      def cached_size(key, entry)
+        key.to_s.bytesize + entry.size + PER_ENTRY_OVERHEAD
+      end
 
-        def read_entry(key, options)
-          entry = @data[key]
-          synchronize do
-            if entry
-              @key_access[key] = Time.now.to_f
-            else
-              @key_access.delete(key)
-            end
-          end
-          entry
-        end
-
-        def write_entry(key, entry, options)
-          entry.dup_value!
-          synchronize do
-            old_entry = @data[key]
-            return false if @data.key?(key) && options[:unless_exist]
-            if old_entry
-              @cache_size -= (old_entry.size - entry.size)
-            else
-              @cache_size += cached_size(key, entry)
-            end
+      def read_entry(key, options)
+        entry = @data[key]
+        synchronize do
+          if entry
             @key_access[key] = Time.now.to_f
-            @data[key] = entry
-            prune(@max_size * 0.75, @max_prune_time) if @cache_size > @max_size
-            true
-          end
-        end
-
-        def delete_entry(key, options)
-          synchronize do
+          else
             @key_access.delete(key)
-            entry = @data.delete(key)
-            @cache_size -= cached_size(key, entry) if entry
-            !!entry
           end
         end
+        entry
+      end
 
-        def modify_value(name, amount, options)
-          synchronize do
-            options = merged_options(options)
-            if num = read(name, options)
-              num = num.to_i + amount
-              write(name, num, options)
-              num
-            end
+      def write_entry(key, entry, options)
+        entry.dup_value!
+        synchronize do
+          old_entry = @data[key]
+          return false if @data.key?(key) && options[:unless_exist]
+          if old_entry
+            @cache_size -= (old_entry.size - entry.size)
+          else
+            @cache_size += cached_size(key, entry)
+          end
+          @key_access[key] = Time.now.to_f
+          @data[key] = entry
+          prune(@max_size * 0.75, @max_prune_time) if @cache_size > @max_size
+          true
+        end
+      end
+
+      def delete_entry(key, options)
+        synchronize do
+          @key_access.delete(key)
+          entry = @data.delete(key)
+          @cache_size -= cached_size(key, entry) if entry
+          !!entry
+        end
+      end
+
+      def modify_value(name, amount, options)
+        synchronize do
+          options = merged_options(options)
+          if num = read(name, options)
+            num = num.to_i + amount
+            write(name, num, options)
+            num
           end
         end
+      end
     end
   end
 end

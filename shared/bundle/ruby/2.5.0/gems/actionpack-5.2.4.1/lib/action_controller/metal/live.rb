@@ -86,7 +86,7 @@ module ActionController
     # Note: SSEs are not currently supported by IE. However, they are supported
     # by Chrome, Firefox, Opera, and Safari.
     class SSE
-      WHITELISTED_OPTIONS = %w( retry event id )
+      WHITELISTED_OPTIONS = %w(retry event id).freeze
 
       def initialize(stream, options = {})
         @stream = stream
@@ -108,18 +108,18 @@ module ActionController
 
       private
 
-        def perform_write(json, options)
-          current_options = @options.merge(options).stringify_keys
+      def perform_write(json, options)
+        current_options = @options.merge(options).stringify_keys
 
-          WHITELISTED_OPTIONS.each do |option_name|
-            if (option_value = current_options[option_name])
-              @stream.write "#{option_name}: #{option_value}\n"
-            end
+        WHITELISTED_OPTIONS.each do |option_name|
+          if (option_value = current_options[option_name])
+            @stream.write "#{option_name}: #{option_value}\n"
           end
-
-          message = json.gsub("\n".freeze, "\ndata: ".freeze)
-          @stream.write "data: #{message}\n\n"
         end
+
+        message = json.gsub("\n", "\ndata: ")
+        @stream.write "data: #{message}\n\n"
+      end
     end
 
     class ClientDisconnected < RuntimeError
@@ -206,33 +206,33 @@ module ActionController
 
       private
 
-        def each_chunk(&block)
-          loop do
-            str = nil
-            ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
-              str = @buf.pop
-            end
-            break unless str
-            yield str
+      def each_chunk(&block)
+        loop do
+          str = nil
+          ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+            str = @buf.pop
           end
+          break unless str
+          yield str
         end
+      end
     end
 
     class Response < ActionDispatch::Response #:nodoc: all
       private
 
-        def before_committed
-          super
-          jar = request.cookie_jar
-          # The response can be committed multiple times
-          jar.write self unless committed?
-        end
+      def before_committed
+        super
+        jar = request.cookie_jar
+        # The response can be committed multiple times
+        jar.write self unless committed?
+      end
 
-        def build_buffer(response, body)
-          buf = Live::Buffer.new response
-          body.each { |part| buf.write part }
-          buf
-        end
+      def build_buffer(response, body)
+        buf = Live::Buffer.new response
+        body.each { |part| buf.write part }
+        buf
+      end
     end
 
     def process(name)
@@ -243,7 +243,7 @@ module ActionController
       # This processes the action in a child thread. It lets us return the
       # response code and headers back up the Rack stack, and still process
       # the body in parallel with sending data to the client.
-      new_controller_thread {
+      new_controller_thread do
         ActiveSupport::Dependencies.interlock.running do
           t2 = Thread.current
 
@@ -271,7 +271,7 @@ module ActionController
             @_response.commit!
           end
         end
-      }
+      end
 
       ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
         @_response.await_commit
@@ -285,11 +285,11 @@ module ActionController
     # a thread to stream data from the response bodies. Nobody should call
     # this method except in Rails internals. Seriously!
     def new_controller_thread # :nodoc:
-      Thread.new {
+      Thread.new do
         t2 = Thread.current
         t2.abort_on_exception = true
         yield
-      }
+      end
     end
 
     def log_error(exception)

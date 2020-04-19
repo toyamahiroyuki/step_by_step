@@ -149,7 +149,7 @@ module Byebug
         call: deco_call,
         file: deco_file,
         line: line,
-        full_path: File.expand_path(deco_file)
+        full_path: File.expand_path(deco_file),
       }
     end
 

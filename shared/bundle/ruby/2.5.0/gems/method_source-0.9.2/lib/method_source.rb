@@ -20,7 +20,7 @@ module MethodSource
   # @param [Array] source_location The array returned by Method#source_location
   # @param [String]  method_name
   # @return [String] The method body
-  def self.source_helper(source_location, name=nil)
+  def self.source_helper(source_location, name = nil)
     raise SourceNotFoundError, "Could not locate source for #{name}!" unless source_location
     file, line = *source_location
 
@@ -35,7 +35,7 @@ module MethodSource
   # @param [Array] source_location The array returned by Method#source_location
   # @param [String]  method_name
   # @return [String] The comments up to the point of the method.
-  def self.comment_helper(source_location, name=nil)
+  def self.comment_helper(source_location, name = nil)
     raise SourceNotFoundError, "Could not locate source for #{name}!" unless source_location
     file, line = *source_location
 
@@ -48,7 +48,7 @@ module MethodSource
   # @param [String]  method_name
   # @return [Array<String>]  the contents of the file
   # @raise [SourceNotFoundError]
-  def self.lines_for(file_name, name=nil)
+  def self.lines_for(file_name, name = nil)
     @lines_for_file ||= {}
     @lines_for_file[file_name] ||= File.readlines(file_name)
   rescue Errno::ENOENT => e
@@ -70,7 +70,6 @@ module MethodSource
   # This module is to be included by `Method` and `UnboundMethod` and
   # provides the `#source` functionality
   module MethodExtensions
-
     # We use the included hook to patch Method#source on rubinius.
     # We need to use the included hook as Rubinius defines a `source`
     # on Method so including a module will have no effect (as it's
@@ -84,13 +83,10 @@ module MethodSource
           orig_source = instance_method(:source)
 
           define_method(:source) do
-            begin
-              super
-            rescue
-              orig_source.bind(self).call
-            end
+            super
+          rescue
+            orig_source.bind(self).call
           end
-
         end
       end
     end
@@ -138,4 +134,3 @@ class Proc
   include MethodSource::SourceLocation::ProcExtensions
   include MethodSource::MethodExtensions
 end
-

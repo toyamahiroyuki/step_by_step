@@ -34,15 +34,18 @@ class GlobalID
     end
 
     private
-      def parse_encoded_gid(gid, options)
-        new(Base64.urlsafe_decode64(repad_gid(gid)), options) rescue nil
-      end
 
-      # We removed the base64 padding character = during #to_param, now we're adding it back so decoding will work
-      def repad_gid(gid)
-        padding_chars = gid.length.modulo(4).zero? ? 0 : (4 - gid.length.modulo(4))
-        gid + ('=' * padding_chars)
-      end
+    def parse_encoded_gid(gid, options)
+      new(Base64.urlsafe_decode64(repad_gid(gid)), options)
+    rescue
+      nil
+    end
+
+    # We removed the base64 padding character = during #to_param, now we're adding it back so decoding will work
+    def repad_gid(gid)
+      padding_chars = gid.length.modulo(4).zero? ? 0 : (4 - gid.length.modulo(4))
+      gid + ('=' * padding_chars)
+    end
   end
 
   attr_reader :uri

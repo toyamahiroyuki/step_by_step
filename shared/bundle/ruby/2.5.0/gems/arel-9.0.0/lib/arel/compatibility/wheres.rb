@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Compatibility # :nodoc:
     class Wheres # :nodoc:
@@ -15,7 +16,7 @@ module Arel
         end
       end
 
-      def initialize engine, collection
+      def initialize(engine, collection)
         @engine     = engine
         @collection = collection
       end
@@ -23,11 +24,11 @@ module Arel
       def each
         to_sql = Visitors::ToSql.new @engine
 
-        @collection.each { |c|
+        @collection.each do |c|
           c.extend(Value)
           c.visitor = to_sql
           yield c
-        }
+        end
       end
     end
   end

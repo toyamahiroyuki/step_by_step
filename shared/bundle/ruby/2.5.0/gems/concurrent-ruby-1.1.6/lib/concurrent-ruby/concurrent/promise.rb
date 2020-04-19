@@ -7,7 +7,6 @@ require 'concurrent/executor/safe_task_executor'
 require 'concurrent/options'
 
 module Concurrent
-
   PromiseExecutionError = Class.new(StandardError)
 
   # Promises are inspired by the JavaScript [Promises/A](http://wiki.commonjs.org/wiki/Promises/A)
@@ -188,7 +187,6 @@ module Concurrent
   # - `rescue { |reason| ... }` is the same as `then(Proc.new { |reason| ... } )`
   # - `rescue` is aliased by `catch` and `on_error`
   class Promise < IVar
-
     # Initialize a new Promise with the provided options.
     #
     # @!macro executor_and_deref_options
@@ -259,7 +257,7 @@ module Concurrent
     #
     # @raise [Concurrent::PromiseExecutionError] if not the root promise
     def set(value = NULL, &block)
-      raise PromiseExecutionError.new('supported only on root promise') unless root?
+      raise PromiseExecutionError, 'supported only on root promise' unless root?
       check_for_block_or_value!(block_given?, value)
       synchronize do
         if @state != :unscheduled
@@ -320,7 +318,7 @@ module Concurrent
 
       executor ||= @executor
 
-      raise ArgumentError.new('rescuers and block are both missing') if rescuer.nil? && !block_given?
+      raise ArgumentError, 'rescuers and block are both missing' if rescuer.nil? && !block_given?
       block = Proc.new { |result| result } unless block_given?
       child = Promise.new(
         parent: self,
@@ -346,7 +344,7 @@ module Concurrent
     #
     # @return [Promise] self
     def on_success(&block)
-      raise ArgumentError.new('no block given') unless block_given?
+      raise ArgumentError, 'no block given' unless block_given?
       self.then(&block)
     end
 
@@ -379,14 +377,12 @@ module Concurrent
 
       on_error { |e| child.on_reject(e) }
       on_success do |result1|
-        begin
-          inner = block.call(result1)
-          inner.execute
-          inner.on_success { |result2| child.on_fulfill(result2) }
-          inner.on_error { |e| child.on_reject(e) }
-        rescue => e
-          child.on_reject(e)
-        end
+        inner = block.call(result1)
+        inner.execute
+        inner.on_success { |result2| child.on_fulfill(result2) }
+        inner.on_error { |e| child.on_reject(e) }
+      rescue => e
+        child.on_reject(e)
       end
 
       child
@@ -409,9 +405,9 @@ module Concurrent
       opts = promises.last.is_a?(::Hash) ? promises.pop.dup : {}
       opts[:executor] ||= ImmediateExecutor.new
       zero = if !opts.key?(:execute) || opts.delete(:execute)
-        fulfill([], opts)
-      else
-        Promise.new(opts) { [] }
+               fulfill([], opts)
+             else
+               Promise.new(opts) { [] }
       end
 
       promises.reduce(zero) do |p1, p2|
@@ -508,7 +504,7 @@ module Concurrent
           promise.wait
           promise
         end
-        unless completed.empty? || completed.send(method){|promise| promise.fulfilled? }
+        unless completed.empty? || completed.send(method) { |promise| promise.fulfilled? }
           raise PromiseExecutionError
         end
       end
@@ -554,7 +550,7 @@ module Concurrent
       end
 
       children_to_notify.each { |child| notify_child(child) }
-      observers.notify_and_delete_observers{ [Time.now, self.value, reason] }
+      observers.notify_and_delete_observers { [Time.now, self.value, reason] }
     end
 
     # @!visibility private

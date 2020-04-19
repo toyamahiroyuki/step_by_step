@@ -9,7 +9,6 @@ require 'mini_magick/utilities'
 
 module MiniMagick
   class Image
-
     ##
     # This is the primary loading method used by all of the other class
     # methods.
@@ -405,7 +404,7 @@ module MiniMagick
     #   if you want to add something.
     # @return [self]
     #
-    def format(format, page = 0, read_opts={})
+    def format(format, page = 0, read_opts = {})
       if @tempfile
         new_tempfile = MiniMagick::Utilities.tempfile(".#{format}")
         new_path = new_tempfile.path

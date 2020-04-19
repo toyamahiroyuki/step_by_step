@@ -69,4 +69,3 @@ class IntegrationTestHtml < Loofah::TestCase
     end
   end
 end
-

@@ -5,8 +5,8 @@ module Rack
     module Puma
       DEFAULT_OPTIONS = {
         :Verbose => false,
-        :Silent  => false
-      }
+        :Silent => false,
+      }.freeze
 
       def self.config(app, options = {})
         require 'puma'
@@ -46,23 +46,21 @@ module Rack
           if options[:Host] || options[:Port]
             host = options[:Host] || default_options[:Host]
             port = options[:Port] || default_options[:Port]
-            self.set_host_port_to_config(host, port, user_config)
+            set_host_port_to_config(host, port, user_config)
           end
 
           if default_options[:Host]
             file_config.set_default_host(default_options[:Host])
           end
-          self.set_host_port_to_config(default_options[:Host], default_options[:Port], default_config)
+          set_host_port_to_config(default_options[:Host], default_options[:Port], default_config)
 
           user_config.app app
         end
         conf
       end
 
-
-
       def self.run(app, options = {})
-        conf   = self.config(app, options)
+        conf = config(app, options)
 
         events = options.delete(:Silent) ? ::Puma::Events.strings : ::Puma::Events.stdio
 
@@ -80,17 +78,19 @@ module Rack
 
       def self.valid_options
         {
-          "Host=HOST"       => "Hostname to listen on (default: localhost)",
-          "Port=PORT"       => "Port to listen on (default: 8080)",
+          "Host=HOST" => "Hostname to listen on (default: localhost)",
+          "Port=PORT" => "Port to listen on (default: 8080)",
           "Threads=MIN:MAX" => "min:max threads to use (default 0:16)",
-          "Verbose"         => "Don't report each request (default: false)"
+          "Verbose" => "Don't report each request (default: false)",
         }
       end
-    private
+
+      private
+
       def self.set_host_port_to_config(host, port, config)
         config.clear_binds! if host || port
 
-        if host && (host[0,1] == '.' || host[0,1] == '/')
+        if host && (host[0, 1] == '.' || host[0, 1] == '/')
           config.bind "unix://#{host}"
         elsif host && host =~ /^ssl:\/\//
           uri = URI.parse(host)

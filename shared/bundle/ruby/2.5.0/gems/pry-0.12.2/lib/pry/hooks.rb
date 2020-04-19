@@ -54,7 +54,7 @@ class Pry
     # @return [Pry::Hooks] a new `Pry::Hooks` instance containing a merge of the
     #   contents of two `Pry:Hooks` instances.
     def merge(other)
-      self.dup.tap do |v|
+      dup.tap do |v|
         v.merge!(other)
       end
     end
@@ -96,12 +96,10 @@ class Pry
     # @return [Object] The return value of the last executed hook.
     def exec_hook(event_name, *args, &block)
       @hooks[event_name.to_s].map do |hook_name, callable|
-        begin
-          callable.call(*args, &block)
-        rescue RescuableException => e
-          errors << e
-          e
-        end
+        callable.call(*args, &block)
+      rescue RescuableException => e
+        errors << e
+        e
       end.last
     end
 
@@ -164,8 +162,6 @@ class Pry
 
     protected
 
-    def hooks
-      @hooks
-    end
+    attr_reader :hooks
   end
 end

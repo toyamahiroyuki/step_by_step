@@ -12,8 +12,8 @@ module ActionDispatch
       def initialize
         super("Session contains objects whose class definition isn't available.\n" \
           "Remember to require the classes for all objects kept in the session.\n" \
-          "(Original exception: #{$!.message} [#{$!.class}])\n")
-        set_backtrace $!.backtrace
+          "(Original exception: #{$ERROR_INFO.message} [#{$ERROR_INFO.class}])\n")
+        set_backtrace $ERROR_INFO.backtrace
       end
     end
 
@@ -29,7 +29,7 @@ module ActionDispatch
         sid
       end
 
-    private
+      private
 
       def initialize_sid # :doc:
         @default_options.delete(:sidbits)
@@ -56,7 +56,7 @@ module ActionDispatch
         if argument_error.message =~ %r{undefined class/module ([\w:]*\w)}
           begin
             # Note that the regexp does not allow $1 to end with a ':'.
-            $1.constantize
+            Regexp.last_match(1).constantize
           rescue LoadError, NameError
             raise ActionDispatch::Session::SessionRestoreError
           end
@@ -83,9 +83,10 @@ module ActionDispatch
       include SessionObject
 
       private
-        def set_cookie(request, session_id, cookie)
-          request.cookie_jar[key] = cookie
-        end
+
+      def set_cookie(request, session_id, cookie)
+        request.cookie_jar[key] = cookie
+      end
     end
 
     class AbstractSecureStore < Rack::Session::Abstract::PersistedSecure
@@ -98,9 +99,10 @@ module ActionDispatch
       end
 
       private
-        def set_cookie(request, session_id, cookie)
-          request.cookie_jar[key] = cookie
-        end
+
+      def set_cookie(request, session_id, cookie)
+        request.cookie_jar[key] = cookie
+      end
     end
   end
 end

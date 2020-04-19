@@ -70,14 +70,14 @@ module ActiveRecord
 
     alias_method :validate, :valid?
 
-  private
+    private
 
     def default_validation_context
       new_record? ? :create : :update
     end
 
     def raise_validation_error
-      raise(RecordInvalid.new(self))
+      raise RecordInvalid, self
     end
 
     def perform_validations(options = {})

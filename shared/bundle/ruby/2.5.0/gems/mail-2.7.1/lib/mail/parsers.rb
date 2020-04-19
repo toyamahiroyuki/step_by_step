@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Ragel-generated parsers are full of known warnings. Suppress them.
 begin
   orig, $VERBOSE = $VERBOSE, nil

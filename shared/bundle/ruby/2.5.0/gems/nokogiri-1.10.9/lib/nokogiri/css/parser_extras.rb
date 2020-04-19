@@ -14,13 +14,13 @@ module Nokogiri
         alias :set_cache :cache_on=
 
         # Get the css selector in +string+ from the cache
-        def [] string
+        def [](string)
           return unless @cache_on
           @mutex.synchronize { @cache[string] }
         end
 
         # Set the css selector in +string+ in the cache to +value+
-        def []= string, value
+        def []=(string, value)
           return value unless @cache_on
           @mutex.synchronize { @cache[string] = value }
         end
@@ -31,7 +31,7 @@ module Nokogiri
         end
 
         # Execute +block+ without cache
-        def without_cache &block
+        def without_cache(&block)
           tmp = @cache_on
           @cache_on = false
           block.call
@@ -40,10 +40,10 @@ module Nokogiri
 
         ###
         # Parse this CSS selector in +selector+.  Returns an AST.
-        def parse selector
+        def parse(selector)
           @warned ||= false
           unless @warned
-            $stderr.puts('Nokogiri::CSS::Parser.parse is deprecated, call Nokogiri::CSS.parse(), this will be removed August 1st or version 1.4.0 (whichever is first)')
+            warn('Nokogiri::CSS::Parser.parse is deprecated, call Nokogiri::CSS.parse(), this will be removed August 1st or version 1.4.0 (whichever is first)')
             @warned = true
           end
           new.parse selector
@@ -51,13 +51,13 @@ module Nokogiri
       end
 
       # Create a new CSS parser with respect to +namespaces+
-      def initialize namespaces = {}
+      def initialize(namespaces = {})
         @tokenizer  = Tokenizer.new
         @namespaces = namespaces
         super()
       end
 
-      def parse string
+      def parse(string)
         @tokenizer.scan_setup string
         do_parse
       end
@@ -67,24 +67,24 @@ module Nokogiri
       end
 
       # Get the xpath for +string+ using +options+
-      def xpath_for string, options={}
+      def xpath_for(string, options = {})
         key = "#{string}#{options[:ns]}#{options[:prefix]}"
         v = self.class[key]
         return v if v
 
         args = [
           options[:prefix] || '//',
-          options[:visitor] || XPathVisitor.new
+          options[:visitor] || XPathVisitor.new,
         ]
-        self.class[key] = parse(string).map { |ast|
+        self.class[key] = parse(string).map do |ast|
           ast.to_xpath(*args)
-        }
+        end
       end
 
       # On CSS parser error, raise an exception
-      def on_error error_token_id, error_value, value_stack
+      def on_error(error_token_id, error_value, value_stack)
         after = value_stack.compact.last
-        raise SyntaxError.new("unexpected '#{error_value}' after '#{after}'")
+        raise SyntaxError, "unexpected '#{error_value}' after '#{after}'"
       end
     end
   end

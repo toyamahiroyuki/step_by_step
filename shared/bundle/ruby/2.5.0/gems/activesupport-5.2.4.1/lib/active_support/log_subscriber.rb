@@ -56,7 +56,7 @@ module ActiveSupport
     class << self
       def logger
         @logger ||= if defined?(Rails) && Rails.respond_to?(:logger)
-          Rails.logger
+                      Rails.logger
         end
       end
 
@@ -88,7 +88,7 @@ module ActiveSupport
       end
     end
 
-  private
+    private
 
     %w(info debug warn error fatal unknown).each do |level|
       class_eval <<-METHOD, __FILE__, __LINE__ + 1

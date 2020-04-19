@@ -1,6 +1,5 @@
 module Concurrent
   module Synchronization
-
     # @!visibility private
     # @!macro internal_implementation_note
     ObjectImplementation = case
@@ -120,7 +119,7 @@ module Concurrent
         define_initialize_atomic_fields
 
         names.each do |name|
-          ivar = :"@Atomic#{name.to_s.gsub(/(?:^|_)(.)/) { $1.upcase }}"
+          ivar = :"@Atomic#{name.to_s.gsub(/(?:^|_)(.)/) { Regexp.last_match(1).upcase }}"
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{name}
               #{ivar}.get
@@ -162,7 +161,7 @@ module Concurrent
 
       def self.define_initialize_atomic_fields
         assignments = @__atomic_fields__.map do |name|
-          "@Atomic#{name.to_s.gsub(/(?:^|_)(.)/) { $1.upcase }} = Concurrent::AtomicReference.new(nil)"
+          "@Atomic#{name.to_s.gsub(/(?:^|_)(.)/) { Regexp.last_match(1).upcase }} = Concurrent::AtomicReference.new(nil)"
         end.join("\n")
 
         class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -177,7 +176,6 @@ module Concurrent
 
       def __initialize_atomic_fields__
       end
-
     end
   end
 end

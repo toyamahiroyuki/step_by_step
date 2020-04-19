@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 #--
 # punycode.rb - PunyCode encoder for the Domain Name library
 #
@@ -64,18 +65,18 @@ class DomainName
     LOBASE = BASE - TMIN
     CUTOFF = LOBASE * TMAX / 2
 
-    RE_NONBASIC = /[^\x00-\x7f]/
+    RE_NONBASIC = /[^\x00-\x7f]/.freeze
 
     # Returns the numeric value of a basic code point (for use in
     # representing integers) in the range 0 to base-1, or nil if cp
     # is does not represent a value.
-    DECODE_DIGIT = {}.tap { |map|
+    DECODE_DIGIT = {}.tap do |map|
       # ASCII A..Z map to 0..25
       # ASCII a..z map to 0..25
       (0..25).each { |i| map[65 + i] = map[97 + i] = i }
       # ASCII 0..9 map to 26..35
       (26..35).each { |i| map[22 + i] = i }
-    }
+    end
 
     # Returns the basic code point whose value (when used for
     # representing integers) is d, which must be in the range 0 to
@@ -125,9 +126,9 @@ class DomainName
           # the next larger one
 
           m = MAXINT
-          input.each { |cp|
+          input.each do |cp|
             m = cp if (n...m) === cp
-          }
+          end
 
           # Increase delta enough to advance the decoder's <n,i> state to
           # <m,0>, but guard against overflow
@@ -136,7 +137,7 @@ class DomainName
           raise BufferOverflowError if delta > MAXINT
           n = m
 
-          input.each { |cp|
+          input.each do |cp|
             # AMC-ACE-Z can use this simplified version instead
             if cp < n
               delta += 1
@@ -145,13 +146,13 @@ class DomainName
               # Represent delta as a generalized variable-length integer
               q = delta
               k = BASE
-              loop {
+              loop do
                 t = k <= bias ? TMIN : k - bias >= TMAX ? TMAX : k - bias
                 break if q < t
                 q, r = (q - t).divmod(BASE - t)
                 output << ENCODE_DIGIT[t + r, false]
                 k += BASE
-              }
+              end
 
               output << ENCODE_DIGIT[q, false]
 
@@ -168,7 +169,7 @@ class DomainName
               delta = 0
               h += 1
             end
-          }
+          end
 
           delta += 1
           n += 1
@@ -179,15 +180,15 @@ class DomainName
 
       # Encode a hostname using IDN/Punycode algorithms
       def encode_hostname(hostname)
-        hostname.match(RE_NONBASIC) or return hostname
+        hostname.match(RE_NONBASIC) || (return hostname)
 
-        hostname.split(DOT).map { |name|
+        hostname.split(DOT).map do |name|
           if name.match(RE_NONBASIC)
             PREFIX + encode(name)
           else
             name
           end
-        }.join(DOT)
+        end.join(DOT)
       end
 
       # Decode a +string+ encoded in Punycode
@@ -200,8 +201,8 @@ class DomainName
         if j = string.rindex(DELIMITER)
           b = string[0...j]
 
-          b.match(RE_NONBASIC) and
-            raise ArgumentError, "Illegal character is found in basic part: #{string.inspect}"
+          b.match(RE_NONBASIC) &&
+            raise(ArgumentError, "Illegal character is found in basic part: #{string.inspect}")
 
           # Handle the basic code points
 
@@ -231,9 +232,9 @@ class DomainName
           w = 1
           k = BASE
 
-          loop {
-            digit = DECODE_DIGIT[input[h]] or
-            raise ArgumentError, "Illegal character is found in non-basic part: #{string.inspect}"
+          loop do
+            (digit = DECODE_DIGIT[input[h]]) ||
+            raise(ArgumentError, "Illegal character is found in non-basic part: #{string.inspect}")
             h += 1
             i += digit * w
             raise BufferOverflowError if i > MAXINT
@@ -242,8 +243,8 @@ class DomainName
             w *= BASE - t
             raise BufferOverflowError if w > MAXINT
             k += BASE
-            h < input_length or raise ArgumentError, "Malformed input given: #{string.inspect}"
-          }
+            (h < input_length) || raise(ArgumentError, "Malformed input given: #{string.inspect}")
+          end
 
           # Adapt the bias
           delta = oldi == 0 ? i / DAMP : (i - oldi) >> 1
@@ -274,9 +275,9 @@ class DomainName
 
       # Decode a hostname using IDN/Punycode algorithms
       def decode_hostname(hostname)
-        hostname.gsub(/(\A|#{Regexp.quote(DOT)})#{Regexp.quote(PREFIX)}([^#{Regexp.quote(DOT)}]*)/o) {
-          $1 << decode($2)
-        }
+        hostname.gsub(/(\A|#{Regexp.quote(DOT)})#{Regexp.quote(PREFIX)}([^#{Regexp.quote(DOT)}]*)/o) do
+          Regexp.last_match(1) << decode(Regexp.last_match(2))
+        end
       end
     end
   end

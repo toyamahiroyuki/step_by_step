@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class ValuesList < Node
@@ -13,9 +14,9 @@ module Arel
         @rows.hash
       end
 
-      def eql? other
+      def eql?(other)
         self.class == other.class &&
-          self.rows == other.rows
+          rows == other.rows
       end
       alias :== :eql?
     end

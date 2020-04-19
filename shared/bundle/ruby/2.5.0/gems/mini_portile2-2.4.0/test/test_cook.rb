@@ -38,32 +38,32 @@ class TestCook < TestCase
   def test_untar
     configure = File.join(work_dir, "configure")
     assert File.exist?(configure), configure
-    assert_match( /^#!\/bin\/sh/, IO.read(configure) )
+    assert_match(/^#!\/bin\/sh/, IO.read(configure))
   end
 
   def test_patch
     patch1 = File.join(work_dir, "patch 1.txt")
     assert File.exist?(patch1), patch1
-    assert_match( /^\tchange 1/, IO.read(patch1) )
+    assert_match(/^\tchange 1/, IO.read(patch1))
   end
 
   def test_configure
     txt = File.join(work_dir, "configure.txt")
     assert File.exist?(txt), txt
     opts = recipe.configure_options + ["--prefix=#{recipe.path}"]
-    assert_equal( opts.inspect, IO.read(txt).chomp )
+    assert_equal(opts.inspect, IO.read(txt).chomp)
   end
 
   def test_compile
     txt = File.join(work_dir, "compile.txt")
     assert File.exist?(txt), txt
-    assert_equal( ["all"].inspect, IO.read(txt).chomp )
+    assert_equal(["all"].inspect, IO.read(txt).chomp)
   end
 
   def test_install
     txt = File.join(work_dir, "install.txt")
     assert File.exist?(txt), txt
-    assert_equal( ["install"].inspect, IO.read(txt).chomp )
+    assert_equal(["install"].inspect, IO.read(txt).chomp)
   end
 end
 
@@ -109,7 +109,7 @@ class TestCookWithBrokenGitDir < TestCase
     Dir.chdir(@git_dir) do
       patch1 = File.join(work_dir, "patch 1.txt")
       assert File.exist?(patch1), patch1
-      assert_match( /^\tchange 1/, IO.read(patch1) )
+      assert_match(/^\tchange 1/, IO.read(patch1))
     end
   end
 end

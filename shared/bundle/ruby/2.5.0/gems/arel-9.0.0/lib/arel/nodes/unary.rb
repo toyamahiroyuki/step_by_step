@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class Unary < Arel::Nodes::Node
       attr_accessor :expr
       alias :value :expr
 
-      def initialize expr
+      def initialize(expr)
         super()
         @expr = expr
       end
@@ -14,14 +15,14 @@ module Arel
         @expr.hash
       end
 
-      def eql? other
+      def eql?(other)
         self.class == other.class &&
-          self.expr == other.expr
+          expr == other.expr
       end
       alias :== :eql?
     end
 
-    %w{
+    %w(
       Bin
       Cube
       DistinctOn
@@ -36,7 +37,7 @@ module Arel
       Ordering
       RollUp
       Top
-    }.each do |name|
+    ).each do |name|
       const_set(name, Class.new(Unary))
     end
   end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann'
 require 'mustermann/pattern'
 require 'mustermann/ast/node'
@@ -50,7 +51,7 @@ module Mustermann
     # Not used internally by {Mustermann::Identity}.
     # @!visibility private
     def to_ast
-      payload = @string.each_char.with_index.map { |c, i| AST::Node[c == ?/ ? :separator : :char].new(c, start: i, stop: i+1) }
+      payload = @string.each_char.with_index.map { |c, i| AST::Node[c == ?/ ? :separator : :char].new(c, start: i, stop: i + 1) }
       AST::Node[:root].new(payload, pattern: @string, start: 0, stop: @string.length)
     end
 
@@ -66,7 +67,7 @@ module Mustermann
     # @see Mustermann::Pattern#expand
     # @see Mustermann::Expander
     def expand(behavior = nil, values = {})
-      return to_s if values.empty? or behavior == :ignore
+      return to_s if values.empty? || (behavior == :ignore)
       raise ExpandError,    "cannot expand with keys %p" % values.keys.sort if behavior == :raise
       raise ArgumentError,  "unknown behavior %p"        % behavior         if behavior != :append
       params    = values.map { |key, value| @@uri.escape(key.to_s) + "=" + @@uri.escape(value.to_s, /[^\w]/) }

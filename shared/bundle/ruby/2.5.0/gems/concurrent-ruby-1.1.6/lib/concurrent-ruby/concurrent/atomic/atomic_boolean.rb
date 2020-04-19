@@ -2,7 +2,6 @@ require 'concurrent/atomic/mutex_atomic_boolean'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   ###################################################################
 
   # @!macro atomic_boolean_method_initialize

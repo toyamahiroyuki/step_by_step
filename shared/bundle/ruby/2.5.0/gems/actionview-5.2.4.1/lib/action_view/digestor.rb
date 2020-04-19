@@ -22,7 +22,7 @@ module ActionView
       # * <tt>dependencies</tt>  - An array of dependent views
       def digest(name:, finder:, dependencies: [])
         dependencies ||= []
-        cache_key = [ name, finder.rendered_format, dependencies ].flatten.compact.join(".")
+        cache_key = [name, finder.rendered_format, dependencies].flatten.compact.join(".")
 
         # this is a correctly done double-checked locking idiom
         # (Concurrent::Map's lookups have volatile semantics)
@@ -44,7 +44,7 @@ module ActionView
 
       # Create a dependency tree for template named +name+.
       def tree(name, finder, partial = false, seen = {})
-        logical_name = name.gsub(%r|/_|, "/")
+        logical_name = name.gsub(%r{/_}, "/")
 
         if template = find_template(finder, logical_name, [], partial, [])
           finder.rendered_format ||= template.formats.first
@@ -55,7 +55,7 @@ module ActionView
             node = seen[template.identifier] = Node.create(name, logical_name, template, partial)
 
             deps = DependencyTracker.find_dependencies(name, template, finder.view_paths)
-            deps.uniq { |n| n.gsub(%r|/_|, "/") }.each do |dep_file|
+            deps.uniq { |n| n.gsub(%r{/_}, "/") }.each do |dep_file|
               node.children << tree(dep_file, finder, true, seen)
             end
             node
@@ -70,13 +70,14 @@ module ActionView
       end
 
       private
-        def find_template(finder, name, prefixes, partial, keys)
-          finder.disable_cache do
-            format = finder.rendered_format
-            result = finder.find_all(name, prefixes, partial, keys, formats: [format]).first if format
-            result || finder.find_all(name, prefixes, partial, keys).first
-          end
+
+      def find_template(finder, name, prefixes, partial, keys)
+        finder.disable_cache do
+          format = finder.rendered_format
+          result = finder.find_all(name, prefixes, partial, keys, formats: [format]).first if format
+          result || finder.find_all(name, prefixes, partial, keys).first
         end
+      end
     end
 
     class Node
@@ -119,15 +120,20 @@ module ActionView
     class Partial < Node; end
 
     class Missing < Node
-      def digest(finder, _ = []) "" end
+      def digest(finder, _ = [])
+        ""
+      end
     end
 
     class Injected < Node
-      def digest(finder, _ = []) name end
+      def digest(finder, _ = [])
+        name
+      end
     end
 
     class NullLogger
       def self.debug(_); end
+
       def self.error(_); end
     end
   end

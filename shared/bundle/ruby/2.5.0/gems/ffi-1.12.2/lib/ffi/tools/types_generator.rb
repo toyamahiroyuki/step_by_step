@@ -1,47 +1,45 @@
 require 'tempfile'
 
 module FFI
-
   # @private
   class TypesGenerator
-
     ##
     # Maps different C types to the C type representations we use
 
     TYPE_MAP = {
-               "char" => :char,
-        "signed char" => :char,
+      "char" => :char,
+      "signed char" => :char,
       "__signed char" => :char,
       "unsigned char" => :uchar,
 
-               "short"     => :short,
-        "signed short"     => :short,
-        "signed short int" => :short,
-      "unsigned short"     => :ushort,
+      "short" => :short,
+      "signed short" => :short,
+      "signed short int" => :short,
+      "unsigned short" => :ushort,
       "unsigned short int" => :ushort,
 
-               "int" => :int,
-        "signed int" => :int,
+      "int" => :int,
+      "signed int" => :int,
       "unsigned int" => :uint,
 
-               "long" => :long,
-               "long int" => :long,
-        "signed long" => :long,
-        "signed long int" => :long,
+      "long" => :long,
+      "long int" => :long,
+      "signed long" => :long,
+      "signed long int" => :long,
       "unsigned long" => :ulong,
       "unsigned long int" => :ulong,
       "long unsigned int" => :ulong,
 
-               "long long"     => :long_long,
-               "long long int" => :long_long,
-        "signed long long"     => :long_long,
-        "signed long long int" => :long_long,
-      "unsigned long long"     => :ulong_long,
+      "long long" => :long_long,
+      "long long int" => :long_long,
+      "signed long long" => :long_long,
+      "signed long long int" => :long_long,
+      "unsigned long long" => :ulong_long,
       "unsigned long long int" => :ulong_long,
 
       "char *" => :string,
       "void *" => :pointer,
-    }
+    }.freeze
 
     def self.generate(options = {})
       typedefs = nil
@@ -80,7 +78,7 @@ module FFI
         type.gsub!(/\s*;\s*$/, "")
 
         parts = type.split(/\s+/)
-        def_type   = parts.join(" ")
+        def_type = parts.join(" ")
 
         # GCC does mapping with __attribute__ stuf, also see
         # http://hal.cs.berkeley.edu/cil/cil016.html section 16.2.7.  Problem
@@ -132,4 +130,3 @@ module FFI
     end
   end
 end
-

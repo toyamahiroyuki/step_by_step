@@ -2,7 +2,6 @@ require 'concurrent/concern/logging'
 
 module Concurrent
   module Concern
-
     # @!visibility private
     # @!macro internal_implementation_note
     module Deprecation

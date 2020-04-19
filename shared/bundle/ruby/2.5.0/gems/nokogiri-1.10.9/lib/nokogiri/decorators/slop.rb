@@ -5,11 +5,11 @@ module Nokogiri
     # used instead of XPath or CSS.  See Nokogiri.Slop
     module Slop
       # The default XPath search context for Slop
-      XPATH_PREFIX = "./"
+      XPATH_PREFIX = "./".freeze
 
       ###
       # look for node with +name+.  See Nokogiri.Slop
-      def method_missing name, *args, &block
+      def method_missing(name, *args, &block)
         if args.empty?
           list = xpath("#{XPATH_PREFIX}#{name.to_s.sub(/^_/, '')}")
         elsif args.first.is_a? Hash
@@ -32,7 +32,7 @@ module Nokogiri
         list.length == 1 ? list.first : list
       end
 
-      def respond_to_missing? name, include_private = false
+      def respond_to_missing?(name, include_private = false)
         list = xpath("#{XPATH_PREFIX}#{name.to_s.sub(/^_/, '')}")
 
         !list.empty?

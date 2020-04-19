@@ -38,7 +38,7 @@ Viiite.bench do |b|
         end
         ths.push t
       end
-      sum = ths.reduce(0){|r,t| r + t.value }
+      sum = ths.reduce(0) { |r, t| r + t.value }
       puts "MessagePack.pack, plain, #{threads} threads: #{sum} times, #{sum / seconds} times/second."
     end
 
@@ -58,7 +58,7 @@ Viiite.bench do |b|
         end
         ths.push t
       end
-      sum = ths.reduce(0){|r,t| r + t.value }
+      sum = ths.reduce(0) { |r, t| r + t.value }
       puts "MessagePack.pack, structured, #{threads} threads: #{sum} times, #{sum / seconds} times/second."
     end
   end

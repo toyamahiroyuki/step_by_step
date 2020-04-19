@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class MSSQL < Arel::Visitors::ToSql
@@ -14,22 +15,22 @@ module Arel
       # `top` wouldn't really work here. I.e. User.select("distinct first_name").limit(10) would generate
       # "select top 10 distinct first_name from users", which is invalid query! it should be
       # "select distinct top 10 first_name from users"
-      def visit_Arel_Nodes_Top o
+      def visit_Arel_Nodes_Top(o)
         ""
       end
 
-      def visit_Arel_Visitors_MSSQL_RowNumber o, collector
+      def visit_Arel_Visitors_MSSQL_RowNumber(o, collector)
         collector << "ROW_NUMBER() OVER (ORDER BY "
         inject_join(o.children, collector, ', ') << ") as _row_num"
       end
 
-      def visit_Arel_Nodes_SelectStatement o, collector
+      def visit_Arel_Nodes_SelectStatement(o, collector)
         if !o.limit && !o.offset
           return super
         end
 
         is_select_count = false
-        o.cores.each { |x|
+        o.cores.each do |x|
           core_order_by = row_num_literal determine_order_by(o.orders, x)
           if select_count? x
             x.projections = [core_order_by]
@@ -37,7 +38,7 @@ module Arel
           else
             x.projections << core_order_by
           end
-        }
+        end
 
         if is_select_count
           # fixme count distinct wouldn't work with limit or offset
@@ -45,9 +46,9 @@ module Arel
         end
 
         collector << "SELECT _t.* FROM ("
-        collector = o.cores.inject(collector) { |c,x|
+        collector = o.cores.inject(collector) do |c, x|
           visit_Arel_Nodes_SelectCore x, c
-        }
+        end
         collector << ") as _t WHERE #{get_offset_limit_clause(o)}"
 
         if is_select_count
@@ -57,7 +58,7 @@ module Arel
         end
       end
 
-      def get_offset_limit_clause o
+      def get_offset_limit_clause(o)
         first_row = o.offset ? o.offset.expr.to_i + 1 : 1
         last_row  = o.limit ? o.limit.expr.to_i - 1 + first_row : nil
         if last_row
@@ -67,7 +68,7 @@ module Arel
         end
       end
 
-      def visit_Arel_Nodes_DeleteStatement o, collector
+      def visit_Arel_Nodes_DeleteStatement(o, collector)
         collector << 'DELETE '
         if o.limit
           collector << 'TOP ('
@@ -84,7 +85,7 @@ module Arel
         end
       end
 
-      def determine_order_by orders, x
+      def determine_order_by(orders, x)
         if orders.any?
           orders
         elsif x.groups.any?
@@ -95,17 +96,17 @@ module Arel
         end
       end
 
-      def row_num_literal order_by
+      def row_num_literal(order_by)
         RowNumber.new order_by
       end
 
-      def select_count? x
+      def select_count?(x)
         x.projections.length == 1 && Arel::Nodes::Count === x.projections.first
       end
 
       # FIXME raise exception of there is no pk?
-      def find_left_table_pk o
-        if o.kind_of?(Arel::Nodes::Join)
+      def find_left_table_pk(o)
+        if o.is_a?(Arel::Nodes::Join)
           find_left_table_pk(o.left)
         elsif o.instance_of?(Arel::Table)
           find_primary_key(o)

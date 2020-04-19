@@ -14,6 +14,7 @@ require 'shellwords'
 # https://github.com/ruby/ruby/commit/58835a9
 class Net::HTTP
   private
+
   remove_method(:edit_path)
   def edit_path(path)
     if proxy?
@@ -67,22 +68,22 @@ class MiniPortile
     (
       # Not a class variable because closures will capture self.
       @apply_patch ||=
-      case
-      when which('git')
-        lambda { |file|
-          message "Running git apply with #{file}... "
-          # By --work-tree=. git-apply uses the current directory as
-          # the project root and will not search upwards for .git.
-          execute('patch', ["git", "--git-dir=.", "--work-tree=.", "apply", "--whitespace=warn", file], :initial_message => false)
-        }
-      when which('patch')
-        lambda { |file|
-          message "Running patch with #{file}... "
-          execute('patch', ["patch", "-p1", "-i", file], :initial_message => false)
-        }
-      else
-        raise "Failed to complete patch task; patch(1) or git(1) is required."
-      end
+        case
+        when which('git')
+          lambda { |file|
+            message "Running git apply with #{file}... "
+            # By --work-tree=. git-apply uses the current directory as
+            # the project root and will not search upwards for .git.
+            execute('patch', ["git", "--git-dir=.", "--work-tree=.", "apply", "--whitespace=warn", file], :initial_message => false)
+          }
+        when which('patch')
+          lambda { |file|
+            message "Running patch with #{file}... "
+            execute('patch', ["patch", "-p1", "-i", file], :initial_message => false)
+          }
+        else
+          raise "Failed to complete patch task; patch(1) or git(1) is required."
+        end
     ).call(patch_file)
   end
 
@@ -103,7 +104,7 @@ class MiniPortile
     cache_file = File.join(tmp_path, 'configure.options_cache')
     File.open(cache_file, "w") { |f| f.write computed_options.to_s }
 
-    if RUBY_PLATFORM=~/mingw|mswin/
+    if RUBY_PLATFORM =~ /mingw|mswin/
       # Windows doesn't recognize the shebang.
       execute('configure', %w(sh ./configure) + computed_options)
     else
@@ -131,7 +132,7 @@ class MiniPortile
   def configured?
     configure = File.join(work_path, 'configure')
     makefile  = File.join(work_path, 'Makefile')
-    cache_file  = File.join(tmp_path, 'configure.options_cache')
+    cache_file = File.join(tmp_path, 'configure.options_cache')
 
     stored_options  = File.exist?(cache_file) ? File.read(cache_file) : ""
     current_options = computed_options.to_s
@@ -140,7 +141,7 @@ class MiniPortile
   end
 
   def installed?
-    makefile  = File.join(work_path, 'Makefile')
+    makefile = File.join(work_path, 'Makefile')
     target_dir = Dir.glob("#{port_path}/*").find { |d| File.directory?(d) }
 
     newer?(target_dir, makefile)
@@ -154,15 +155,15 @@ class MiniPortile
     compile
     install unless installed?
 
-    return true
+    true
   end
 
   def activate
     lib_path = File.join(port_path, "lib")
     vars = {
-      'PATH'          => File.join(port_path, 'bin'),
-      'CPATH'         => File.join(port_path, 'include'),
-      'LIBRARY_PATH'  => lib_path
+      'PATH' => File.join(port_path, 'bin'),
+      'CPATH' => File.join(port_path, 'include'),
+      'LIBRARY_PATH' => lib_path,
     }.reject { |env, path| !File.directory?(path) }
 
     output "Activating #{@name} #{@version} (from #{port_path})..."
@@ -196,7 +197,7 @@ class MiniPortile
     File.expand_path(port_path)
   end
 
-private
+  private
 
   def tmp_path
     "tmp/#{@host}/ports/#{@name}/#{@version}"
@@ -218,7 +219,7 @@ private
     [
       "--host=#{@host}",    # build for specific target (host)
       "--enable-static",    # build static library
-      "--disable-shared"    # disable generation of shared object
+      "--disable-shared",    # disable generation of shared object
     ]
   end
 
@@ -236,25 +237,25 @@ private
   def files_hashs
     @files.map do |file|
       hash = case file
-      when String
-        { :url => file }
-      when Hash
-        file.dup
-      else
-        raise ArgumentError, "files must be an Array of Stings or Hashs"
+             when String
+               { :url => file }
+             when Hash
+               file.dup
+             else
+               raise ArgumentError, "files must be an Array of Stings or Hashs"
       end
 
-      url = hash.fetch(:url){ raise ArgumentError, "no url given" }
+      url = hash.fetch(:url) { raise ArgumentError, "no url given" }
       filename = File.basename(url)
       hash[:local_path] = File.join(archives_path, filename)
       hash
     end
   end
 
-  KEYRING_NAME = "mini_portile_keyring.gpg"
+  KEYRING_NAME = "mini_portile_keyring.gpg".freeze
 
   def verify_file(file)
-    if file.has_key?(:gpg)
+    if file.key?(:gpg)
       gpg = file[:gpg]
 
       signature_url = gpg[:signature_url] || "#{file[:url]}.asc"
@@ -278,14 +279,14 @@ private
       # remove the key from our keyring
       IO.popen([gpg_exe, "--batch", "--yes", "--no-default-keyring", "--keyring", KEYRING_NAME, "--delete-keys", key_id], &:read)
 
-      raise "unable to delete the imported key" unless $?.exitstatus==0
+      raise "unable to delete the imported key" unless $CHILD_STATUS.exitstatus == 0
       raise "signature mismatch" unless gpg_status.match(/^\[GNUPG:\] VALIDSIG/)
 
     else
       digest = case
-        when exp=file[:sha256] then Digest::SHA256
-        when exp=file[:sha1] then Digest::SHA1
-        when exp=file[:md5] then Digest::MD5
+               when exp = file[:sha256] then Digest::SHA256
+               when exp = file[:sha1] then Digest::SHA1
+               when exp = file[:md5] then Digest::MD5
       end
       if digest
         is = digest.file(file[:local_path]).hexdigest
@@ -298,30 +299,30 @@ private
 
   def log_file(action)
     @log_files[action] ||=
-      File.expand_path("#{action}.log", tmp_path).tap { |file|
+      File.expand_path("#{action}.log", tmp_path).tap do |file|
         File.unlink(file) if File.exist?(file)
-      }
+      end
   end
 
-  TAR_EXECUTABLES = %w[gtar bsdtar tar basic-bsdtar]
+  TAR_EXECUTABLES = %w(gtar bsdtar tar basic-bsdtar).freeze
   def tar_exe
     @@tar_exe ||= begin
-      TAR_EXECUTABLES.find { |c|
+      TAR_EXECUTABLES.find do |c|
         which(c)
-      } or raise("tar not found - please make sure that one of the following commands is in the PATH: #{TAR_EXECUTABLES.join(", ")}")
+      end || raise("tar not found - please make sure that one of the following commands is in the PATH: #{TAR_EXECUTABLES.join(", ")}")
     end
   end
 
   def tar_compression_switch(filename)
     case File.extname(filename)
-      when '.gz', '.tgz'
-        'z'
-      when '.bz2', '.tbz2'
-        'j'
-      when '.Z'
-        'Z'
-      else
-        ''
+    when '.gz', '.tgz'
+      'z'
+    when '.bz2', '.tbz2'
+      'j'
+    when '.Z'
+      'Z'
+    else
+      ''
     end
   end
 
@@ -334,12 +335,12 @@ private
   def which(cmd)
     exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
     ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
-      exts.each { |ext|
+      exts.each do |ext|
         exe = File.join(path, "#{cmd}#{ext}")
         return exe if File.executable? exe
-      }
+      end
     end
-    return nil
+    nil
   end
 
   def detect_host
@@ -364,31 +365,31 @@ private
     FileUtils.mkdir_p target
 
     message "Extracting #{filename} into #{target}... "
-    execute('extract', [tar_exe, "#{tar_compression_switch(filename)}xf", file, "-C", target], {:cd => Dir.pwd, :initial_message => false})
+    execute('extract', [tar_exe, "#{tar_compression_switch(filename)}xf", file, "-C", target], { :cd => Dir.pwd, :initial_message => false })
   end
 
-  def execute(action, command, options={})
-    log_out    = log_file(action)
+  def execute(action, command, options = {})
+    log_out = log_file(action)
 
-    Dir.chdir (options.fetch(:cd){ work_path }) do
-      if options.fetch(:initial_message){ true }
+    Dir.chdir (options.fetch(:cd) { work_path }) do
+      if options.fetch(:initial_message) { true }
         message "Running '#{action}' for #{@name} #{@version}... "
       end
 
-      if Process.respond_to?(:spawn) && ! RbConfig.respond_to?(:java)
-        args = [command].flatten + [{[:out, :err]=>[log_out, "a"]}]
+      if Process.respond_to?(:spawn) && !RbConfig.respond_to?(:java)
+        args = [command].flatten + [{ [:out, :err] => [log_out, "a"] }]
         pid = spawn(*args)
         Process.wait(pid)
       else
-        redirected = if command.kind_of?(Array)
-                       %Q{#{command.map(&:shellescape).join(" ")} > #{log_out.shellescape} 2>&1}
+        redirected = if command.is_a?(Array)
+                       %Q(#{command.map(&:shellescape).join(" ")} > #{log_out.shellescape} 2>&1)
                      else
-                       %Q{#{command} > #{log_out.shellescape} 2>&1}
+                       %Q(#{command} > #{log_out.shellescape} 2>&1)
                      end
         system redirected
       end
 
-      if $?.success?
+      if $CHILD_STATUS.success?
         output "OK"
         return true
       else
@@ -396,7 +397,7 @@ private
           output "ERROR, review '#{log_out}' to see what happened. Last lines are:"
           output("=" * 72)
           log_lines = File.readlines(log_out)
-          output(log_lines[-[log_lines.length, 20].min .. -1])
+          output(log_lines[-[log_lines.length, 20].min..-1])
           output("=" * 72)
         end
         raise "Failed to complete #{action} task"
@@ -438,7 +439,7 @@ private
     when /file/
       download_file_file(uri, full_path)
     else
-      raise ArgumentError.new("Unsupported protocol for #{url}")
+      raise ArgumentError, "Unsupported protocol for #{url}"
     end
   rescue Exception => e
     File.unlink full_path if File.exist?(full_path)
@@ -452,8 +453,8 @@ private
       total = 0
       params = {
         "Accept-Encoding" => 'identity',
-        :content_length_proc => lambda{|length| total = length },
-        :progress_proc => lambda{|bytes|
+        :content_length_proc => lambda { |length| total = length },
+        :progress_proc => lambda { |bytes|
           if total
             new_progress = (bytes * 100) / total
             message "\rDownloading %s (%3d%%) " % [filename, new_progress]
@@ -462,7 +463,7 @@ private
             # Content-Length is unavailable because Transfer-Encoding is chunked
             message "\rDownloading %s " % [filename]
           end
-        }
+        },
       }
       proxy_uri = URI.parse(url).scheme.downcase == 'https' ?
                   ENV["https_proxy"] :
@@ -470,7 +471,7 @@ private
       if proxy_uri
         _, userinfo, _p_host, _p_port = URI.split(proxy_uri)
         if userinfo
-          proxy_user, proxy_pass = userinfo.split(/:/).map{|s| CGI.unescape(s) }
+          proxy_user, proxy_pass = userinfo.split(/:/).map { |s| CGI.unescape(s) }
           params[:proxy_http_basic_authentication] =
             [proxy_uri, proxy_user, proxy_pass]
         end
@@ -483,10 +484,10 @@ private
         output
       rescue OpenURI::HTTPRedirect => redirect
         raise "Too many redirections for the original URL, halting." if count <= 0
-        count = count - 1
-        return download_file(redirect.url, full_path, count-1)
+        count -= 1
+        return download_file(redirect.url, full_path, count - 1)
       rescue => e
-        count = count - 1
+        count -= 1
         puts "#{count} retrie(s) left for #{filename}"
         if count > 0
           sleep 1
@@ -510,17 +511,17 @@ private
       progress = 0
       total = 0
       params = {
-        :content_length_proc => lambda{|length| total = length },
-        :progress_proc => lambda{|bytes|
+        :content_length_proc => lambda { |length| total = length },
+        :progress_proc => lambda { |bytes|
           new_progress = (bytes * 100) / total
           message "\rDownloading %s (%3d%%) " % [filename, new_progress]
           progress = new_progress
-        }
+        },
       }
       if ENV["ftp_proxy"]
         _, userinfo, _p_host, _p_port = URI.split(ENV['ftp_proxy'])
         if userinfo
-          proxy_user, proxy_pass = userinfo.split(/:/).map{|s| CGI.unescape(s) }
+          proxy_user, proxy_pass = userinfo.split(/:/).map { |s| CGI.unescape(s) }
           params[:proxy_http_basic_authentication] =
             [ENV['ftp_proxy'], proxy_user, proxy_pass]
         end
@@ -531,7 +532,7 @@ private
       output
     end
   rescue Net::FTPError
-    return false
+    false
   end
 
   def with_tempfile(filename, full_path)
@@ -546,11 +547,11 @@ private
 
   def gcc_cmd
     cc = ENV["CC"] || RbConfig::CONFIG["CC"] || "gcc"
-    return cc.dup
+    cc.dup
   end
 
   def make_cmd
     m = ENV['MAKE'] || ENV['make'] || 'make'
-    return m.dup
+    m.dup
   end
 end

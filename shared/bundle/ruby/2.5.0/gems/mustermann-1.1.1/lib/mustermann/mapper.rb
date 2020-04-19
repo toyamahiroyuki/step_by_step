@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann'
 require 'mustermann/expander'
 
@@ -73,7 +74,7 @@ module Mustermann
     def convert(input, values = {})
       @map.inject(input) do |current, (pattern, expander)|
         params = pattern.params(current)
-        params &&= Hash[values.merge(params).map { |k,v| [k.to_s, v] }]
+        params &&= Hash[values.merge(params).map { |k, v| [k.to_s, v] }]
         expander.expandable?(params) ? expander.expand(params) : current
       end
     end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'mustermann/extension'
 require 'sinatra/base'
@@ -20,6 +21,7 @@ describe Mustermann::Extension do
 
   context 'uses Sinatra-style patterns by default' do
     before { app.get('/:slug(.:extension)?') { params[:slug] } }
+
     example { get('/foo')     .body.should be == 'foo'  }
     example { get('/foo.')    .body.should be == 'foo.' }
     example { get('/foo.bar') .body.should be == 'foo'  }
@@ -28,6 +30,7 @@ describe Mustermann::Extension do
 
   describe :except do
     before { app.get('/auth/*', except: '/auth/login') { 'ok' } }
+
     example { get('/auth/dunno').should     be_ok }
     example { get('/auth/login').should_not be_ok }
   end
@@ -35,7 +38,7 @@ describe Mustermann::Extension do
   describe :capture do
     context 'global' do
       before do
-        app.set(:pattern, capture: { ext: %w[png jpg gif] })
+        app.set(:pattern, capture: { ext: %w(png jpg gif) })
         app.get('/:slug(.:ext)?') { params[:slug] }
       end
 
@@ -89,6 +92,7 @@ describe Mustermann::Extension do
   describe :pattern do
     describe :except do
       before { app.get('/auth/*', pattern: { except: '/auth/login' }) { 'ok' } }
+
       example { get('/auth/dunno').should     be_ok }
       example { get('/auth/login').should_not be_ok }
     end
@@ -108,9 +112,9 @@ describe Mustermann::Extension do
         context 'global is a hash' do
           before do
             app.set(:pattern, capture: { id: /\d+/ })
-            app.get('/:id(.:ext)?', pattern: { capture: { ext: 'png' }}) { ?a }
-            app.get('/:id',         pattern: { capture: { id: 'foo'  }}) { ?b }
-            app.get('/:id',         pattern: { capture: :alpha })        { ?c }
+            app.get('/:id(.:ext)?', pattern: { capture: { ext: 'png' } }) { ?a }
+            app.get('/:id',         pattern: { capture: { id: 'foo'  } }) { ?b }
+            app.get('/:id',         pattern: { capture: :alpha }) { ?c }
           end
 
           example { get('/20')     .body.should be == ?a }
@@ -122,7 +126,7 @@ describe Mustermann::Extension do
         context 'global is not a hash' do
           before do
             app.set(:pattern, capture: /\d+/)
-            app.get('/:slug(.:ext)?', pattern: { capture: { ext: 'png' }}) { params[:slug] }
+            app.get('/:slug(.:ext)?', pattern: { capture: { ext: 'png' } }) { params[:slug] }
             app.get('/:slug', pattern: { capture: :alpha }) { 'ok' }
           end
 
@@ -139,19 +143,22 @@ describe Mustermann::Extension do
 
     describe :greedy do
       context 'default' do
-        before { app.get('/:name.:ext') { params[:name] }}
+        before { app.get('/:name.:ext') { params[:name] } }
+
         example { get('/foo.bar')     .body.should be == 'foo'     }
         example { get('/foo.bar.baz') .body.should be == 'foo.bar' }
       end
 
       context 'enabled' do
-        before { app.get('/:name.:ext', pattern: { greedy: true }) { params[:name] }}
+        before { app.get('/:name.:ext', pattern: { greedy: true }) { params[:name] } }
+
         example { get('/foo.bar')     .body.should be == 'foo'     }
         example { get('/foo.bar.baz') .body.should be == 'foo.bar' }
       end
 
       context 'disabled' do
-        before { app.get('/:name.:ext', pattern: { greedy: false }) { params[:name] }}
+        before { app.get('/:name.:ext', pattern: { greedy: false }) { params[:name] } }
+
         example { get('/foo.bar')     .body.should be == 'foo' }
         example { get('/foo.bar.baz') .body.should be == 'foo' }
       end
@@ -169,19 +176,22 @@ describe Mustermann::Extension do
 
     describe :space_matches_plus do
       context 'default' do
-        before { app.get('/foo bar') { 'ok' }}
+        before { app.get('/foo bar') { 'ok' } }
+
         example { get('/foo%20bar') .should be_ok }
         example { get('/foo+bar')   .should be_ok }
       end
 
       context 'enabled' do
-        before { app.get('/foo bar', pattern: { space_matches_plus: true }) { 'ok' }}
+        before { app.get('/foo bar', pattern: { space_matches_plus: true }) { 'ok' } }
+
         example { get('/foo%20bar') .should be_ok }
         example { get('/foo+bar')   .should be_ok }
       end
 
       context 'disabled' do
-        before { app.get('/foo bar', pattern: { space_matches_plus: false }) { 'ok' }}
+        before { app.get('/foo bar', pattern: { space_matches_plus: false }) { 'ok' } }
+
         example { get('/foo%20bar') .should     be_ok }
         example { get('/foo+bar')   .should_not be_ok }
       end
@@ -199,19 +209,22 @@ describe Mustermann::Extension do
 
     describe :uri_decode do
       context 'default' do
-        before { app.get('/&') { 'ok' }}
+        before { app.get('/&') { 'ok' } }
+
         example { get('/&')   .should be_ok }
         example { get('/%26') .should be_ok }
       end
 
       context 'enabled' do
-        before { app.get('/&', pattern: { uri_decode: true }) { 'ok' }}
+        before { app.get('/&', pattern: { uri_decode: true }) { 'ok' } }
+
         example { get('/&')   .should be_ok }
         example { get('/%26') .should be_ok }
       end
 
       context 'disabled' do
-        before { app.get('/&', pattern: { uri_decode: false }) { 'ok' }}
+        before { app.get('/&', pattern: { uri_decode: false }) { 'ok' } }
+
         example { get('/&')   .should     be_ok }
         example { get('/%26') .should_not be_ok }
       end

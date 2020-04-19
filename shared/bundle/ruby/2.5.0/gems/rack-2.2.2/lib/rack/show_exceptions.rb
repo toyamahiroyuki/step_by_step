@@ -50,7 +50,7 @@ module Rack
     end
 
     def accepts_html?(env)
-      Rack::Utils.best_q_match(env["HTTP_ACCEPT"], %w[text/html])
+      Rack::Utils.best_q_match(env["HTTP_ACCEPT"], %w(text/html))
     end
     private :accepts_html?
 
@@ -69,12 +69,12 @@ module Rack
 
       # This double assignment is to prevent an "unused variable" warning.
       # Yes, it is dumb, but I don't like Ruby yelling at me.
-      frames = frames = exception.backtrace.map { |line|
+      frames = frames = exception.backtrace.map do |line|
         frame = OpenStruct.new
         if line =~ /(.*?):(\d+)(:in `(.*)')?/
-          frame.filename = $1
-          frame.lineno = $2.to_i
-          frame.function = $4
+          frame.filename = Regexp.last_match(1)
+          frame.lineno = Regexp.last_match(2).to_i
+          frame.function = Regexp.last_match(4)
 
           begin
             lineno = frame.lineno - 1
@@ -91,7 +91,7 @@ module Rack
         else
           nil
         end
-      }.compact
+      end.compact
 
       template.result(binding)
     end
@@ -100,7 +100,7 @@ module Rack
       TEMPLATE
     end
 
-    def h(obj)                  # :nodoc:
+    def h(obj) # :nodoc:
       case obj
       when String
         Utils.escape_html(obj)

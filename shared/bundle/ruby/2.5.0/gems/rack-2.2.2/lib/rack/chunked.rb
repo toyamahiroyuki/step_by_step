@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Rack
-
   # Middleware that applies chunked transfer encoding to response bodies
   # when the response does not include a Content-Length header.
   #

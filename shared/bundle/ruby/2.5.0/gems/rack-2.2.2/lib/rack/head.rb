@@ -15,7 +15,7 @@ module Rack
         [
           status, headers, Rack::BodyProxy.new([]) do
             body.close if body.respond_to? :close
-          end
+          end,
         ]
       else
         [status, headers, body]

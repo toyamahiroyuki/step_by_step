@@ -1,9 +1,15 @@
 class IncomesController < ApplicationController
-    before_action :authenticate_user!
+  before_action :authenticate_user!
   def new
     @income = Income.new
     @income_day = params["day"]
     @incomes = current_user.incomes.where(day: @income_day)
+
+    # partial = render_to_string(partial: 'new', layout: false, collection: @income)
+    # puts partial
+    # render json: { html: partial }
+
+    # render plain: render_to_string(partial: 'new', layout: false, locals: { income: @income})
   end
 
   def show
@@ -30,7 +36,7 @@ class IncomesController < ApplicationController
     @income = Income.new(income_params)
     @income.user_id = current_user.id
     if @income.save
-       redirect_to homes_top_path
+      redirect_to homes_top_path
     else
       @income = Income.new
       @income_day = params["day"]
@@ -47,11 +53,11 @@ class IncomesController < ApplicationController
   def update
     income = Income.find(params[:id])
     if income.update(income_params)
-       redirect_to homes_top_path
+      redirect_to homes_top_path
     else
-       @income_day = params["day"]
-       @income = Income.find(params[:id])
-       render action: :edit
+      @income_day = params["day"]
+      @income = Income.find(params[:id])
+      render action: :edit
     end
   end
 

@@ -90,7 +90,7 @@ module ActionMailer
     #     end
     #   end
     def assert_enqueued_emails(number, &block)
-      assert_enqueued_jobs number, only: [ ActionMailer::DeliveryJob, ActionMailer::Parameterized::DeliveryJob ], &block
+      assert_enqueued_jobs number, only: [ActionMailer::DeliveryJob, ActionMailer::Parameterized::DeliveryJob], &block
     end
 
     # Asserts that block should cause the specified email
@@ -138,7 +138,7 @@ module ActionMailer
     #     end
     #   end
     def assert_no_enqueued_emails(&block)
-      assert_no_enqueued_jobs only: [ ActionMailer::DeliveryJob, ActionMailer::Parameterized::DeliveryJob ], &block
+      assert_no_enqueued_jobs only: [ActionMailer::DeliveryJob, ActionMailer::Parameterized::DeliveryJob], &block
     end
   end
 end

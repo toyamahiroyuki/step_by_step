@@ -43,20 +43,20 @@ class Pry
         if name.nil?
           nil
         elsif name.to_s =~ /(.+)\#(\S+)\Z/
-          context, meth_name = $1, $2
+          context, meth_name = Regexp.last_match(1), Regexp.last_match(2)
           from_module(target.eval(context), meth_name, target)
         elsif name.to_s =~ /(.+)(\[\])\Z/
-          context, meth_name = $1, $2
+          context, meth_name = Regexp.last_match(1), Regexp.last_match(2)
           from_obj(target.eval(context), meth_name, target)
         elsif name.to_s =~ /(.+)(\.|::)(\S+)\Z/
-          context, meth_name = $1, $3
+          context, meth_name = Regexp.last_match(1), Regexp.last_match(3)
           from_obj(target.eval(context), meth_name, target)
         elsif options[:instance]
           from_module(target.eval("self"), name, target)
         elsif options[:methods]
           from_obj(target.eval("self"), name, target)
         else
-          from_str(name, target, instance: true) or
+          from_str(name, target, instance: true) ||
             from_str(name, target, methods: true)
         end
 
@@ -119,7 +119,9 @@ class Pry
       # @param [Binding] target The binding where the method is looked up.
       # @return [Pry::Method, nil]
       def from_class(klass, name, target = TOPLEVEL_BINDING)
-        new(lookup_method_via_binding(klass, name, :instance_method, target)) rescue nil
+        new(lookup_method_via_binding(klass, name, :instance_method, target))
+      rescue
+        nil
       end
       alias from_module from_class
 
@@ -132,7 +134,9 @@ class Pry
       # @param [Binding] target The binding where the method is looked up.
       # @return [Pry::Method, nil]
       def from_obj(obj, name, target = TOPLEVEL_BINDING)
-        new(lookup_method_via_binding(obj, name, :method, target)) rescue nil
+        new(lookup_method_via_binding(obj, name, :method, target))
+      rescue
+        nil
       end
 
       # Get all of the instance methods of a `Class` or `Module`
@@ -178,7 +182,11 @@ class Pry
         if Class === obj
           singleton_class_resolution_order(obj) + instance_resolution_order(Class)
         else
-          klass = singleton_class_of(obj) rescue obj.class
+          klass = begin
+                    singleton_class_of(obj)
+                  rescue
+                    obj.class
+                  end
           instance_resolution_order(klass)
         end
       end
@@ -220,11 +228,9 @@ class Pry
       end
 
       def singleton_class_of(obj)
-        begin
-          class << obj; self; end
-        rescue TypeError # can't define singleton. Fixnum, Symbol, Float, ...
-          obj.class
-        end
+        class << obj; self; end
+      rescue TypeError # can't define singleton. Fixnum, Symbol, Float, ...
+        obj.class
       end
     end
 
@@ -342,15 +348,15 @@ class Pry
     # @return [Symbol] The visibility of the method. May be `:public`,
     #   `:protected`, or `:private`.
     def visibility
-     @visibility ||= if owner.public_instance_methods.any? { |m| m.to_s == name }
-                       :public
-                     elsif owner.protected_instance_methods.any? { |m| m.to_s == name }
-                       :protected
-                     elsif owner.private_instance_methods.any? { |m| m.to_s == name }
-                       :private
-                     else
-                       :none
-                     end
+      @visibility ||= if owner.public_instance_methods.any? { |m| m.to_s == name }
+                        :public
+                      elsif owner.protected_instance_methods.any? { |m| m.to_s == name }
+                        :protected
+                      elsif owner.private_instance_methods.any? { |m| m.to_s == name }
+                        :private
+                      else
+                        :none
+                      end
     end
 
     # @return [String] A representation of the method's signature, including its
@@ -404,7 +410,7 @@ class Pry
 
     # @return [Boolean] Was the method defined outside a source file?
     def dynamically_defined?
-      !!(source_file and source_file =~ /(\(.*\))|<.*>/)
+      !!(source_file && source_file =~ /(\(.*\))|<.*>/)
     end
 
     # @return [Boolean] Whether the method is unbound.
@@ -461,14 +467,14 @@ class Pry
     # @param [Class] klass
     # @return [Boolean]
     def is_a?(klass)
-      klass == Pry::Method or @method.is_a?(klass)
+      (klass == Pry::Method) || @method.is_a?(klass)
     end
     alias kind_of? is_a?
 
     # @param [String, Symbol] method_name
     # @return [Boolean]
     def respond_to?(method_name, include_all = false)
-      super or @method.respond_to?(method_name, include_all)
+      super || @method.respond_to?(method_name, include_all)
     end
 
     # Delegate any unknown calls to the wrapped method.
@@ -486,7 +492,7 @@ class Pry
     # @raise [CommandError] when the method can't be found or `pry-doc` isn't installed.
     def pry_doc_info
       if Pry.config.has_pry_doc
-        Pry::MethodInfo.info_for(@method) or raise CommandError, "Cannot locate this method: #{name}. (source_location returns nil)"
+        Pry::MethodInfo.info_for(@method) || raise(CommandError, "Cannot locate this method: #{name}. (source_location returns nil)")
       else
         fail_msg = "Cannot locate this method: #{name}."
         if Helpers::Platform.mri?
@@ -499,16 +505,20 @@ class Pry
     # @param [Class, Module] ancestors The ancestors to investigate
     # @return [Method] The unwrapped super-method
     def super_using_ancestors(ancestors, times = 1)
-      next_owner = self.owner
+      next_owner = owner
       times.times do
         i = ancestors.index(next_owner) + 1
         while ancestors[i] && !(ancestors[i].method_defined?(name) || ancestors[i].private_method_defined?(name))
           i += 1
         end
-        next_owner = ancestors[i] or return nil
+        (next_owner = ancestors[i]) || (return nil)
       end
 
-      safe_send(next_owner, :instance_method, name) rescue nil
+      begin
+        safe_send(next_owner, :instance_method, name)
+      rescue
+        nil
+      end
     end
 
     # @param [String] first_ln The first line of a method definition.
@@ -529,7 +539,7 @@ class Pry
 
     def c_source
       info = pry_doc_info
-      if info and info.source
+      if info && info.source
         strip_comments_from_c_code(info.source)
       end
     end
@@ -544,7 +554,7 @@ class Pry
       begin
         code = Pry::Code.from_file(file).expression_at(line)
       rescue SyntaxError => e
-        raise MethodSource::SourceNotFoundError.new(e.message)
+        raise MethodSource::SourceNotFoundError, e.message
       end
       strip_leading_whitespace(code)
     end

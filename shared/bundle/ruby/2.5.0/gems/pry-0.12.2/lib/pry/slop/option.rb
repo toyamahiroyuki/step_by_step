@@ -13,8 +13,8 @@ class Pry::Slop
       optional: true,
       required: false,
       as: String,
-      autocreated: false
-    }
+      autocreated: false,
+    }.freeze
 
     attr_reader :short, :long, :description, :config, :types
     attr_accessor :count, :argument_in_value
@@ -45,7 +45,7 @@ class Pry::Slop
         integer: proc { |v| value_to_integer(v) },
         float: proc { |v| value_to_float(v) },
         range: proc { |v| value_to_range(v) },
-        count: proc { |v| @count }
+        count: proc { |v| @count },
       }
 
       if long && long.size > @slop.config[:longest_flag]
@@ -142,8 +142,8 @@ class Pry::Slop
 
     # Returns the String inspection text.
     def inspect
-      "#<Slop::Option [-#{short} | --#{long}" +
-      "#{'=' if expects_argument?}#{'=?' if accepts_optional_argument?}]" +
+      "#<Slop::Option [-#{short} | --#{long}" \
+      "#{'=' if expects_argument?}#{'=?' if accepts_optional_argument?}]" \
       " (#{description}) #{config.inspect}"
     end
 
@@ -191,9 +191,9 @@ class Pry::Slop
     def value_to_range(value)
       case value.to_s
       when /\A(\-?\d+)\z/
-        Range.new($1.to_i, $1.to_i)
+        Range.new(Regexp.last_match(1).to_i, Regexp.last_match(1).to_i)
       when /\A(-?\d+?)(\.\.\.?|-|,)(-?\d+)\z/
-        Range.new($1.to_i, $3.to_i, $2 == '...')
+        Range.new(Regexp.last_match(1).to_i, Regexp.last_match(3).to_i, Regexp.last_match(2) == '...')
       else
         if @slop.strict?
           raise InvalidArgumentError, "#{value} could not be coerced into Range"

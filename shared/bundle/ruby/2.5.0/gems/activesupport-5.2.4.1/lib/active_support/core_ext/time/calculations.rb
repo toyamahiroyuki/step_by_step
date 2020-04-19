@@ -10,7 +10,7 @@ require "active_support/core_ext/date/calculations"
 class Time
   include DateAndTime::Calculations
 
-  COMMON_YEAR_DAYS_IN_MONTH = [nil, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  COMMON_YEAR_DAYS_IN_MONTH = [nil, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31].freeze
 
   class << self
     # Overriding case equality method so that it returns true for ActiveSupport::TimeWithZone instances

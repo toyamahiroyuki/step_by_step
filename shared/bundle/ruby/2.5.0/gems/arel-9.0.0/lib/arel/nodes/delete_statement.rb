@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class DeleteStatement < Arel::Nodes::Binary
@@ -9,11 +10,11 @@ module Arel
       alias :wheres :right
       alias :wheres= :right=
 
-      def initialize relation = nil, wheres = []
+      def initialize(relation = nil, wheres = [])
         super
       end
 
-      def initialize_copy other
+      def initialize_copy(other)
         super
         @right = @right.clone
       end

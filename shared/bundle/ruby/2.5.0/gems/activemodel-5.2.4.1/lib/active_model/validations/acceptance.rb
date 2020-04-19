@@ -16,60 +16,60 @@ module ActiveModel
 
       private
 
-        def setup!(klass)
-          klass.include(LazilyDefineAttributes.new(AttributeDefinition.new(attributes)))
-        end
+      def setup!(klass)
+        klass.include(LazilyDefineAttributes.new(AttributeDefinition.new(attributes)))
+      end
 
-        def acceptable_option?(value)
-          Array(options[:accept]).include?(value)
-        end
+      def acceptable_option?(value)
+        Array(options[:accept]).include?(value)
+      end
 
-        class LazilyDefineAttributes < Module
-          def initialize(attribute_definition)
-            define_method(:respond_to_missing?) do |method_name, include_private = false|
-              super(method_name, include_private) || attribute_definition.matches?(method_name)
+      class LazilyDefineAttributes < Module
+        def initialize(attribute_definition)
+          define_method(:respond_to_missing?) do |method_name, include_private = false|
+            super(method_name, include_private) || attribute_definition.matches?(method_name)
+          end
+
+          define_method(:method_missing) do |method_name, *args, &block|
+            if attribute_definition.matches?(method_name)
+              attribute_definition.define_on(self.class)
+              send(method_name, *args, &block)
+            else
+              super(method_name, *args, &block)
             end
-
-            define_method(:method_missing) do |method_name, *args, &block|
-              if attribute_definition.matches?(method_name)
-                attribute_definition.define_on(self.class)
-                send(method_name, *args, &block)
-              else
-                super(method_name, *args, &block)
-              end
-            end
           end
         end
+      end
 
-        class AttributeDefinition
-          def initialize(attributes)
-            @attributes = attributes.map(&:to_s)
-          end
-
-          def matches?(method_name)
-            attr_name = convert_to_reader_name(method_name)
-            attributes.include?(attr_name)
-          end
-
-          def define_on(klass)
-            attr_readers = attributes.reject { |name| klass.attribute_method?(name) }
-            attr_writers = attributes.reject { |name| klass.attribute_method?("#{name}=") }
-            klass.send(:attr_reader, *attr_readers)
-            klass.send(:attr_writer, *attr_writers)
-          end
-
-          # TODO Change this to private once we've dropped Ruby 2.2 support.
-          # Workaround for Ruby 2.2 "private attribute?" warning.
-          protected
-
-            attr_reader :attributes
-
-          private
-
-            def convert_to_reader_name(method_name)
-              method_name.to_s.chomp("=")
-            end
+      class AttributeDefinition
+        def initialize(attributes)
+          @attributes = attributes.map(&:to_s)
         end
+
+        def matches?(method_name)
+          attr_name = convert_to_reader_name(method_name)
+          attributes.include?(attr_name)
+        end
+
+        def define_on(klass)
+          attr_readers = attributes.reject { |name| klass.attribute_method?(name) }
+          attr_writers = attributes.reject { |name| klass.attribute_method?("#{name}=") }
+          klass.send(:attr_reader, *attr_readers)
+          klass.send(:attr_writer, *attr_writers)
+        end
+
+        # TODO Change this to private once we've dropped Ruby 2.2 support.
+        # Workaround for Ruby 2.2 "private attribute?" warning.
+        protected
+
+        attr_reader :attributes
+
+        private
+
+        def convert_to_reader_name(method_name)
+          method_name.to_s.chomp("=")
+        end
+      end
     end
 
     module HelperMethods

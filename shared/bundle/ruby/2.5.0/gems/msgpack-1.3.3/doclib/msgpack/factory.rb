@@ -31,7 +31,7 @@ module MessagePack
     #
     # See Packer#initialize for supported options.
     #
-    def dump(obj, options={})
+    def dump(obj, options = {})
     end
     alias pack dump
 
@@ -57,7 +57,7 @@ module MessagePack
     #
     # See Unpacker#initialize for supported options.
     #
-    def load(data, options={})
+    def load(data, options = {})
     end
     alias unpack load
 
@@ -76,7 +76,7 @@ module MessagePack
     # * *:packer* specify symbol or proc object for packer
     # * *:unpacker* specify symbol or proc object for unpacker
     #
-    def register_type(type, klass, options={})
+    def register_type(type, klass, options = {})
     end
 
     #
@@ -85,7 +85,7 @@ module MessagePack
     # @param selector [Symbol] specify to list types registered for :packer, :unpacker or :both (default)
     # @return Array
     #
-    def registered_types(selector=:both)
+    def registered_types(selector = :both)
     end
 
     #
@@ -95,7 +95,7 @@ module MessagePack
     # @param selector [Symbol] specify to check for :packer, :unpacker or :both (default)
     # @return true or false
     #
-    def type_registered?(klass_or_type, selector=:both)
+    def type_registered?(klass_or_type, selector = :both)
     end
   end
 end

@@ -13,8 +13,8 @@ module ActiveRecord
       config = config.symbolize_keys
       config[:flags] ||= 0
 
-      if config[:flags].kind_of? Array
-        config[:flags].push "FOUND_ROWS".freeze
+      if config[:flags].is_a? Array
+        config[:flags].push "FOUND_ROWS"
       else
         config[:flags] |= Mysql2::Client::FOUND_ROWS
       end
@@ -32,7 +32,7 @@ module ActiveRecord
 
   module ConnectionAdapters
     class Mysql2Adapter < AbstractMysqlAdapter
-      ADAPTER_NAME = "Mysql2".freeze
+      ADAPTER_NAME = "Mysql2"
 
       include MySQL::DatabaseStatements
 
@@ -111,19 +111,19 @@ module ActiveRecord
 
       private
 
-        def connect
-          @connection = Mysql2::Client.new(@config)
-          configure_connection
-        end
+      def connect
+        @connection = Mysql2::Client.new(@config)
+        configure_connection
+      end
 
-        def configure_connection
-          @connection.query_options.merge!(as: :array)
-          super
-        end
+      def configure_connection
+        @connection.query_options.merge!(as: :array)
+        super
+      end
 
-        def full_version
-          @full_version ||= @connection.server_info[:version]
-        end
+      def full_version
+        @full_version ||= @connection.server_info[:version]
+      end
     end
   end
 end

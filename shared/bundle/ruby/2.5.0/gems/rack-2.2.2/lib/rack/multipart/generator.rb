@@ -32,6 +32,7 @@ module Rack
       end
 
       private
+
       def multipart?
         query = lambda { |value|
           case value
@@ -49,21 +50,21 @@ module Rack
 
       def flattened_params
         @flattened_params ||= begin
-          h = Hash.new
+          h = {}
           @params.each do |key, value|
             k = @first ? key.to_s : "[#{key}]"
 
             case value
             when Array
-              value.map { |v|
-                Multipart.build_multipart(v, false).each { |subkey, subvalue|
+              value.map do |v|
+                Multipart.build_multipart(v, false).each do |subkey, subvalue|
                   h["#{k}[]#{subkey}"] = subvalue
-                }
-              }
+                end
+              end
             when Hash
-              Multipart.build_multipart(value, false).each { |subkey, subvalue|
+              Multipart.build_multipart(value, false).each do |subkey, subvalue|
                 h[k + subkey] = subvalue
-              }
+              end
             else
               h[k] = value
             end
@@ -75,7 +76,7 @@ module Rack
       def content_for_tempfile(io, file, name)
         length = ::File.stat(file.path).size if file.path
         filename = "; filename=\"#{Utils.escape(file.original_filename)}\"" if file.original_filename
-<<-EOF
+        <<-EOF
 --#{MULTIPART_BOUNDARY}\r
 Content-Disposition: form-data; name="#{name}"#{filename}\r
 Content-Type: #{file.content_type}\r
@@ -85,7 +86,7 @@ EOF
       end
 
       def content_for_other(file, name)
-<<-EOF
+        <<-EOF
 --#{MULTIPART_BOUNDARY}\r
 Content-Disposition: form-data; name="#{name}"\r
 \r

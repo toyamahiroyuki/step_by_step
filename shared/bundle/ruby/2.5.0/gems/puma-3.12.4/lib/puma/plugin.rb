@@ -82,13 +82,13 @@ module Puma
         :\d+     # a colon is followed by one or more digits
         :in      # followed by a colon followed by in
       )
-    /x
+    /x.freeze
 
     def self.extract_name(ary)
       path = ary.first[CALLER_FILE]
 
-      m = %r!puma/plugin/([^/]*)\.rb$!.match(path)
-      return m[1]
+      m = %r{puma/plugin/([^/]*)\.rb$}.match(path)
+      m[1]
     end
 
     def self.create(&blk)

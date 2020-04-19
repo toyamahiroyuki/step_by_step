@@ -4,7 +4,7 @@ module MiniMagick
   class Image
     # @private
     class Info
-      ASCII_ENCODED_EXIF_KEYS = %w[ExifVersion FlashPixVersion]
+      ASCII_ENCODED_EXIF_KEYS = %w(ExifVersion FlashPixVersion).freeze
 
       def initialize(path)
         @path = path
@@ -48,11 +48,11 @@ module MiniMagick
           path = path.match(/\[\d+\]$/).pre_match if path =~ /\[\d+\]$/
 
           @info.update(
-            "format"     => format,
-            "width"      => Integer(width),
-            "height"     => Integer(height),
+            "format" => format,
+            "width" => Integer(width),
+            "height" => Integer(height),
             "dimensions" => [Integer(width), Integer(height)],
-            "size"       => File.size(path),
+            "size" => File.size(path),
             "human_size" => size,
           )
 
@@ -186,7 +186,6 @@ module MiniMagick
         value += "[0]" unless value =~ /\[\d+\]$/
         value
       end
-
     end
   end
 end

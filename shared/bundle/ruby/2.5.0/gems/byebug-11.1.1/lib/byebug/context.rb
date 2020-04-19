@@ -79,9 +79,9 @@ module Byebug
     def stack_size
       return 0 unless backtrace
 
-      backtrace.drop_while { |l| ignored_file?(l.first.path) }
-               .take_while { |l| !ignored_file?(l.first.path) }
-               .size
+      backtrace.drop_while { |l| ignored_file?(l.first.path) }.
+        take_while { |l| !ignored_file?(l.first.path) }.
+        size
     end
 
     def interrupt

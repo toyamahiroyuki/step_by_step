@@ -17,7 +17,7 @@ module Rack
     #
     # The `:allow_if` option can also be set to a proc to use custom allow/deny logic.
     class HttpOrigin < Base
-      DEFAULT_PORTS = { 'http' => 80, 'https' => 443, 'coffee' => 80 }
+      DEFAULT_PORTS = { 'http' => 80, 'https' => 443, 'coffee' => 80 }.freeze
       default_reaction :deny
       default_options :allow_if => nil
 
@@ -34,7 +34,6 @@ module Rack
         return true if options[:allow_if] && options[:allow_if].call(env)
         Array(options[:origin_whitelist]).include? origin
       end
-
     end
   end
 end

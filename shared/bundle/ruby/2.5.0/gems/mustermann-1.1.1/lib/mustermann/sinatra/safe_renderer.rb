@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mustermann
   class Sinatra < AST::Pattern
     # Generates a string that can safely be concatenated with other strings
@@ -17,7 +18,7 @@ module Mustermann
 
       translate(:capture) do
         raise Mustermann::Error, 'cannot render variables'      if node.is_a? :variable
-        raise Mustermann::Error, 'cannot translate constraints' if constraint or qualifier or convert
+        raise Mustermann::Error, 'cannot translate constraints' if constraint || qualifier || convert
         prefix = node.is_a?(:splat) ? "+" : ""
         "{#{prefix}#{name}}"
       end

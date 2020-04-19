@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mustermann
   # Fakes MatchData for patterns that do not support capturing.
   # @see http://ruby-doc.org/core-2.0/MatchData.html MatchData
@@ -28,7 +29,7 @@ module Mustermann
     # @return [nil] imitates MatchData interface
     def [](*args)
       args.map! do |arg|
-        next arg unless arg.is_a? Symbol or arg.is_a? String
+        next arg unless arg.is_a?(Symbol) || arg.is_a?(String)
         names.index(arg.to_s)
       end
       @captures[*args]
@@ -37,8 +38,8 @@ module Mustermann
     # @!visibility private
     def +(other)
       SimpleMatch.new(@string + other.to_s,
-          names:    @names    + other.names,
-          captures: @captures + other.captures)
+                      names: @names + other.names,
+                      captures: @captures + other.captures)
     end
 
     # @return [String] string representation

@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class Oracle12 < Arel::Visitors::ToSql
       private
 
-      def visit_Arel_Nodes_SelectStatement o, collector
+      def visit_Arel_Nodes_SelectStatement(o, collector)
         # Oracle does not allow LIMIT clause with select for update
         if o.limit && o.lock
           raise ArgumentError, <<-MSG
@@ -16,31 +17,31 @@ module Arel
         super
       end
 
-      def visit_Arel_Nodes_SelectOptions o, collector
+      def visit_Arel_Nodes_SelectOptions(o, collector)
         collector = maybe_visit o.offset, collector
         collector = maybe_visit o.limit, collector
         collector = maybe_visit o.lock, collector
       end
 
-      def visit_Arel_Nodes_Limit o, collector
+      def visit_Arel_Nodes_Limit(o, collector)
         collector << "FETCH FIRST "
         collector = visit o.expr, collector
         collector << " ROWS ONLY"
       end
 
-      def visit_Arel_Nodes_Offset o, collector
+      def visit_Arel_Nodes_Offset(o, collector)
         collector << "OFFSET "
         visit o.expr, collector
         collector << " ROWS"
       end
 
-      def visit_Arel_Nodes_Except o, collector
+      def visit_Arel_Nodes_Except(o, collector)
         collector << "( "
         collector = infix_value o, collector, " MINUS "
         collector << " )"
       end
 
-      def visit_Arel_Nodes_UpdateStatement o, collector
+      def visit_Arel_Nodes_UpdateStatement(o, collector)
         # Oracle does not allow ORDER BY/LIMIT in UPDATEs.
         if o.orders.any? && o.limit.nil?
           # However, there is no harm in silently eating the ORDER BY clause if no LIMIT has been provided,
@@ -52,7 +53,7 @@ module Arel
         super
       end
 
-      def visit_Arel_Nodes_BindParam o, collector
+      def visit_Arel_Nodes_BindParam(o, collector)
         collector.add_bind(o.value) { |i| ":a#{i}" }
       end
     end

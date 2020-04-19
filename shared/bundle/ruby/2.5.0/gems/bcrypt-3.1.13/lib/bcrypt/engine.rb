@@ -36,8 +36,8 @@ module BCrypt
     #
     #   # cost can still be overridden as needed
     #   BCrypt::Password.create('secret', :cost => 6).cost  #=> 6
-    def self.cost=(cost)
-      @cost = cost
+    class << self
+      attr_writer :cost
     end
 
     # Given a secret and a valid salt (see BCrypt::Engine.generate_salt) calculates
@@ -51,10 +51,10 @@ module BCrypt
             __bc_crypt(secret.to_s, salt)
           end
         else
-          raise Errors::InvalidSalt.new("invalid salt")
+          raise Errors::InvalidSalt, "invalid salt"
         end
       else
-        raise Errors::InvalidSecret.new("invalid secret")
+        raise Errors::InvalidSecret, "invalid secret"
       end
     end
 
@@ -72,7 +72,7 @@ module BCrypt
           __bc_salt(prefix, cost, OpenSSL::Random.random_bytes(MAX_SALT_LENGTH))
         end
       else
-        raise Errors::InvalidCost.new("cost must be numeric and > 0")
+        raise Errors::InvalidCost, "cost must be numeric and > 0"
       end
     end
 
@@ -101,7 +101,7 @@ module BCrypt
     def self.calibrate(upper_time_limit_in_ms)
       40.times do |i|
         start_time = Time.now
-        Password.create("testing testing", :cost => i+1)
+        Password.create("testing testing", :cost => i + 1)
         end_time = Time.now - start_time
         return i if end_time * 1_000 > upper_time_limit_in_ms
       end
@@ -112,5 +112,4 @@ module BCrypt
       salt[4..5].to_i
     end
   end
-
 end

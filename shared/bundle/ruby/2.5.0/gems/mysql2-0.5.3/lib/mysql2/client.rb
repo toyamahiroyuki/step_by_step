@@ -31,11 +31,11 @@ module Mysql2
       opts[:connect_timeout] = 120 unless opts.key?(:connect_timeout)
 
       # TODO: stricter validation rather than silent massaging
-      %i[reconnect connect_timeout local_infile read_timeout write_timeout default_file default_group secure_auth init_command automatic_close enable_cleartext_plugin default_auth].each do |key|
+      %i(reconnect connect_timeout local_infile read_timeout write_timeout default_file default_group secure_auth init_command automatic_close enable_cleartext_plugin default_auth).each do |key|
         next unless opts.key?(key)
         case key
         when :reconnect, :local_infile, :secure_auth, :automatic_close, :enable_cleartext_plugin
-          send(:"#{key}=", !!opts[key]) # rubocop:disable Style/DoubleNegation
+          send(:"#{key}=", !!opts[key])
         when :connect_timeout, :read_timeout, :write_timeout
           send(:"#{key}=", Integer(opts[key])) unless opts[key].nil?
         else
@@ -51,20 +51,20 @@ module Mysql2
       self.ssl_mode = parse_ssl_mode(opts[:ssl_mode]) if opts[:ssl_mode]
 
       flags = case opts[:flags]
-      when Array
-        parse_flags_array(opts[:flags], @query_options[:connect_flags])
-      when String
-        parse_flags_array(opts[:flags].split(' '), @query_options[:connect_flags])
-      when Integer
-        @query_options[:connect_flags] | opts[:flags]
-      else
-        @query_options[:connect_flags]
+              when Array
+                parse_flags_array(opts[:flags], @query_options[:connect_flags])
+              when String
+                parse_flags_array(opts[:flags].split(' '), @query_options[:connect_flags])
+              when Integer
+                @query_options[:connect_flags] | opts[:flags]
+              else
+                @query_options[:connect_flags]
       end
 
       # SSL verify is a connection flag rather than a mysql_ssl_set option
       flags |= SSL_VERIFY_SERVER_CERT if opts[:sslverify]
 
-      if %i[user pass hostname dbname db sock].any? { |k| @query_options.key?(k) }
+      if %i(user pass hostname dbname db sock).any? { |k| @query_options.key?(k) }
         warn "============= WARNING FROM mysql2 ============="
         warn "The options :user, :pass, :hostname, :dbname, :db, and :sock are deprecated and will be removed at some point in the future."
         warn "Instead, please use :username, :password, :host, :port, :database, :socket, :flags for the options."

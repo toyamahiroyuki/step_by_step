@@ -55,23 +55,23 @@ module ActiveSupport
 
     private
 
-      def with_execution_control(name, block, once)
-        unless @run_once[name].include?(block)
-          @run_once[name] << block if once
+    def with_execution_control(name, block, once)
+      unless @run_once[name].include?(block)
+        @run_once[name] << block if once
 
-          yield
+        yield
+      end
+    end
+
+    def execute_hook(name, base, options, block)
+      with_execution_control(name, block, options[:run_once]) do
+        if options[:yield]
+          block.call(base)
+        else
+          base.instance_eval(&block)
         end
       end
-
-      def execute_hook(name, base, options, block)
-        with_execution_control(name, block, options[:run_once]) do
-          if options[:yield]
-            block.call(base)
-          else
-            base.instance_eval(&block)
-          end
-        end
-      end
+    end
   end
 
   extend LazyLoadHooks

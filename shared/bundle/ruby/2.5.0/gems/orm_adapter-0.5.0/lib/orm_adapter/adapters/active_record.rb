@@ -37,7 +37,8 @@ module OrmAdapter
       object.destroy && true if valid_object?(object)
     end
 
-  protected
+    protected
+
     def construct_relation(relation, options)
       conditions, order, limit, offset = extract_conditions!(options)
 
@@ -71,7 +72,7 @@ module OrmAdapter
     end
 
     def order_clause(order)
-      order.map {|pair| "#{pair[0]} #{pair[1]}"}.join(",")
+      order.map { |pair| "#{pair[0]} #{pair[1]}" }.join(",")
     end
   end
 end

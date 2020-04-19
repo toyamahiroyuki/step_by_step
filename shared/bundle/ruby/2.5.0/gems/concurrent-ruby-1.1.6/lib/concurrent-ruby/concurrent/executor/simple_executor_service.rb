@@ -2,7 +2,6 @@ require 'concurrent/atomics'
 require 'concurrent/executor/executor_service'
 
 module Concurrent
-
   # An executor service in which every operation spawns a new,
   # independently operating thread.
   #
@@ -16,10 +15,9 @@ module Concurrent
   #
   # @note Intended for use primarily in testing and debugging.
   class SimpleExecutorService < RubyExecutorService
-
     # @!macro executor_service_method_post
     def self.post(*args)
-      raise ArgumentError.new('no block given') unless block_given?
+      raise ArgumentError, 'no block given' unless block_given?
       Thread.new(*args) do
         Thread.current.abort_on_exception = false
         yield(*args)
@@ -35,7 +33,7 @@ module Concurrent
 
     # @!macro executor_service_method_post
     def post(*args, &task)
-      raise ArgumentError.new('no block given') unless block_given?
+      raise ArgumentError, 'no block given' unless block_given?
       return false unless running?
       @count.increment
       Thread.new(*args) do
@@ -62,7 +60,7 @@ module Concurrent
 
     # @!macro executor_service_method_shuttingdown_question
     def shuttingdown?
-      @running.false? && ! @stopped.set?
+      @running.false? && !@stopped.set?
     end
 
     # @!macro executor_service_method_shutdown_question

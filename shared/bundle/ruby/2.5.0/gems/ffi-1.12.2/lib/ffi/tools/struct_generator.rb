@@ -1,7 +1,6 @@
 require 'tempfile'
 
 module FFI
-
   ##
   # Generates an FFI Struct layout.
   #
@@ -44,17 +43,20 @@ module FFI
       @found = false
       @size = nil
 
-      if block_given? then
+      if block_given?
         yield self
         calculate self.class.options.merge(options)
       end
     end
-    def self.options=(options)
-      @options = options
+
+    class << self
+      attr_writer :options
     end
-    def self.options
-      @options
+
+    class << self
+      attr_reader :options
     end
+
     def calculate(options = {})
       binary = File.join Dir.tmpdir, "rb_struct_gen_bin_#{Process.pid}"
 
@@ -84,7 +86,7 @@ module FFI
 
         output = `gcc #{options[:cppflags]} #{options[:cflags]} -D_DARWIN_USE_64_BIT_INODE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -x c -Wall -Werror #{f.path} -o #{binary} 2>&1`
 
-        unless $?.success? then
+        unless $CHILD_STATUS.success?
           @found = false
           output = output.split("\n").map { |l| "\t#{l}" }.join "\n"
           raise "Compilation error generating struct #{@name} (#{@struct_name}):\n#{output}"
@@ -111,10 +113,10 @@ module FFI
       @found = true
     end
 
-    def field(name, type=nil)
+    def field(name, type = nil)
       field = Field.new(name, type)
       @fields << field
-      return field
+      field
     end
 
     def found?
@@ -156,14 +158,12 @@ module FFI
     def name(n)
       @struct_name = n
     end
-
   end
 
   ##
   # A field in a Struct.
 
   class StructGenerator::Field
-
     attr_reader :name
     attr_reader :type
     attr_reader :offset
@@ -176,9 +176,7 @@ module FFI
       @size = nil
     end
 
-    def offset=(o)
-      @offset = o
-    end
+    attr_writer :offset
 
     def to_config(name)
       buf = []
@@ -187,8 +185,5 @@ module FFI
       buf << "rbx.platform.#{name}.#{@name}.type = #{@type}" if @type
       buf
     end
-
   end
-
 end
-

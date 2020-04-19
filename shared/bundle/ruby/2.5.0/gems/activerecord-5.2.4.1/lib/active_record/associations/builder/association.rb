@@ -18,7 +18,7 @@ module ActiveRecord::Associations::Builder # :nodoc:
     end
     self.extensions = []
 
-    VALID_OPTIONS = [:class_name, :anonymous_class, :foreign_key, :validate] # :nodoc:
+    VALID_OPTIONS = [:class_name, :anonymous_class, :foreign_key, :validate].freeze # :nodoc:
 
     def self.build(model, name, scope, options, &block)
       if model.dangerous_attribute_method?(name)
@@ -36,7 +36,7 @@ module ActiveRecord::Associations::Builder # :nodoc:
     end
 
     def self.create_reflection(model, name, scope, options, extension = nil)
-      raise ArgumentError, "association names must be a Symbol" unless name.kind_of?(Symbol)
+      raise ArgumentError, "association names must be a Symbol" unless name.is_a?(Symbol)
 
       validate_options(options)
 

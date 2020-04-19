@@ -1,5 +1,5 @@
 class DomainName
-  ETLD_DATA_DATE = '2019-07-01T18:45:50Z'
+  ETLD_DATA_DATE = '2019-07-01T18:45:50Z'.freeze
 
   ETLD_DATA = {
     "ac" => 0,
@@ -8779,7 +8779,7 @@ class DomainName
     "site.builder.nu" => 0,
     "enterprisecloud.nu" => 0,
     "zone.id" => 0,
-  }
+  }.freeze
 
   def self.etld_data
     ETLD_DATA

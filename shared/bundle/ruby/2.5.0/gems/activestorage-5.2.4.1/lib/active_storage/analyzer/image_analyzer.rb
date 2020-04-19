@@ -31,15 +31,16 @@ module ActiveStorage
     end
 
     private
-      def read_image
-        download_blob_to_tempfile do |file|
-          require "mini_magick"
-          yield MiniMagick::Image.new(file.path)
-        end
-      end
 
-      def rotated_image?(image)
-        %w[ RightTop LeftBottom ].include?(image["%[orientation]"])
+    def read_image
+      download_blob_to_tempfile do |file|
+        require "mini_magick"
+        yield MiniMagick::Image.new(file.path)
       end
+    end
+
+    def rotated_image?(image)
+      %w(RightTop LeftBottom).include?(image["%[orientation]"])
+    end
   end
 end

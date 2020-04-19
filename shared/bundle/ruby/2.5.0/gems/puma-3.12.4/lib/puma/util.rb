@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 major, minor, patch = RUBY_VERSION.split('.').map { |v| v.to_i }
 
 if major == 1 && minor == 9 && patch == 3 && RUBY_PATCHLEVEL < 125
@@ -28,7 +29,7 @@ module Puma
     end
     module_function :unescape
 
-    DEFAULT_SEP = /[&;] */n
+    DEFAULT_SEP = /[&;] */n.freeze
 
     # Stolen from Mongrel, with some small modifications:
     # Parses a query string by breaking it up at the '&'
@@ -55,17 +56,17 @@ module Puma
         end
       end
 
-      return params
+      params
     end
 
     # A case-insensitive Hash that preserves the original case of a
     # header when set.
     class HeaderHash < Hash
-      def self.new(hash={})
+      def self.new(hash = {})
         HeaderHash === hash ? hash : super(hash)
       end
 
-      def initialize(hash={})
+      def initialize(hash = {})
         super()
         @names = {}
         hash.each { |k, v| self[k] = v }
@@ -79,7 +80,7 @@ module Puma
 
       def to_hash
         hash = {}
-        each { |k,v| hash[k] = v }
+        each { |k, v| hash[k] = v }
         hash
       end
 

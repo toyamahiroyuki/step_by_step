@@ -1,12 +1,12 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 #
 # Thanks to Nicolas Fouché for this wrapper
 #
 require 'singleton'
 
 module Mail
-
   # The Configuration class is a Singleton used to hold the default
   # configuration for all Mail objects.
   #
@@ -72,7 +72,5 @@ module Mail
     def param_encode_language(value = nil)
       value ? @encode_language = value : @encode_language ||= 'en'
     end
-
   end
-
 end

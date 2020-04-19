@@ -1,5 +1,6 @@
 # -*- coding: binary -*-
 # frozen_string_literal: true
+
 # Generated from freedesktop.org.xml
 class MimeMagic
   # @private
@@ -954,7 +955,7 @@ class MimeMagic
     'zoo' => 'application/x-zoo',
     'zsav' => 'application/x-spss-sav',
     'zz' => 'application/zlib',
-  }
+  }.freeze
   # @private
   # :nodoc:
   TYPES = {
@@ -1635,7 +1636,7 @@ class MimeMagic
     'video/x-sgi-movie' => [%w(movie), %w(), 'SGI video'],
     'video/x-theora+ogg' => [%w(ogg), %w(video/ogg), 'Ogg Theora video'],
     'x-epoc/x-sisx-app' => [%w(sisx), %w(), 'SISX package'],
-  }
+  }.freeze
   # @private
   # :nodoc:
   MAGIC = [
@@ -2063,5 +2064,5 @@ class MimeMagic
     ['text/x-matlab', [[0, '##']]],
     ['text/x-modelica', [[0, '//']]],
     ['text/x-tex', [[0, '%']]],
-  ]
+  ].freeze
 end

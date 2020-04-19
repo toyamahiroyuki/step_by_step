@@ -1,5 +1,5 @@
 class FixedCostsController < ApplicationController
-    before_action :authenticate_user!
+  before_action :authenticate_user!
   def new
     if current_user.fixed_cost.nil?
       @fixed_cost = FixedCost.new
@@ -26,8 +26,8 @@ class FixedCostsController < ApplicationController
     @lifeline.user_id = current_user.id
 
     if @fixed_cost.save
-       @lifeline.save
-       redirect_to fixed_costs_path
+      @lifeline.save
+      redirect_to fixed_costs_path
     else
       @fixed_cost = FixedCost.new
       @lifeline = Lifeline.new

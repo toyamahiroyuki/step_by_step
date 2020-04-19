@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 module Crass
-
   # Like {Scanner}, but for tokens!
   class TokenScanner
     attr_reader :current, :pos, :tokens
@@ -46,5 +45,4 @@ module Crass
       @pos     = 0
     end
   end
-
 end

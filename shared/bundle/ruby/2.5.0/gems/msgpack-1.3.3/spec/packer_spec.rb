@@ -1,4 +1,5 @@
 # encoding: ascii-8bit
+
 require 'spec_helper'
 
 require 'stringio'
@@ -23,7 +24,7 @@ describe MessagePack::Packer do
   end
 
   it 'gets IO or object which has #write to write/append data to it' do
-    sample_data = {"message" => "morning!", "num" => 1}
+    sample_data = { "message" => "morning!", "num" => 1 }
     sample_packed = MessagePack.pack(sample_data)
 
     Tempfile.open("for_io") do |file|
@@ -54,7 +55,7 @@ describe MessagePack::Packer do
     writer.close
     dio.rewind
     compressed = dio.string
-    str = Zlib::GzipReader.wrap(StringIO.new(compressed)){|gz| gz.read }
+    str = Zlib::GzipReader.wrap(StringIO.new(compressed)) { |gz| gz.read }
     expect(str).to eql(sample_packed)
 
     class DummyIO
@@ -62,10 +63,12 @@ describe MessagePack::Packer do
         @buf = "".force_encoding('ASCII-8BIT')
         @pos = 0
       end
+
       def write(val)
         @buf << val.to_s
       end
-      def read(length=nil,outbuf="")
+
+      def read(length = nil, outbuf = "")
         if @pos == @buf.size
           nil
         elsif length.nil?
@@ -81,9 +84,11 @@ describe MessagePack::Packer do
           outbuf
         end
       end
+
       def flush
         # nop
       end
+
       def close
         # nop
       end
@@ -209,8 +214,8 @@ describe MessagePack::Packer do
     1.to_msgpack.class.should == String
     1.0.to_msgpack.class.should == String
     "".to_msgpack.class.should == String
-    Hash.new.to_msgpack.class.should == String
-    Array.new.to_msgpack.class.should == String
+    {}.to_msgpack.class.should == String
+    [].to_msgpack.class.should == String
   end
 
   it 'to_msgpack with packer equals to_msgpack' do
@@ -220,8 +225,8 @@ describe MessagePack::Packer do
     1.to_msgpack(MessagePack::Packer.new).to_str.should == 1.to_msgpack
     1.0.to_msgpack(MessagePack::Packer.new).to_str.should == 1.0.to_msgpack
     "".to_msgpack(MessagePack::Packer.new).to_str.should == "".to_msgpack
-    Hash.new.to_msgpack(MessagePack::Packer.new).to_str.should == Hash.new.to_msgpack
-    Array.new.to_msgpack(MessagePack::Packer.new).to_str.should == Array.new.to_msgpack
+    {}.to_msgpack(MessagePack::Packer.new).to_str.should == {}.to_msgpack
+    [].to_msgpack(MessagePack::Packer.new).to_str.should == [].to_msgpack
   end
 
   it 'raises type error on wrong type' do
@@ -237,44 +242,44 @@ describe MessagePack::Packer do
   end
 
   class CustomPack01
-    def to_msgpack(pk=nil)
+    def to_msgpack(pk = nil)
       return MessagePack.pack(self, pk) unless pk.class == MessagePack::Packer
       pk.write_array_header(2)
       pk.write(1)
       pk.write(2)
-      return pk
+      pk
     end
   end
 
   class CustomPack02
-    def to_msgpack(pk=nil)
-      [1,2].to_msgpack(pk)
+    def to_msgpack(pk = nil)
+      [1, 2].to_msgpack(pk)
     end
   end
 
   it 'calls custom to_msgpack method' do
-    MessagePack.pack(CustomPack01.new).should == [1,2].to_msgpack
-    MessagePack.pack(CustomPack02.new).should == [1,2].to_msgpack
-    CustomPack01.new.to_msgpack.should == [1,2].to_msgpack
-    CustomPack02.new.to_msgpack.should == [1,2].to_msgpack
+    MessagePack.pack(CustomPack01.new).should == [1, 2].to_msgpack
+    MessagePack.pack(CustomPack02.new).should == [1, 2].to_msgpack
+    CustomPack01.new.to_msgpack.should == [1, 2].to_msgpack
+    CustomPack02.new.to_msgpack.should == [1, 2].to_msgpack
   end
 
   it 'calls custom to_msgpack method with io' do
     s01 = StringIO.new
     MessagePack.pack(CustomPack01.new, s01)
-    s01.string.should == [1,2].to_msgpack
+    s01.string.should == [1, 2].to_msgpack
 
     s02 = StringIO.new
     MessagePack.pack(CustomPack02.new, s02)
-    s02.string.should == [1,2].to_msgpack
+    s02.string.should == [1, 2].to_msgpack
 
     s03 = StringIO.new
     CustomPack01.new.to_msgpack(s03)
-    s03.string.should == [1,2].to_msgpack
+    s03.string.should == [1, 2].to_msgpack
 
     s04 = StringIO.new
     CustomPack02.new.to_msgpack(s04)
-    s04.string.should == [1,2].to_msgpack
+    s04.string.should == [1, 2].to_msgpack
   end
 
   context 'in compatibility mode' do
@@ -299,14 +304,15 @@ describe MessagePack::Packer do
     def initialize(num)
       @num = num
     end
-    def num
-      @num
-    end
+
+    attr_reader :num
+
     def to_msgpack_ext
       @num.to_msgpack
     end
+
     def self.from_msgpack_ext(data)
-      self.new(MessagePack.unpack(data))
+      new(MessagePack.unpack(data))
     end
   end
 
@@ -314,14 +320,17 @@ describe MessagePack::Packer do
     def initialize(num)
       @num_s = num.to_s
     end
+
     def num
       @num_s.to_i
     end
+
     def to_msgpack_ext
       @num_s.to_msgpack
     end
+
     def self.from_msgpack_ext(data)
-      self.new(MessagePack.unpack(data))
+      new(MessagePack.unpack(data))
     end
   end
 
@@ -349,8 +358,8 @@ describe MessagePack::Packer do
   describe '#register_type' do
     it 'get type and class mapping for packing' do
       packer = MessagePack::Packer.new
-      packer.register_type(0x01, ValueOne){|obj| obj.to_msgpack_ext }
-      packer.register_type(0x02, ValueTwo){|obj| obj.to_msgpack_ext }
+      packer.register_type(0x01, ValueOne) { |obj| obj.to_msgpack_ext }
+      packer.register_type(0x02, ValueTwo) { |obj| obj.to_msgpack_ext }
 
       packer = MessagePack::Packer.new
       packer.register_type(0x01, ValueOne, :to_msgpack_ext)
@@ -384,6 +393,7 @@ describe MessagePack::Packer do
 
     context 'when it has no ext type but a super class has' do
       before { stub_const('Value', Class.new) }
+
       before do
         Value.class_eval do
           def to_msgpack_ext
@@ -391,17 +401,20 @@ describe MessagePack::Packer do
           end
         end
       end
+
       before { packer.register_type(0x01, Value, :to_msgpack_ext) }
 
       context "when it is a child class" do
-        before { stub_const('InheritedValue', Class.new(Value)) }
         subject { packer.pack(InheritedValue.new).to_s }
+
+        before { stub_const('InheritedValue', Class.new(Value)) }
 
         it { is_expected.to eq "\xC7\x0F\x01value_msgpacked" }
 
         context "when it is a grandchild class" do
-          before { stub_const('InheritedTwiceValue', Class.new(InheritedValue)) }
           subject { packer.pack(InheritedTwiceValue.new).to_s }
+
+          before { stub_const('InheritedTwiceValue', Class.new(InheritedValue)) }
 
           it { is_expected.to eq "\xC7\x0F\x01value_msgpacked" }
         end
@@ -410,6 +423,7 @@ describe MessagePack::Packer do
 
     context 'when it and its super class has an ext type' do
       before { stub_const('Value', Class.new) }
+
       before do
         Value.class_eval do
           def to_msgpack_ext
@@ -417,10 +431,14 @@ describe MessagePack::Packer do
           end
         end
       end
+
       before { packer.register_type(0x01, Value, :to_msgpack_ext) }
 
       context "when it is a child class" do
+        subject { packer.pack(InheritedValue.new).to_s }
+
         before { stub_const('InheritedValue', Class.new(Value)) }
+
         before do
           InheritedValue.class_eval do
             def to_msgpack_ext
@@ -430,13 +448,15 @@ describe MessagePack::Packer do
         end
 
         before { packer.register_type(0x02, InheritedValue, :to_msgpack_ext) }
-        subject { packer.pack(InheritedValue.new).to_s }
 
         it { is_expected.to eq "\xC7\x19\x02inherited_value_msgpacked" }
       end
 
       context "even when it is a child class" do
+        subject { packer.pack(Value.new).to_s }
+
         before { stub_const('InheritedValue', Class.new(Value)) }
+
         before do
           InheritedValue.class_eval do
             def to_msgpack_ext
@@ -446,7 +466,6 @@ describe MessagePack::Packer do
         end
 
         before { packer.register_type(0x02, InheritedValue, :to_msgpack_ext) }
-        subject { packer.pack(Value.new).to_s }
 
         it { is_expected.to eq "\xC7\x0F\x01value_msgpacked" }
       end
@@ -463,15 +482,17 @@ describe MessagePack::Packer do
         end
         stub_const('Mod', mod)
       end
+
       before { packer.register_type(0x01, Mod, :to_msgpack_ext) }
 
-      before { stub_const('Value', Class.new{ include Mod }) }
+      before { stub_const('Value', Class.new { include Mod }) }
 
       it { is_expected.to eq "\xC7\x0F\x01value_msgpacked" }
     end
 
     context 'when it has no ext type but it was extended by a module which has one' do
       subject { packer.pack(object).to_s }
+
       let(:object) { Object.new.extend Mod }
 
       before do
@@ -482,8 +503,8 @@ describe MessagePack::Packer do
         end
         stub_const('Mod', mod)
       end
-      before { packer.register_type(0x01, Mod, :to_msgpack_ext) }
 
+      before { packer.register_type(0x01, Mod, :to_msgpack_ext) }
 
       it { is_expected.to eq "\xC7\x0F\x01value_msgpacked" }
     end
@@ -526,32 +547,32 @@ describe MessagePack::Packer do
   end
 
   describe "ext formats" do
-    [1, 2, 4, 8, 16].zip([0xd4, 0xd5, 0xd6, 0xd7, 0xd8]).each do |n,b|
+    [1, 2, 4, 8, 16].zip([0xd4, 0xd5, 0xd6, 0xd7, 0xd8]).each do |n, b|
       it "msgpack fixext #{n} format" do
-        MessagePack::ExtensionValue.new(1, "a"*n).to_msgpack.should ==
-          [b, 1].pack('CC') + "a"*n
+        MessagePack::ExtensionValue.new(1, "a" * n).to_msgpack.should ==
+          [b, 1].pack('CC') + "a" * n
       end
     end
 
     it "msgpack ext 8 format" do
       MessagePack::ExtensionValue.new(1, "").to_msgpack.should ==
         [0xc7, 0, 1].pack('CCC') + ""
-      MessagePack::ExtensionValue.new(-1, "a"*255).to_msgpack.should ==
-        [0xc7, 255, -1].pack('CCC') + "a"*255
+      MessagePack::ExtensionValue.new(-1, "a" * 255).to_msgpack.should ==
+        [0xc7, 255, -1].pack('CCC') + "a" * 255
     end
 
     it "msgpack ext 16 format" do
-      MessagePack::ExtensionValue.new(1, "a"*256).to_msgpack.should ==
-        [0xc8, 256, 1].pack('CnC') + "a"*256
-      MessagePack::ExtensionValue.new(-1, "a"*65535).to_msgpack.should ==
-        [0xc8, 65535, -1].pack('CnC') + "a"*65535
+      MessagePack::ExtensionValue.new(1, "a" * 256).to_msgpack.should ==
+        [0xc8, 256, 1].pack('CnC') + "a" * 256
+      MessagePack::ExtensionValue.new(-1, "a" * 65535).to_msgpack.should ==
+        [0xc8, 65535, -1].pack('CnC') + "a" * 65535
     end
 
     it "msgpack ext 32 format" do
-      MessagePack::ExtensionValue.new(1, "a"*65536).to_msgpack.should ==
-        [0xc9, 65536, 1].pack('CNC') + "a"*65536
-      MessagePack::ExtensionValue.new(-1, "a"*65538).to_msgpack.should ==
-        [0xc9, 65538, -1].pack('CNC') + "a"*65538
+      MessagePack::ExtensionValue.new(1, "a" * 65536).to_msgpack.should ==
+        [0xc9, 65536, 1].pack('CNC') + "a" * 65536
+      MessagePack::ExtensionValue.new(-1, "a" * 65538).to_msgpack.should ==
+        [0xc9, 65538, -1].pack('CNC') + "a" * 65538
     end
   end
 end

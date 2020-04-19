@@ -1,24 +1,27 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class Informix < Arel::Visitors::ToSql
       private
-      def visit_Arel_Nodes_SelectStatement o, collector
+
+      def visit_Arel_Nodes_SelectStatement(o, collector)
         collector << "SELECT "
         collector = maybe_visit o.offset, collector
         collector = maybe_visit o.limit, collector
-        collector = o.cores.inject(collector) { |c,x|
+        collector = o.cores.inject(collector) do |c, x|
           visit_Arel_Nodes_SelectCore x, c
-        }
+        end
         if o.orders.any?
           collector << "ORDER BY "
           collector = inject_join o.orders, collector, ", "
         end
         collector = maybe_visit o.lock, collector
       end
-      def visit_Arel_Nodes_SelectCore o, collector
+
+      def visit_Arel_Nodes_SelectCore(o, collector)
         collector = inject_join o.projections, collector, ", "
-        if o.source && !o.source.empty?
+        if o.source.present?
           collector << " FROM "
           collector = visit o.source, collector
         end
@@ -40,11 +43,12 @@ module Arel
         collector
       end
 
-      def visit_Arel_Nodes_Offset o, collector
+      def visit_Arel_Nodes_Offset(o, collector)
         collector << "SKIP "
         visit o.expr, collector
       end
-      def visit_Arel_Nodes_Limit o, collector
+
+      def visit_Arel_Nodes_Limit(o, collector)
         collector << "FIRST "
         visit o.expr, collector
         collector << " "
@@ -52,4 +56,3 @@ module Arel
     end
   end
 end
-

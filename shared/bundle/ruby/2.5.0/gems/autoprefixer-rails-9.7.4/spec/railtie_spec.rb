@@ -14,8 +14,8 @@ describe AutoprefixedRails::Railtie do
   context "with empty config/autoprefixer.yml" do
     before do
       file_path = File.join(Rails.application.root, "config/autoprefixer.yml")
-      allow(File).to receive(:exists?).with(file_path) { true }
-      allow(::YAML).to receive(:load_file).with(file_path) { false } # empty yaml
+      allow(File).to receive(:exists?).with(file_path).and_return(true)
+      allow(::YAML).to receive(:load_file).with(file_path).and_return(false) # empty yaml
     end
 
     it "skips empty YAML" do

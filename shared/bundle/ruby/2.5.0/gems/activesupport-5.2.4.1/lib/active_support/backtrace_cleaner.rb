@@ -82,24 +82,25 @@ module ActiveSupport
     end
 
     private
-      def filter_backtrace(backtrace)
-        @filters.each do |f|
-          backtrace = backtrace.map { |line| f.call(line) }
-        end
 
-        backtrace
+    def filter_backtrace(backtrace)
+      @filters.each do |f|
+        backtrace = backtrace.map { |line| f.call(line) }
       end
 
-      def silence(backtrace)
-        @silencers.each do |s|
-          backtrace = backtrace.reject { |line| s.call(line) }
-        end
+      backtrace
+    end
 
-        backtrace
+    def silence(backtrace)
+      @silencers.each do |s|
+        backtrace = backtrace.reject { |line| s.call(line) }
       end
 
-      def noise(backtrace)
-        backtrace - silence(backtrace)
-      end
+      backtrace
+    end
+
+    def noise(backtrace)
+      backtrace - silence(backtrace)
+    end
   end
 end

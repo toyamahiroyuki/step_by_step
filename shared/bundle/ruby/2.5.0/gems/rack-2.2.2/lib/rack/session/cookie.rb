@@ -7,9 +7,7 @@ require 'json'
 require 'base64'
 
 module Rack
-
   module Session
-
     # Rack::Session::Cookie provides simple cookie based session management.
     # By default, the session is a Ruby Hash stored as base64 encoded marshalled
     # data set to :key (default: rack.session).  The object that encodes the
@@ -65,7 +63,11 @@ module Rack
 
           def decode(str)
             return unless str
-            ::Marshal.load(super(str)) rescue nil
+            begin
+              ::Marshal.load(super(str))
+            rescue
+              nil
+            end
           end
         end
 
@@ -78,7 +80,11 @@ module Rack
 
           def decode(str)
             return unless str
-            ::JSON.parse(super(str)) rescue nil
+            begin
+              ::JSON.parse(super(str))
+            rescue
+              nil
+            end
           end
         end
 
@@ -98,8 +104,13 @@ module Rack
 
       # Use no encoding for session cookies
       class Identity
-        def encode(str); str; end
-        def decode(str); str; end
+        def encode(str)
+          str
+        end
+
+        def decode(str)
+          str
+        end
       end
 
       attr_reader :coder
@@ -197,7 +208,6 @@ module Rack
         @secrets.size >= 1 ||
         (options[:coder] && options[:let_coder_handle_secure_encoding])
       end
-
     end
   end
 end

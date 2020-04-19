@@ -37,9 +37,7 @@ require 'ffi/struct_layout_builder'
 require 'ffi/struct_by_reference'
 
 module FFI
-
   class Struct
-
     # Get struct size
     # @return [Numeric]
     def size
@@ -137,15 +135,14 @@ module FFI
     end
 
     def self.by_value
-      self.val
+      val
     end
 
     def self.by_ref(flags = :inout)
-      self.ptr(flags)
+      ptr(flags)
     end
 
     class ManagedStructConverter < StructByReference
-
       # @param [Struct] struct_class
       def initialize(struct_class)
         super(struct_class)
@@ -165,7 +162,6 @@ module FFI
     def self.auto_ptr
       @managed_type ||= Type::Mapped.new(ManagedStructConverter.new(self))
     end
-
 
     class << self
       public
@@ -203,7 +199,7 @@ module FFI
       #             :field3, :string
       #    end
       def layout(*spec)
-        warn "[DEPRECATION] Struct layout is already defined for class #{self.inspect}. Redefinition as in #{caller[0]} will be disallowed in ffi-2.0." if defined?(@layout)
+        warn "[DEPRECATION] Struct layout is already defined for class #{inspect}. Redefinition as in #{caller[0]} will be disallowed in ffi-2.0." if defined?(@layout)
         return @layout if spec.size == 0
 
         builder = StructLayoutBuilder.new
@@ -211,7 +207,7 @@ module FFI
         builder.packed = @packed if defined?(@packed)
         builder.alignment = @min_alignment if defined?(@min_alignment)
 
-        if spec[0].kind_of?(Hash)
+        if spec[0].is_a?(Hash)
           hash_layout(builder, spec)
         else
           array_layout(builder, spec)
@@ -220,9 +216,8 @@ module FFI
         cspec = builder.build
         @layout = cspec unless self == Struct
         @size = cspec.size
-        return cspec
+        cspec
       end
-
 
       protected
 
@@ -242,23 +237,20 @@ module FFI
       alias :align :aligned
 
       def enclosing_module
-        begin
-          mod = self.name.split("::")[0..-2].inject(Object) { |obj, c| obj.const_get(c) }
-          (mod < FFI::Library || mod < FFI::Struct || mod.respond_to?(:find_type)) ? mod : nil
-        rescue Exception
-          nil
-        end
+        mod = name.split("::")[0..-2].inject(Object) { |obj, c| obj.const_get(c) }
+        (mod < FFI::Library || mod < FFI::Struct || mod.respond_to?(:find_type)) ? mod : nil
+      rescue Exception
+        nil
       end
 
-
       def find_field_type(type, mod = enclosing_module)
-        if type.kind_of?(Class) && type < Struct
+        if type.is_a?(Class) && type < Struct
           FFI::Type::Struct.new(type)
 
-        elsif type.kind_of?(Class) && type < FFI::StructLayout::Field
+        elsif type.is_a?(Class) && type < FFI::StructLayout::Field
           type
 
-        elsif type.kind_of?(::Array)
+        elsif type.is_a?(::Array)
           FFI::Type::Array.new(find_field_type(type[0]), type[1])
 
         else
@@ -295,7 +287,7 @@ module FFI
           i += 2
 
           # If the next param is a Integer, it specifies the offset
-          if spec[i].kind_of?(Integer)
+          if spec[i].is_a?(Integer)
             offset = spec[i]
             i += 1
           else

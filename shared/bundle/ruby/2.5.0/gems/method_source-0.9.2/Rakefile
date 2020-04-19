@@ -21,7 +21,7 @@ def apply_spec_defaults(s)
   s.require_path = 'lib'
   s.license = 'MIT'
 
-  s.add_development_dependency("rspec","~>3.6")
+  s.add_development_dependency("rspec", "~>3.6")
   s.add_development_dependency("rake", "~>0.9")
   s.homepage = "http://banisterfiend.wordpress.com"
   s.has_rdoc = 'yard'
@@ -31,12 +31,16 @@ end
 
 require "rspec/core/rake_task"
 RSpec::Core::RakeTask.new(:spec) do |t|
-  t.ruby_opts = %w[-w]
+  t.ruby_opts = %w(-w)
 end
 
 desc "reinstall gem"
 task :reinstall => :gems do
-  sh "gem uninstall method_source" rescue nil
+  begin
+    sh "gem uninstall method_source"
+  rescue
+    nil
+  end
   sh "gem install #{direc}/pkg/method_source-#{MethodSource::VERSION}.gem"
 end
 
@@ -57,7 +61,7 @@ namespace :ruby do
     pkg.need_tar = false
   end
 
-  desc  "Generate gemspec file"
+  desc "Generate gemspec file"
   task :gemspec do
     File.open("#{spec.name}.gemspec", "w") do |f|
       f << spec.to_ruby

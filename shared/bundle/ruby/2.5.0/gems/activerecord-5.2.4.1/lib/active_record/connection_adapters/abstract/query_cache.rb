@@ -109,37 +109,37 @@ module ActiveRecord
 
       private
 
-        def cache_sql(sql, name, binds)
-          @lock.synchronize do
-            result =
-              if @query_cache[sql].key?(binds)
-                ActiveSupport::Notifications.instrument(
-                  "sql.active_record",
-                  sql: sql,
-                  binds: binds,
-                  type_casted_binds: -> { type_casted_binds(binds) },
-                  name: name,
-                  connection_id: object_id,
-                  cached: true,
-                )
-                @query_cache[sql][binds]
-              else
-                @query_cache[sql][binds] = yield
-              end
-            result.dup
-          end
+      def cache_sql(sql, name, binds)
+        @lock.synchronize do
+          result =
+            if @query_cache[sql].key?(binds)
+              ActiveSupport::Notifications.instrument(
+                "sql.active_record",
+                sql: sql,
+                binds: binds,
+                type_casted_binds: -> { type_casted_binds(binds) },
+                name: name,
+                connection_id: object_id,
+                cached: true,
+              )
+              @query_cache[sql][binds]
+            else
+              @query_cache[sql][binds] = yield
+            end
+          result.dup
         end
+      end
 
-        # If arel is locked this is a SELECT ... FOR UPDATE or somesuch. Such
-        # queries should not be cached.
-        def locked?(arel)
-          arel = arel.arel if arel.is_a?(Relation)
-          arel.respond_to?(:locked) && arel.locked
-        end
+      # If arel is locked this is a SELECT ... FOR UPDATE or somesuch. Such
+      # queries should not be cached.
+      def locked?(arel)
+        arel = arel.arel if arel.is_a?(Relation)
+        arel.respond_to?(:locked) && arel.locked
+      end
 
-        def configure_query_cache!
-          enable_query_cache! if pool.query_cache_enabled
-        end
+      def configure_query_cache!
+        enable_query_cache! if pool.query_cache_enabled
+      end
     end
   end
 end

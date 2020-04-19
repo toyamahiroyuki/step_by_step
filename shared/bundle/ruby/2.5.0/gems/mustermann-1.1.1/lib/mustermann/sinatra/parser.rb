@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mustermann
   class Sinatra < AST::Pattern
     # Sinatra syntax definition.
@@ -30,7 +31,7 @@ module Mustermann
           end
           grouped_captures if expect(?})
         else
-          type = :splat if type == :named_splat and name == 'splat'
+          type = :splat if (type == :named_splat) && (name == 'splat')
           expect(?})
           node(type, name)
         end

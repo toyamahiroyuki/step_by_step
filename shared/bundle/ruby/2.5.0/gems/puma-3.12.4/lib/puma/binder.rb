@@ -10,7 +10,7 @@ module Puma
   class Binder
     include Puma::Const
 
-    RACK_VERSION = [1,3].freeze
+    RACK_VERSION = [1, 3].freeze
 
     def initialize(events)
       @events = events
@@ -20,22 +20,22 @@ module Puma
       @unix_paths = []
 
       @proto_env = {
-        "rack.version".freeze => RACK_VERSION,
-        "rack.errors".freeze => events.stderr,
-        "rack.multithread".freeze => true,
-        "rack.multiprocess".freeze => false,
-        "rack.run_once".freeze => false,
-        "SCRIPT_NAME".freeze => ENV['SCRIPT_NAME'] || "",
+        "rack.version" => RACK_VERSION,
+        "rack.errors" => events.stderr,
+        "rack.multithread" => true,
+        "rack.multiprocess" => false,
+        "rack.run_once" => false,
+        "SCRIPT_NAME" => ENV['SCRIPT_NAME'] || "",
 
         # I'd like to set a default CONTENT_TYPE here but some things
         # depend on their not being a default set and inferring
         # it from the content. And so if i set it here, it won't
         # infer properly.
 
-        "QUERY_STRING".freeze => "",
+        "QUERY_STRING" => "",
         SERVER_PROTOCOL => HTTP_11,
         SERVER_SOFTWARE => PUMA_SERVER_STRING,
-        GATEWAY_INTERFACE => CGI_VER
+        GATEWAY_INTERFACE => CGI_VER,
       }
 
       @envs = {}
@@ -56,23 +56,23 @@ module Puma
     def import_from_env
       remove = []
 
-      ENV.each do |k,v|
+      ENV.each do |k, v|
         if k =~ /PUMA_INHERIT_\d+/
           fd, url = v.split(":", 2)
           @inherited_fds[url] = fd.to_i
           remove << k
-        elsif k == 'LISTEN_FDS' && ENV['LISTEN_PID'].to_i == $$
+        elsif k == 'LISTEN_FDS' && ENV['LISTEN_PID'].to_i == $PROCESS_ID
           v.to_i.times do |num|
             fd = num + 3
             sock = TCPServer.for_fd(fd)
             begin
-              key = [ :unix, Socket.unpack_sockaddr_un(sock.getsockname) ]
+              key = [:unix, Socket.unpack_sockaddr_un(sock.getsockname)]
             rescue ArgumentError
               port, addr = Socket.unpack_sockaddr_in(sock.getsockname)
               if addr =~ /\:/
                 addr = "[#{addr}]"
               end
-              key = [ :tcp, addr, port ]
+              key = [:tcp, addr, port]
             end
             @activated_sockets[key] = sock
             @events.debug "Registered #{key.join ':'} for activation from LISTEN_FDS"
@@ -94,7 +94,7 @@ module Puma
           if fd = @inherited_fds.delete(str)
             io = inherit_tcp_listener uri.host, uri.port, fd
             logger.log "* Inherited #{str}"
-          elsif sock = @activated_sockets.delete([ :tcp, uri.host, uri.port ])
+          elsif sock = @activated_sockets.delete([:tcp, uri.host, uri.port])
             io = inherit_tcp_listener uri.host, uri.port, sock
             logger.log "* Activated #{str}"
           else
@@ -114,7 +114,7 @@ module Puma
           if fd = @inherited_fds.delete(str)
             io = inherit_unix_listener path, fd
             logger.log "* Inherited #{str}"
-          elsif sock = @activated_sockets.delete([ :unix, path ])
+          elsif sock = @activated_sockets.delete([:unix, path])
             io = inherit_unix_listener path, sock
             logger.log "* Activated #{str}"
           else
@@ -130,7 +130,7 @@ module Puma
               end
 
               if u = params['mode']
-                mode = Integer('0'+u)
+                mode = Integer('0' + u)
               end
 
               if u = params['backlog']
@@ -204,7 +204,7 @@ module Puma
           if fd = @inherited_fds.delete(str)
             logger.log "* Inherited #{str}"
             io = inherit_ssl_listener fd, ctx
-          elsif sock = @activated_sockets.delete([ :tcp, uri.host, uri.port ])
+          elsif sock = @activated_sockets.delete([:tcp, uri.host, uri.port])
             io = inherit_ssl_listener sock, ctx
             logger.log "* Activated #{str}"
           else
@@ -261,7 +261,7 @@ module Puma
     # +backlog+ indicates how many unaccepted connections the kernel should
     # allow to accumulate before returning connection refused.
     #
-    def add_tcp_listener(host, port, optimize_for_latency=true, backlog=1024)
+    def add_tcp_listener(host, port, optimize_for_latency = true, backlog = 1024)
       if host == "localhost"
         loopback_addresses.each do |addr|
           add_tcp_listener addr, port, optimize_for_latency, backlog
@@ -269,12 +269,12 @@ module Puma
         return
       end
 
-      host = host[1..-2] if host and host[0..0] == '['
+      host = host[1..-2] if host && (host[0..0] == '[')
       s = TCPServer.new(host, port)
       if optimize_for_latency
         s.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
       end
-      s.setsockopt(Socket::SOL_SOCKET,Socket::SO_REUSEADDR, true)
+      s.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
       s.listen backlog
       @connected_port = s.addr[1]
 
@@ -285,7 +285,7 @@ module Puma
     attr_reader :connected_port
 
     def inherit_tcp_listener(host, port, fd)
-      if fd.kind_of? TCPServer
+      if fd.is_a? TCPServer
         s = fd
       else
         s = TCPServer.for_fd(fd)
@@ -296,7 +296,7 @@ module Puma
     end
 
     def add_ssl_listener(host, port, ctx,
-                         optimize_for_latency=true, backlog=1024)
+                         optimize_for_latency = true, backlog = 1024)
       require 'puma/minissl'
 
       MiniSSL.check
@@ -313,9 +313,8 @@ module Puma
       if optimize_for_latency
         s.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
       end
-      s.setsockopt(Socket::SOL_SOCKET,Socket::SO_REUSEADDR, true)
+      s.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
       s.listen backlog
-
 
       ssl = MiniSSL::Server.new s, ctx
       env = @proto_env.dup
@@ -330,7 +329,7 @@ module Puma
       require 'puma/minissl'
       MiniSSL.check
 
-      if fd.kind_of? TCPServer
+      if fd.is_a? TCPServer
         s = fd
       else
         s = TCPServer.for_fd(fd)
@@ -348,7 +347,7 @@ module Puma
 
     # Tell the server to listen on +path+ as a UNIX domain socket.
     #
-    def add_unix_listener(path, umask=nil, mode=nil, backlog=1024)
+    def add_unix_listener(path, umask = nil, mode = nil, backlog = 1024)
       @unix_paths << path
 
       # Let anyone connect by default
@@ -389,7 +388,7 @@ module Puma
     def inherit_unix_listener(path, fd)
       @unix_paths << path
 
-      if fd.kind_of? TCPServer
+      if fd.is_a? TCPServer
         s = fd
       else
         s = UNIXServer.for_fd fd
@@ -402,6 +401,5 @@ module Puma
 
       s
     end
-
   end
 end

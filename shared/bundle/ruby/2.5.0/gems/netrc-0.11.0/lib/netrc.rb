@@ -1,7 +1,7 @@
 require 'rbconfig'
 
 class Netrc
-  VERSION = "0.11.0"
+  VERSION = "0.11.0".freeze
 
   # see http://stackoverflow.com/questions/4871309/what-is-the-correct-way-to-detect-if-ruby-is-running-on-windows
   WINDOWS = RbConfig::CONFIG["host_os"] =~ /mswin|mingw|cygwin/
@@ -23,7 +23,7 @@ class Netrc
 
     (home && File.readable?(home)) ? home : Dir.pwd
   rescue ArgumentError
-    return Dir.pwd
+    Dir.pwd
   end
 
   def self.netrc_filename
@@ -35,30 +35,30 @@ class Netrc
   end
 
   def self.configure
-    yield(self.config) if block_given?
-    self.config
+    yield(config) if block_given?
+    config
   end
 
   def self.check_permissions(path)
-    perm = File.stat(path).mode & 0777
-    if perm != 0600 && !(WINDOWS) && !(Netrc.config[:allow_permissive_netrc_file])
-      raise Error, "Permission bits for '#{path}' should be 0600, but are "+perm.to_s(8)
+    perm = File.stat(path).mode & 0o777
+    if perm != 0o600 && !WINDOWS && !Netrc.config[:allow_permissive_netrc_file]
+      raise Error, "Permission bits for '#{path}' should be 0600, but are " + perm.to_s(8)
     end
   end
 
   # Reads path and parses it as a .netrc file. If path doesn't
   # exist, returns an empty object. Decrypt paths ending in .gpg.
-  def self.read(path=default_path)
+  def self.read(path = default_path)
     check_permissions(path)
     data = if path =~ /\.gpg$/
-      decrypted = `gpg --batch --quiet --decrypt #{path}`
-      if $?.success?
-        decrypted
-      else
-        raise Error.new("Decrypting #{path} failed.") unless $?.success?
-      end
-    else
-      File.read(path)
+             decrypted = `gpg --batch --quiet --decrypt #{path}`
+             if $CHILD_STATUS.success?
+               decrypted
+             else
+               raise Error, "Decrypting #{path} failed." unless $CHILD_STATUS.success?
+             end
+           else
+             File.read(path)
     end
     new(path, parse(lex(data.lines.to_a)))
   rescue Errno::ENOENT
@@ -75,10 +75,10 @@ class Netrc
 
     def readto
       l = []
-      while length > 0 && ! yield(self[0])
+      while length > 0 && !yield(self[0])
         l << shift
       end
-      return l.join
+      l.join
     end
   end
 
@@ -113,8 +113,6 @@ class Netrc
     s =~ /^\s/
   end
 
-
-
   # Returns two values, a header and a list of items.
   # Each item is a tuple, containing some or all of:
   # - machine keyword (including trailing whitespace+comments)
@@ -133,28 +131,28 @@ class Netrc
       ts = TokenArray.new(ts)
     end
 
-    pre = ts.readto{|t| t == "machine" || t == "default"}
+    pre = ts.readto { |t| t == "machine" || t == "default" }
 
     while ts.length > 0
       if ts[0] == 'default'
         cur << ts.take.to_sym
         cur << ''
       else
-        cur << ts.take + ts.readto{|t| ! skip?(t)}
+        cur << ts.take + ts.readto { |t| !skip?(t) }
         cur << ts.take
       end
 
       if ts.include?('login')
-        cur << ts.readto{|t| t == "login"} + ts.take + ts.readto{|t| ! skip?(t)}
+        cur << ts.readto { |t| t == "login" } + ts.take + ts.readto { |t| !skip?(t) }
         cur << ts.take
       end
 
       if ts.include?('password')
-        cur << ts.readto{|t| t == "password"} + ts.take + ts.readto{|t| ! skip?(t)}
+        cur << ts.readto { |t| t == "password" } + ts.take + ts.readto { |t| !skip?(t) }
         cur << ts.take
       end
 
-      cur << ts.readto{|t| t == "machine" || t == "default"}
+      cur << ts.readto { |t| t == "machine" || t == "default" }
 
       item << cur
       cur = []
@@ -178,7 +176,7 @@ class Netrc
   attr_accessor :new_item_prefix
 
   def [](k)
-    if item = @data.detect {|datum| datum[1] == k}
+    if item = @data.detect { |datum| datum[1] == k }
       Entry.new(item[3], item[5])
     elsif @default
       Entry.new(@default[3], @default[5])
@@ -186,7 +184,7 @@ class Netrc
   end
 
   def []=(k, info)
-    if item = @data.detect {|datum| datum[1] == k}
+    if item = @data.detect { |datum| datum[1] == k }
       item[3], item[5] = info
     else
       @data << new_item(k, info[0], info[1])
@@ -213,7 +211,7 @@ class Netrc
   end
 
   def new_item(m, l, p)
-    [new_item_prefix+"machine ", m, "\n  login ", l, "\n  password ", p, "\n"]
+    [new_item_prefix + "machine ", m, "\n  login ", l, "\n  password ", p, "\n"]
   end
 
   def save
@@ -223,20 +221,20 @@ class Netrc
         gpg.close_write
         gpg.read
       end
-      raise Error.new("Encrypting #{@path} failed.") unless $?.success?
-      File.open(@path, 'w', 0600) {|file| file.print(e)}
+      raise Error, "Encrypting #{@path} failed." unless $CHILD_STATUS.success?
+      File.open(@path, 'w', 0o600) { |file| file.print(e) }
     else
-      File.open(@path, 'w', 0600) {|file| file.print(unparse)}
+      File.open(@path, 'w', 0o600) { |file| file.print(unparse) }
     end
   end
 
   def unparse
     @pre + @data.map do |datum|
       datum = datum.join
-      unless datum[-1..-1] == "\n"
-        datum << "\n"
-      else
+      if datum[-1..-1] == "\n"
         datum
+      else
+        datum << "\n"
       end
     end.join
   end
@@ -244,7 +242,6 @@ class Netrc
   Entry = Struct.new(:login, :password) do
     alias to_ary to_a
   end
-
 end
 
 class Netrc::Error < ::StandardError

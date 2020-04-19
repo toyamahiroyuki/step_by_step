@@ -7,8 +7,8 @@ class String
 
   unless method_defined? :byteslice
     def byteslice(*arg)
-      enc = self.encoding
-      self.dup.force_encoding(Encoding::ASCII_8BIT).slice(*arg).force_encoding(enc)
+      enc = encoding
+      dup.force_encoding(Encoding::ASCII_8BIT).slice(*arg).force_encoding(enc)
     end
   end
 end

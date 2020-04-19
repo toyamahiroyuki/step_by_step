@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mustermann
   # Class for pattern objects composed of multiple patterns using binary logic.
   # @see Mustermann::Pattern#&
@@ -103,7 +104,7 @@ module Mustermann
 
     # @!visibility private
     def patterns_from(pattern, **options)
-      return pattern.patterns if pattern.is_a? Composite and pattern.operator == self.operator
+      return pattern.patterns if pattern.is_a?(Composite) && (pattern.operator == operator)
       [options.empty? && pattern.is_a?(Pattern) ? pattern : Mustermann.new(pattern, **options)]
     end
 

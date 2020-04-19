@@ -5,13 +5,15 @@ require "bigdecimal/util"
 module ActiveModel
   module Validations
     class NumericalityValidator < EachValidator # :nodoc:
-      CHECKS = { greater_than: :>, greater_than_or_equal_to: :>=,
-                 equal_to: :==, less_than: :<, less_than_or_equal_to: :<=,
-                 odd: :odd?, even: :even?, other_than: :!= }.freeze
+      CHECKS = {
+        greater_than: :>, greater_than_or_equal_to: :>=,
+        equal_to: :==, less_than: :<, less_than_or_equal_to: :<=,
+        odd: :odd?, even: :even?, other_than: :!=,
+      }.freeze
 
       RESERVED_OPTIONS = CHECKS.keys + [:only_integer]
 
-      INTEGER_REGEX = /\A[+-]?\d+\z/
+      INTEGER_REGEX = /\A[+-]?\d+\z/.freeze
 
       def check_validity!
         keys = CHECKS.keys - [:odd, :even]
@@ -78,7 +80,7 @@ module ActiveModel
         end
       end
 
-    private
+      private
 
       def is_number?(raw_value)
         !parse_as_number(raw_value).nil?

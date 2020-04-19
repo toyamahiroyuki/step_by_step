@@ -26,7 +26,7 @@ module I18n
 
       def translate(locale, key, options = EMPTY_HASH)
         raise I18n::ArgumentError if (key.is_a?(String) || key.is_a?(Symbol)) && key.empty?
-        raise InvalidLocale.new(locale) unless locale
+        raise InvalidLocale, locale unless locale
         return nil if key.nil? && !options.key?(:default)
 
         entry = lookup(locale, key, options[:scope], options) unless key.nil?
@@ -56,9 +56,9 @@ module I18n
         values = options.except(*RESERVED_KEYS)
         if values
           entry = if deep_interpolation
-            deep_interpolate(locale, entry, values)
-          else
-            interpolate(locale, entry, values)
+                    deep_interpolate(locale, entry, values)
+                  else
+                    interpolate(locale, entry, values)
           end
         end
         entry
@@ -104,181 +104,177 @@ module I18n
 
       protected
 
-        def eager_loaded?
-          @eager_loaded ||= false
-        end
+      def eager_loaded?
+        @eager_loaded ||= false
+      end
 
-        # The method which actually looks up for the translation in the store.
-        def lookup(locale, key, scope = [], options = EMPTY_HASH)
-          raise NotImplementedError
-        end
+      # The method which actually looks up for the translation in the store.
+      def lookup(locale, key, scope = [], options = EMPTY_HASH)
+        raise NotImplementedError
+      end
 
-        def subtrees?
-          true
-        end
+      def subtrees?
+        true
+      end
 
-        # Evaluates defaults.
-        # If given subject is an Array, it walks the array and returns the
-        # first translation that can be resolved. Otherwise it tries to resolve
-        # the translation directly.
-        def default(locale, object, subject, options = EMPTY_HASH)
-          options = options.reject { |key, value| key == :default }
+      # Evaluates defaults.
+      # If given subject is an Array, it walks the array and returns the
+      # first translation that can be resolved. Otherwise it tries to resolve
+      # the translation directly.
+      def default(locale, object, subject, options = EMPTY_HASH)
+        options = options.reject { |key, value| key == :default }
+        case subject
+        when Array
+          subject.each do |item|
+            result = resolve(locale, object, item, options)
+            return result unless result.nil?
+          end && nil
+        else
+          resolve(locale, object, subject, options)
+        end
+      end
+
+      # Resolves a translation.
+      # If the given subject is a Symbol, it will be translated with the
+      # given options. If it is a Proc then it will be evaluated. All other
+      # subjects will be returned directly.
+      def resolve(locale, object, subject, options = EMPTY_HASH)
+        return subject if options[:resolve] == false
+        result = catch(:exception) do
           case subject
-          when Array
-            subject.each do |item|
-              result = resolve(locale, object, item, options)
-              return result unless result.nil?
-            end and nil
-          else
-            resolve(locale, object, subject, options)
-          end
-        end
-
-        # Resolves a translation.
-        # If the given subject is a Symbol, it will be translated with the
-        # given options. If it is a Proc then it will be evaluated. All other
-        # subjects will be returned directly.
-        def resolve(locale, object, subject, options = EMPTY_HASH)
-          return subject if options[:resolve] == false
-          result = catch(:exception) do
-            case subject
-            when Symbol
-              I18n.translate(subject, **options.merge(:locale => locale, :throw => true))
-            when Proc
-              date_or_time = options.delete(:object) || object
-              resolve(locale, object, subject.call(date_or_time, options))
-            else
-              subject
-            end
-          end
-          result unless result.is_a?(MissingTranslation)
-        end
-
-        # Picks a translation from a pluralized mnemonic subkey according to English
-        # pluralization rules :
-        # - It will pick the :one subkey if count is equal to 1.
-        # - It will pick the :other subkey otherwise.
-        # - It will pick the :zero subkey in the special case where count is
-        #   equal to 0 and there is a :zero subkey present. This behaviour is
-        #   not standard with regards to the CLDR pluralization rules.
-        # Other backends can implement more flexible or complex pluralization rules.
-        def pluralize(locale, entry, count)
-          return entry unless entry.is_a?(Hash) && count && entry.values.none? { |v| v.is_a?(Hash) }
-
-          key = pluralization_key(entry, count)
-          raise InvalidPluralizationData.new(entry, count, key) unless entry.has_key?(key)
-          entry[key]
-        end
-
-        # Interpolates values into a given subject.
-        #
-        #   if the given subject is a string then:
-        #   method interpolates "file %{file} opened by %%{user}", :file => 'test.txt', :user => 'Mr. X'
-        #   # => "file test.txt opened by %{user}"
-        #
-        #   if the given subject is an array then:
-        #   each element of the array is recursively interpolated (until it finds a string)
-        #   method interpolates ["yes, %{user}", ["maybe no, %{user}, "no, %{user}"]], :user => "bartuz"
-        #   # => "["yes, bartuz",["maybe no, bartuz", "no, bartuz"]]"
-        def interpolate(locale, subject, values = EMPTY_HASH)
-          return subject if values.empty?
-
-          case subject
-          when ::String then I18n.interpolate(subject, values)
-          when ::Array then subject.map { |element| interpolate(locale, element, values) }
+          when Symbol
+            I18n.translate(subject, **options.merge(:locale => locale, :throw => true))
+          when Proc
+            date_or_time = options.delete(:object) || object
+            resolve(locale, object, subject.call(date_or_time, options))
           else
             subject
           end
         end
+        result unless result.is_a?(MissingTranslation)
+      end
 
-        # Deep interpolation
-        #
-        #   deep_interpolate { people: { ann: "Ann is %{ann}", john: "John is %{john}" } },
-        #                    ann: 'good', john: 'big'
-        #   #=> { people: { ann: "Ann is good", john: "John is big" } }
-        def deep_interpolate(locale, data, values = EMPTY_HASH)
-          return data if values.empty?
+      # Picks a translation from a pluralized mnemonic subkey according to English
+      # pluralization rules :
+      # - It will pick the :one subkey if count is equal to 1.
+      # - It will pick the :other subkey otherwise.
+      # - It will pick the :zero subkey in the special case where count is
+      #   equal to 0 and there is a :zero subkey present. This behaviour is
+      #   not standard with regards to the CLDR pluralization rules.
+      # Other backends can implement more flexible or complex pluralization rules.
+      def pluralize(locale, entry, count)
+        return entry unless entry.is_a?(Hash) && count && entry.values.none? { |v| v.is_a?(Hash) }
 
-          case data
-          when ::String
-            I18n.interpolate(data, values)
-          when ::Hash
-            data.each_with_object({}) do |(k, v), result|
-              result[k] = deep_interpolate(locale, v, values)
-            end
-          when ::Array
-            data.map do |v|
-              deep_interpolate(locale, v, values)
-            end
-          else
-            data
+        key = pluralization_key(entry, count)
+        raise InvalidPluralizationData.new(entry, count, key) unless entry.key?(key)
+        entry[key]
+      end
+
+      # Interpolates values into a given subject.
+      #
+      #   if the given subject is a string then:
+      #   method interpolates "file %{file} opened by %%{user}", :file => 'test.txt', :user => 'Mr. X'
+      #   # => "file test.txt opened by %{user}"
+      #
+      #   if the given subject is an array then:
+      #   each element of the array is recursively interpolated (until it finds a string)
+      #   method interpolates ["yes, %{user}", ["maybe no, %{user}, "no, %{user}"]], :user => "bartuz"
+      #   # => "["yes, bartuz",["maybe no, bartuz", "no, bartuz"]]"
+      def interpolate(locale, subject, values = EMPTY_HASH)
+        return subject if values.empty?
+
+        case subject
+        when ::String then I18n.interpolate(subject, values)
+        when ::Array then subject.map { |element| interpolate(locale, element, values) }
+        else
+          subject
+        end
+      end
+
+      # Deep interpolation
+      #
+      #   deep_interpolate { people: { ann: "Ann is %{ann}", john: "John is %{john}" } },
+      #                    ann: 'good', john: 'big'
+      #   #=> { people: { ann: "Ann is good", john: "John is big" } }
+      def deep_interpolate(locale, data, values = EMPTY_HASH)
+        return data if values.empty?
+
+        case data
+        when ::String
+          I18n.interpolate(data, values)
+        when ::Hash
+          data.each_with_object({}) do |(k, v), result|
+            result[k] = deep_interpolate(locale, v, values)
+          end
+        when ::Array
+          data.map do |v|
+            deep_interpolate(locale, v, values)
+          end
+        else
+          data
+        end
+      end
+
+      # Loads a single translations file by delegating to #load_rb or
+      # #load_yml depending on the file extension and directly merges the
+      # data to the existing translations. Raises I18n::UnknownFileType
+      # for all other file extensions.
+      def load_file(filename)
+        type = File.extname(filename).tr('.', '').downcase
+        raise UnknownFileType.new(type, filename) unless respond_to?(:"load_#{type}", true)
+        data = send(:"load_#{type}", filename)
+        unless data.is_a?(Hash)
+          raise InvalidLocaleData.new(filename, 'expects it to return a hash, but does not')
+        end
+        data.each { |locale, d| store_translations(locale, d || {}) }
+      end
+
+      # Loads a plain Ruby translations file. eval'ing the file must yield
+      # a Hash containing translation data with locales as toplevel keys.
+      def load_rb(filename)
+        eval(IO.read(filename), binding, filename)
+      end
+
+      # Loads a YAML translations file. The data must have locales as
+      # toplevel keys.
+      def load_yml(filename)
+        YAML.load_file(filename)
+      rescue TypeError, ScriptError, StandardError => e
+        raise InvalidLocaleData.new(filename, e.inspect)
+      end
+      alias_method :load_yaml, :load_yml
+
+      # Loads a JSON translations file. The data must have locales as
+      # toplevel keys.
+      def load_json(filename)
+        ::JSON.parse(File.read(filename))
+      rescue TypeError, StandardError => e
+        raise InvalidLocaleData.new(filename, e.inspect)
+      end
+
+      def translate_localization_format(locale, object, format, options)
+        format.to_s.gsub(/%(|\^)[aAbBpP]/) do |match|
+          case match
+          when '%a' then I18n.t!(:"date.abbr_day_names",                  :locale => locale, :format => format)[object.wday]
+          when '%^a' then I18n.t!(:"date.abbr_day_names",                 :locale => locale, :format => format)[object.wday].upcase
+          when '%A' then I18n.t!(:"date.day_names",                       :locale => locale, :format => format)[object.wday]
+          when '%^A' then I18n.t!(:"date.day_names",                      :locale => locale, :format => format)[object.wday].upcase
+          when '%b' then I18n.t!(:"date.abbr_month_names",                :locale => locale, :format => format)[object.mon]
+          when '%^b' then I18n.t!(:"date.abbr_month_names",               :locale => locale, :format => format)[object.mon].upcase
+          when '%B' then I18n.t!(:"date.month_names",                     :locale => locale, :format => format)[object.mon]
+          when '%^B' then I18n.t!(:"date.month_names",                    :locale => locale, :format => format)[object.mon].upcase
+          when '%p' then I18n.t!(:"time.#{object.hour < 12 ? :am : :pm}", :locale => locale, :format => format).upcase if object.respond_to? :hour
+          when '%P' then I18n.t!(:"time.#{object.hour < 12 ? :am : :pm}", :locale => locale, :format => format).downcase if object.respond_to? :hour
           end
         end
+      rescue MissingTranslationData => e
+        e.message
+      end
 
-        # Loads a single translations file by delegating to #load_rb or
-        # #load_yml depending on the file extension and directly merges the
-        # data to the existing translations. Raises I18n::UnknownFileType
-        # for all other file extensions.
-        def load_file(filename)
-          type = File.extname(filename).tr('.', '').downcase
-          raise UnknownFileType.new(type, filename) unless respond_to?(:"load_#{type}", true)
-          data = send(:"load_#{type}", filename)
-          unless data.is_a?(Hash)
-            raise InvalidLocaleData.new(filename, 'expects it to return a hash, but does not')
-          end
-          data.each { |locale, d| store_translations(locale, d || {}) }
-        end
-
-        # Loads a plain Ruby translations file. eval'ing the file must yield
-        # a Hash containing translation data with locales as toplevel keys.
-        def load_rb(filename)
-          eval(IO.read(filename), binding, filename)
-        end
-
-        # Loads a YAML translations file. The data must have locales as
-        # toplevel keys.
-        def load_yml(filename)
-          begin
-            YAML.load_file(filename)
-          rescue TypeError, ScriptError, StandardError => e
-            raise InvalidLocaleData.new(filename, e.inspect)
-          end
-        end
-        alias_method :load_yaml, :load_yml
-
-        # Loads a JSON translations file. The data must have locales as
-        # toplevel keys.
-        def load_json(filename)
-          begin
-            ::JSON.parse(File.read(filename))
-          rescue TypeError, StandardError => e
-            raise InvalidLocaleData.new(filename, e.inspect)
-          end
-        end
-
-        def translate_localization_format(locale, object, format, options)
-          format.to_s.gsub(/%(|\^)[aAbBpP]/) do |match|
-            case match
-            when '%a' then I18n.t!(:"date.abbr_day_names",                  :locale => locale, :format => format)[object.wday]
-            when '%^a' then I18n.t!(:"date.abbr_day_names",                 :locale => locale, :format => format)[object.wday].upcase
-            when '%A' then I18n.t!(:"date.day_names",                       :locale => locale, :format => format)[object.wday]
-            when '%^A' then I18n.t!(:"date.day_names",                      :locale => locale, :format => format)[object.wday].upcase
-            when '%b' then I18n.t!(:"date.abbr_month_names",                :locale => locale, :format => format)[object.mon]
-            when '%^b' then I18n.t!(:"date.abbr_month_names",               :locale => locale, :format => format)[object.mon].upcase
-            when '%B' then I18n.t!(:"date.month_names",                     :locale => locale, :format => format)[object.mon]
-            when '%^B' then I18n.t!(:"date.month_names",                    :locale => locale, :format => format)[object.mon].upcase
-            when '%p' then I18n.t!(:"time.#{object.hour < 12 ? :am : :pm}", :locale => locale, :format => format).upcase if object.respond_to? :hour
-            when '%P' then I18n.t!(:"time.#{object.hour < 12 ? :am : :pm}", :locale => locale, :format => format).downcase if object.respond_to? :hour
-            end
-          end
-        rescue MissingTranslationData => e
-          e.message
-        end
-
-        def pluralization_key(entry, count)
-          key = :zero if count == 0 && entry.has_key?(:zero)
-          key ||= count == 1 ? :one : :other
-        end
+      def pluralization_key(entry, count)
+        key = :zero if count == 0 && entry.key?(:zero)
+        key ||= count == 1 ? :one : :other
+      end
     end
   end
 end

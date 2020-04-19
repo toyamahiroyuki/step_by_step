@@ -89,7 +89,7 @@ module I18n
         end
 
         test "interpolation: ASCII strings in the backend should be encoded to UTF8 if interpolation options are in UTF8" do
-          I18n.backend.store_translations 'en', 'encoding' => ('%{who} let me go'.force_encoding("ASCII"))
+          I18n.backend.store_translations 'en', 'encoding' => '%{who} let me go'.force_encoding("ASCII")
           result = I18n.t 'encoding', :who => "måmmå miå"
           assert_equal Encoding::UTF_8, result.encoding
         end

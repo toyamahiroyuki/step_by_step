@@ -1,9 +1,11 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class MySQL < Arel::Visitors::ToSql
       private
-      def visit_Arel_Nodes_Union o, collector, suppress_parens = false
+
+      def visit_Arel_Nodes_Union(o, collector, suppress_parens = false)
         unless suppress_parens
           collector << "( "
         end
@@ -31,7 +33,7 @@ module Arel
         end
       end
 
-      def visit_Arel_Nodes_Bin o, collector
+      def visit_Arel_Nodes_Bin(o, collector)
         collector << "BINARY "
         visit o.expr, collector
       end
@@ -39,19 +41,19 @@ module Arel
       ###
       # :'(
       # http://dev.mysql.com/doc/refman/5.0/en/select.html#id3482214
-      def visit_Arel_Nodes_SelectStatement o, collector
+      def visit_Arel_Nodes_SelectStatement(o, collector)
         if o.offset && !o.limit
           o.limit = Arel::Nodes::Limit.new(18446744073709551615)
         end
         super
       end
 
-      def visit_Arel_Nodes_SelectCore o, collector
+      def visit_Arel_Nodes_SelectCore(o, collector)
         o.froms ||= Arel.sql('DUAL')
         super
       end
 
-      def visit_Arel_Nodes_UpdateStatement o, collector
+      def visit_Arel_Nodes_UpdateStatement(o, collector)
         collector << "UPDATE "
         collector = visit o.relation, collector
 
@@ -73,7 +75,7 @@ module Arel
         maybe_visit o.limit, collector
       end
 
-      def visit_Arel_Nodes_Concat o, collector
+      def visit_Arel_Nodes_Concat(o, collector)
         collector << " CONCAT("
         visit o.left, collector
         collector << ", "

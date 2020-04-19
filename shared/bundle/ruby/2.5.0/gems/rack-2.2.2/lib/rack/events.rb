@@ -96,7 +96,9 @@ module Rack
         @body = body
       end
 
-      def to_a; [status, headers, body]; end
+      def to_a
+        [status, headers, body]
+      end
     end
 
     def initialize(app, handlers)

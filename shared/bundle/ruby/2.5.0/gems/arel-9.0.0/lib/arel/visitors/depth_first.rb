@@ -1,20 +1,21 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class DepthFirst < Arel::Visitors::Visitor
-      def initialize block = nil
+      def initialize(block = nil)
         @block = block || Proc.new
         super()
       end
 
       private
 
-      def visit o
+      def visit(o)
         super
         @block.call o
       end
 
-      def unary o
+      def unary(o)
         visit o.expr
       end
       alias :visit_Arel_Nodes_Else              :unary
@@ -35,7 +36,7 @@ module Arel
       alias :visit_Arel_Nodes_Top               :unary
       alias :visit_Arel_Nodes_UnqualifiedColumn :unary
 
-      def function o
+      def function(o)
         visit o.expressions
         visit o.alias
         visit o.distinct
@@ -46,31 +47,31 @@ module Arel
       alias :visit_Arel_Nodes_Min    :function
       alias :visit_Arel_Nodes_Sum    :function
 
-      def visit_Arel_Nodes_NamedFunction o
+      def visit_Arel_Nodes_NamedFunction(o)
         visit o.name
         visit o.expressions
         visit o.distinct
         visit o.alias
       end
 
-      def visit_Arel_Nodes_Count o
+      def visit_Arel_Nodes_Count(o)
         visit o.expressions
         visit o.alias
         visit o.distinct
       end
 
-      def visit_Arel_Nodes_Case o
+      def visit_Arel_Nodes_Case(o)
         visit o.case
         visit o.conditions
         visit o.default
       end
 
-      def nary o
-        o.children.each { |child| visit child}
+      def nary(o)
+        o.children.each { |child| visit child }
       end
       alias :visit_Arel_Nodes_And :nary
 
-      def binary o
+      def binary(o)
         visit o.left
         visit o.right
       end
@@ -102,11 +103,11 @@ module Arel
       alias :visit_Arel_Nodes_Values             :binary
       alias :visit_Arel_Nodes_When               :binary
 
-      def visit_Arel_Nodes_StringJoin o
+      def visit_Arel_Nodes_StringJoin(o)
         visit o.left
       end
 
-      def visit_Arel_Attribute o
+      def visit_Arel_Attribute(o)
         visit o.relation
         visit o.name
       end
@@ -118,11 +119,11 @@ module Arel
       alias :visit_Arel_Attributes_Attribute :visit_Arel_Attribute
       alias :visit_Arel_Attributes_Decimal :visit_Arel_Attribute
 
-      def visit_Arel_Table o
+      def visit_Arel_Table(o)
         visit o.name
       end
 
-      def terminal o
+      def terminal(o)
       end
       alias :visit_ActiveSupport_Multibyte_Chars :terminal
       alias :visit_ActiveSupport_StringInquirer  :terminal
@@ -148,13 +149,13 @@ module Arel
       alias :visit_Time                          :terminal
       alias :visit_TrueClass                     :terminal
 
-      def visit_Arel_Nodes_InsertStatement o
+      def visit_Arel_Nodes_InsertStatement(o)
         visit o.relation
         visit o.columns
         visit o.values
       end
 
-      def visit_Arel_Nodes_SelectCore o
+      def visit_Arel_Nodes_SelectCore(o)
         visit o.projections
         visit o.source
         visit o.wheres
@@ -163,7 +164,7 @@ module Arel
         visit o.havings
       end
 
-      def visit_Arel_Nodes_SelectStatement o
+      def visit_Arel_Nodes_SelectStatement(o)
         visit o.cores
         visit o.orders
         visit o.limit
@@ -171,7 +172,7 @@ module Arel
         visit o.offset
       end
 
-      def visit_Arel_Nodes_UpdateStatement o
+      def visit_Arel_Nodes_UpdateStatement(o)
         visit o.relation
         visit o.values
         visit o.wheres
@@ -179,13 +180,13 @@ module Arel
         visit o.limit
       end
 
-      def visit_Array o
+      def visit_Array(o)
         o.each { |i| visit i }
       end
       alias :visit_Set :visit_Array
 
-      def visit_Hash o
-        o.each { |k,v| visit(k); visit(v) }
+      def visit_Hash(o)
+        o.each { |k, v| visit(k); visit(v) }
       end
 
       DISPATCH = dispatch_cache

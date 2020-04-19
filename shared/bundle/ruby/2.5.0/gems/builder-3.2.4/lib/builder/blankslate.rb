@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+
 #--
 # Copyright 2004, 2006 by Jim Weirich (jim@weirichhouse.org).
 # All rights reserved.
@@ -15,7 +16,7 @@
 # Builder namespace for compatibility.
 #
 module Builder
-  if Object::const_defined?(:BasicObject)
+  if Object.const_defined?(:BasicObject)
     BlankSlate = ::BasicObject
   else
     require 'blankslate'

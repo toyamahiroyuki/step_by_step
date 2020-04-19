@@ -2,10 +2,8 @@ require 'concurrent/future'
 require 'concurrent/atomic/atomic_fixnum'
 
 module Concurrent
-
   # @!visibility private
   class DependencyCounter # :nodoc:
-
     def initialize(count, &block)
       @counter = AtomicFixnum.new(count)
       @block = block
@@ -54,10 +52,10 @@ module Concurrent
   private
 
   def call_dataflow(method, executor, *inputs, &block)
-    raise ArgumentError.new('an executor must be provided') if executor.nil?
-    raise ArgumentError.new('no block given') unless block_given?
+    raise ArgumentError, 'an executor must be provided' if executor.nil?
+    raise ArgumentError, 'no block given' unless block_given?
     unless inputs.all? { |input| input.is_a? IVar }
-      raise ArgumentError.new("Not all dependencies are IVars.\nDependencies: #{ inputs.inspect }")
+      raise ArgumentError, "Not all dependencies are IVars.\nDependencies: #{inputs.inspect}"
     end
 
     result = Future.new(executor: executor) do

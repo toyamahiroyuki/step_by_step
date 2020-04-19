@@ -88,7 +88,7 @@ module Rack
                       :allow_if => nil
 
       def self.token(session)
-        self.new(nil).mask_authenticity_token(session)
+        new(nil).mask_authenticity_token(session)
       end
 
       def self.random_token
@@ -102,7 +102,7 @@ module Rack
         safe?(env) ||
           valid_token?(session, env['HTTP_X_CSRF_TOKEN']) ||
           valid_token?(session, Request.new(env).params[options[:authenticity_param]]) ||
-          ( options[:allow_if] && options[:allow_if].call(env) )
+          (options[:allow_if] && options[:allow_if].call(env))
       end
 
       def mask_authenticity_token(session)
@@ -119,7 +119,7 @@ module Rack
       # Checks the client's masked token to see if it matches the
       # session token.
       def valid_token?(session, token)
-        return false if token.nil? || token.empty?
+        return false if token.blank?
 
         begin
           token = decode_token(token)
@@ -189,7 +189,7 @@ module Rack
       end
 
       def xor_byte_strings(s1, s2)
-        s1.bytes.zip(s2.bytes).map { |(c1,c2)| c1 ^ c2 }.pack('c*')
+        s1.bytes.zip(s2.bytes).map { |(c1, c2)| c1 ^ c2 }.pack('c*')
       end
     end
   end

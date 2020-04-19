@@ -4,7 +4,6 @@ require 'concurrent/delay'
 
 module Concurrent
   module Utility
-
     # @!visibility private
     class ProcessorCounter
       def initialize
@@ -79,14 +78,19 @@ module Concurrent
       def compute_processor_count
         if Concurrent.on_jruby?
           java.lang.Runtime.getRuntime.availableProcessors
-        elsif Etc.respond_to?(:nprocessors) && (nprocessor = Etc.nprocessors rescue nil)
+        elsif Etc.respond_to?(:nprocessors) && (nprocessor = begin
+                                                               Etc.nprocessors
+                                                             rescue
+                                                               nil
+                                                             end)
           nprocessor
         else
           os_name = RbConfig::CONFIG["target_os"]
           if os_name =~ /mingw|mswin/
             require 'win32ole'
             result = WIN32OLE.connect("winmgmts://").ExecQuery(
-              "select NumberOfLogicalProcessors from Win32_Processor")
+              "select NumberOfLogicalProcessors from Win32_Processor"
+            )
             result.to_enum.collect(&:NumberOfLogicalProcessors).reduce(:+)
           elsif File.readable?("/proc/cpuinfo") && (cpuinfo_count = IO.read("/proc/cpuinfo").scan(/^processor/).size) > 0
             cpuinfo_count
@@ -102,7 +106,7 @@ module Concurrent
             IO.popen("/usr/sbin/pmcycles -m", &:read).count("\n")
           elsif File.executable?("/usr/sbin/lsdev")
             IO.popen("/usr/sbin/lsdev -Cc processor -S 1", &:read).count("\n")
-          elsif File.executable?("/usr/sbin/sysconf") and os_name =~ /irix/i
+          elsif File.executable?("/usr/sbin/sysconf") && os_name =~ /irix/i
             IO.popen("/usr/sbin/sysconf NPROC_ONLN", &:read).to_i
           elsif File.executable?("/usr/sbin/sysctl")
             IO.popen("/usr/sbin/sysctl -n hw.ncpu", &:read).to_i
@@ -114,7 +118,7 @@ module Concurrent
           end
         end
       rescue
-        return 1
+        1
       end
 
       def compute_physical_processor_count
@@ -129,14 +133,15 @@ module Concurrent
                     phy = ln[/\d+/]
                   elsif ln.start_with?("core")
                     cid        = phy + ":" + ln[/\d+/]
-                    cores[cid] = true if not cores[cid]
+                    cores[cid] = true if !(cores[cid])
                   end
                 end
                 cores.count
               when /mswin|mingw/
                 require 'win32ole'
                 result_set = WIN32OLE.connect("winmgmts://").ExecQuery(
-                  "select NumberOfCores from Win32_Processor")
+                  "select NumberOfCores from Win32_Processor"
+                )
                 result_set.to_enum.collect(&:NumberOfCores).reduce(:+)
               else
                 processor_count
@@ -144,7 +149,7 @@ module Concurrent
         # fall back to logical count if physical info is invalid
         ppc > 0 ? ppc : processor_count
       rescue
-        return 1
+        1
       end
     end
   end

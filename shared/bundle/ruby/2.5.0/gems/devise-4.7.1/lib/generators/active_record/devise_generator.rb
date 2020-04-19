@@ -29,9 +29,9 @@ module ActiveRecord
         content = model_contents
 
         class_path = if namespaced?
-          class_name.to_s.split("::")
-        else
-          [class_name]
+                       class_name.to_s.split("::")
+                     else
+                       [class_name]
         end
 
         indent_depth = class_path.size - 1
@@ -41,7 +41,7 @@ module ActiveRecord
       end
 
       def migration_data
-<<RUBY
+        <<RUBY
       ## Database authenticatable
       t.string :email,              null: false, default: ""
       t.string :encrypted_password, null: false, default: ""
@@ -91,20 +91,20 @@ RUBY
         config && config['adapter'] == 'postgresql'
       end
 
-     def migration_version
-       if rails5_and_up?
-         "[#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}]"
-       end
-     end
+      def migration_version
+        if rails5_and_up?
+          "[#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}]"
+        end
+      end
 
-     def primary_key_type
-       primary_key_string if rails5_and_up?
-     end
+      def primary_key_type
+        primary_key_string if rails5_and_up?
+      end
 
-     def primary_key_string
-       key_string = options[:primary_key_type]
-       ", id: :#{key_string}" if key_string
-     end
+      def primary_key_string
+        key_string = options[:primary_key_type]
+        ", id: :#{key_string}" if key_string
+      end
     end
   end
 end

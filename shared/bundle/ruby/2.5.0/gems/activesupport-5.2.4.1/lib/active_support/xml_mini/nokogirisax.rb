@@ -3,7 +3,7 @@
 begin
   require "nokogiri"
 rescue LoadError => e
-  $stderr.puts "You don't have nokogiri installed in your application. Please add it to your Gemfile and run bundle install"
+  warn "You don't have nokogiri installed in your application. Please add it to your Gemfile and run bundle install"
   raise e
 end
 require "active_support/core_ext/object/blank"
@@ -16,8 +16,8 @@ module ActiveSupport
     # Class that will build the hash while the XML document
     # is being parsed using SAX events.
     class HashBuilder < Nokogiri::XML::SAX::Document
-      CONTENT_KEY   = "__content__".freeze
-      HASH_SIZE_KEY = "__hash_size__".freeze
+      CONTENT_KEY   = "__content__"
+      HASH_SIZE_KEY = "__hash_size__"
 
       attr_reader :hash
 

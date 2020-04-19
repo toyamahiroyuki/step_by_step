@@ -225,25 +225,25 @@ module ActionView
       module LayoutConditions # :nodoc:
         private
 
-          # Determines whether the current action has a layout definition by
-          # checking the action name against the :only and :except conditions
-          # set by the <tt>layout</tt> method.
-          #
-          # ==== Returns
-          # * <tt>Boolean</tt> - True if the action has a layout definition, false otherwise.
-          def _conditional_layout?
-            return unless super
+        # Determines whether the current action has a layout definition by
+        # checking the action name against the :only and :except conditions
+        # set by the <tt>layout</tt> method.
+        #
+        # ==== Returns
+        # * <tt>Boolean</tt> - True if the action has a layout definition, false otherwise.
+        def _conditional_layout?
+          return unless super
 
-            conditions = _layout_conditions
+          conditions = _layout_conditions
 
-            if only = conditions[:only]
-              only.include?(action_name)
-            elsif except = conditions[:except]
-              !except.include?(action_name)
-            else
-              true
-            end
+          if only = conditions[:only]
+            only.include?(action_name)
+          elsif except = conditions[:except]
+            !except.include?(action_name)
+          else
+            true
           end
+        end
       end
 
       # Specify the layout to use for this class.
@@ -284,9 +284,9 @@ module ActionView
         prefixes = /\blayouts/.match?(_implied_layout_name) ? [] : ["layouts"]
         default_behavior = "lookup_context.find_all('#{_implied_layout_name}', #{prefixes.inspect}, false, [], { formats: formats }).first || super"
         name_clause = if name
-          default_behavior
-        else
-          <<-RUBY
+                        default_behavior
+                      else
+                        <<-RUBY
             super
           RUBY
         end
@@ -335,14 +335,14 @@ module ActionView
 
       private
 
-        # If no layout is supplied, look for a template named the return
-        # value of this method.
-        #
-        # ==== Returns
-        # * <tt>String</tt> - A template name
-        def _implied_layout_name
-          controller_path
-        end
+      # If no layout is supplied, look for a template named the return
+      # value of this method.
+      #
+      # ==== Returns
+      # * <tt>String</tt> - A template name
+      def _implied_layout_name
+        controller_path
+      end
     end
 
     def _normalize_options(options) # :nodoc:
@@ -371,7 +371,7 @@ module ActionView
       @_action_has_layout
     end
 
-  private
+    private
 
     def _conditional_layout?
       true
@@ -393,7 +393,7 @@ module ActionView
       when false, nil then nil
       else
         raise ArgumentError,
-          "String, Proc, :default, true, or false, expected for `layout'; you passed #{name.inspect}"
+              "String, Proc, :default, true, or false, expected for `layout'; you passed #{name.inspect}"
       end
     end
 
@@ -420,7 +420,7 @@ module ActionView
 
       if require_layout && action_has_layout? && !value
         raise ArgumentError,
-          "There was no default layout for #{self.class} in #{view_paths.inspect}"
+              "There was no default layout for #{self.class} in #{view_paths.inspect}"
       end
 
       _normalize_layout(value)

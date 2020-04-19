@@ -91,19 +91,20 @@ module ActiveSupport
       end
 
       private
-        def calculate(op, other)
-          if Scalar === other
-            Scalar.new(value.public_send(op, other.value))
-          elsif Numeric === other
-            Scalar.new(value.public_send(op, other))
-          else
-            raise_type_error(other)
-          end
-        end
 
-        def raise_type_error(other)
-          raise TypeError, "no implicit conversion of #{other.class} into #{self.class}"
+      def calculate(op, other)
+        if Scalar === other
+          Scalar.new(value.public_send(op, other.value))
+        elsif Numeric === other
+          Scalar.new(value.public_send(op, other))
+        else
+          raise_type_error(other)
         end
+      end
+
+      def raise_type_error(other)
+        raise TypeError, "no implicit conversion of #{other.class} into #{self.class}"
+      end
     end
 
     SECONDS_PER_MINUTE = 60
@@ -116,11 +117,11 @@ module ActiveSupport
     PARTS_IN_SECONDS = {
       seconds: 1,
       minutes: SECONDS_PER_MINUTE,
-      hours:   SECONDS_PER_HOUR,
-      days:    SECONDS_PER_DAY,
-      weeks:   SECONDS_PER_WEEK,
-      months:  SECONDS_PER_MONTH,
-      years:   SECONDS_PER_YEAR
+      hours: SECONDS_PER_HOUR,
+      days: SECONDS_PER_DAY,
+      weeks: SECONDS_PER_WEEK,
+      months: SECONDS_PER_MONTH,
+      years: SECONDS_PER_YEAR,
     }.freeze
 
     PARTS = [:years, :months, :weeks, :days, :hours, :minutes, :seconds].freeze
@@ -200,11 +201,11 @@ module ActiveSupport
 
       private
 
-        def calculate_total_seconds(parts)
-          parts.inject(0) do |total, (part, value)|
-            total + value * PARTS_IN_SECONDS[part]
-          end
+      def calculate_total_seconds(parts)
+        parts.inject(0) do |total, (part, value)|
+          total + value * PARTS_IN_SECONDS[part]
         end
+      end
     end
 
     def initialize(value, parts) #:nodoc:
@@ -249,7 +250,7 @@ module ActiveSupport
     # Subtracts another Duration or a Numeric from this Duration. Numeric
     # values are treated as seconds.
     def -(other)
-      self + (-other)
+      self + -other
     end
 
     # Multiplies this Duration by a Numeric and returns a new Duration.
@@ -374,7 +375,7 @@ module ActiveSupport
 
       parts.
         reduce(::Hash.new(0)) { |h, (l, r)| h[l] += r; h }.
-        sort_by { |unit,  _ | PARTS.index(unit) }.
+        sort_by { |unit, _| PARTS.index(unit) }.
         map     { |unit, val| "#{val} #{val == 1 ? unit.to_s.chop : unit.to_s}" }.
         to_sentence(locale: ::I18n.default_locale)
     end
@@ -399,34 +400,34 @@ module ActiveSupport
 
     private
 
-      def sum(sign, time = ::Time.current)
-        parts.inject(time) do |t, (type, number)|
-          if t.acts_like?(:time) || t.acts_like?(:date)
-            if type == :seconds
-              t.since(sign * number)
-            elsif type == :minutes
-              t.since(sign * number * 60)
-            elsif type == :hours
-              t.since(sign * number * 3600)
-            else
-              t.advance(type => sign * number)
-            end
+    def sum(sign, time = ::Time.current)
+      parts.inject(time) do |t, (type, number)|
+        if t.acts_like?(:time) || t.acts_like?(:date)
+          if type == :seconds
+            t.since(sign * number)
+          elsif type == :minutes
+            t.since(sign * number * 60)
+          elsif type == :hours
+            t.since(sign * number * 3600)
           else
-            raise ::ArgumentError, "expected a time or date, got #{time.inspect}"
+            t.advance(type => sign * number)
           end
+        else
+          raise ::ArgumentError, "expected a time or date, got #{time.inspect}"
         end
       end
+    end
 
-      def respond_to_missing?(method, _)
-        value.respond_to?(method)
-      end
+    def respond_to_missing?(method, _)
+      value.respond_to?(method)
+    end
 
-      def method_missing(method, *args, &block)
-        value.public_send(method, *args, &block)
-      end
+    def method_missing(method, *args, &block)
+      value.public_send(method, *args, &block)
+    end
 
-      def raise_type_error(other)
-        raise TypeError, "no implicit conversion of #{other.class} into #{self.class}"
-      end
+    def raise_type_error(other)
+      raise TypeError, "no implicit conversion of #{other.class} into #{self.class}"
+    end
   end
 end

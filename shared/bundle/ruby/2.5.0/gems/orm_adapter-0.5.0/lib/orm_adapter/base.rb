@@ -107,19 +107,19 @@ module OrmAdapter
       if order.length == 2 && !order[0].is_a?(Array) && [:asc, :desc].include?(order[1])
         order = [order]
       else
-        order = order.map {|pair| pair.is_a?(Array) ? pair : [pair, :asc] }
+        order = order.map { |pair| pair.is_a?(Array) ? pair : [pair, :asc] }
       end
 
       order.each do |pair|
-        pair.length == 2 or raise ArgumentError, "each order clause must be a pair (unknown clause #{pair.inspect})"
-        [:asc, :desc].include?(pair[1]) or raise ArgumentError, "order must be specified with :asc or :desc (unknown key #{pair[1].inspect})"
+        (pair.length == 2) || raise(ArgumentError, "each order clause must be a pair (unknown clause #{pair.inspect})")
+        [:asc, :desc].include?(pair[1]) || raise(ArgumentError, "order must be specified with :asc or :desc (unknown key #{pair[1].inspect})")
       end
 
       order
     end
   end
 
-  class NotSupportedError < NotImplementedError
+  class NotSupportedError < StandardError
     def to_s
       "method not supported by this orm adapter"
     end

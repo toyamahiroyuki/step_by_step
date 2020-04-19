@@ -142,7 +142,7 @@ class Pry
     # @return [Array<Method>]
     #
     def search_all_methods(namespace)
-      done = Hash.new { |h,k| h[k] = {} }
+      done = Hash.new { |h, k| h[k] = {} }
       matches = []
 
       recurse_namespace(namespace) do |klass|
@@ -178,11 +178,9 @@ class Pry
     #
     def content_search(namespace)
       search_all_methods(namespace) do |meth|
-        begin
-          meth.source =~ pattern
-        rescue RescuableException
-          false
-        end
+        meth.source =~ pattern
+      rescue RescuableException
+        false
       end
     end
   end

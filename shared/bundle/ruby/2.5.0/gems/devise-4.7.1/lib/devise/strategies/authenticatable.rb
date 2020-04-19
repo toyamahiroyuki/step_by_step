@@ -25,7 +25,7 @@ module Devise
         true
       end
 
-    private
+      private
 
       # Receives a resource and check if it is valid by calling valid_for_authentication?
       # A block that will be triggered while validating can be optionally
@@ -121,7 +121,7 @@ module Devise
       # Helper to decode credentials from HTTP.
       def decode_credentials
         return [] unless request.authorization && request.authorization =~ /^Basic (.*)/mi
-        Base64.decode64($1).split(/:/, 2)
+        Base64.decode64(Regexp.last_match(1)).split(/:/, 2)
       end
 
       # Sets the authentication hash and the password from params_auth_hash or http_auth_hash.
@@ -139,8 +139,8 @@ module Devise
 
       def http_authentication_key
         @http_authentication_key ||= mapping.to.http_authentication_key || case authentication_keys
-          when Array then authentication_keys.first
-          when Hash then authentication_keys.keys.first
+                                                                           when Array then authentication_keys.first
+                                                                           when Hash then authentication_keys.keys.first
         end
       end
 
@@ -150,7 +150,7 @@ module Devise
 
       def request_values
         keys = request_keys.respond_to?(:keys) ? request_keys.keys : request_keys
-        values = keys.map { |k| self.request.send(k) }
+        values = keys.map { |k| request.send(k) }
         Hash[keys.zip(values)]
       end
 
@@ -158,7 +158,7 @@ module Devise
         keys.each do |key, enforce|
           value = hash[key].presence
           if value
-            self.authentication_hash[key] = value
+            authentication_hash[key] = value
           else
             return false unless enforce == false
           end

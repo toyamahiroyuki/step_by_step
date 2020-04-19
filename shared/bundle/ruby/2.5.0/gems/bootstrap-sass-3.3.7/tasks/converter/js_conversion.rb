@@ -18,9 +18,9 @@ class Converter
       end
       dist_js = read_files('dist/js', %w(bootstrap.js bootstrap.min.js))
       {
-          'assets/javascripts/bootstrap-sprockets.js' => manifest,
-          'assets/javascripts/bootstrap.js'           => dist_js['bootstrap.js'],
-          'assets/javascripts/bootstrap.min.js'       => dist_js['bootstrap.min.js'],
+        'assets/javascripts/bootstrap-sprockets.js' => manifest,
+        'assets/javascripts/bootstrap.js' => dist_js['bootstrap.js'],
+        'assets/javascripts/bootstrap.min.js' => dist_js['bootstrap.min.js'],
       }.each do |path, content|
         save_file path, content
         log_processed path
@@ -29,18 +29,18 @@ class Converter
 
     def bootstrap_js_files
       @bootstrap_js_files ||= begin
-        files = get_paths_by_type('js', /\.js$/).reject { |path| path =~ %r(^tests/) }
-        files.sort_by { |f|
+        files = get_paths_by_type('js', /\.js$/).reject { |path| path =~ %r{^tests/} }
+        files.sort_by do |f|
           case f
             # tooltip depends on popover and must be loaded earlier
-            when /tooltip/ then
-              1
-            when /popover/ then
-              2
-            else
-              0
+          when /tooltip/
+            1
+          when /popover/
+            2
+          else
+            0
           end
-        }
+        end
       end
     end
   end

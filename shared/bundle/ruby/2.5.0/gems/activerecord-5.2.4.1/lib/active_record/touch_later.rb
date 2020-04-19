@@ -41,24 +41,24 @@ module ActiveRecord
 
     private
 
-      def surreptitiously_touch(attrs)
-        attrs.each { |attr| write_attribute attr, @_touch_time }
-        clear_attribute_changes attrs
-      end
+    def surreptitiously_touch(attrs)
+      attrs.each { |attr| write_attribute attr, @_touch_time }
+      clear_attribute_changes attrs
+    end
 
-      def touch_deferred_attributes
-        if has_defer_touch_attrs? && persisted?
-          touch(*@_defer_touch_attrs, time: @_touch_time)
-          @_defer_touch_attrs, @_touch_time = nil, nil
-        end
+    def touch_deferred_attributes
+      if has_defer_touch_attrs? && persisted?
+        touch(*@_defer_touch_attrs, time: @_touch_time)
+        @_defer_touch_attrs, @_touch_time = nil, nil
       end
+    end
 
-      def has_defer_touch_attrs?
-        defined?(@_defer_touch_attrs) && @_defer_touch_attrs.present?
-      end
+    def has_defer_touch_attrs?
+      defined?(@_defer_touch_attrs) && @_defer_touch_attrs.present?
+    end
 
-      def belongs_to_touch_method
-        :touch_later
-      end
+    def belongs_to_touch_method
+      :touch_later
+    end
   end
 end

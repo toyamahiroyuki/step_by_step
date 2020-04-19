@@ -37,16 +37,16 @@ module ActionController #:nodoc:
 
     private
 
-      def content_security_policy?
-        request.content_security_policy
-      end
+    def content_security_policy?
+      request.content_security_policy
+    end
 
-      def content_security_policy_nonce
-        request.content_security_policy_nonce
-      end
+    def content_security_policy_nonce
+      request.content_security_policy_nonce
+    end
 
-      def current_content_security_policy
-        request.content_security_policy.try(:clone) || ActionDispatch::ContentSecurityPolicy.new
-      end
+    def current_content_security_policy
+      request.content_security_policy.try(:clone) || ActionDispatch::ContentSecurityPolicy.new
+    end
   end
 end

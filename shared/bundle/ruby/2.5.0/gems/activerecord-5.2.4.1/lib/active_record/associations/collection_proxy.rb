@@ -1097,35 +1097,35 @@ module ActiveRecord
       delegate_methods = [
         QueryMethods,
         SpawnMethods,
-      ].flat_map { |klass|
+      ].flat_map do |klass|
         klass.public_instance_methods(false)
-      } - self.public_instance_methods(false) - [:select] + [:scoping]
+      end - public_instance_methods(false) - [:select] + [:scoping]
 
       delegate(*delegate_methods, to: :scope)
 
       private
 
-        def find_nth_with_limit(index, limit)
-          load_target if find_from_target?
-          super
-        end
+      def find_nth_with_limit(index, limit)
+        load_target if find_from_target?
+        super
+      end
 
-        def find_nth_from_last(index)
-          load_target if find_from_target?
-          super
-        end
+      def find_nth_from_last(index)
+        load_target if find_from_target?
+        super
+      end
 
-        def null_scope?
-          @association.null_scope?
-        end
+      def null_scope?
+        @association.null_scope?
+      end
 
-        def find_from_target?
-          @association.find_from_target?
-        end
+      def find_from_target?
+        @association.find_from_target?
+      end
 
-        def exec_queries
-          load_target
-        end
+      def exec_queries
+        load_target
+      end
     end
   end
 end

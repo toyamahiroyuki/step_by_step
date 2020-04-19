@@ -15,7 +15,6 @@ module Rack
       # to limit the validity of the generated nonces.
 
       class Nonce
-
         class << self
           attr_accessor :private_key, :time_limit
         end
@@ -47,7 +46,6 @@ module Rack
         def fresh?
           !stale?
         end
-
       end
     end
   end

@@ -16,7 +16,7 @@ module ActiveStorage
 
         system mutool_path, out: File::NULL, err: File::NULL
 
-        @mutool_exists = $?.exitstatus == 1
+        @mutool_exists = $CHILD_STATUS.exitstatus == 1
       end
     end
 
@@ -29,8 +29,9 @@ module ActiveStorage
     end
 
     private
-      def draw_first_page_from(file, &block)
-        draw self.class.mutool_path, "draw", "-F", "png", "-o", "-", file.path, "1", &block
-      end
+
+    def draw_first_page_from(file, &block)
+      draw self.class.mutool_path, "draw", "-F", "png", "-o", "-", file.path, "1", &block
+    end
   end
 end

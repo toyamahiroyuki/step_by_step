@@ -1,11 +1,12 @@
 # encoding: utf-8
+
 $LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
 
 begin
   require 'bundler'
   Bundler::GemHelper.install_tasks
 rescue LoadError => e
-  $stderr.puts e
+  warn e
 end
 
 desc "run specs"
@@ -14,9 +15,9 @@ task(:spec) { ruby '-S rspec spec' }
 namespace :doc do
   task :readmes do
     Dir.glob 'lib/rack/protection/*.rb' do |file|
-      excluded_files = %w[lib/rack/protection/base.rb lib/rack/protection/version.rb]
+      excluded_files = %w(lib/rack/protection/base.rb lib/rack/protection/version.rb)
       next if excluded_files.include?(file)
-      doc  = File.read(file)[/^  module Protection(\n)+(    #[^\n]*\n)*/m].scan(/^ *#(?!#) ?(.*)\n/).join("\n")
+      doc = File.read(file)[/^  module Protection(\n)+(    #[^\n]*\n)*/m].scan(/^ *#(?!#) ?(.*)\n/).join("\n")
       file = "doc/#{file[4..-4].tr("/_", "-")}.rdoc"
       Dir.mkdir "doc" unless File.directory? "doc"
       puts "writing #{file}"
@@ -46,8 +47,8 @@ task 'rack-protection.gemspec' do
   # fetch data
   fields = {
     :authors => `git shortlog -sn`.force_encoding('utf-8').scan(/[^\d\s].*/),
-    :email   => ["mail@zzak.io", "konstantin.haase@gmail.com"],
-    :files   => %w(License README.md Rakefile Gemfile rack-protection.gemspec) + Dir['lib/**/*']
+    :email => ["mail@zzak.io", "konstantin.haase@gmail.com"],
+    :files => %w(License README.md Rakefile Gemfile rack-protection.gemspec) + Dir['lib/**/*'],
   }
 
   # insert data

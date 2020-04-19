@@ -7,10 +7,10 @@ require "active_support/multibyte/unicode"
 
 class ERB
   module Util
-    HTML_ESCAPE = { "&" => "&amp;",  ">" => "&gt;",   "<" => "&lt;", '"' => "&quot;", "'" => "&#39;" }
-    JSON_ESCAPE = { "&" => '\u0026', ">" => '\u003e', "<" => '\u003c', "\u2028" => '\u2028', "\u2029" => '\u2029' }
-    HTML_ESCAPE_ONCE_REGEXP = /["><']|&(?!([a-zA-Z]+|(#\d+)|(#[xX][\dA-Fa-f]+));)/
-    JSON_ESCAPE_REGEXP = /[\u2028\u2029&><]/u
+    HTML_ESCAPE = { "&" => "&amp;",  ">" => "&gt;",   "<" => "&lt;", '"' => "&quot;", "'" => "&#39;" }.freeze
+    JSON_ESCAPE = { "&" => '\u0026', ">" => '\u003e', "<" => '\u003c', "\u2028" => '\u2028', "\u2029" => '\u2029' }.freeze
+    HTML_ESCAPE_ONCE_REGEXP = /["><']|&(?!([a-zA-Z]+|(#\d+)|(#[xX][\dA-Fa-f]+));)/.freeze
+    JSON_ESCAPE_REGEXP = /[\u2028\u2029&><]/u.freeze
 
     # A utility method for escaping HTML tag characters.
     # This method is also aliased as <tt>h</tt>.
@@ -136,7 +136,7 @@ module ActiveSupport #:nodoc:
     UNSAFE_STRING_METHODS = %w(
       capitalize chomp chop delete downcase gsub lstrip next reverse rstrip
       slice squeeze strip sub succ swapcase tr tr_s upcase
-    )
+    ).freeze
 
     alias_method :original_concat, :concat
     private :original_concat
@@ -240,9 +240,9 @@ module ActiveSupport #:nodoc:
 
     private
 
-      def html_escape_interpolated_argument(arg)
-        (!html_safe? || arg.html_safe?) ? arg : CGI.escapeHTML(arg.to_s)
-      end
+    def html_escape_interpolated_argument(arg)
+      (!html_safe? || arg.html_safe?) ? arg : CGI.escapeHTML(arg.to_s)
+    end
   end
 end
 

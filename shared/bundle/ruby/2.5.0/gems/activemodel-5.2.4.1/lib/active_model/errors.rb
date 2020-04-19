@@ -59,8 +59,8 @@ module ActiveModel
   class Errors
     include Enumerable
 
-    CALLBACKS_OPTIONS = [:if, :unless, :on, :allow_nil, :allow_blank, :strict]
-    MESSAGE_OPTIONS = [:message]
+    CALLBACKS_OPTIONS = [:if, :unless, :on, :allow_nil, :allow_blank, :strict].freeze
+    MESSAGE_OPTIONS = [:message].freeze
 
     attr_reader :messages, :details
 
@@ -369,9 +369,9 @@ module ActiveModel
       attr_name = attribute.to_s.tr(".", "_").humanize
       attr_name = @base.class.human_attribute_name(attribute, default: attr_name)
       I18n.t(:"errors.format",
-        default:  "%{attribute} %{message}",
-        attribute: attr_name,
-        message:   message)
+             default: "%{attribute} %{message}",
+             attribute: attr_name,
+             message: message)
     end
 
     # Translates an error message in its default scope
@@ -404,8 +404,10 @@ module ActiveModel
       if @base.class.respond_to?(:i18n_scope)
         i18n_scope = @base.class.i18n_scope.to_s
         defaults = @base.class.lookup_ancestors.flat_map do |klass|
-          [ :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.attributes.#{attribute}.#{type}",
-            :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.#{type}" ]
+          [
+            :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.attributes.#{attribute}.#{type}",
+            :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.#{type}",
+          ]
         end
         defaults << :"#{i18n_scope}.errors.messages.#{type}"
       else
@@ -424,7 +426,7 @@ module ActiveModel
         model: @base.model_name.human,
         attribute: @base.class.human_attribute_name(attribute),
         value: value,
-        object: @base
+        object: @base,
       }.merge!(options)
 
       I18n.translate(key, options)
@@ -447,7 +449,8 @@ module ActiveModel
       apply_default_array(@details)
     end
 
-  private
+    private
+
     def normalize_message(attribute, message, options)
       case message
       when Symbol

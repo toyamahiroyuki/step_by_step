@@ -15,7 +15,7 @@ module Rack
         Tempfile.new(["RackMultipart", ::File.extname(filename.gsub("\0", '%00'))])
       }
 
-      BOUNDARY_REGEX = /\A([^\n]*(?:\n|\Z))/
+      BOUNDARY_REGEX = /\A([^\n]*(?:\n|\Z))/.freeze
 
       class BoundedIO # :nodoc:
         def initialize(io, content_length)
@@ -97,8 +97,10 @@ module Rack
               # those which give the lone filename.
               fn = filename.split(/[\/\\]/).last
 
-              data = { filename: fn, type: content_type,
-                      name: name, tempfile: body, head: head }
+              data = {
+                filename: fn, type: content_type,
+                name: name, tempfile: body, head: head,
+              }
             end
 
             yield data
@@ -106,13 +108,21 @@ module Rack
         end
 
         class BufferPart < MimePart
-          def file?; false; end
+          def file?
+            false
+          end
+
           def close; end
         end
 
         class TempfilePart < MimePart
-          def file?; true; end
-          def close; body.close; end
+          def file?
+            true
+          end
+
+          def close
+            body.close
+          end
         end
 
         include Enumerable
@@ -230,9 +240,9 @@ module Rack
         tok = consume_boundary
         # break if we're at the end of a buffer, but not if it is the end of a field
         @state = if tok == :END_BOUNDARY || (@sbuf.eos? && tok != :BOUNDARY)
-          :DONE
-        else
-          :MIME_HEAD
+                   :DONE
+                 else
+                   :MIME_HEAD
         end
       end
 
@@ -241,14 +251,14 @@ module Rack
           head = @sbuf[1]
           content_type = head[MULTIPART_CONTENT_TYPE, 1]
           if name = head[MULTIPART_CONTENT_DISPOSITION, 1]
-            name = Rack::Auth::Digest::Params::dequote(name)
+            name = Rack::Auth::Digest::Params.dequote(name)
           else
             name = head[MULTIPART_CONTENT_ID, 1]
           end
 
           filename = get_filename(head)
 
-          if name.nil? || name.empty?
+          if name.blank?
             name = filename || "#{content_type || TEXT_PLAIN}[]".dup
           end
 
@@ -278,7 +288,7 @@ module Rack
         end
       end
 
-      def full_boundary; @full_boundary; end
+      attr_reader :full_boundary
 
       def consume_boundary
         while read_buffer = @sbuf.scan_until(BOUNDARY_REGEX)
@@ -297,12 +307,12 @@ module Rack
           params = Hash[*head.scan(DISPPARM).flat_map(&:compact)]
 
           if filename = params['filename']
-            filename = $1 if filename =~ /^"(.*)"$/
+            filename = Regexp.last_match(1) if filename =~ /^"(.*)"$/
           elsif filename = params['filename*']
             encoding, _, filename = filename.split("'", 3)
           end
         when BROKEN_QUOTED, BROKEN_UNQUOTED
-          filename = $1
+          filename = Regexp.last_match(1)
         end
 
         return unless filename
@@ -355,7 +365,7 @@ module Rack
       end
 
       def handle_empty_content!(content)
-        if content.nil? || content.empty?
+        if content.blank?
           raise EOFError
         end
       end

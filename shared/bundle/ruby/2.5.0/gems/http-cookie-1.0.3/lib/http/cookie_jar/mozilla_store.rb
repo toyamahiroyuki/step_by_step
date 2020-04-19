@@ -20,20 +20,20 @@ class HTTP::CookieJar
       }
     end
 
-    ALL_COLUMNS = %w[
+    ALL_COLUMNS = %w(
       baseDomain
       appId inBrowserElement
       name value
       host path
       expiry creationTime lastAccessed
       isSecure isHttpOnly
-    ]
-    UK_COLUMNS = %w[
+    ).freeze
+    UK_COLUMNS = %w(
       name host path
       appId inBrowserElement
-    ]
+    ).freeze
 
-    SQL = {}
+    SQL = {}.freeze
 
     Callable = proc { |obj, meth, *args|
       proc {
@@ -60,9 +60,9 @@ class HTTP::CookieJar
 
       def close
         return self if closed?
-        @stmts.reject! { |st|
+        @stmts.reject! do |st|
           st.closed? || st.close
-        }
+        end
         super
       end
     end
@@ -95,15 +95,15 @@ class HTTP::CookieJar
     def initialize(options = nil)
       super
 
-      @filename = options[:filename] or raise ArgumentError, ':filename option is missing'
+      (@filename = options[:filename]) || raise(ArgumentError, ':filename option is missing')
 
       @sjar = HTTP::CookieJar::HashStore.new
 
       @db = Database.new(@filename)
 
-      @stmt = Hash.new { |st, key|
+      @stmt = Hash.new do |st, key|
         st[key] = @db.prepare(SQL[key])
-      }
+      end
 
       ObjectSpace.define_finalizer(self, Callable[@db, :close])
 
@@ -137,12 +137,12 @@ class HTTP::CookieJar
       @schema_version ||= @db.execute("PRAGMA user_version").first[0]
     rescue SQLite3::SQLException
       @logger.warn "couldn't get schema version!" if @logger
-      return nil
+      nil
     end
 
     protected
 
-    def schema_version= version
+    def schema_version=(version)
       @db.execute("PRAGMA user_version = %d" % version)
       @schema_version = version
     end
@@ -184,7 +184,7 @@ class HTTP::CookieJar
     end
 
     def upgrade_database
-      loop {
+      loop do
         case schema_version
         when nil, 0
           self.schema_version = SCHEMA_VERSION
@@ -195,29 +195,29 @@ class HTTP::CookieJar
         when 2
           @db.execute("ALTER TABLE moz_cookies ADD baseDomain TEXT")
 
-          db_prepare("UPDATE moz_cookies SET baseDomain = :baseDomain WHERE id = :id") { |st_update|
-            @db.execute("SELECT id, host FROM moz_cookies") { |row|
+          db_prepare("UPDATE moz_cookies SET baseDomain = :baseDomain WHERE id = :id") do |st_update|
+            @db.execute("SELECT id, host FROM moz_cookies") do |row|
               domain_name = DomainName.new(row['host'][/\A\.?(.*)/, 1])
               domain = domain_name.domain || domain_name.hostname
               st_update.execute(:baseDomain => domain, :id => row['id'])
-            }
-          }
+            end
+          end
 
           @db.execute("CREATE INDEX moz_basedomain ON moz_cookies (baseDomain)")
           self.schema_version += 1
         when 3
-          db_prepare("DELETE FROM moz_cookies WHERE id = :id") { |st_delete|
+          db_prepare("DELETE FROM moz_cookies WHERE id = :id") do |st_delete|
             prev_row = nil
-            @db.execute(<<-'SQL') { |row|
+            @db.execute(<<-'SQL') do |row|
                          SELECT id, name, host, path FROM moz_cookies
                            ORDER BY name ASC, host ASC, path ASC, expiry ASC
             SQL
-              if %w[name host path].all? { |col| prev_row and row[col] == prev_row[col] }
+              if %w(name host path).all? { |col| prev_row && (row[col] == prev_row[col]) }
                 st_delete.execute(prev_row['id'])
               end
               prev_row = row
-            }
-          }
+            end
+          end
 
           @db.execute("ALTER TABLE moz_cookies ADD creationTime INTEGER")
           @db.execute("UPDATE moz_cookies SET creationTime = (SELECT id WHERE id = moz_cookies.id)")
@@ -240,7 +240,7 @@ class HTTP::CookieJar
         else
           break
         end
-      }
+      end
 
       begin
         @db.execute("SELECT %s from moz_cookies limit 1" % ALL_COLUMNS.join(', '))
@@ -253,23 +253,23 @@ class HTTP::CookieJar
       INSERT OR REPLACE INTO moz_cookies (%s) VALUES (%s)
     SQL
       ALL_COLUMNS.join(', '),
-      ALL_COLUMNS.map { |col| ":#{col}" }.join(', ')
+      ALL_COLUMNS.map { |col| ":#{col}" }.join(', '),
     ]
 
     def db_add(cookie)
       @stmt[:add].execute({
-          :baseDomain => cookie.domain_name.domain || cookie.domain,
-          :appId => @app_id,
-          :inBrowserElement => @in_browser_element ? 1 : 0,
-          :name => cookie.name, :value => cookie.value,
-          :host => cookie.dot_domain,
-          :path => cookie.path,
-          :expiry => cookie.expires_at.to_i,
-          :creationTime => cookie.created_at.to_i,
-          :lastAccessed => cookie.accessed_at.to_i,
-          :isSecure => cookie.secure? ? 1 : 0,
-          :isHttpOnly => cookie.httponly? ? 1 : 0,
-        })
+        :baseDomain => cookie.domain_name.domain || cookie.domain,
+        :appId => @app_id,
+        :inBrowserElement => @in_browser_element ? 1 : 0,
+        :name => cookie.name, :value => cookie.value,
+        :host => cookie.dot_domain,
+        :path => cookie.path,
+        :expiry => cookie.expires_at.to_i,
+        :creationTime => cookie.created_at.to_i,
+        :lastAccessed => cookie.accessed_at.to_i,
+        :isSecure => cookie.secure? ? 1 : 0,
+        :isHttpOnly => cookie.httponly? ? 1 : 0,
+      })
       cleanup if (@gc_index += 1) >= @gc_threshold
 
       self
@@ -286,12 +286,12 @@ class HTTP::CookieJar
 
     def db_delete(cookie)
       @stmt[:delete].execute({
-          :appId => @app_id,
-          :inBrowserElement => @in_browser_element ? 1 : 0,
-          :name => cookie.name,
-          :host => cookie.dot_domain,
-          :path => cookie.path,
-        })
+        :appId => @app_id,
+        :inBrowserElement => @in_browser_element ? 1 : 0,
+        :name => cookie.name,
+        :host => cookie.dot_domain,
+        :path => cookie.path,
+      })
       self
     end
 
@@ -340,57 +340,57 @@ class HTTP::CookieJar
         tpath = uri.path
 
         @stmt[:cookies_for_domain].execute({
-            :baseDomain => thost.domain || thost.hostname,
-            :appId => @app_id,
-            :inBrowserElement => @in_browser_element ? 1 : 0,
-            :expiry => now.to_i,
-          }).each { |row|
+          :baseDomain => thost.domain || thost.hostname,
+          :appId => @app_id,
+          :inBrowserElement => @in_browser_element ? 1 : 0,
+          :expiry => now.to_i,
+        }).each do |row|
           if secure = row['isSecure'] != 0
             next unless URI::HTTPS === uri
           end
 
-          cookie = HTTP::Cookie.new({}.tap { |attrs|
-              attrs[:name]        = row['name']
-              attrs[:value]       = row['value']
-              attrs[:domain]      = row['host']
-              attrs[:path]        = row['path']
-              attrs[:expires_at]  = Time.at(row['expiry'])
-              attrs[:accessed_at] = Time.at(row['lastAccessed'] || 0)
-              attrs[:created_at]  = Time.at(row['creationTime'] || 0)
-              attrs[:secure]      = secure
-              attrs[:httponly]    = row['isHttpOnly'] != 0
-            })
+          cookie = HTTP::Cookie.new({}.tap do |attrs|
+                                      attrs[:name]        = row['name']
+                                      attrs[:value]       = row['value']
+                                      attrs[:domain]      = row['host']
+                                      attrs[:path]        = row['path']
+                                      attrs[:expires_at]  = Time.at(row['expiry'])
+                                      attrs[:accessed_at] = Time.at(row['lastAccessed'] || 0)
+                                      attrs[:created_at]  = Time.at(row['creationTime'] || 0)
+                                      attrs[:secure]      = secure
+                                      attrs[:httponly]    = row['isHttpOnly'] != 0
+                                    end)
 
           if cookie.valid_for_uri?(uri)
             cookie.accessed_at = now
             @stmt[:update_lastaccessed].execute({
-                'lastAccessed' => now.to_i,
-                'id' => row['id'],
-              })
+              'lastAccessed' => now.to_i,
+              'id' => row['id'],
+            })
             yield cookie
           end
-        }
+        end
         @sjar.each(uri, &block)
       else
         @stmt[:all_cookies].execute({
-            :appId => @app_id,
-            :inBrowserElement => @in_browser_element ? 1 : 0,
-            :expiry => now.to_i,
-          }).each { |row|
-          cookie = HTTP::Cookie.new({}.tap { |attrs|
-              attrs[:name]        = row['name']
-              attrs[:value]       = row['value']
-              attrs[:domain]      = row['host']
-              attrs[:path]        = row['path']
-              attrs[:expires_at]  = Time.at(row['expiry'])
-              attrs[:accessed_at] = Time.at(row['lastAccessed'] || 0)
-              attrs[:created_at]  = Time.at(row['creationTime'] || 0)
-              attrs[:secure]      = row['isSecure'] != 0
-              attrs[:httponly]    = row['isHttpOnly'] != 0
-            })
+          :appId => @app_id,
+          :inBrowserElement => @in_browser_element ? 1 : 0,
+          :expiry => now.to_i,
+        }).each do |row|
+          cookie = HTTP::Cookie.new({}.tap do |attrs|
+                                      attrs[:name]        = row['name']
+                                      attrs[:value]       = row['value']
+                                      attrs[:domain]      = row['host']
+                                      attrs[:path]        = row['path']
+                                      attrs[:expires_at]  = Time.at(row['expiry'])
+                                      attrs[:accessed_at] = Time.at(row['lastAccessed'] || 0)
+                                      attrs[:created_at]  = Time.at(row['creationTime'] || 0)
+                                      attrs[:secure]      = row['isSecure'] != 0
+                                      attrs[:httponly]    = row['isHttpOnly'] != 0
+                                    end)
 
           yield cookie
-        }
+        end
         @sjar.each(&block)
       end
       self
@@ -428,21 +428,21 @@ class HTTP::CookieJar
     SQL
 
     def cleanup(session = false)
-      synchronize {
+      synchronize do
         break if @gc_index == 0
 
         @stmt[:delete_expired].execute({ 'expiry' => Time.now.to_i })
 
         @stmt[:overusing_domains].execute({
-            'count' => HTTP::Cookie::MAX_COOKIES_PER_DOMAIN
-          }).each { |row|
+          'count' => HTTP::Cookie::MAX_COOKIES_PER_DOMAIN,
+        }).each do |row|
           domain, count = row['domain'], row['count']
 
           @stmt[:delete_per_domain_overuse].execute({
-              'domain' => domain,
-              'limit' => count - HTTP::Cookie::MAX_COOKIES_PER_DOMAIN,
-            })
-        }
+            'domain' => domain,
+            'limit' => count - HTTP::Cookie::MAX_COOKIES_PER_DOMAIN,
+          })
+        end
 
         overrun = count - HTTP::Cookie::MAX_COOKIES_TOTAL
 
@@ -451,7 +451,7 @@ class HTTP::CookieJar
         end
 
         @gc_index = 0
-      }
+      end
       self
     end
   end

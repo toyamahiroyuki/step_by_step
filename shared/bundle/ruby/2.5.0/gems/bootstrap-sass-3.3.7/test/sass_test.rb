@@ -2,16 +2,16 @@ require 'test_helper'
 require 'shellwords'
 
 class SassTest < Minitest::Test
-  DUMMY_PATH = 'test/dummy_sass_only'
+  DUMMY_PATH = 'test/dummy_sass_only'.freeze
 
   def test_font_helper
-    assert_match %r(url\(['"]?.*eot['"]?\)), @css
+    assert_match %r{url\(['"]?.*eot['"]?\)}, @css
   end
 
   def setup
     Dir.chdir DUMMY_PATH do
-      %x[rm -rf .sass-cache/]
-      %x[bundle]
+      `rm -rf .sass-cache/`
+      `bundle`
     end
     css_path = File.join GEM_PATH, 'tmp/bootstrap-sass-only.css'
     command  = "bundle exec ruby compile.rb #{Shellwords.escape css_path}"

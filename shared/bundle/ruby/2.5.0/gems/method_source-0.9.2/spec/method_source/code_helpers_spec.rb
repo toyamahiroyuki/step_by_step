@@ -15,7 +15,7 @@ describe MethodSource::CodeHelpers do
     ["pouts(<<HI, 'foo", "bar", "HI", "baz')"],
     ["=begin", "no-one uses this syntax anymore...", "=end"],
     ["puts 1, 2,", "3"],
-    ["puts 'hello'\\", "'world'"]
+    ["puts 'hello'\\", "'world'"],
   ].each do |lines|
     it "should not raise an error on broken lines: #{lines.join("\\n")}" do
       1.upto(lines.size - 1) do |i|
@@ -29,15 +29,15 @@ describe MethodSource::CodeHelpers do
     ["end"],
     ["puts )("],
     ["1 1"],
-    ["puts :"]
+    ["puts :"],
   ] + (RbConfig::CONFIG['ruby_install_name'] == 'rbx' ? [] : [
     ["def", "method(1"], # in this case the syntax error is "expecting ')'".
-    ["o = Object.new.tap{ def o.render;","'MEH'", "}"] # in this case the syntax error is "expecting keyword_end".
+    ["o = Object.new.tap{ def o.render;", "'MEH'", "}"], # in this case the syntax error is "expecting keyword_end".
   ]).compact.each do |foo|
     it "should raise an error on invalid syntax like #{foo.inspect}" do
-      expect {
+      expect do
         @tester.complete_expression?(foo.join("\n"))
-      }.to raise_error(SyntaxError)
+      end.to raise_error(SyntaxError)
     end
   end
 end

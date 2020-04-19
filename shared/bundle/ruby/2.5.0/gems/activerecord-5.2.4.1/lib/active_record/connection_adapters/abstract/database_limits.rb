@@ -64,9 +64,10 @@ module ActiveRecord
       end
 
       private
-        def bind_params_length
-          65535
-        end
+
+      def bind_params_length
+        65535
+      end
     end
   end
 end

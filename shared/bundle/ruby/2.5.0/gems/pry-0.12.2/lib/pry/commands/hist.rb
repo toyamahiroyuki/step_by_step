@@ -25,7 +25,7 @@ class Pry
       opt.on :T, :tail,   "Display the last N items", optional_argument: true, as: Integer
       opt.on :s, :show,   "Show the given range of lines", optional_argument: true, as: Range
       opt.on :G, :grep,   "Show lines matching the given pattern", argument: true, as: String
-      opt.on :c, :clear , "Clear the current session's history"
+      opt.on :c, :clear, "Clear the current session's history"
       opt.on :r, :replay, "Replay a line or range of lines", argument: true, as: Range
       opt.on     :save,   "Save history to a file", argument: true, as: Range
       opt.on :e, :'exclude-pry', "Exclude Pry commands from the history"
@@ -57,8 +57,8 @@ class Pry
 
       if opts.present?(:'exclude-pry')
         @history = @history.select do |loc|
-                     !command_set.valid_command?(loc.line)
-                   end
+          !command_set.valid_command?(loc.line)
+        end
       end
 
       if opts.present?(:save)
@@ -145,7 +145,7 @@ class Pry
     def check_for_juxtaposed_replay(replay_sequence)
       if replay_sequence =~ /\Ahist(?:ory)?\b/
         # Create *fresh* instance of Options for parsing of "hist" command.
-        _slop = self.slop
+        _slop = slop
         _slop.parse replay_sequence.split(' ')[1..-1]
 
         if _slop.present?(:r)
@@ -153,7 +153,7 @@ class Pry
           index = opts[:r]
           index = index.min if index.min == index.max || index.max.nil?
 
-          raise CommandError, "Replay index #{ index } points out to another replay call: `#{ replay_sequence }`"
+          raise CommandError, "Replay index #{index} points out to another replay call: `#{replay_sequence}`"
         end
       else
         false

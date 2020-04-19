@@ -74,7 +74,7 @@ module PryByebug
 
     private
 
-    %w[delete disable enable disable_all delete_all].each do |command|
+    %w(delete disable enable disable_all delete_all).each do |command|
       define_method(:"process_#{command}") do
         breakpoints.send(*[command, opts[command]].compact)
         print_all

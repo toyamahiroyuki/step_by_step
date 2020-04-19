@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/ast/translator'
 
 module Mustermann
@@ -36,8 +37,8 @@ module Mustermann
       # Checks that a node is within the given boundaries.
       # @!visibility private
       def set_boundaries(node, start, stop)
-        node.start = start                      if node.start.nil? or node.start < start
-        node.stop  = node.start + node.min_size if node.stop.nil?  or node.stop  < node.start
+        node.start = start                      if node.start.nil? || (node.start < start)
+        node.stop  = node.start + node.min_size if node.stop.nil?  || (node.stop  < node.start)
         node.stop  = stop                       if node.stop > stop
       end
     end

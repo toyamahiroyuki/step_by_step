@@ -37,7 +37,7 @@ module Rack
 
         @server = ::WEBrick::HTTPServer.new(options)
         @server.mount "/", Rack::Handler::WEBrick, app
-        yield @server  if block_given?
+        yield @server if block_given?
         @server.start
       end
 
@@ -72,16 +72,16 @@ module Rack
         rack_input.set_encoding(Encoding::BINARY)
 
         env.update(
-          RACK_VERSION      => Rack::VERSION,
-          RACK_INPUT        => rack_input,
-          RACK_ERRORS       => $stderr,
-          RACK_MULTITHREAD  => true,
+          RACK_VERSION => Rack::VERSION,
+          RACK_INPUT => rack_input,
+          RACK_ERRORS => $stderr,
+          RACK_MULTITHREAD => true,
           RACK_MULTIPROCESS => false,
-          RACK_RUNONCE      => false,
-          RACK_URL_SCHEME   => ["yes", "on", "1"].include?(env[HTTPS]) ? "https" : "http",
-          RACK_IS_HIJACK    => true,
-          RACK_HIJACK       => lambda { raise NotImplementedError, "only partial hijack is supported."},
-          RACK_HIJACK_IO    => nil
+          RACK_RUNONCE => false,
+          RACK_URL_SCHEME => ["yes", "on", "1"].include?(env[HTTPS]) ? "https" : "http",
+          RACK_IS_HIJACK => true,
+          RACK_HIJACK => lambda { raise NotImplementedError, "only partial hijack is supported." },
+          RACK_HIJACK_IO => nil
         )
 
         env[HTTP_VERSION] ||= env[SERVER_PROTOCOL]
@@ -96,7 +96,7 @@ module Rack
         begin
           res.status = status.to_i
           io_lambda = nil
-          headers.each { |k, vs|
+          headers.each do |k, vs|
             if k == RACK_HIJACK
               io_lambda = vs
             elsif k.downcase == "set-cookie"
@@ -106,7 +106,7 @@ module Rack
               # merge the values per RFC 1945 section 4.2.
               res[k] = vs.split("\n").join(", ")
             end
-          }
+          end
 
           if io_lambda
             rd, wr = IO.pipe
@@ -116,12 +116,12 @@ module Rack
           elsif body.respond_to?(:to_path)
             res.body = ::File.open(body.to_path, 'rb')
           else
-            body.each { |part|
+            body.each do |part|
               res.body << part
-            }
+            end
           end
         ensure
-          body.close  if body.respond_to? :close
+          body.close if body.respond_to? :close
         end
       end
     end

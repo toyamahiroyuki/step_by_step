@@ -60,21 +60,22 @@ module ActiveRecord
         end
 
         private
-          def fetch_arel_attribute(value)
-            case value
-            when Arel::Nodes::Between, Arel::Nodes::In, Arel::Nodes::NotIn, Arel::Nodes::Equality, Arel::Nodes::NotEqual, Arel::Nodes::LessThan, Arel::Nodes::LessThanOrEqual, Arel::Nodes::GreaterThan, Arel::Nodes::GreaterThanOrEqual
-              yield value.left.is_a?(Arel::Attributes::Attribute) ? value.left : value.right
-            end
-          end
 
-          def append_constraints(join, constraints)
-            if join.is_a?(Arel::Nodes::StringJoin)
-              join_string = table.create_and(constraints.unshift(join.left))
-              join.left = Arel.sql(base_klass.connection.visitor.compile(join_string))
-            else
-              join.right.expr.children.concat(constraints)
-            end
+        def fetch_arel_attribute(value)
+          case value
+          when Arel::Nodes::Between, Arel::Nodes::In, Arel::Nodes::NotIn, Arel::Nodes::Equality, Arel::Nodes::NotEqual, Arel::Nodes::LessThan, Arel::Nodes::LessThanOrEqual, Arel::Nodes::GreaterThan, Arel::Nodes::GreaterThanOrEqual
+            yield value.left.is_a?(Arel::Attributes::Attribute) ? value.left : value.right
           end
+        end
+
+        def append_constraints(join, constraints)
+          if join.is_a?(Arel::Nodes::StringJoin)
+            join_string = table.create_and(constraints.unshift(join.left))
+            join.left = Arel.sql(base_klass.connection.visitor.compile(join_string))
+          else
+            join.right.expr.children.concat(constraints)
+          end
+        end
       end
     end
   end

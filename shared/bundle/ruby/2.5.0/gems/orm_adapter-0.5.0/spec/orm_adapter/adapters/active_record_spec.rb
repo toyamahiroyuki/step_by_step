@@ -8,8 +8,8 @@ else
 
   ActiveRecord::Migration.suppress_messages do
     ActiveRecord::Schema.define(:version => 0) do
-      create_table(:users, :force => true) {|t| t.string :name; t.integer :rating; }
-      create_table(:notes, :force => true) {|t| t.belongs_to :owner, :polymorphic => true }
+      create_table(:users, :force => true) { |t| t.string :name; t.integer :rating; }
+      create_table(:notes, :force => true) { |t| t.belongs_to :owner, :polymorphic => true }
     end
   end
 
@@ -48,12 +48,12 @@ else
           let(:user) { User.create! }
           let(:adapter) { PerverseNote.to_adapter }
 
-          it "should convert polymorphic object in conditions to the appropriate fields" do
-            adapter.send(:conditions_to_fields, :pwner => user).should == {'owner_id' => user.id, 'owner_type' => user.class.name}
+          it "converts polymorphic object in conditions to the appropriate fields" do
+            adapter.send(:conditions_to_fields, :pwner => user).should == { 'owner_id' => user.id, 'owner_type' => user.class.name }
           end
 
-          it "should convert belongs_to object in conditions to the appropriate fields" do
-            adapter.send(:conditions_to_fields, :user => user).should == {'owner_id' => user.id}
+          it "converts belongs_to object in conditions to the appropriate fields" do
+            adapter.send(:conditions_to_fields, :user => user).should == { 'owner_id' => user.id }
           end
         end
       end

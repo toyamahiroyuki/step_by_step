@@ -2,7 +2,7 @@
 
 module Puma
   class TCPLogger
-    def initialize(logger, app, quiet=false)
+    def initialize(logger, app, quiet = false)
       @logger = logger
       @app = app
       @quiet = quiet

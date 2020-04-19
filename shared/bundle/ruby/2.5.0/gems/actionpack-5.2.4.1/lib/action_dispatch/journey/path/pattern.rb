@@ -63,9 +63,9 @@ module ActionDispatch
         end
 
         def optional_names
-          @optional_names ||= spec.find_all(&:group?).flat_map { |group|
+          @optional_names ||= spec.find_all(&:group?).flat_map do |group|
             group.find_all(&:symbol?)
-          }.map(&:name).uniq
+          end.map(&:name).uniq
         end
 
         class AnchoredRegexp < Journey::Visitors::Visitor # :nodoc:
@@ -171,28 +171,28 @@ module ActionDispatch
 
         private
 
-          def regexp_visitor
-            @anchored ? AnchoredRegexp : UnanchoredRegexp
-          end
+        def regexp_visitor
+          @anchored ? AnchoredRegexp : UnanchoredRegexp
+        end
 
-          def offsets
-            return @offsets if @offsets
+        def offsets
+          return @offsets if @offsets
 
-            @offsets = [0]
+          @offsets = [0]
 
-            spec.find_all(&:symbol?).each do |node|
-              node = node.to_sym
+          spec.find_all(&:symbol?).each do |node|
+            node = node.to_sym
 
-              if @requirements.key?(node)
-                re = /#{@requirements[node]}|/
-                @offsets.push((re.match("").length - 1) + @offsets.last)
-              else
-                @offsets << @offsets.last
-              end
+            if @requirements.key?(node)
+              re = /#{@requirements[node]}|/
+              @offsets.push((re.match("").length - 1) + @offsets.last)
+            else
+              @offsets << @offsets.last
             end
-
-            @offsets
           end
+
+          @offsets
+        end
       end
     end
   end

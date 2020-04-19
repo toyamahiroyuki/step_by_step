@@ -1,5 +1,4 @@
 module Concurrent
-
   # @!visibility private
   # @!macro internal_implementation_note
   class MutexAtomicReference < Synchronization::LockableObject

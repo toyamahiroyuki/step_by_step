@@ -1,11 +1,11 @@
 class TargetItemsController < ApplicationController
-    before_action :authenticate_user!
+  before_action :authenticate_user!
   def create
     target_item = TargetItem.new(target_item_params)
     target_item.save
     target_item.target_balance = target_item.target.calc_total_cost
     if target_item.save
-       redirect_to targets_path
+      redirect_to targets_path
     else
       # @targets = current_user.targets
       # @target_item = TargetItem.new
@@ -37,11 +37,11 @@ class TargetItemsController < ApplicationController
       target_item.target_balance = target.target_cost - target.target_items.where(id: 1..target_item.id).sum(:target_by_month)
       if target_item.update(target_item_params)
     end
-        redirect_to targets_path
+      redirect_to targets_path
       else
-        @target_item = TargetItem.find(params[:id])
-        render aciton: :edit
-      end
+      @target_item = TargetItem.find(params[:id])
+      render aciton: :edit
+    end
   end
 
   def destroy

@@ -31,19 +31,18 @@
 #
 
 module FFI
-  class VariadicInvoker    
+  class VariadicInvoker
     def init(arg_types, type_map)
-      @fixed = Array.new
+      @fixed = []
       @type_map = type_map
       arg_types.each_with_index do |type, i|
         @fixed << type unless type == Type::VARARGS
       end
     end
 
-
     def call(*args, &block)
       param_types = Array.new(@fixed)
-      param_values = Array.new
+      param_values = []
       @fixed.each_with_index do |t, i|
         param_values << args[i]
       end

@@ -44,7 +44,7 @@ module Mongoid
         object.destroy if valid_object?(object)
       end
 
-    protected
+      protected
 
       # converts and documents to ids
       def conditions_to_fields(conditions)

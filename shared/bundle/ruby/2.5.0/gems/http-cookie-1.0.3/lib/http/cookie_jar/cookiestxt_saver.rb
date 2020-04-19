@@ -23,16 +23,16 @@ class HTTP::CookieJar::CookiestxtSaver < HTTP::CookieJar::AbstractSaver
 
   def save(io, jar)
     io.puts @header if @header
-    jar.each { |cookie|
+    jar.each do |cookie|
       next if !@session && cookie.session?
       io.print cookie_to_record(cookie)
-    }
+    end
   end
 
   def load(io, jar)
-    io.each_line { |line|
-      cookie = parse_record(line) and jar.add(cookie)
-    }
+    io.each_line do |line|
+      (cookie = parse_record(line)) && jar.add(cookie)
+    end
   end
 
   private
@@ -45,16 +45,16 @@ class HTTP::CookieJar::CookiestxtSaver < HTTP::CookieJar::AbstractSaver
   end
 
   # :stopdoc:
-  True  = "TRUE"
-  False = "FALSE"
+  True  = "TRUE".freeze
+  False = "FALSE".freeze
 
-  HTTPONLY_PREFIX = '#HttpOnly_'
-  RE_HTTPONLY_PREFIX = /\A#{HTTPONLY_PREFIX}/
+  HTTPONLY_PREFIX = '#HttpOnly_'.freeze
+  RE_HTTPONLY_PREFIX = /\A#{HTTPONLY_PREFIX}/.freeze
   # :startdoc:
 
   # Serializes the cookie into a cookies.txt line.
   def cookie_to_record(cookie)
-    cookie.instance_eval {
+    cookie.instance_eval do
       [
         @httponly ? HTTPONLY_PREFIX + dot_domain : dot_domain,
         @for_domain ? True : False,
@@ -62,9 +62,9 @@ class HTTP::CookieJar::CookiestxtSaver < HTTP::CookieJar::AbstractSaver
         @secure ? True : False,
         expires.to_i,
         @name,
-        @value
+        @value,
       ]
-    }.join("\t") << @linefeed
+    end.join("\t") << @linefeed
   end
 
   # Parses a line from cookies.txt and returns a cookie object if the
@@ -81,10 +81,10 @@ class HTTP::CookieJar::CookiestxtSaver < HTTP::CookieJar::AbstractSaver
     end
 
     domain,
-    s_for_domain,	# Whether this cookie is for domain
-    path,		# Path for which the cookie is relevant
-    s_secure,		# Requires a secure connection
-    s_expires,		# Time the cookie expires (Unix epoch time)
+    s_for_domain, # Whether this cookie is for domain
+    path, # Path for which the cookie is relevant
+    s_secure, # Requires a secure connection
+    s_expires, # Time the cookie expires (Unix epoch time)
     name, value = line.split("\t", 7)
     return nil if value.nil?
 
@@ -96,11 +96,11 @@ class HTTP::CookieJar::CookiestxtSaver < HTTP::CookieJar::AbstractSaver
     end
 
     HTTP::Cookie.new(name, value,
-      :domain => domain,
-      :for_domain => s_for_domain == True,
-      :path => path,
-      :secure => s_secure == True,
-      :httponly => httponly,
-      :expires => expires)
+                     :domain => domain,
+                     :for_domain => s_for_domain == True,
+                     :path => path,
+                     :secure => s_secure == True,
+                     :httponly => httponly,
+                     :expires => expires)
   end
 end

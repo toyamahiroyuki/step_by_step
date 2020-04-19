@@ -17,7 +17,7 @@ class Pry
     def visible_commands
       visible = {}
       commands.each do |key, command|
-        visible[key] = command if command.description && !command.description.empty?
+        visible[key] = command if command.description.present?
       end
       visible
     end
@@ -45,7 +45,7 @@ class Pry
         commands = sorted_commands(groups[group_name])
 
         if commands.any?
-           help_text << help_text_for_commands(group_name, commands)
+          help_text << help_text_for_commands(group_name, commands)
         end
       end
 
@@ -113,7 +113,7 @@ class Pry
       if filtered.size == 1
         display_command(filtered.values.first)
       else
-        display_index({"'#{search}' commands" => filtered.values})
+        display_index({ "'#{search}' commands" => filtered.values })
       end
     end
 
@@ -138,7 +138,7 @@ class Pry
       hash.each_pair do |key, value|
         next unless key.is_a?(String)
         if normalize(key) == normalize(search)
-          return {key => value}
+          return { key => value }
         elsif normalize(key).start_with?(normalize(search))
           matching[key] = value
         end

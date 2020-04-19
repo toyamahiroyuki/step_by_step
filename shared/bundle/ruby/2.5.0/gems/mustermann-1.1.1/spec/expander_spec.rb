@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'mustermann/expander'
 
@@ -54,6 +55,7 @@ describe Mustermann::Expander do
 
     context :raise do
       subject(:expander) { Mustermann::Expander.new('/:a', additional_values: :raise) }
+
       example { expander.expand(a: ?a).should be == '/a' }
       example { expect { expander.expand(a: ?a, b: ?b) }.to raise_error(Mustermann::ExpandError) }
       example { expect { expander.expand(b: ?b) }.to raise_error(Mustermann::ExpandError) }
@@ -61,6 +63,7 @@ describe Mustermann::Expander do
 
     context :ignore do
       subject(:expander) { Mustermann::Expander.new('/:a', additional_values: :ignore) }
+
       example { expander.expand(a: ?a).should be == '/a' }
       example { expander.expand(a: ?a, b: ?b).should be == '/a' }
       example { expect { expander.expand(b: ?b) }.to raise_error(Mustermann::ExpandError) }
@@ -70,6 +73,7 @@ describe Mustermann::Expander do
 
     context :append do
       subject(:expander) { Mustermann::Expander.new('/:a', additional_values: :append) }
+
       example { expander.expand(a: ?a).should be == '/a' }
       example { expander.expand(a: ?a, b: ?b).should be == '/a?b=b' }
       example { expect { expander.expand(b: ?b) }.to raise_error(Mustermann::ExpandError) }
@@ -84,7 +88,7 @@ describe Mustermann::Expander do
     example { expander.cast          { |v| v.upcase      }.expand(a: "foo", b: "bar") .should be == "/FOO/BAR"  }
     example { expander.cast(:a)      { |v| v.upcase      }.expand(a: "foo", b: "bar") .should be == "/FOO/bar"  }
     example { expander.cast(:a, :b)  { |v| v.upcase      }.expand(a: "foo", b: "bar") .should be == "/FOO/BAR"  }
-    example { expander.cast(Integer) { |k,v| "#{k}_#{v}" }.expand(a: "foo", b: 42)    .should be == "/foo/b_42" }
+    example { expander.cast(Integer) { |k, v| "#{k}_#{v}" }.expand(a: "foo", b: 42) .should be == "/foo/b_42" }
 
     example do
       expander.cast(:a) { |v| v.upcase   }

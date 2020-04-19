@@ -107,7 +107,9 @@ class Time
     #   Time.find_zone "America/New_York" # => #<ActiveSupport::TimeZone @name="America/New_York" ...>
     #   Time.find_zone "NOT-A-TIMEZONE"   # => nil
     def find_zone(time_zone)
-      find_zone!(time_zone) rescue nil
+      find_zone!(time_zone)
+    rescue
+      nil
     end
   end
 end

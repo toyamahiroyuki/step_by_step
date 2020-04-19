@@ -49,17 +49,20 @@ class Pry
   # the exception is just a vanilla RuntimeError.
   module FrozenObjectException
     def self.===(exception)
-      ["can't modify frozen class/module",
-       "can't modify frozen Class",
-       "can't modify frozen object",
+      [
+        "can't modify frozen class/module",
+        "can't modify frozen Class",
+        "can't modify frozen object",
       ].include?(exception.message)
     end
   end
 
   # Don't catch these exceptions
-  DEFAULT_EXCEPTION_WHITELIST = [SystemExit,
-                                 SignalException,
-                                 Pry::TooSafeException]
+  DEFAULT_EXCEPTION_WHITELIST = [
+    SystemExit,
+    SignalException,
+    Pry::TooSafeException,
+  ].freeze
 
   # CommandErrors are caught by the REPL loop and displayed to the user. They
   # indicate an exceptional condition that's fatal to the current command.

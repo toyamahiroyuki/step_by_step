@@ -1,7 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
 
 describe "Errors" do
-
   shared_examples "descends from StandardError" do
     it "can be rescued as a StandardError" do
       expect(described_class).to be < StandardError
@@ -33,5 +32,4 @@ describe "Errors" do
   describe BCrypt::Errors::InvalidSecret do
     include_examples "descends from BCrypt::Error"
   end
-
 end

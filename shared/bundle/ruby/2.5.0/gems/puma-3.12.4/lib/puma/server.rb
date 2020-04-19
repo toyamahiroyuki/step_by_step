@@ -23,7 +23,6 @@ end
 require 'socket'
 
 module Puma
-
   # The HTTP Server itself. Serves out a single Rack app.
   #
   # This class is used by the `Puma::Single` and `Puma::Cluster` classes
@@ -35,7 +34,6 @@ module Puma
   #
   # Each `Puma::Server` will have one reactor and one thread pool.
   class Server
-
     include Puma::Const
     extend  Puma::Delegation
 
@@ -58,7 +56,7 @@ module Puma
     # Server#run returns a thread that you can join on to wait for the server
     # to do its work.
     #
-    def initialize(app, events=Events.stdio, options={})
+    def initialize(app, events = Events.stdio, options = {})
       @app = app
       @events = events
 
@@ -113,29 +111,25 @@ module Puma
     # packetizes our stream. This improves both latency and throughput.
     #
     if RUBY_PLATFORM =~ /linux/
-      UNPACK_TCP_STATE_FROM_TCP_INFO = "C".freeze
+      UNPACK_TCP_STATE_FROM_TCP_INFO = "C"
 
       # 6 == Socket::IPPROTO_TCP
       # 3 == TCP_CORK
       # 1/0 == turn on/off
       def cork_socket(socket)
-        begin
-          socket.setsockopt(6, 3, 1) if socket.kind_of? TCPSocket
-        rescue IOError, SystemCallError
-          Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
-        end
+        socket.setsockopt(6, 3, 1) if socket.is_a? TCPSocket
+      rescue IOError, SystemCallError
+        Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
       end
 
       def uncork_socket(socket)
-        begin
-          socket.setsockopt(6, 3, 0) if socket.kind_of? TCPSocket
-        rescue IOError, SystemCallError
-          Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
-        end
+        socket.setsockopt(6, 3, 0) if socket.is_a? TCPSocket
+      rescue IOError, SystemCallError
+        Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
       end
 
       def closed_socket?(socket)
-        return false unless socket.kind_of? TCPSocket
+        return false unless socket.is_a? TCPSocket
         return false unless @precheck_closing
 
         begin
@@ -163,13 +157,12 @@ module Puma
     end
 
     def backlog
-      @thread_pool and @thread_pool.backlog
+      @thread_pool && @thread_pool.backlog
     end
 
     def running
-      @thread_pool and @thread_pool.spawned
+      @thread_pool && @thread_pool.spawned
     end
-
 
     # This number represents the number of requests that
     # the server is capable of taking right now.
@@ -179,16 +172,15 @@ module Puma
     # a request. If one request comes in, then the
     # value would be 4 until it finishes processing.
     def pool_capacity
-      @thread_pool and @thread_pool.pool_capacity
+      @thread_pool && @thread_pool.pool_capacity
     end
 
     # Lopez Mode == raw tcp apps
 
-    def run_lopez_mode(background=true)
+    def run_lopez_mode(background = true)
       @thread_pool = ThreadPool.new(@min_threads,
                                     @max_threads,
                                     Hash) do |client, tl|
-
         io = client.to_io
         addr = io.peeraddr.last
 
@@ -204,8 +196,8 @@ module Puma
         begin
           @app.call env, client.to_io
         rescue Object => e
-          STDERR.puts "! Detected exception at toplevel: #{e.message} (#{e.class})"
-          STDERR.puts e.backtrace
+          warn "! Detected exception at toplevel: #{e.message} (#{e.class})"
+          warn e.backtrace
         end
 
         client.close unless env['detach']
@@ -261,8 +253,8 @@ module Puma
         graceful_shutdown if @status == :stop || @status == :restart
 
       rescue Exception => e
-        STDERR.puts "Exception handling servers: #{e.message} (#{e.class})"
-        STDERR.puts e.backtrace
+        warn "Exception handling servers: #{e.message} (#{e.class})"
+        warn e.backtrace
       ensure
         begin
           @check.close
@@ -272,20 +264,21 @@ module Puma
 
         @notify.close
 
-        if @status != :restart and @own_binder
+        if (@status != :restart) && @own_binder
           @binder.close
         end
       end
 
       @events.fire :state, :done
     end
+
     # Runs the server.
     #
     # If +background+ is true (the default) then a thread is spun
     # up in the background to handle requests. Otherwise requests
     # are handled synchronously.
     #
-    def run(background=true)
+    def run(background = true)
       BasicSocket.do_not_reverse_lookup = true
 
       @events.fire :state, :booting
@@ -301,7 +294,6 @@ module Puma
       @thread_pool = ThreadPool.new(@min_threads,
                                     @max_threads,
                                     IOBuffer) do |client, buffer|
-
         # Advertise this server into the thread
         Thread.current[ThreadLocalKey] = self
 
@@ -425,13 +417,13 @@ module Puma
           @reactor.shutdown
         end
       rescue Exception => e
-        STDERR.puts "Exception handling servers: #{e.message} (#{e.class})"
-        STDERR.puts e.backtrace
+        warn "Exception handling servers: #{e.message} (#{e.class})"
+        warn e.backtrace
       ensure
         @check.close
         @notify.close
 
-        if @status != :restart and @own_binder
+        if (@status != :restart) && @own_binder
           @binder.close
         end
       end
@@ -455,7 +447,7 @@ module Puma
         return true
       end
 
-      return false
+      false
     end
 
     # Given a connection on +client+, handle the incoming requests.
@@ -465,90 +457,87 @@ module Puma
     # returning.
     #
     def process_client(client, buffer)
-      begin
+      clean_thread_locals = @options[:clean_thread_locals]
+      close_socket = true
 
-        clean_thread_locals = @options[:clean_thread_locals]
-        close_socket = true
+      requests = 0
 
-        requests = 0
+      while true
+        case handle_request(client, buffer)
+        when false
+          return
+        when :async
+          close_socket = false
+          return
+        when true
+          return unless @queue_requests
+          buffer.reset
 
-        while true
-          case handle_request(client, buffer)
-          when false
-            return
-          when :async
+          ThreadPool.clean_thread_locals if clean_thread_locals
+
+          requests += 1
+
+          check_for_more_data = @status == :run
+
+          if requests >= MAX_FAST_INLINE
+            # This will mean that reset will only try to use the data it already
+            # has buffered and won't try to read more data. What this means is that
+            # every client, independent of their request speed, gets treated like a slow
+            # one once every MAX_FAST_INLINE requests.
+            check_for_more_data = false
+          end
+
+          unless client.reset(check_for_more_data)
             close_socket = false
+            client.set_timeout @persistent_timeout
+            @reactor.add client
             return
-          when true
-            return unless @queue_requests
-            buffer.reset
-
-            ThreadPool.clean_thread_locals if clean_thread_locals
-
-            requests += 1
-
-            check_for_more_data = @status == :run
-
-            if requests >= MAX_FAST_INLINE
-              # This will mean that reset will only try to use the data it already
-              # has buffered and won't try to read more data. What this means is that
-              # every client, independent of their request speed, gets treated like a slow
-              # one once every MAX_FAST_INLINE requests.
-              check_for_more_data = false
-            end
-
-            unless client.reset(check_for_more_data)
-              close_socket = false
-              client.set_timeout @persistent_timeout
-              @reactor.add client
-              return
-            end
           end
         end
+      end
 
-      # The client disconnected while we were reading data
-      rescue ConnectionError
-        # Swallow them. The ensure tries to close +client+ down
+    # The client disconnected while we were reading data
+    rescue ConnectionError
+    # Swallow them. The ensure tries to close +client+ down
 
-      # SSL handshake error
-      rescue MiniSSL::SSLError => e
-        lowlevel_error(e, client.env)
+    # SSL handshake error
+    rescue MiniSSL::SSLError => e
+      lowlevel_error(e, client.env)
 
-        ssl_socket = client.io
-        addr = ssl_socket.peeraddr.last
-        cert = ssl_socket.peercert
+      ssl_socket = client.io
+      addr = ssl_socket.peeraddr.last
+      cert = ssl_socket.peercert
 
-        close_socket = true
+      close_socket = true
 
-        @events.ssl_error self, addr, cert, e
+      @events.ssl_error self, addr, cert, e
 
-      # The client doesn't know HTTP well
-      rescue HttpParserError => e
-        lowlevel_error(e, client.env)
+    # The client doesn't know HTTP well
+    rescue HttpParserError => e
+      lowlevel_error(e, client.env)
 
-        client.write_400
+      client.write_400
 
-        @events.parse_error self, client.env, e
+      @events.parse_error self, client.env, e
 
-      # Server error
+    # Server error
+    rescue StandardError => e
+      lowlevel_error(e, client.env)
+
+      client.write_500
+
+      @events.unknown_error self, e, "Read"
+
+    ensure
+      buffer.reset
+
+      begin
+        client.close if close_socket
+      rescue IOError, SystemCallError
+        Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
+        # Already closed
       rescue StandardError => e
-        lowlevel_error(e, client.env)
-
-        client.write_500
-
-        @events.unknown_error self, e, "Read"
-
-      ensure
-        buffer.reset
-
-        begin
-          client.close if close_socket
-        rescue IOError, SystemCallError
-          Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
-          # Already closed
-        rescue StandardError => e
-          @events.unknown_error self, e, "Client"
-        end
+        @events.unknown_error self, e, "Client"
       end
     end
 
@@ -559,7 +548,7 @@ module Puma
       if host = env[HTTP_HOST]
         if colon = host.index(":")
           env[SERVER_NAME] = host[0, colon]
-          env[SERVER_PORT] = host[colon+1, host.bytesize]
+          env[SERVER_PORT] = host[colon + 1, host.bytesize]
         else
           env[SERVER_NAME] = host
           env[SERVER_PORT] = default_server_port(env)
@@ -644,11 +633,11 @@ module Puma
       head = env[REQUEST_METHOD] == HEAD
 
       env[RACK_INPUT] = body
-      env[RACK_URL_SCHEME] =  env[HTTPS_KEY] ? HTTPS : HTTP
+      env[RACK_URL_SCHEME] = env[HTTPS_KEY] ? HTTPS : HTTP
 
       if @early_hints
         env[EARLY_HINTS] = lambda { |headers|
-          fast_write client, "HTTP/1.1 103 Early Hints\r\n".freeze
+          fast_write client, "HTTP/1.1 103 Early Hints\r\n"
 
           headers.each_pair do |k, vs|
             if vs.respond_to?(:to_s) && !vs.to_s.empty?
@@ -661,7 +650,7 @@ module Puma
             end
           end
 
-          fast_write client, "\r\n".freeze
+          fast_write client, "\r\n"
         }
       end
 
@@ -679,7 +668,7 @@ module Puma
           status = status.to_i
 
           if status == -1
-            unless headers.empty? and res_body == []
+            unless headers.empty? && (res_body == [])
               raise "async response must have empty headers and body"
             end
 
@@ -702,7 +691,7 @@ module Puma
         content_length = nil
         no_body = head
 
-        if res_body.kind_of? Array and res_body.size == 1
+        if res_body.is_a?(Array) && (res_body.size == 1)
           content_length = res_body[0].bytesize
         end
 
@@ -712,39 +701,39 @@ module Puma
         colon = COLON
 
         http_11 = if env[HTTP_VERSION] == HTTP_11
-          allow_chunked = true
-          keep_alive = env.fetch(HTTP_CONNECTION, "").downcase != CLOSE
-          include_keepalive_header = false
+                    allow_chunked = true
+                    keep_alive = env.fetch(HTTP_CONNECTION, "").downcase != CLOSE
+                    include_keepalive_header = false
 
-          # An optimization. The most common response is 200, so we can
-          # reply with the proper 200 status without having to compute
-          # the response header.
-          #
-          if status == 200
-            lines << HTTP_11_200
-          else
-            lines.append "HTTP/1.1 ", status.to_s, " ",
-                         fetch_status_code(status), line_ending
+                    # An optimization. The most common response is 200, so we can
+                    # reply with the proper 200 status without having to compute
+                    # the response header.
+                    #
+                    if status == 200
+                      lines << HTTP_11_200
+                    else
+                      lines.append "HTTP/1.1 ", status.to_s, " ",
+                                   fetch_status_code(status), line_ending
 
-            no_body ||= status < 200 || STATUS_WITH_NO_ENTITY_BODY[status]
-          end
-          true
-        else
-          allow_chunked = false
-          keep_alive = env.fetch(HTTP_CONNECTION, "").downcase == KEEP_ALIVE
-          include_keepalive_header = keep_alive
+                      no_body ||= status < 200 || STATUS_WITH_NO_ENTITY_BODY[status]
+                    end
+                    true
+                  else
+                    allow_chunked = false
+                    keep_alive = env.fetch(HTTP_CONNECTION, "").downcase == KEEP_ALIVE
+                    include_keepalive_header = keep_alive
 
-          # Same optimization as above for HTTP/1.1
-          #
-          if status == 200
-            lines << HTTP_10_200
-          else
-            lines.append "HTTP/1.0 ", status.to_s, " ",
-                         fetch_status_code(status), line_ending
+                    # Same optimization as above for HTTP/1.1
+                    #
+                    if status == 200
+                      lines << HTTP_10_200
+                    else
+                      lines.append "HTTP/1.0 ", status.to_s, " ",
+                                   fetch_status_code(status), line_ending
 
-            no_body ||= status < 200 || STATUS_WITH_NO_ENTITY_BODY[status]
-          end
-          false
+                      no_body ||= status < 200 || STATUS_WITH_NO_ENTITY_BODY[status]
+                    end
+                    false
         end
 
         response_hijack = nil
@@ -780,7 +769,7 @@ module Puma
         end
 
         if no_body
-          if content_length and status != 204
+          if content_length && (status != 204)
             lines.append CONTENT_LENGTH_S, content_length.to_s, line_ending
           end
 
@@ -792,7 +781,7 @@ module Puma
         if content_length
           lines.append CONTENT_LENGTH_S, content_length.to_s, line_ending
           chunked = false
-        elsif !response_hijack and allow_chunked
+        elsif !response_hijack && allow_chunked
           lines << TRANSFER_ENCODING_CHUNKED
           chunked = true
         end
@@ -839,7 +828,7 @@ module Puma
         after_reply.each { |o| o.call }
       end
 
-      return keep_alive
+      keep_alive
     end
 
     def fetch_status_code(status)
@@ -868,7 +857,7 @@ module Puma
       else
         # The body[0,0] trick is to get an empty string in the same
         # encoding as body.
-        stream = StringIO.new body[0,0]
+        stream = StringIO.new body[0, 0]
       end
 
       stream.write body
@@ -898,7 +887,7 @@ module Puma
 
       stream.rewind
 
-      return stream
+      stream
     end
 
     # A fallback rack response if +@app+ raises as exception.
@@ -930,8 +919,8 @@ module Puma
 
         $stdout.syswrite "#{pid}: === Begin thread backtrace dump ===\n"
 
-        threads.each_with_index do |t,i|
-          $stdout.syswrite "#{pid}: Thread #{i+1}/#{total}: #{t.inspect}\n"
+        threads.each_with_index do |t, i|
+          $stdout.syswrite "#{pid}: Thread #{i + 1}/#{total}: #{t.inspect}\n"
           $stdout.syswrite "#{pid}: #{t.backtrace.join("\n#{pid}: ")}\n\n"
         end
         $stdout.syswrite "#{pid}: === End thread backtrace dump ===\n"
@@ -945,14 +934,12 @@ module Puma
           break unless ios
 
           ios.first.each do |sock|
-            begin
-              if io = sock.accept_nonblock
-                count += 1
-                client = Client.new io, @binder.env(sock)
-                @thread_pool << client
-              end
-            rescue SystemCallError
+            if io = sock.accept_nonblock
+              count += 1
+              client = Client.new io, @binder.env(sock)
+              @thread_pool << client
             end
+          rescue SystemCallError
           end
         end
 
@@ -969,18 +956,16 @@ module Puma
     end
 
     def notify_safely(message)
-      begin
-        @notify << message
-      rescue IOError
-         # The server, in another thread, is shutting down
+      @notify << message
+    rescue IOError
+      # The server, in another thread, is shutting down
+      Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
+    rescue RuntimeError => e
+      # Temporary workaround for https://bugs.ruby-lang.org/issues/13239
+      if e.message.include?('IOError')
         Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
-      rescue RuntimeError => e
-        # Temporary workaround for https://bugs.ruby-lang.org/issues/13239
-        if e.message.include?('IOError')
-          Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
-        else
-          raise e
-        end
+      else
+        raise e
       end
     end
     private :notify_safely
@@ -988,12 +973,12 @@ module Puma
     # Stops the acceptor thread and then causes the worker threads to finish
     # off the request queue before finally exiting.
 
-    def stop(sync=false)
+    def stop(sync = false)
       notify_safely(STOP_COMMAND)
       @thread.join if @thread && sync
     end
 
-    def halt(sync=false)
+    def halt(sync = false)
       notify_safely(HALT_COMMAND)
       @thread.join if @thread && sync
     end

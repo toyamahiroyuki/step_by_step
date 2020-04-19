@@ -32,14 +32,14 @@ module ActionCable
 
   INTERNAL = {
     message_types: {
-      welcome: "welcome".freeze,
-      ping: "ping".freeze,
-      confirmation: "confirm_subscription".freeze,
-      rejection: "reject_subscription".freeze
+      welcome: "welcome",
+      ping: "ping",
+      confirmation: "confirm_subscription",
+      rejection: "reject_subscription",
     },
-    default_mount_path: "/cable".freeze,
-    protocols: ["actioncable-v1-json".freeze, "actioncable-unsupported".freeze].freeze
-  }
+    default_mount_path: "/cable",
+    protocols: ["actioncable-v1-json", "actioncable-unsupported"].freeze,
+  }.freeze
 
   # Singleton instance of the server
   module_function def server

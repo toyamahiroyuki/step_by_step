@@ -7,10 +7,8 @@ require 'concurrent/thread_safe/util/volatile'
 require 'concurrent/thread_safe/util/xor_shift_random'
 
 module Concurrent
-
   # @!visibility private
   module Collection
-
     # A Ruby port of the Doug Lea's jsr166e.ConcurrentHashMapV8 class version 1.59
     # available in public domain.
     #
@@ -192,7 +190,6 @@ module Concurrent
     #
     # @!visibility private
     class AtomicReferenceMapBackend
-
       # @!visibility private
       class Table < Concurrent::ThreadSafe::Util::PowerOfTwoTuple
         def cas_new_node(i, hash, key, value)
@@ -216,7 +213,7 @@ module Concurrent
               new_node.unlock_via_hash(locked_hash, hash)
             end
           end
-          return succeeded, new_value
+          [succeeded, new_value]
         end
 
         def try_lock_via_hash(i, node, node_hash)
@@ -261,8 +258,8 @@ module Concurrent
         def initialize(hash, key, value, next_node = nil)
           super()
           @key = key
-          self.lazy_set_hash(hash)
-          self.lazy_set_value(value)
+          lazy_set_hash(hash)
+          lazy_set_value(value)
           self.next = next_node
         end
 
@@ -330,6 +327,7 @@ module Concurrent
         end
 
         private
+
         def force_acquire_lock(table, i)
           cheap_synchronize do
             if equal?(table.volatile_get(i)) && (hash & WAITING) == WAITING
@@ -365,17 +363,17 @@ module Concurrent
       extend Concurrent::ThreadSafe::Util::Volatile
       attr_volatile :table, # The array of bins. Lazily initialized upon first insertion. Size is always a power of two.
 
-        # Table initialization and resizing control.  When negative, the
-        # table is being initialized or resized. Otherwise, when table is
-        # null, holds the initial table size to use upon creation, or 0
-        # for default. After initialization, holds the next element count
-        # value upon which to resize the table.
-        :size_control
+                    # Table initialization and resizing control.  When negative, the
+                    # table is being initialized or resized. Otherwise, when table is
+                    # null, holds the initial table size to use upon creation, or 0
+                    # for default. After initialization, holds the next element count
+                    # value upon which to resize the table.
+                    :size_control
 
       def initialize(options = nil)
         super()
         @counter = Concurrent::ThreadSafe::Util::Adder.new
-        initial_capacity  = options && options[:initial_capacity] || DEFAULT_CAPACITY
+        initial_capacity = options && options[:initial_capacity] || DEFAULT_CAPACITY
         self.size_control = (capacity = table_size_for(initial_capacity)) > MAX_CAPACITY ? MAX_CAPACITY : capacity
       end
 
@@ -574,6 +572,7 @@ module Concurrent
       end
 
       private
+
       # Internal versions of the insertion methods, each a
       # little more complicated than the last. All have
       # the same basic structure:
@@ -829,7 +828,7 @@ module Concurrent
         while true
           if !(node = table.volatile_get(i))
             # no lock needed (or available) if bin >= 0, because we're not popping values from locked_indexes until we've run through the whole table
-            redo unless (bin >= 0 ? table.cas(i, nil, forwarder) : lock_and_clean_up_reverse_forwarders(table, old_table_size, new_table, i, forwarder))
+            redo unless bin >= 0 ? table.cas(i, nil, forwarder) : lock_and_clean_up_reverse_forwarders(table, old_table_size, new_table, i, forwarder)
           elsif Node.locked_hash?(node_hash = node.hash)
             locked_indexes ||= ::Array.new
             if bin < 0 && locked_arr_idx > 0
@@ -852,7 +851,7 @@ module Concurrent
 
           if bin > 0
             i = (bin -= 1)
-          elsif locked_indexes && !locked_indexes.empty?
+          elsif locked_indexes.present?
             bin = -1
             i = locked_indexes.pop
             locked_arr_idx = locked_indexes.size - 1

@@ -3,7 +3,6 @@ require 'logger'
 
 module MiniMagick
   module Configuration
-
     ##
     # Set whether you want to use [ImageMagick](http://www.imagemagick.org) or
     # [GraphicsMagick](http://www.graphicsmagick.org).
@@ -110,10 +109,10 @@ module MiniMagick
     end
 
     CLI_DETECTION = {
-      imagemagick7:   "magick",
-      imagemagick:    "mogrify",
+      imagemagick7: "magick",
+      imagemagick: "mogrify",
       graphicsmagick: "gm",
-    }
+    }.freeze
 
     # @private (for backwards compatibility)
     def processor
@@ -128,8 +127,8 @@ module MiniMagick
 
       unless CLI_DETECTION.value?(@processor)
         raise ArgumentError,
-          "processor has to be set to either \"magick\", \"mogrify\" or \"gm\"" \
-          ", was set to #{@processor.inspect}"
+              "processor has to be set to either \"magick\", \"mogrify\" or \"gm\"" \
+              ", was set to #{@processor.inspect}"
       end
     end
 
@@ -143,8 +142,8 @@ module MiniMagick
       if instance_variable_defined?("@cli")
         instance_variable_get("@cli")
       else
-        cli = CLI_DETECTION.key(processor) or
-          fail MiniMagick::Error, "You must have ImageMagick or GraphicsMagick installed"
+        (cli = CLI_DETECTION.key(processor)) ||
+          fail(MiniMagick::Error, "You must have ImageMagick or GraphicsMagick installed")
 
         instance_variable_set("@cli", cli)
       end
@@ -157,10 +156,10 @@ module MiniMagick
     def cli=(value)
       @cli = value
 
-      if not CLI_DETECTION.key?(@cli)
+      if !CLI_DETECTION.key?(@cli)
         raise ArgumentError,
-          "CLI has to be set to either :imagemagick, :imagemagick7 or :graphicsmagick" \
-          ", was set to #{@cli.inspect}"
+              "CLI has to be set to either :imagemagick, :imagemagick7 or :graphicsmagick" \
+              ", was set to #{@cli.inspect}"
       end
     end
 
@@ -193,6 +192,5 @@ module MiniMagick
     def reload_tools
       warn "MiniMagick.reload_tools is deprecated because it is no longer necessary"
     end
-
   end
 end

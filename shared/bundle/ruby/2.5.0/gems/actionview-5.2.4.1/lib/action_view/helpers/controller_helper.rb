@@ -9,9 +9,11 @@ module ActionView
     module ControllerHelper #:nodoc:
       attr_internal :controller, :request
 
-      CONTROLLER_DELEGATES = [:request_forgery_protection_token, :params,
+      CONTROLLER_DELEGATES = [
+        :request_forgery_protection_token, :params,
         :session, :cookies, :response, :headers, :flash, :action_name,
-        :controller_name, :controller_path]
+        :controller_name, :controller_path,
+      ].freeze
 
       delegate(*CONTROLLER_DELEGATES, to: :controller)
 

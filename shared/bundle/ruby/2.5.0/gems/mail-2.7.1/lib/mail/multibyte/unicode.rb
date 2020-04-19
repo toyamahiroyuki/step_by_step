@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mail
   module Multibyte
     module Unicode
@@ -27,7 +28,7 @@ module Mail
 
       # A list of all available normalization forms. See http://www.unicode.org/reports/tr15/tr15-29.html for more
       # information about normalization.
-      NORMALIZATION_FORMS = [:c, :kc, :d, :kd]
+      NORMALIZATION_FORMS = [:c, :kc, :d, :kd].freeze
 
       # The default normalization used for operations that require normalization. It can be set to any of the
       # normalizations in NORMALIZATION_FORMS.
@@ -73,10 +74,10 @@ module Mail
 
       # Returns a regular expression pattern that matches the passed Unicode codepoints
       def self.codepoints_to_pattern(array_of_codepoints) #:nodoc:
-        array_of_codepoints.collect{ |e| [e].pack 'U*' }.join('|')
+        array_of_codepoints.collect { |e| [e].pack 'U*' }.join('|')
       end
-      TRAILERS_PAT = /(#{codepoints_to_pattern(LEADERS_AND_TRAILERS)})+\Z/u
-      LEADERS_PAT = /\A(#{codepoints_to_pattern(LEADERS_AND_TRAILERS)})+/u
+      TRAILERS_PAT = /(#{codepoints_to_pattern(LEADERS_AND_TRAILERS)})+\Z/u.freeze
+      LEADERS_PAT = /\A(#{codepoints_to_pattern(LEADERS_AND_TRAILERS)})+/u.freeze
 
       # Unpack the string at codepoints boundaries. Raises an EncodingError when the encoding of the string isn't
       # valid UTF-8.
@@ -84,11 +85,9 @@ module Mail
       # Example:
       #   Unicode.u_unpack('Café') # => [67, 97, 102, 233]
       def u_unpack(string)
-        begin
-          string.unpack 'U*'
-        rescue ArgumentError
-          raise EncodingError, 'malformed UTF-8 character'
-        end
+        string.unpack 'U*'
+      rescue ArgumentError
+        raise EncodingError, 'malformed UTF-8 character'
       end
 
       # Detect whether the codepoint is in a certain character class. Returns +true+ when it's in the specified
@@ -111,24 +110,24 @@ module Mail
         pos = 0
         marker = 0
         eoc = codepoints.length
-        while(pos < eoc)
+        while pos < eoc
           pos += 1
-          previous = codepoints[pos-1]
+          previous = codepoints[pos - 1]
           current = codepoints[pos]
-          if (
+          if
               # CR X LF
-              ( previous == database.boundary[:cr] and current == database.boundary[:lf] ) or
+              ((previous == database.boundary[:cr]) && (current == database.boundary[:lf])) ||
               # L X (L|V|LV|LVT)
-              ( database.boundary[:l] === previous and in_char_class?(current, [:l,:v,:lv,:lvt]) ) or
+              ((database.boundary[:l] === previous) && in_char_class?(current, [:l, :v, :lv, :lvt])) ||
               # (LV|V) X (V|T)
-              ( in_char_class?(previous, [:lv,:v]) and in_char_class?(current, [:v,:t]) ) or
+              (in_char_class?(previous, [:lv, :v]) && in_char_class?(current, [:v, :t])) ||
               # (LVT|T) X (T)
-              ( in_char_class?(previous, [:lvt,:t]) and database.boundary[:t] === current ) or
+              (in_char_class?(previous, [:lvt, :t]) && (database.boundary[:t] === current)) ||
               # X Extend
               (database.boundary[:extend] === current)
-            )
+
           else
-            unpacked << codepoints[marker..pos-1]
+            unpacked << codepoints[marker..pos - 1]
             marker = pos
           end
         end
@@ -140,17 +139,17 @@ module Mail
       # Example:
       #   Unicode.g_pack(Unicode.g_unpack('क्षि')) # => 'क्षि'
       def g_pack(unpacked)
-        (unpacked.flatten).pack('U*')
+        unpacked.flatten.pack('U*')
       end
 
       # Re-order codepoints so the string becomes canonical.
       def reorder_characters(codepoints)
-        length = codepoints.length- 1
+        length = codepoints.length - 1
         pos = 0
-        while pos < length do
-          cp1, cp2 = database.codepoints[codepoints[pos]], database.codepoints[codepoints[pos+1]]
+        while pos < length
+          cp1, cp2 = database.codepoints[codepoints[pos]], database.codepoints[codepoints[pos + 1]]
           if (cp1.combining_class > cp2.combining_class) && (cp2.combining_class > 0)
-            codepoints[pos..pos+1] = cp2.code, cp1.code
+            codepoints[pos..pos + 1] = cp2.code, cp1.code
             pos += (pos > 0 ? -1 : 1)
           else
             pos += 1
@@ -163,7 +162,7 @@ module Mail
       def decompose_codepoints(type, codepoints)
         codepoints.inject([]) do |decomposed, cp|
           # if it's a hangul syllable starter character
-          if HANGUL_SBASE <= cp and cp < HANGUL_SLAST
+          if (HANGUL_SBASE <= cp) && (cp < HANGUL_SLAST)
             sindex = cp - HANGUL_SBASE
             ncp = [] # new codepoints
             ncp << HANGUL_LBASE + sindex / HANGUL_NCOUNT
@@ -172,7 +171,7 @@ module Mail
             ncp << (HANGUL_TBASE + tindex) unless tindex == 0
             decomposed.concat ncp
           # if the codepoint is decomposable in with the current decomposition type
-          elsif (ncp = database.codepoints[cp].decomp_mapping) and (!database.codepoints[cp].decomp_type || type == :compatability)
+          elsif (ncp = database.codepoints[cp].decomp_mapping) && (!database.codepoints[cp].decomp_type || type == :compatability)
             decomposed.concat decompose_codepoints(type, ncp.dup)
           else
             decomposed << cp
@@ -191,11 +190,19 @@ module Mail
           pos += 1
           lindex = starter_char - HANGUL_LBASE
           # -- Hangul
-          if 0 <= lindex and lindex < HANGUL_LCOUNT
-            vindex = codepoints[starter_pos+1] - HANGUL_VBASE rescue vindex = -1
-            if 0 <= vindex and vindex < HANGUL_VCOUNT
-              tindex = codepoints[starter_pos+2] - HANGUL_TBASE rescue tindex = -1
-              if 0 <= tindex and tindex < HANGUL_TCOUNT
+          if (0 <= lindex) && (lindex < HANGUL_LCOUNT)
+            vindex = begin
+                       codepoints[starter_pos + 1] - HANGUL_VBASE
+                     rescue
+                       vindex = -1
+                     end
+            if (0 <= vindex) && (vindex < HANGUL_VCOUNT)
+              tindex = begin
+                         codepoints[starter_pos + 2] - HANGUL_TBASE
+                       rescue
+                         tindex = -1
+                       end
+              if (0 <= tindex) && (tindex < HANGUL_TCOUNT)
                 j = starter_pos + 2
                 eoa -= 2
               else
@@ -217,15 +224,15 @@ module Mail
               else
                 composition = nil
               end
-              unless composition.nil?
+              if composition.nil?
+                previous_combining_class = current.combining_class
+              else
                 codepoints[starter_pos] = composition
                 starter_char = composition
                 codepoints.delete_at pos
                 eoa -= 1
                 pos -= 1
                 previous_combining_class = -1
-              else
-                previous_combining_class = current.combining_class
               end
             else
               previous_combining_class = current.combining_class
@@ -254,7 +261,6 @@ module Mail
         last_lead = 0
 
         bytes.each_index do |i|
-
           byte          = bytes[i]
           is_cont       = byte > 127 && byte < 192
           is_lead       = byte > 191 && byte < 245
@@ -271,7 +277,7 @@ module Mail
             if conts_expected > 0
               # Expected continuation, but got ASCII or leading? Clean backwards up to
               # the leading byte.
-              (1..(i - last_lead)).each {|j| bytes[i - j] = tidy_byte(bytes[i - j])}
+              (1..(i - last_lead)).each { |j| bytes[i - j] = tidy_byte(bytes[i - j]) }
               conts_expected = 0
             end
             if is_lead
@@ -297,7 +303,7 @@ module Mail
       # * <tt>form</tt> - The form you want to normalize in. Should be one of the following:
       #   <tt>:c</tt>, <tt>:kc</tt>, <tt>:d</tt>, or <tt>:kd</tt>. Default is
       #   Mail::Multibyte.default_normalization_form
-      def normalize(string, form=nil)
+      def normalize(string, form = nil)
         form ||= @default_normalization_form
         # See http://www.unicode.org/reports/tr15, Table 1
         codepoints = u_unpack(string)
@@ -318,7 +324,7 @@ module Mail
       def apply_mapping(string, mapping) #:nodoc:
         u_unpack(string).map do |codepoint|
           cp = database.codepoints[codepoint]
-          if cp and (ncp = cp.send(mapping)) and ncp > 0
+          if cp && (ncp = cp.send(mapping)) && (ncp > 0)
             ncp
           else
             codepoint
@@ -328,7 +334,7 @@ module Mail
 
       # Holds static data from the Unicode database
       class UnicodeDatabase
-        ATTRIBUTES = :codepoints, :composition_exclusion, :composition_map, :boundary, :cp1252
+        ATTRIBUTES = [:codepoints, :composition_exclusion, :composition_map, :boundary, :cp1252].freeze
 
         attr_writer(*ATTRIBUTES)
 
@@ -355,16 +361,18 @@ module Mail
           begin
             @codepoints, @composition_exclusion, @composition_map, @boundary, @cp1252 = File.open(self.class.filename, 'rb') { |f| Marshal.load f.read }
           rescue => e
-              raise IOError.new("Couldn't load the Unicode tables for UTF8Handler (#{e.message}), Mail::Multibyte is unusable")
+            raise IOError, "Couldn't load the Unicode tables for UTF8Handler (#{e.message}), Mail::Multibyte is unusable"
           end
 
           # Redefine the === method so we can write shorter rules for grapheme cluster breaks
-          @boundary.each do |k,_|
-            @boundary[k].instance_eval do
-              def ===(other)
-                detect { |i| i === other } ? true : false
+          @boundary.each do |k, _|
+            if @boundary[k].is_a?(Array)
+              @boundary[k].instance_eval do
+                def ===(other)
+                  detect { |i| i === other } ? true : false
+                end
               end
-            end if @boundary[k].kind_of?(Array)
+            end
           end
 
           # define attr_reader methods for the instance variables
@@ -399,7 +407,6 @@ module Mail
       def database
         @database ||= UnicodeDatabase.new
       end
-
     end
   end
 end

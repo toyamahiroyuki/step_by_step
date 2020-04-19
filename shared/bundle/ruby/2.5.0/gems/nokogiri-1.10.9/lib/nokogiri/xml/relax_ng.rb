@@ -4,7 +4,7 @@ module Nokogiri
       ###
       # Create a new Nokogiri::XML::RelaxNG document from +string_or_io+.
       # See Nokogiri::XML::RelaxNG for an example.
-      def RelaxNG string_or_io
+      def RelaxNG(string_or_io)
         RelaxNG.new(string_or_io)
       end
     end

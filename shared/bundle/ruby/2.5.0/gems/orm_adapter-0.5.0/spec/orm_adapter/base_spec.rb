@@ -4,7 +4,7 @@ describe OrmAdapter::Base do
   subject { OrmAdapter::Base.new(Object) }
 
   describe "#extract_conditions!" do
-    let(:conditions) { {:foo => 'bar'} }
+    let(:conditions) { { :foo => 'bar' } }
     let(:order) { [[:foo, :asc]] }
     let(:limit) { 1 }
     let(:offset) { 2 }
@@ -44,7 +44,7 @@ describe OrmAdapter::Base do
     describe "#valid_object?" do
       it "determines whether an object is valid for the current model class" do
         subject.send(:valid_object?, Object.new).should be_true
-        subject.send(:valid_object?, String.new).should be_false
+        subject.send(:valid_object?, '').should be_false
       end
     end
 

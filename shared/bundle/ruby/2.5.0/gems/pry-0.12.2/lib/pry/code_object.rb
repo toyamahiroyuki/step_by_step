@@ -90,13 +90,16 @@ class Pry
     def command_lookup
       # TODO: just make it so find_command_by_match_or_listing doesn't
       # raise?
-      _pry_.commands.find_command_by_match_or_listing(str) rescue nil
+
+      _pry_.commands.find_command_by_match_or_listing(str)
+    rescue
+      nil
     end
 
     # when no paramter is given (i.e CodeObject.lookup(nil)), then we
     # lookup the 'current object' from the binding.
     def empty_lookup
-      return nil if str && !str.empty?
+      return nil if str.present?
 
       obj = if internal_binding?(target)
               mod = target_self.is_a?(Module) ? target_self : target_self.class
@@ -112,7 +115,6 @@ class Pry
 
     # lookup variables and constants and `self` that are not modules
     def default_lookup
-
       # we skip instance methods as we want those to fall through to method_or_class_lookup()
       if safe_to_evaluate?(str) && !looks_like_an_instance_method?(str)
         obj = target.eval(str)
@@ -135,9 +137,9 @@ class Pry
     def method_or_class_lookup
       obj = case str
             when /\S+\(\)\z/
-              Pry::Method.from_str(str.sub(/\(\)\z/, ''),target) || Pry::WrappedModule.from_str(str, target)
+              Pry::Method.from_str(str.sub(/\(\)\z/, ''), target) || Pry::WrappedModule.from_str(str, target)
             else
-              Pry::WrappedModule.from_str(str,target) || Pry::Method.from_str(str, target)
+              Pry::WrappedModule.from_str(str, target) || Pry::Method.from_str(str, target)
             end
 
       lookup_super(obj, super_level)

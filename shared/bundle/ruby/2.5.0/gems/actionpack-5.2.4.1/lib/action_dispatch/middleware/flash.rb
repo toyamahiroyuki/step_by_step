@@ -38,7 +38,7 @@ module ActionDispatch
   #
   # See docs on the FlashHash class for more details about the flash.
   class Flash
-    KEY = "action_dispatch.request.flash_hash".freeze
+    KEY = "action_dispatch.request.flash_hash"
 
     module RequestMethods
       # Access the contents of the flash. Use <tt>flash["notice"]</tt> to
@@ -279,19 +279,23 @@ module ActionDispatch
       end
 
       protected
-        def now_is_loaded?
-          @now
-        end
+
+      def now_is_loaded?
+        @now
+      end
 
       private
-        def stringify_array(array) # :doc:
-          array.map do |item|
-            item.kind_of?(Symbol) ? item.to_s : item
-          end
+
+      def stringify_array(array) # :doc:
+        array.map do |item|
+          item.is_a?(Symbol) ? item.to_s : item
         end
+      end
     end
 
-    def self.new(app) app; end
+    def self.new(app)
+      app
+    end
   end
 
   class Request

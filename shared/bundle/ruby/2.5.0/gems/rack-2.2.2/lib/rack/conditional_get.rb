@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Rack
-
   # Middleware that enables conditional GET using If-None-Match and
   # If-Modified-Since. The application should set either or both of the
   # Last-Modified or Etag response headers according to RFC 2616. When
@@ -41,7 +40,7 @@ module Rack
       end
     end
 
-  private
+    private
 
     # Return whether the response has not been modified since the
     # last request.
@@ -63,8 +62,8 @@ module Rack
     # Whether the Last-Modified response header matches the If-Modified-Since
     # request header.  If so, the request has not been modified.
     def modified_since?(modified_since, headers)
-      last_modified = to_rfc2822(headers['Last-Modified']) and
-        modified_since >= last_modified
+      (last_modified = to_rfc2822(headers['Last-Modified'])) &&
+        (modified_since >= last_modified)
     end
 
     # Return a Time object for the given string (which should be in RFC2822
@@ -76,7 +75,11 @@ module Rack
       if since && since.length >= 16
         # NOTE: there is no trivial way to write this in a non exception way
         #   _rfc2822 returns a hash but is not that usable
-        Time.rfc2822(since) rescue nil
+        begin
+          Time.rfc2822(since)
+        rescue
+          nil
+        end
       end
     end
   end

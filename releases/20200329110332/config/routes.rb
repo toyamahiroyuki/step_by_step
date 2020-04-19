@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: {
-      sessions:      'users/sessions',
-      passwords:     'users/passwords',
-      registrations: 'users/registrations'
-      }
+    sessions: 'users/sessions',
+    passwords: 'users/passwords',
+    registrations: 'users/registrations',
+  }
 
   root :to => "homes#home"
 
@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   resource :fixed_costs, only: [:new, :create, :show, :edit, :update]
   resource :lifelines, only: [:new, :create, :index, :edit, :update]
   resources :loans do
-  resources :loan_items
+    resources :loan_items
   end
   resource :communication
   resources :goals

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/pattern'
 require 'mustermann/composite'
 require 'mustermann/concat'
@@ -118,7 +119,7 @@ module Mustermann
 
   # @!visibility private
   def self.extend_object(object)
-    return super unless defined? ::Sinatra::Base and object.is_a? Class and object < ::Sinatra::Base
+    return super unless defined? ::Sinatra::Base && object.is_a?(Class) && (object < ::Sinatra::Base)
     require 'mustermann/extension'
     object.register Extension
   end
@@ -126,9 +127,9 @@ end
 
 # :nocov:
 begin
-  require 'mustermann/visualizer' if defined?(Pry) or defined?(IRB)
+  require 'mustermann/visualizer' if defined?(Pry) || defined?(IRB)
 rescue LoadError => error
   raise error unless error.path == 'mustermann/visualizer'
-  $stderr.puts(error.message) if caller_locations[1].absolute_path =~ %r{/lib/pry/|/irb/|^\((?:irb|pry)\)$}
+  warn(error.message) if caller_locations[1].absolute_path =~ %r{/lib/pry/|/irb/|^\((?:irb|pry)\)$}
 end
 # :nocov:

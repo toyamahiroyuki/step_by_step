@@ -1,10 +1,10 @@
 require 'mimemagic'
 require 'mimemagic/overlay'
 
-Marcel::MimeType.extend "text/plain", extensions: %w( txt asc )
+Marcel::MimeType.extend "text/plain", extensions: %w(txt asc)
 
 Marcel::MimeType.extend "application/illustrator", parents: "application/pdf"
-Marcel::MimeType.extend "image/vnd.adobe.photoshop", magic: [[0, "8BPS"]], extensions: %w( psd psb )
+Marcel::MimeType.extend "image/vnd.adobe.photoshop", magic: [[0, "8BPS"]], extensions: %w(psd psb)
 
 Marcel::MimeType.extend "application/vnd.ms-excel", parents: "application/x-ole-storage"
 Marcel::MimeType.extend "application/vnd.ms-powerpoint", parents: "application/x-ole-storage"
@@ -29,11 +29,11 @@ Marcel::MimeType.extend "application/vnd.ms-powerpoint.presentation.macroenabled
 Marcel::MimeType.extend "application/vnd.ms-powerpoint.template.macroenabled.12", parents: "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 Marcel::MimeType.extend "application/vnd.ms-powerpoint.slideshow.macroenabled.12", parents: "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 
-Marcel::MimeType.extend "application/vnd.apple.pages", extensions: %w( pages ), parents: "application/zip"
-Marcel::MimeType.extend "application/vnd.apple.numbers", extensions: %w( numbers ), parents: "application/zip"
-Marcel::MimeType.extend "application/vnd.apple.keynote", extensions: %w( key ), parents: "application/zip"
+Marcel::MimeType.extend "application/vnd.apple.pages", extensions: %w(pages), parents: "application/zip"
+Marcel::MimeType.extend "application/vnd.apple.numbers", extensions: %w(numbers), parents: "application/zip"
+Marcel::MimeType.extend "application/vnd.apple.keynote", extensions: %w(key), parents: "application/zip"
 
 Marcel::MimeType.extend "image/vnd.dwg", magic: [[0, "AC10"]]
 
-Marcel::MimeType.extend "image/heif", magic: [[4, "ftypmif1"]], extensions: %w( heif )
-Marcel::MimeType.extend "image/heic", magic: [[4, "ftypheic"]], extensions: %w( heic )
+Marcel::MimeType.extend "image/heif", magic: [[4, "ftypmif1"]], extensions: %w(heif)
+Marcel::MimeType.extend "image/heic", magic: [[4, "ftypheic"]], extensions: %w(heic)

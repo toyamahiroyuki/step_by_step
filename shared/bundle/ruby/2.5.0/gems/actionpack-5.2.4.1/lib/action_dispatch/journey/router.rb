@@ -85,72 +85,72 @@ module ActionDispatch
 
       private
 
-        def partitioned_routes
-          routes.partition { |r|
-            r.path.anchored && r.ast.grep(Nodes::Symbol).all? { |n| n.default_regexp?  }
-          }
+      def partitioned_routes
+        routes.partition do |r|
+          r.path.anchored && r.ast.grep(Nodes::Symbol).all? { |n| n.default_regexp? }
         end
+      end
 
-        def ast
-          routes.ast
-        end
+      def ast
+        routes.ast
+      end
 
-        def simulator
-          routes.simulator
-        end
+      def simulator
+        routes.simulator
+      end
 
-        def custom_routes
-          routes.custom_routes
-        end
+      def custom_routes
+        routes.custom_routes
+      end
 
-        def filter_routes(path)
-          return [] unless ast
-          simulator.memos(path) { [] }
-        end
+      def filter_routes(path)
+        return [] unless ast
+        simulator.memos(path) { [] }
+      end
 
-        def find_routes(req)
-          routes = filter_routes(req.path_info).concat custom_routes.find_all { |r|
-            r.path.match(req.path_info)
-          }
+      def find_routes(req)
+        routes = filter_routes(req.path_info).concat custom_routes.find_all { |r|
+          r.path.match(req.path_info)
+        }
 
-          routes =
-            if req.head?
-              match_head_routes(routes, req)
-            else
-              match_routes(routes, req)
-            end
-
-          routes.sort_by!(&:precedence)
-
-          routes.map! { |r|
-            match_data = r.path.match(req.path_info)
-            path_parameters = {}
-            match_data.names.zip(match_data.captures) { |name, val|
-              path_parameters[name.to_sym] = Utils.unescape_uri(val) if val
-            }
-            [match_data, path_parameters, r]
-          }
-        end
-
-        def match_head_routes(routes, req)
-          verb_specific_routes = routes.select(&:requires_matching_verb?)
-          head_routes = match_routes(verb_specific_routes, req)
-
-          if head_routes.empty?
-            begin
-              req.request_method = "GET"
-              match_routes(routes, req)
-            ensure
-              req.request_method = "HEAD"
-            end
+        routes =
+          if req.head?
+            match_head_routes(routes, req)
           else
-            head_routes
+            match_routes(routes, req)
           end
-        end
 
-        def match_routes(routes, req)
-          routes.select { |r| r.matches?(req) }
+        routes.sort_by!(&:precedence)
+
+        routes.map! do |r|
+          match_data = r.path.match(req.path_info)
+          path_parameters = {}
+          match_data.names.zip(match_data.captures) do |name, val|
+            path_parameters[name.to_sym] = Utils.unescape_uri(val) if val
+          end
+          [match_data, path_parameters, r]
         end
+      end
+
+      def match_head_routes(routes, req)
+        verb_specific_routes = routes.select(&:requires_matching_verb?)
+        head_routes = match_routes(verb_specific_routes, req)
+
+        if head_routes.empty?
+          begin
+            req.request_method = "GET"
+            match_routes(routes, req)
+          ensure
+            req.request_method = "HEAD"
+          end
+        else
+          head_routes
+        end
+      end
+
+      def match_routes(routes, req)
+        routes.select { |r| r.matches?(req) }
+      end
     end
   end
 end

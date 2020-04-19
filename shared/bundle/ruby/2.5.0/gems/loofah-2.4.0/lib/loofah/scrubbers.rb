@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Loofah
   #
   #  Loofah provides some built-in scrubbers for sanitizing with
@@ -127,7 +128,7 @@ module Loofah
       def scrub(node)
         return CONTINUE if html5lib_sanitize(node) == CONTINUE
         node.remove
-        return STOP
+        STOP
       end
     end
 
@@ -149,7 +150,7 @@ module Loofah
         return CONTINUE if html5lib_sanitize(node) == CONTINUE
         node.add_next_sibling Nokogiri::XML::Text.new(node.to_s, node.document)
         node.remove
-        return STOP
+        STOP
       end
     end
 
@@ -208,7 +209,7 @@ module Loofah
       def scrub(node)
         return CONTINUE unless (node.type == Nokogiri::XML::Node::ELEMENT_NODE) && (node.name == 'a')
         append_attribute(node, 'rel', 'nofollow')
-        return STOP
+        STOP
       end
     end
 
@@ -229,7 +230,7 @@ module Loofah
       def scrub(node)
         return CONTINUE unless (node.type == Nokogiri::XML::Node::ELEMENT_NODE) && (node.name == 'a')
         append_attribute(node, 'rel', 'noopener')
-        return STOP
+        STOP
       end
     end
 
@@ -278,15 +279,15 @@ module Loofah
     #  A hash that maps a symbol (like +:prune+) to the appropriate Scrubber (Loofah::Scrubbers::Prune).
     #
     MAP = {
-      :escape    => Escape,
-      :prune     => Prune,
+      :escape => Escape,
+      :prune => Prune,
       :whitewash => Whitewash,
-      :strip     => Strip,
-      :nofollow  => NoFollow,
+      :strip => Strip,
+      :nofollow => NoFollow,
       :noopener => NoOpener,
       :newline_block_elements => NewlineBlockElements,
-      :unprintable => Unprintable
-    }
+      :unprintable => Unprintable,
+    }.freeze
 
     #
     #  Returns an array of symbols representing the built-in scrubbers

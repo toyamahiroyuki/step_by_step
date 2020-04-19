@@ -31,7 +31,6 @@ module Rack
   # You can use +map+ to construct a Rack::URLMap in a convenient way.
 
   class Builder
-
     # https://stackoverflow.com/questions/2223882/whats-the-difference-between-utf-8-and-utf-8-without-bom
     UTF_8_BOM = '\xef\xbb\xbf'
 
@@ -63,11 +62,11 @@ module Rack
     #   # assumes MyApp constant contains Rack application
     def self.parse_file(config, opts = Server::Options.new)
       if config.end_with?('.ru')
-        return self.load_file(config, opts)
+        load_file(config, opts)
       else
         require config
         app = Object.const_get(::File.basename(config, '.rb').split('_').map(&:capitalize).join(''))
-        return app, {}
+        [app, {}]
       end
     end
 
@@ -98,13 +97,13 @@ module Rack
 
       if cfgfile[/^#\\(.*)/] && opts
         warn "Parsing options from the first comment line is deprecated!"
-        options = opts.parse! $1.split(/\s+/)
+        options = opts.parse! Regexp.last_match(1).split(/\s+/)
       end
 
       cfgfile.sub!(/^__END__\n.*\Z/m, '')
       app = new_from_string cfgfile, path
 
-      return app, options
+      [app, options]
     end
 
     # Evaluate the given +builder_script+ string in the context of
@@ -128,7 +127,7 @@ module Rack
     # Create a new Rack::Builder instance and return the Rack application
     # generated from it.
     def self.app(default_app = nil, &block)
-      self.new(default_app, &block).to_app
+      new(default_app, &block).to_app
     end
 
     # Specifies middleware to use in a stack.

@@ -126,7 +126,7 @@ module ActionController
 
       def authentication_request(controller, realm, message)
         message ||= "HTTP Basic: Access denied.\n"
-        controller.headers["WWW-Authenticate"] = %(Basic realm="#{realm.tr('"'.freeze, "".freeze)}")
+        controller.headers["WWW-Authenticate"] = %(Basic realm="#{realm.tr('"', "")}")
         controller.status = 401
         controller.response_body = message
       end
@@ -405,8 +405,8 @@ module ActionController
     #   RewriteRule ^(.*)$ dispatch.fcgi [E=X-HTTP_AUTHORIZATION:%{HTTP:Authorization},QSA,L]
     module Token
       TOKEN_KEY = "token="
-      TOKEN_REGEX = /^(Token|Bearer)\s+/
-      AUTHN_PAIR_DELIMITERS = /(?:,|;|\t+)/
+      TOKEN_REGEX = /^(Token|Bearer)\s+/.freeze
+      AUTHN_PAIR_DELIMITERS = /(?:,|;|\t+)/.freeze
       extend self
 
       module ControllerMethods
@@ -439,7 +439,7 @@ module ActionController
 
       def authenticate(controller, &login_procedure)
         token, options = token_and_options(controller.request)
-        unless token.blank?
+        if token.present?
           login_procedure.call(token, options)
         end
       end
@@ -469,12 +469,12 @@ module ActionController
 
       # Takes raw_params and turns it into an array of parameters
       def params_array_from(raw_params)
-        raw_params.map { |param| param.split %r/=(.+)?/ }
+        raw_params.map { |param| param.split %r{=(.+)?} }
       end
 
       # This removes the <tt>"</tt> characters wrapping the value.
       def rewrite_param_values(array_params)
-        array_params.each { |param| (param[1] || "".dup).gsub! %r/^"|"$/, "" }
+        array_params.each { |param| (param[1] || "".dup).gsub! %r{^"|"$}, "" }
       end
 
       # This method takes an authorization body and splits up the key-value
@@ -511,7 +511,7 @@ module ActionController
       # Returns nothing.
       def authentication_request(controller, realm, message = nil)
         message ||= "HTTP Token: Access denied.\n"
-        controller.headers["WWW-Authenticate"] = %(Token realm="#{realm.tr('"'.freeze, "".freeze)}")
+        controller.headers["WWW-Authenticate"] = %(Token realm="#{realm.tr('"', "")}")
         controller.__send__ :render, plain: message, status: :unauthorized
       end
     end

@@ -16,7 +16,7 @@ module Rack
     # Compatible with rack-csrf.
     class FormToken < AuthenticityToken
       def accepts?(env)
-        env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest" or super
+        (env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest") || super
       end
     end
   end

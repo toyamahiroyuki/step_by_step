@@ -4,17 +4,17 @@ class Pry
     module Text
       extend self
       COLORS =
-      {
-        "black"   => 0,
-        "red"     => 1,
-        "green"   => 2,
-        "yellow"  => 3,
-        "blue"    => 4,
-        "purple"  => 5,
-        "magenta" => 5,
-        "cyan"    => 6,
-        "white"   => 7
-      }
+        {
+          "black" => 0,
+          "red" => 1,
+          "green" => 2,
+          "yellow" => 3,
+          "blue" => 4,
+          "purple" => 5,
+          "magenta" => 5,
+          "cyan" => 6,
+          "white" => 7,
+        }.freeze
 
       COLORS.each_pair do |color, value|
         define_method color do |text|
@@ -41,7 +41,7 @@ class Pry
       # @param  [String, #to_s] text
       # @return [String] _text_ stripped of any color codes.
       def strip_color(text)
-        text.to_s.gsub(/(\001)?\e\[.*?(\d)+m(\002)?/ , '')
+        text.to_s.gsub(/(\001)?\e\[.*?(\d)+m(\002)?/, '')
       end
 
       # Returns _text_ as bold text for use on a terminal.
@@ -99,7 +99,7 @@ class Pry
         max_width = (offset + lines.count).to_s.length
         lines.each_with_index.map do |line, index|
           adjusted_index = (index + offset).to_s.rjust(max_width)
-          "#{self.send(color, adjusted_index)}: #{line}"
+          "#{send(color, adjusted_index)}: #{line}"
         end.join
       end
 

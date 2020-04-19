@@ -14,7 +14,9 @@ module ActionDispatch
         @block = block
       end
 
-      def name; klass.name; end
+      def name
+        klass.name
+      end
 
       def ==(middleware)
         case middleware
@@ -103,14 +105,14 @@ module ActionDispatch
 
     private
 
-      def assert_index(index, where)
-        i = index.is_a?(Integer) ? index : middlewares.index { |m| m.klass == index }
-        raise "No such middleware to insert #{where}: #{index.inspect}" unless i
-        i
-      end
+    def assert_index(index, where)
+      i = index.is_a?(Integer) ? index : middlewares.index { |m| m.klass == index }
+      raise "No such middleware to insert #{where}: #{index.inspect}" unless i
+      i
+    end
 
-      def build_middleware(klass, args, block)
-        Middleware.new(klass, args, block)
-      end
+    def build_middleware(klass, args, block)
+      Middleware.new(klass, args, block)
+    end
   end
 end

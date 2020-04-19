@@ -40,9 +40,11 @@ class Pry
 
     private
 
-    def enabled?; !!@enabled; end
+    def enabled?
+      !!@enabled
+    end
 
-    def output; @output; end
+    attr_reader :output
 
     # Return an instance of the "best" available pager class --
     # `SystemPager` if possible, `SimplePager` if `SystemPager` isn't
@@ -131,7 +133,7 @@ class Pry
 
         # Default to less, and make sure less is being passed the correct
         # options
-        if pager.strip.empty? or pager =~ /^less\b/
+        if pager.strip.empty? || pager =~ /^less\b/
           pager = "less -R -F -X"
         end
 
@@ -149,9 +151,9 @@ class Pry
             else
               `which #{pager_executable}`
             end
-            $?.success?
-          rescue
-            false
+            $CHILD_STATUS.success?
+                          rescue
+                            false
           end
         else
           @system_pager

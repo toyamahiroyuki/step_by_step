@@ -1,6 +1,5 @@
 module Concurrent
   module Synchronization
-
     # Volatile adds the attr_volatile class method when included.
     #
     # @example

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/error'
 require 'mustermann/simple_match'
 require 'mustermann/equality_map'
@@ -51,7 +52,7 @@ module Mustermann
       if ignore_unknown_options
         options = options.select { |key, value| supported?(key, **options) if key != :ignore_unknown_options }
       else
-        unsupported = options.keys.detect { |key| not supported?(key, **options) }
+        unsupported = options.keys.detect { |key| !supported?(key, **options) }
         raise ArgumentError, "unsupported option %p for %p" % [unsupported, self] if unsupported
       end
 
@@ -117,14 +118,14 @@ module Mustermann
     # and the same options.
     # @return [true, false]
     def ==(other)
-      other.class == self.class and other.to_s == @string and other.options == options
+      (other.class == self.class) && (other.to_s == @string) && (other.options == options)
     end
 
     # Two patterns are considered equal if they are of the same type, have the same pattern string
     # and the same options.
     # @return [true, false]
     def eql?(other)
-      other.class.eql?(self.class) and other.to_s.eql?(@string) and other.options.eql?(options)
+      other.class.eql?(self.class) && other.to_s.eql?(@string) && other.options.eql?(options)
     end
 
     # Tries to match the pattern against the beginning of the string (as opposed to the full string).
@@ -203,9 +204,9 @@ module Mustermann
     # @return [Hash{String: String, Array<String>}, nil] Sinatra style params if pattern matches.
     def params(string = nil, captures: nil, offset: 0)
       return unless captures ||= match(string)
-      params   = named_captures.map do |name, positions|
+      params = named_captures.map do |name, positions|
         values = positions.map { |pos| map_param(name, captures[pos + offset]) }.flatten
-        values = values.first if values.size < 2 and not always_array? name
+        values = values.first if (values.size < 2) && (!always_array? name)
         [name, values]
       end
 
@@ -334,7 +335,7 @@ module Mustermann
     # @param [Mustermann::Pattern, String] other pattern to be appended
     # @return [Mustermann::Pattern] concatenated pattern
     def +(other)
-       Concat.new(self, other, type: :identity)
+      Concat.new(self, other, type: :identity)
     end
 
     # @example
@@ -351,7 +352,7 @@ module Mustermann
     # @return [Boolean]
     # @see Object#respond_to?
     def respond_to?(method, *args)
-      return super unless %i[expand to_templates].include? method
+      return super unless %i(expand to_templates).include? method
       respond_to_special?(method)
     end
 
@@ -380,12 +381,12 @@ module Mustermann
 
     # @!visibility private
     def unescape(string, decode = uri_decode)
-      return string unless decode and string
+      return string unless decode && string
       @@uri.unescape(string)
     end
 
     # @!visibility private
-    ALWAYS_ARRAY = %w[splat captures]
+    ALWAYS_ARRAY = %w(splat captures).freeze
 
     # @!visibility private
     def always_array?(key)

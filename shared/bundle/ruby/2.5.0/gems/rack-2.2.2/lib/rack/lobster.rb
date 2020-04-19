@@ -21,9 +21,11 @@ module Rack
         href = "?flip"
       end
 
-      content = ["<title>Lobstericious!</title>",
-                 "<pre>", lobster, "</pre>",
-                 "<a href='#{href}'>flip!</a>"]
+      content = [
+        "<title>Lobstericious!</title>",
+        "<pre>", lobster, "</pre>",
+        "<a href='#{href}'>flip!</a>",
+      ]
       length = content.inject(0) { |a, e| a + e.size }.to_s
       [200, { CONTENT_TYPE => "text/html", CONTENT_LENGTH => length }, content]
     }
@@ -56,11 +58,10 @@ module Rack
       res.write "<p><a href='?flip=crash'>crash!</a></p>"
       res.finish
     end
-
   end
 end
 
-if $0 == __FILE__
+if $PROGRAM_NAME == __FILE__
   # :nocov:
   require_relative '../rack'
   Rack::Server.start(

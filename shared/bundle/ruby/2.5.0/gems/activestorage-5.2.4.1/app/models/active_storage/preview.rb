@@ -66,24 +66,24 @@ class ActiveStorage::Preview
   end
 
   private
-    def processed?
-      image.attached?
-    end
 
-    def process
-      previewer.preview { |attachable| image.attach(attachable) }
-    end
+  def processed?
+    image.attached?
+  end
 
-    def variant
-      ActiveStorage::Variant.new(image, variation).processed
-    end
+  def process
+    previewer.preview { |attachable| image.attach(attachable) }
+  end
 
+  def variant
+    ActiveStorage::Variant.new(image, variation).processed
+  end
 
-    def previewer
-      previewer_class.new(blob)
-    end
+  def previewer
+    previewer_class.new(blob)
+  end
 
-    def previewer_class
-      ActiveStorage.previewers.detect { |klass| klass.accept?(blob) }
-    end
+  def previewer_class
+    ActiveStorage.previewers.detect { |klass| klass.accept?(blob) }
+  end
 end

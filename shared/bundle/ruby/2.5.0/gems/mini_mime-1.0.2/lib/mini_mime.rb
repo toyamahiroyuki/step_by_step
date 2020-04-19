@@ -25,7 +25,7 @@ module MiniMime
   end
 
   class Info
-    BINARY_ENCODINGS = %w(base64 8bit)
+    BINARY_ENCODINGS = %w(base64 8bit).freeze
 
     attr_accessor :extension, :content_type, :encoding
 
@@ -128,8 +128,8 @@ module MiniMime
         to = @rows - 1
         result = nil
 
-        while from <= to do
-          midpoint = from + (to-from).div(2)
+        while from <= to
+          midpoint = from + (to - from).div(2)
           current = resolve(midpoint)
           data = current[@sort_order]
           if data > val
@@ -145,7 +145,7 @@ module MiniMime
       end
 
       def resolve(row)
-        @file.seek(row*@row_length)
+        @file.seek(row * @row_length)
         Info.new(@file.readline)
       end
     end

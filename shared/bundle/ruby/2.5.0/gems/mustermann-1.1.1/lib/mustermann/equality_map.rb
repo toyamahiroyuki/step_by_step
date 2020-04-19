@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mustermann
   # A simple wrapper around ObjectSpace::WeakMap that allows matching keys by equality rather than identity.
   # Used for caching. Note that `fetch` is not guaranteed to return the object, even if it has not been

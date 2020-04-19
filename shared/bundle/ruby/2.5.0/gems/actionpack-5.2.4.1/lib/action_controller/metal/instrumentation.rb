@@ -24,19 +24,17 @@ module ActionController
         headers: request.headers,
         format: request.format.ref,
         method: request.request_method,
-        path: request.fullpath
+        path: request.fullpath,
       }
 
       ActiveSupport::Notifications.instrument("start_processing.action_controller", raw_payload.dup)
 
       ActiveSupport::Notifications.instrument("process_action.action_controller", raw_payload) do |payload|
-        begin
-          result = super
-          payload[:status] = response.status
-          result
-        ensure
-          append_info_to_payload(payload)
-        end
+        result = super
+        payload[:status] = response.status
+        result
+      ensure
+        append_info_to_payload(payload)
       end
     end
 
@@ -50,7 +48,7 @@ module ActionController
 
     def send_file(path, options = {})
       ActiveSupport::Notifications.instrument("send_file.action_controller",
-        options.merge(path: path)) do
+                                              options.merge(path: path)) do
         super
       end
     end
@@ -70,7 +68,7 @@ module ActionController
       end
     end
 
-  private
+    private
 
     # A hook invoked every time a before callback is halted.
     def halted_callback_hook(filter)

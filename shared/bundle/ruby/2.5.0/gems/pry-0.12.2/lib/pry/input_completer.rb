@@ -1,45 +1,46 @@
 # taken from irb
 # Implements tab completion for Readline in Pry
 class Pry::InputCompleter
-  NUMERIC_REGEXP            = /^(-?(0[dbo])?[0-9_]+(\.[0-9_]+)?([eE]-?[0-9]+)?)\.([^.]*)$/
-  ARRAY_REGEXP              = /^([^\]]*\])\.([^.]*)$/
-  SYMBOL_REGEXP             = /^(:[^:.]*)$/
-  SYMBOL_METHOD_CALL_REGEXP = /^(:[^:.]+)\.([^.]*)$/
-  REGEX_REGEXP              = /^(\/[^\/]*\/)\.([^.]*)$/
-  PROC_OR_HASH_REGEXP       = /^([^\}]*\})\.([^.]*)$/
-  TOPLEVEL_LOOKUP_REGEXP    = /^::([A-Z][^:\.\(]*)$/
-  CONSTANT_REGEXP           = /^([A-Z][A-Za-z0-9]*)$/
-  CONSTANT_OR_METHOD_REGEXP = /^([A-Z].*)::([^:.]*)$/
-  HEX_REGEXP                = /^(-?0x[0-9a-fA-F_]+)\.([^.]*)$/
-  GLOBALVARIABLE_REGEXP     = /^(\$[^.]*)$/
-  VARIABLE_REGEXP           = /^([^."].*)\.([^.]*)$/
+  NUMERIC_REGEXP            = /^(-?(0[dbo])?[0-9_]+(\.[0-9_]+)?([eE]-?[0-9]+)?)\.([^.]*)$/.freeze
+  ARRAY_REGEXP              = /^([^\]]*\])\.([^.]*)$/.freeze
+  SYMBOL_REGEXP             = /^(:[^:.]*)$/.freeze
+  SYMBOL_METHOD_CALL_REGEXP = /^(:[^:.]+)\.([^.]*)$/.freeze
+  REGEX_REGEXP              = /^(\/[^\/]*\/)\.([^.]*)$/.freeze
+  PROC_OR_HASH_REGEXP       = /^([^\}]*\})\.([^.]*)$/.freeze
+  TOPLEVEL_LOOKUP_REGEXP    = /^::([A-Z][^:\.\(]*)$/.freeze
+  CONSTANT_REGEXP           = /^([A-Z][A-Za-z0-9]*)$/.freeze
+  CONSTANT_OR_METHOD_REGEXP = /^([A-Z].*)::([^:.]*)$/.freeze
+  HEX_REGEXP                = /^(-?0x[0-9a-fA-F_]+)\.([^.]*)$/.freeze
+  GLOBALVARIABLE_REGEXP     = /^(\$[^.]*)$/.freeze
+  VARIABLE_REGEXP           = /^([^."].*)\.([^.]*)$/.freeze
 
   ReservedWords = [
-                   "BEGIN", "END",
-                   "alias", "and",
-                   "begin", "break",
-                   "case", "class",
-                   "def", "defined", "do",
-                   "else", "elsif", "end", "ensure",
-                   "false", "for",
-                   "if", "in",
-                   "module",
-                   "next", "nil", "not",
-                   "or",
-                   "redo", "rescue", "retry", "return",
-                   "self", "super",
-                   "then", "true",
-                   "undef", "unless", "until",
-                   "when", "while",
-                   "yield" ]
+    "BEGIN", "END",
+    "alias", "and",
+    "begin", "break",
+    "case", "class",
+    "def", "defined", "do",
+    "else", "elsif", "end", "ensure",
+    "false", "for",
+    "if", "in",
+    "module",
+    "next", "nil", "not",
+    "or",
+    "redo", "rescue", "retry", "return",
+    "self", "super",
+    "then", "true",
+    "undef", "unless", "until",
+    "when", "while",
+    "yield",
+  ].freeze
 
   Operators = [
-               "%", "&", "*", "**", "+", "-", "/",
-               "<", "<<", "<=", "<=>", "==", "===", "=~", ">", ">=", ">>",
-               "[]", "[]=", "^", "!", "!=", "!~"
-              ]
+    "%", "&", "*", "**", "+", "-", "/",
+    "<", "<<", "<=", "<=>", "==", "===", "=~", ">", ">=", ">>",
+    "[]", "[]=", "^", "!", "!=", "!~",
+  ].freeze
 
-  WORD_ESCAPE_STR = " \t\n\"\\'`><=;|&{("
+  WORD_ESCAPE_STR = " \t\n\"\\'`><=;|&{(".freeze
 
   def initialize(input, pry = nil)
     @pry = pry
@@ -74,35 +75,35 @@ class Pry::InputCompleter
       # Complete stdlib symbols
       case input
       when REGEX_REGEXP # Regexp
-        receiver = $1
-        message = Regexp.quote($2)
+        receiver = Regexp.last_match(1)
+        message = Regexp.quote(Regexp.last_match(2))
         candidates = Regexp.instance_methods.collect(&:to_s)
         select_message(path, receiver, message, candidates)
       when ARRAY_REGEXP # Array
-        receiver = $1
-        message = Regexp.quote($2)
+        receiver = Regexp.last_match(1)
+        message = Regexp.quote(Regexp.last_match(2))
         candidates = Array.instance_methods.collect(&:to_s)
         select_message(path, receiver, message, candidates)
       when PROC_OR_HASH_REGEXP # Proc or Hash
-        receiver = $1
-        message = Regexp.quote($2)
+        receiver = Regexp.last_match(1)
+        message = Regexp.quote(Regexp.last_match(2))
         candidates = Proc.instance_methods.collect(&:to_s)
         candidates |= Hash.instance_methods.collect(&:to_s)
         select_message(path, receiver, message, candidates)
       when SYMBOL_REGEXP # Symbol
         if Symbol.respond_to?(:all_symbols)
-          sym        = Regexp.quote($1)
+          sym        = Regexp.quote(Regexp.last_match(1))
           candidates = Symbol.all_symbols.collect { |s| ":" << s.id2name }
           candidates.grep(/^#{sym}/)
         else
           []
         end
       when TOPLEVEL_LOOKUP_REGEXP # Absolute Constant or class methods
-        receiver = $1
+        receiver = Regexp.last_match(1)
         candidates = Object.constants.collect(&:to_s)
         candidates.grep(/^#{receiver}/).collect { |e| "::" << e }
       when CONSTANT_REGEXP # Constant
-        message = $1
+        message = Regexp.last_match(1)
         begin
           context = target.eval("self")
           context = context.class unless context.respond_to? :constants
@@ -112,8 +113,8 @@ class Pry::InputCompleter
         end
         candidates = candidates.grep(/^#{message}/).collect(&path)
       when CONSTANT_OR_METHOD_REGEXP # Constant or class methods
-        receiver = $1
-        message = Regexp.quote($2)
+        receiver = Regexp.last_match(1)
+        message = Regexp.quote(Regexp.last_match(2))
         begin
           candidates = eval("#{receiver}.constants.collect(&:to_s)", bind)
           candidates |= eval("#{receiver}.methods.collect(&:to_s)", bind)
@@ -122,14 +123,14 @@ class Pry::InputCompleter
         end
         candidates.grep(/^#{message}/).collect { |e| receiver + "::" + e }
       when SYMBOL_METHOD_CALL_REGEXP # method call on a Symbol
-        receiver = $1
-        message = Regexp.quote($2)
+        receiver = Regexp.last_match(1)
+        message = Regexp.quote(Regexp.last_match(2))
         candidates = Symbol.instance_methods.collect(&:to_s)
         select_message(path, receiver, message, candidates)
       when NUMERIC_REGEXP
         # Numeric
-        receiver = $1
-        message = Regexp.quote($5)
+        receiver = Regexp.last_match(1)
+        message = Regexp.quote(Regexp.last_match(5))
         begin
           candidates = eval(receiver, bind).methods.collect(&:to_s)
         rescue Pry::RescuableException
@@ -138,8 +139,8 @@ class Pry::InputCompleter
         select_message(path, receiver, message, candidates)
       when HEX_REGEXP
         # Numeric(0xFFFF)
-        receiver = $1
-        message = Regexp.quote($2)
+        receiver = Regexp.last_match(1)
+        message = Regexp.quote(Regexp.last_match(2))
         begin
           candidates = eval(receiver, bind).methods.collect(&:to_s)
         rescue Pry::RescuableException
@@ -147,17 +148,17 @@ class Pry::InputCompleter
         end
         select_message(path, receiver, message, candidates)
       when GLOBALVARIABLE_REGEXP # global
-        regmessage = Regexp.new(Regexp.quote($1))
+        regmessage = Regexp.new(Regexp.quote(Regexp.last_match(1)))
         candidates = global_variables.collect(&:to_s).grep(regmessage)
       when VARIABLE_REGEXP # variable
-        receiver = $1
-        message = Regexp.quote($2)
+        receiver = Regexp.last_match(1)
+        message = Regexp.quote(Regexp.last_match(2))
 
         gv = eval("global_variables", bind).collect(&:to_s)
         lv = eval("local_variables", bind).collect(&:to_s)
         cv = eval("self.class.constants", bind).collect(&:to_s)
 
-        if (gv | lv | cv).include?(receiver) or /^[A-Z]/ =~ receiver && /\./ !~ receiver
+        if (gv | lv | cv).include?(receiver) || /^[A-Z]/ =~ receiver && /\./ !~ receiver
           # foo.func and foo is local var. OR
           # Foo::Bar.func
           begin
@@ -170,29 +171,33 @@ class Pry::InputCompleter
           require 'set'
           candidates = Set.new
           to_ignore = ignored_modules
-          ObjectSpace.each_object(Module) { |m|
-            next if (to_ignore.include?(m) rescue true)
+          ObjectSpace.each_object(Module) do |m|
+            next if begin
+                       to_ignore.include?(m)
+                    rescue
+                      true
+                     end
 
             # jruby doesn't always provide #instance_methods() on each
             # object.
             if m.respond_to?(:instance_methods)
               candidates.merge m.instance_methods(false).collect(&:to_s)
             end
-          }
+          end
         end
         select_message(path, receiver, message, candidates.sort)
       when /^\.([^.]*)$/
         # Unknown(maybe String)
         receiver = ""
-        message = Regexp.quote($1)
+        message = Regexp.quote(Regexp.last_match(1))
         candidates = String.instance_methods(true).collect(&:to_s)
         select_message(path, receiver, message, candidates)
       else
         candidates = eval(
-                          "methods | private_methods | local_variables | " \
-                          "self.class.constants | instance_variables",
-                          bind
-                          ).collect(&:to_s)
+          "methods | private_methods | local_variables | " \
+          "self.class.constants | instance_variables",
+          bind
+        ).collect(&:to_s)
 
         if eval("respond_to?(:class_variables)", bind)
           candidates += eval("class_variables", bind).collect(&:to_s)
@@ -206,15 +211,15 @@ class Pry::InputCompleter
   end
 
   def select_message(path, receiver, message, candidates)
-    candidates.grep(/^#{message}/).collect { |e|
+    candidates.grep(/^#{message}/).collect do |e|
       case e
       when /^[a-zA-Z_]/
         path.call(receiver + "." << e)
       when /^[0-9]/
       when *Operators
-        #receiver + " " << e
+        # receiver + " " << e
       end
-    }.compact
+    end.compact
   end
 
   # build_path seperates the input into two parts: path and input.
@@ -232,7 +237,7 @@ class Pry::InputCompleter
       p += '/' if trailing_slash && !i.nil?
       p
     end
-    return path, input
+    [path, input]
   end
 
   def ignored_modules

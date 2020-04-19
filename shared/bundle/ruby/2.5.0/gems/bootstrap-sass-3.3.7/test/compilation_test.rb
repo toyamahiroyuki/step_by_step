@@ -9,9 +9,9 @@ class CompilationTest < Minitest::Test
       FileUtils.rm_rf('.sass-cache', secure: true)
       engine = Sass::Engine.for_file("#{path}/#{file}.scss", syntax: :scss, load_paths: [path])
       FileUtils.mkdir_p("tmp/#{File.dirname(file)}")
-      File.open("tmp/#{file}.css", 'w') { |f|
+      File.open("tmp/#{file}.css", 'w') do |f|
         f.write engine.render
-      }
+      end
       assert true # nothing was raised
     end
   end

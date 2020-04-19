@@ -176,13 +176,14 @@ module ActiveRecord
         include ColumnMethods
 
         private
-          def integer_like_primary_key_type(type, options)
-            if type == :bigint || options[:limit] == 8
-              :bigserial
-            else
-              :serial
-            end
+
+        def integer_like_primary_key_type(type, options)
+          if type == :bigint || options[:limit] == 8
+            :bigserial
+          else
+            :serial
           end
+        end
       end
 
       class Table < ActiveRecord::ConnectionAdapters::Table

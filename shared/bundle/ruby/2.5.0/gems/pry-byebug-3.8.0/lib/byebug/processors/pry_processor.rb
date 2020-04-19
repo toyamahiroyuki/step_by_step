@@ -43,7 +43,7 @@ module Byebug
     # Set up a number of navigational commands to be performed by Byebug.
     #
     def perform(action, options = {})
-      return unless %i[
+      return unless %i(
         backtrace
         down
         finish
@@ -51,7 +51,7 @@ module Byebug
         next
         step
         up
-      ].include?(action)
+      ).include?(action)
 
       send("perform_#{action}", options)
     end

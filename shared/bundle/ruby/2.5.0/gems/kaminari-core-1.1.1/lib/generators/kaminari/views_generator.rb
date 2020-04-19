@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Kaminari
   module Generators
     # rails g kaminari:views THEME
@@ -18,7 +19,7 @@ rails g kaminari:views THEME [options]
         - default
             The default one.
             This one is used internally while you don't override the partials.
-#{themes.map {|t| "        - #{t.name}\n#{t.description}"}.join("\n")}
+#{themes.map { |t| "        - #{t.name}\n#{t.description}" }.join("\n")}
 BANNER
       end
 
@@ -26,7 +27,7 @@ BANNER
       def copy_or_fetch #:nodoc:
         return copy_default_views if file_name == 'default'
 
-        if (theme = self.class.themes.detect {|t| t.name == file_name})
+        if (theme = self.class.themes.detect { |t| t.name == file_name })
           if download_templates(theme).empty?
             say "template_engine: #{template_engine} is not available for theme: #{file_name}"
           end
@@ -36,8 +37,9 @@ BANNER
       end
 
       private
+
       def self.themes
-        @themes ||= GitHubApiHelper.get_files_in_master.group_by {|fn, _| fn[0...(fn.index('/') || 0)]}.delete_if {|fn, _| fn.blank?}.map do |name, files|
+        @themes ||= GitHubApiHelper.get_files_in_master.group_by { |fn, _| fn[0...(fn.index('/') || 0)] }.delete_if { |fn, _| fn.blank? }.map do |name, files|
           Theme.new name, files
         end
       rescue SocketError
@@ -53,7 +55,7 @@ BANNER
 
       def copy_default_views
         filename_pattern = File.join self.class.source_root, "*.html.#{template_engine}"
-        Dir.glob(filename_pattern).map {|f| File.basename f}.each do |f|
+        Dir.glob(filename_pattern).map { |f| File.basename f }.each do |f|
           copy_file f, view_path_for(f)
         end
       end
@@ -95,7 +97,7 @@ BANNER
     class Theme
       attr_accessor :name
       def initialize(name, templates) #:nodoc:
-        @name, @templates = name, templates.map {|fn, sha| Template.new fn.sub(/^#{name}\//, ''), sha}
+        @name, @templates = name, templates.map { |fn, sha| Template.new fn.sub(/^#{name}\//, ''), sha }
       end
 
       def description #:nodoc:
@@ -105,7 +107,7 @@ BANNER
       end
 
       def templates_for(template_engine) #:nodoc:
-        @templates.select {|t| t.engine == template_engine }
+        @templates.select { |t| t.engine == template_engine }
       end
     end
 
@@ -117,7 +119,7 @@ BANNER
           ActiveSupport::JSON.decode(json.read)['object']['sha']
         end
         open('https://api.github.com/repos/amatsuda/kaminari_themes/git/trees/' + master_tree_sha + '?recursive=1') do |json|
-          blobs = ActiveSupport::JSON.decode(json.read)['tree'].find_all {|i| i['type'] == 'blob' }
+          blobs = ActiveSupport::JSON.decode(json.read)['tree'].find_all { |i| i['type'] == 'blob' }
           blobs.map do |blob|
             [blob['path'], blob['sha']]
           end

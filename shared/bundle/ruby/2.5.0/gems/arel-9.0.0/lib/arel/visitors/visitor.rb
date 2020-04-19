@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class Visitor
@@ -6,7 +7,7 @@ module Arel
         @dispatch = get_dispatch_cache
       end
 
-      def accept object
+      def accept(object)
         visit object
       end
 
@@ -22,18 +23,16 @@ module Arel
         self.class.dispatch_cache
       end
 
-      def dispatch
-        @dispatch
-      end
+      attr_reader :dispatch
 
-      def visit object
+      def visit(object)
         dispatch_method = dispatch[object.class]
         send dispatch_method, object
       rescue NoMethodError => e
         raise e if respond_to?(dispatch_method, true)
-        superklass = object.class.ancestors.find { |klass|
+        superklass = object.class.ancestors.find do |klass|
           respond_to?(dispatch[klass], true)
-        }
+        end
         raise(TypeError, "Cannot visit #{object.class}") unless superklass
         dispatch[object.class] = dispatch[superklass]
         retry

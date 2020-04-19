@@ -21,9 +21,10 @@ module ActiveJob
       end
 
       private
-        def job_or_instantiate(*args) # :doc:
-          args.first.is_a?(self) ? args.first : new(*args)
-        end
+
+      def job_or_instantiate(*args) # :doc:
+        args.first.is_a?(self) ? args.first : new(*args)
+      end
     end
 
     # Enqueues the job to be performed by the queue adapter.

@@ -9,9 +9,7 @@ require 'securerandom'
 require 'digest/sha2'
 
 module Rack
-
   module Session
-
     class SessionId
       ID_VERSION = 2
 
@@ -28,8 +26,13 @@ module Rack
       alias :cookie_value :public_id
       alias :to_s :public_id
 
-      def empty?; false; end
-      def inspect; public_id.inspect; end
+      def empty?
+        false
+      end
+
+      def inspect
+        public_id.inspect
+      end
 
       private
 
@@ -66,7 +69,7 @@ module Rack
         end
 
         def id
-          return @id if @loaded or instance_variable_defined?(:@id)
+          return @id if @loaded || instance_variable_defined?(:@id)
           @id = @store.send(:extract_session_id, @req)
         end
 
@@ -100,7 +103,7 @@ module Rack
 
         def has_key?(key)
           load_for_read!
-          @data.has_key?(key.to_s)
+          @data.key?(key.to_s)
         end
         alias :key? :has_key?
         alias :include? :has_key?
@@ -146,7 +149,7 @@ module Rack
           if loaded?
             @data.inspect
           else
-            "#<#{self.class}:0x#{self.object_id.to_s(16)} not yet loaded>"
+            "#<#{self.class}:0x#{object_id.to_s(16)} not yet loaded>"
           end
         end
 
@@ -175,7 +178,7 @@ module Rack
           @data.values
         end
 
-      private
+        private
 
         def load_for_read!
           load! if !loaded? && exists?
@@ -242,7 +245,7 @@ module Rack
           renew: false,
           sidbits: 128,
           cookie_only: true,
-          secure_random: ::SecureRandom
+          secure_random: ::SecureRandom,
         }.freeze
 
         attr_reader :key, :default_options, :sid_secure
@@ -333,7 +336,7 @@ module Rack
 
         def session_exists?(req)
           value = current_session_id(req)
-          value && !value.empty?
+          value.present?
         end
 
         # Session should be committed if it was loaded, any of specific options like :renew, :drop
@@ -385,12 +388,12 @@ module Rack
           session_id ||= session.id
           session_data = session.to_hash.delete_if { |k, v| v.nil? }
 
-          if not data = write_session(req, session_id, session_data, options)
+          if !data = write_session(req, session_id, session_data, options)
             req.get_header(RACK_ERRORS).puts("Warning! #{self.class.name} failed to save session. Content dropped.")
-          elsif options[:defer] and not options[:renew]
+          elsif options[:defer] && !(options[:renew])
             req.get_header(RACK_ERRORS).puts("Deferring cookie for #{session_id}") if $VERBOSE
           else
-            cookie = Hash.new
+            cookie = {}
             cookie[:value] = cookie_value(data)
             cookie[:expires] = Time.now + options[:expire_after] if options[:expire_after]
             cookie[:expires] = Time.now + options[:max_age] if options[:max_age]

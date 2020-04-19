@@ -70,13 +70,15 @@ module ActionDispatch
       DEFAULT_HOST = "www.example.com"
 
       include Minitest::Assertions
-      include TestProcess, RequestHelpers, Assertions
+      include Assertions
+      include RequestHelpers
+      include TestProcess
 
-      %w( status status_message headers body redirect? ).each do |method|
+      %w(status status_message headers body redirect?).each do |method|
         delegate method, to: :response, allow_nil: true
       end
 
-      %w( path ).each do |method|
+      %w(path).each do |method|
         delegate method, to: :request, allow_nil: true
       end
 
@@ -228,16 +230,16 @@ module ActionDispatch
           :method => method,
           :params => request_encoder.encode_params(params),
 
-          "SERVER_NAME"     => hostname,
-          "SERVER_PORT"     => port || (https? ? "443" : "80"),
-          "HTTPS"           => https? ? "on" : "off",
+          "SERVER_NAME" => hostname,
+          "SERVER_PORT" => port || (https? ? "443" : "80"),
+          "HTTPS" => https? ? "on" : "off",
           "rack.url_scheme" => https? ? "https" : "http",
 
-          "REQUEST_URI"    => path,
-          "HTTP_HOST"      => host,
-          "REMOTE_ADDR"    => remote_addr,
-          "CONTENT_TYPE"   => request_encoder.content_type,
-          "HTTP_ACCEPT"    => request_encoder.accept_header || accept
+          "REQUEST_URI" => path,
+          "HTTP_HOST" => host,
+          "REMOTE_ADDR" => remote_addr,
+          "CONTENT_TYPE" => request_encoder.content_type,
+          "HTTP_ACCEPT" => request_encoder.accept_header || accept,
         }
 
         wrapped_headers = Http::Headers.from_hash({})
@@ -281,26 +283,27 @@ module ActionDispatch
       alias :host! :host=
 
       private
-        def _mock_session
-          @_mock_session ||= Rack::MockSession.new(@app, host)
-        end
 
-        def build_full_uri(path, env)
-          "#{env['rack.url_scheme']}://#{env['SERVER_NAME']}:#{env['SERVER_PORT']}#{path}"
-        end
+      def _mock_session
+        @_mock_session ||= Rack::MockSession.new(@app, host)
+      end
 
-        def build_expanded_path(path)
-          location = URI.parse(path)
-          yield location if block_given?
-          path = location.path
-          location.query ? "#{path}?#{location.query}" : path
-        end
+      def build_full_uri(path, env)
+        "#{env['rack.url_scheme']}://#{env['SERVER_NAME']}:#{env['SERVER_PORT']}#{path}"
+      end
+
+      def build_expanded_path(path)
+        location = URI.parse(path)
+        yield location if block_given?
+        path = location.path
+        location.query ? "#{path}?#{location.query}" : path
+      end
     end
 
     module Runner
       include ActionDispatch::Assertions
 
-      APP_SESSIONS = {}
+      APP_SESSIONS = {}.freeze
 
       attr_reader :app
 
@@ -325,14 +328,14 @@ module ActionDispatch
       end
 
       def create_session(app)
-        klass = APP_SESSIONS[app] ||= Class.new(Integration::Session) {
+        klass = APP_SESSIONS[app] ||= Class.new(Integration::Session) do
           # If the app is a Rails app, make url_helpers available on the session.
           # This makes app.url_for and app.foo_path available in the console.
           if app.respond_to?(:routes)
             include app.routes.url_helpers
             include app.routes.mounted_helpers
           end
-        }
+        end
         klass.new(app)
       end
 
@@ -386,7 +389,8 @@ module ActionDispatch
         integration_session.default_url_options = options
       end
 
-    private
+      private
+
       def respond_to_missing?(method, _)
         integration_session.respond_to?(method) || super
       end

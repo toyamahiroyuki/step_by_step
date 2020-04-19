@@ -4,7 +4,6 @@ require 'optparse'
 require 'fileutils'
 
 module Rack
-
   class Server
     (require_relative 'core_ext/regexp'; using ::Rack::RegexpExtensions) if RUBY_VERSION < '2.4'
 
@@ -18,66 +17,66 @@ module Rack
           opts.separator "Ruby options:"
 
           lineno = 1
-          opts.on("-e", "--eval LINE", "evaluate a LINE of code") { |line|
+          opts.on("-e", "--eval LINE", "evaluate a LINE of code") do |line|
             eval line, TOPLEVEL_BINDING, "-e", lineno
             lineno += 1
-          }
+          end
 
-          opts.on("-d", "--debug", "set debugging flags (set $DEBUG to true)") {
+          opts.on("-d", "--debug", "set debugging flags (set $DEBUG to true)") do
             options[:debug] = true
-          }
-          opts.on("-w", "--warn", "turn warnings on for your script") {
+          end
+          opts.on("-w", "--warn", "turn warnings on for your script") do
             options[:warn] = true
-          }
-          opts.on("-q", "--quiet", "turn off logging") {
+          end
+          opts.on("-q", "--quiet", "turn off logging") do
             options[:quiet] = true
-          }
+          end
 
           opts.on("-I", "--include PATH",
-                  "specify $LOAD_PATH (may be used more than once)") { |path|
+                  "specify $LOAD_PATH (may be used more than once)") do |path|
             (options[:include] ||= []).concat(path.split(":"))
-          }
+          end
 
           opts.on("-r", "--require LIBRARY",
-                  "require the library, before executing your script") { |library|
+                  "require the library, before executing your script") do |library|
             (options[:require] ||= []) << library
-          }
+          end
 
           opts.separator ""
           opts.separator "Rack options:"
-          opts.on("-b", "--builder BUILDER_LINE", "evaluate a BUILDER_LINE of code as a builder script") { |line|
+          opts.on("-b", "--builder BUILDER_LINE", "evaluate a BUILDER_LINE of code as a builder script") do |line|
             options[:builder] = line
-          }
+          end
 
-          opts.on("-s", "--server SERVER", "serve using SERVER (thin/puma/webrick)") { |s|
+          opts.on("-s", "--server SERVER", "serve using SERVER (thin/puma/webrick)") do |s|
             options[:server] = s
-          }
+          end
 
-          opts.on("-o", "--host HOST", "listen on HOST (default: localhost)") { |host|
+          opts.on("-o", "--host HOST", "listen on HOST (default: localhost)") do |host|
             options[:Host] = host
-          }
+          end
 
-          opts.on("-p", "--port PORT", "use PORT (default: 9292)") { |port|
+          opts.on("-p", "--port PORT", "use PORT (default: 9292)") do |port|
             options[:Port] = port
-          }
+          end
 
-          opts.on("-O", "--option NAME[=VALUE]", "pass VALUE to the server as option NAME. If no VALUE, sets it to true. Run '#{$0} -s SERVER -h' to get a list of options for SERVER") { |name|
+          opts.on("-O", "--option NAME[=VALUE]", "pass VALUE to the server as option NAME. If no VALUE, sets it to true. Run '#{$PROGRAM_NAME} -s SERVER -h' to get a list of options for SERVER") do |name|
             name, value = name.split('=', 2)
             value = true if value.nil?
             options[name.to_sym] = value
-          }
+          end
 
-          opts.on("-E", "--env ENVIRONMENT", "use ENVIRONMENT for defaults (default: development)") { |e|
+          opts.on("-E", "--env ENVIRONMENT", "use ENVIRONMENT for defaults (default: development)") do |e|
             options[:environment] = e
-          }
+          end
 
-          opts.on("-D", "--daemonize", "run daemonized in the background") { |d|
+          opts.on("-D", "--daemonize", "run daemonized in the background") do |d|
             options[:daemonize] = d ? true : false
-          }
+          end
 
-          opts.on("-P", "--pid FILE", "file to store PID") { |f|
+          opts.on("-P", "--pid FILE", "file to store PID") do |f|
             options[:pid] = ::File.expand_path(f)
-          }
+          end
 
           opts.separator ""
           opts.separator "Profiling options:"
@@ -120,30 +119,28 @@ module Rack
           abort opt_parser.to_s
         end
 
-        options[:config] = args.last if args.last && !args.last.empty?
+        options[:config] = args.last if args.last.present?
         options
       end
 
       def handler_opts(options)
-        begin
-          info = []
-          server = Rack::Handler.get(options[:server]) || Rack::Handler.default
-          if server && server.respond_to?(:valid_options)
-            info << ""
-            info << "Server-specific options for #{server.name}:"
+        info = []
+        server = Rack::Handler.get(options[:server]) || Rack::Handler.default
+        if server && server.respond_to?(:valid_options)
+          info << ""
+          info << "Server-specific options for #{server.name}:"
 
-            has_options = false
-            server.valid_options.each do |name, description|
-              next if /^(Host|Port)[^a-zA-Z]/.match?(name.to_s) # ignore handler's host and port options, we do our own.
-              info << "  -O %-21s %s" % [name, description]
-              has_options = true
-            end
-            return "" if !has_options
+          has_options = false
+          server.valid_options.each do |name, description|
+            next if /^(Host|Port)[^a-zA-Z]/.match?(name.to_s) # ignore handler's host and port options, we do our own.
+            info << "  -O %-21s %s" % [name, description]
+            has_options = true
           end
-          info.join("\n")
-        rescue NameError, LoadError
-          return "Warning: Could not find handler specified (#{options[:server] || 'default'}) to determine handler-specific options"
+          return "" if !has_options
         end
+        info.join("\n")
+      rescue NameError, LoadError
+        "Warning: Could not find handler specified (#{options[:server] || 'default'}) to determine handler-specific options"
       end
     end
 
@@ -241,7 +238,7 @@ module Rack
         Port: 9292,
         Host: default_host,
         AccessLog: [],
-        config: "config.ru"
+        config: "config.ru",
       }
     end
 
@@ -257,18 +254,18 @@ module Rack
       end
 
       def default_middleware_by_environment
-        m = Hash.new {|h, k| h[k] = []}
+        m = Hash.new { |h, k| h[k] = [] }
         m["deployment"] = [
           [Rack::ContentLength],
           logging_middleware,
-          [Rack::TempfileReaper]
+          [Rack::TempfileReaper],
         ]
         m["development"] = [
           [Rack::ContentLength],
           logging_middleware,
           [Rack::ShowExceptions],
           [Rack::Lint],
-          [Rack::TempfileReaper]
+          [Rack::TempfileReaper],
         ]
 
         m
@@ -341,126 +338,125 @@ module Rack
     end
 
     private
-      def build_app_and_options_from_config
-        if !::File.exist? options[:config]
-          abort "configuration #{options[:config]} not found"
-        end
 
-        app, options = Rack::Builder.parse_file(self.options[:config], opt_parser)
-        @options.merge!(options) { |key, old, new| old }
-        app
+    def build_app_and_options_from_config
+      if !::File.exist? options[:config]
+        abort "configuration #{options[:config]} not found"
       end
 
-      def handle_profiling(heapfile, profile_mode, filename)
-        if heapfile
-          require "objspace"
-          ObjectSpace.trace_object_allocations_start
-          yield
-          GC.start
-          ::File.open(heapfile, "w") { |f| ObjectSpace.dump_all(output: f) }
-          exit
-        end
+      app, options = Rack::Builder.parse_file(self.options[:config], opt_parser)
+      @options.merge!(options) { |key, old, new| old }
+      app
+    end
 
-        if profile_mode
-          require "stackprof"
-          require "tempfile"
-
-          make_profile_name(filename) do |filename|
-            ::File.open(filename, "w") do |f|
-              StackProf.run(mode: profile_mode, out: f) do
-                yield
-              end
-              puts "Profile written to: #{filename}"
-            end
-          end
-          exit
-        end
-
+    def handle_profiling(heapfile, profile_mode, filename)
+      if heapfile
+        require "objspace"
+        ObjectSpace.trace_object_allocations_start
         yield
+        GC.start
+        ::File.open(heapfile, "w") { |f| ObjectSpace.dump_all(output: f) }
+        exit
       end
 
-      def make_profile_name(filename)
-        if filename
-          yield filename
-        else
-          ::Dir::Tmpname.create("profile.dump") do |tmpname, _, _|
-            yield tmpname
+      if profile_mode
+        require "stackprof"
+        require "tempfile"
+
+        make_profile_name(filename) do |filename|
+          ::File.open(filename, "w") do |f|
+            StackProf.run(mode: profile_mode, out: f) do
+              yield
+            end
+            puts "Profile written to: #{filename}"
           end
         end
+        exit
       end
 
-      def build_app_from_string
-        Rack::Builder.new_from_string(self.options[:builder])
-      end
+      yield
+    end
 
-      def parse_options(args)
-        # Don't evaluate CGI ISINDEX parameters.
-        # http://www.meb.uni-bonn.de/docs/cgi/cl.html
-        args.clear if ENV.include?(REQUEST_METHOD)
-
-        @options = opt_parser.parse!(args)
-        @options[:config] = ::File.expand_path(options[:config])
-        ENV["RACK_ENV"] = options[:environment]
-        @options
-      end
-
-      def opt_parser
-        Options.new
-      end
-
-      def build_app(app)
-        middleware[options[:environment]].reverse_each do |middleware|
-          middleware = middleware.call(self) if middleware.respond_to?(:call)
-          next unless middleware
-          klass, *args = middleware
-          app = klass.new(app, *args)
-        end
-        app
-      end
-
-      def wrapped_app
-        @wrapped_app ||= build_app app
-      end
-
-      def daemonize_app
-        # Cannot be covered as it forks
-        # :nocov:
-        Process.daemon
-        # :nocov:
-      end
-
-      def write_pid
-        ::File.open(options[:pid], ::File::CREAT | ::File::EXCL | ::File::WRONLY ){ |f| f.write("#{Process.pid}") }
-        at_exit { ::FileUtils.rm_f(options[:pid]) }
-      rescue Errno::EEXIST
-        check_pid!
-        retry
-      end
-
-      def check_pid!
-        case pidfile_process_status
-        when :running, :not_owned
-          $stderr.puts "A server is already running. Check #{options[:pid]}."
-          exit(1)
-        when :dead
-          ::File.delete(options[:pid])
+    def make_profile_name(filename)
+      if filename
+        yield filename
+      else
+        ::Dir::Tmpname.create("profile.dump") do |tmpname, _, _|
+          yield tmpname
         end
       end
+    end
 
-      def pidfile_process_status
-        return :exited unless ::File.exist?(options[:pid])
+    def build_app_from_string
+      Rack::Builder.new_from_string(options[:builder])
+    end
 
-        pid = ::File.read(options[:pid]).to_i
-        return :dead if pid == 0
+    def parse_options(args)
+      # Don't evaluate CGI ISINDEX parameters.
+      # http://www.meb.uni-bonn.de/docs/cgi/cl.html
+      args.clear if ENV.include?(REQUEST_METHOD)
 
-        Process.kill(0, pid)
-        :running
-      rescue Errno::ESRCH
-        :dead
-      rescue Errno::EPERM
-        :not_owned
+      @options = opt_parser.parse!(args)
+      @options[:config] = ::File.expand_path(options[:config])
+      ENV["RACK_ENV"] = options[:environment]
+      @options
+    end
+
+    def opt_parser
+      Options.new
+    end
+
+    def build_app(app)
+      middleware[options[:environment]].reverse_each do |middleware|
+        middleware = middleware.call(self) if middleware.respond_to?(:call)
+        next unless middleware
+        klass, *args = middleware
+        app = klass.new(app, *args)
       end
+      app
+    end
 
+    def wrapped_app
+      @wrapped_app ||= build_app app
+    end
+
+    def daemonize_app
+      # Cannot be covered as it forks
+      # :nocov:
+      Process.daemon
+      # :nocov:
+    end
+
+    def write_pid
+      ::File.open(options[:pid], ::File::CREAT | ::File::EXCL | ::File::WRONLY) { |f| f.write("#{Process.pid}") }
+      at_exit { ::FileUtils.rm_f(options[:pid]) }
+    rescue Errno::EEXIST
+      check_pid!
+      retry
+    end
+
+    def check_pid!
+      case pidfile_process_status
+      when :running, :not_owned
+        warn "A server is already running. Check #{options[:pid]}."
+        exit(1)
+      when :dead
+        ::File.delete(options[:pid])
+      end
+    end
+
+    def pidfile_process_status
+      return :exited unless ::File.exist?(options[:pid])
+
+      pid = ::File.read(options[:pid]).to_i
+      return :dead if pid == 0
+
+      Process.kill(0, pid)
+      :running
+    rescue Errno::ESRCH
+      :dead
+    rescue Errno::EPERM
+      :not_owned
+    end
   end
-
 end

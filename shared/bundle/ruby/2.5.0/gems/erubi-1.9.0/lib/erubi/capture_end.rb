@@ -16,9 +16,9 @@ module Erubi
     #                          expression.  Normally the buffer will be returned anyway, but there
     #                          are cases where the last expression will not be the buffer,
     #                          and therefore a different object will be returned.
-    def initialize(input, properties={})
+    def initialize(input, properties = {})
       properties = Hash[properties]
-      escape = properties.fetch(:escape){properties.fetch(:escape_html, false)}
+      escape = properties.fetch(:escape) { properties.fetch(:escape_html, false) }
       @escape_capture = properties.fetch(:escape_capture, escape)
       @yield_returns_buffer = properties.fetch(:yield_returns_buffer, false)
       @bufval = properties[:bufval] ||= '::String.new'
@@ -33,13 +33,13 @@ module Erubi
     def handle(indicator, code, tailch, rspace, lspace)
       case indicator
       when '|=', '|=='
-        rspace = nil if tailch && !tailch.empty?
+        rspace = nil if tailch.present?
         add_text(lspace) if lspace
         escape_capture = !((indicator == '|=') ^ @escape_capture)
         src << "begin; (#{@bufstack} ||= []) << #{@bufvar}; #{@bufvar} = #{@bufval}; #{@bufstack}.last << #{@escapefunc if escape_capture}((" << code
         add_text(rspace) if rspace
       when '|'
-        rspace = nil if tailch && !tailch.empty?
+        rspace = nil if tailch.present?
         add_text(lspace) if lspace
         result = @yield_returns_buffer ? " #{@bufvar}; " : ""
         src << result << code << ")).to_s; ensure; #{@bufvar} = #{@bufstack}.pop; end;"

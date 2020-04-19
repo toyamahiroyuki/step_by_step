@@ -21,7 +21,7 @@ module Mongoid
       end
 
       def migration_data
-<<RUBY
+        <<RUBY
   ## Database authenticatable
   field :email,              type: String, default: ""
   field :encrypted_password, type: String, default: ""

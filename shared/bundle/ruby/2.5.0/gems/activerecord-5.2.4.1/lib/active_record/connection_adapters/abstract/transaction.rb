@@ -83,10 +83,21 @@ module ActiveRecord
 
     class NullTransaction #:nodoc:
       def initialize; end
+
       def state; end
-      def closed?; true; end
-      def open?; false; end
-      def joinable?; false; end
+
+      def closed?
+        true
+      end
+
+      def open?
+        false
+      end
+
+      def joinable?
+        false
+      end
+
       def add_record(record); end
     end
 
@@ -135,10 +146,21 @@ module ActiveRecord
         ite.each { |i| i.committed!(should_run_callbacks: false) }
       end
 
-      def full_rollback?; true; end
-      def joinable?; @joinable; end
-      def closed?; false; end
-      def open?; !closed?; end
+      def full_rollback?
+        true
+      end
+
+      def joinable?
+        @joinable
+      end
+
+      def closed?
+        false
+      end
+
+      def open?
+        !closed?
+      end
     end
 
     class SavepointTransaction < Transaction
@@ -163,7 +185,9 @@ module ActiveRecord
         @state.commit!
       end
 
-      def full_rollback?; false; end
+      def full_rollback?
+        false
+      end
     end
 
     class RealTransaction < Transaction
@@ -234,26 +258,24 @@ module ActiveRecord
 
       def within_new_transaction(options = {})
         @connection.lock.synchronize do
-          begin
-            transaction = begin_transaction options
-            yield
-          rescue Exception => error
-            if transaction
-              rollback_transaction
-              after_failure_actions(transaction, error)
-            end
-            raise
-          ensure
-            unless error
-              if Thread.current.status == "aborting"
-                rollback_transaction if transaction
-              else
-                begin
-                  commit_transaction if transaction
-                rescue Exception
-                  rollback_transaction(transaction) unless transaction.state.completed?
-                  raise
-                end
+          transaction = begin_transaction options
+          yield
+        rescue Exception => error
+          if transaction
+            rollback_transaction
+            after_failure_actions(transaction, error)
+          end
+          raise
+        ensure
+          unless error
+            if Thread.current.status == "aborting"
+              rollback_transaction if transaction
+            else
+              begin
+                commit_transaction if transaction
+              rescue Exception
+                rollback_transaction(transaction) unless transaction.state.completed?
+                raise
               end
             end
           end
@@ -270,14 +292,14 @@ module ActiveRecord
 
       private
 
-        NULL_TRANSACTION = NullTransaction.new
+      NULL_TRANSACTION = NullTransaction.new
 
-        # Deallocate invalidated prepared statements outside of the transaction
-        def after_failure_actions(transaction, error)
-          return unless transaction.is_a?(RealTransaction)
-          return unless error.is_a?(ActiveRecord::PreparedStatementCacheExpired)
-          @connection.clear_cache!
-        end
+      # Deallocate invalidated prepared statements outside of the transaction
+      def after_failure_actions(transaction, error)
+        return unless transaction.is_a?(RealTransaction)
+        return unless error.is_a?(ActiveRecord::PreparedStatementCacheExpired)
+        @connection.clear_cache!
+      end
     end
   end
 end

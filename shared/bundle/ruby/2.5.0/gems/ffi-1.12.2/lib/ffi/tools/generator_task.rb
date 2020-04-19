@@ -14,8 +14,7 @@ require 'rake/tasklib'
 #
 # @see FFI::Generator for a description of the file content
 class FFI::Generator::Task < Rake::TaskLib
-
-  def initialize(rb_names, options={})
+  def initialize(rb_names, options = {})
     task :clean do rm_f rb_names end
 
     rb_names.each do |rb_name|
@@ -28,5 +27,4 @@ class FFI::Generator::Task < Rake::TaskLib
       end
     end
   end
-
 end

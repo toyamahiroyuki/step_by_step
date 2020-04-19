@@ -64,7 +64,7 @@ module Puma
     attr_accessor :clean_thread_locals
 
     def self.clean_thread_locals
-      Thread.current.keys.each do |key| # rubocop: disable Performance/HashEachMethods
+      Thread.current.keys.each do |key|
         Thread.current[key] = nil unless key == :__recursive_key__
       end
     end
@@ -89,7 +89,7 @@ module Puma
       th = Thread.new(@spawned) do |spawned|
         # Thread name is new in Ruby 2.3
         Thread.current.name = 'puma %03i' % spawned if Thread.current.respond_to?(:name=)
-        todo  = @todo
+        todo = @todo
         block = @block
         mutex = @mutex
         not_empty = @not_empty
@@ -134,7 +134,7 @@ module Puma
           begin
             block.call(work, *extra)
           rescue Exception => e
-            STDERR.puts "Error reached top of thread-pool: #{e.message} (#{e.class})"
+            warn "Error reached top of thread-pool: #{e.message} (#{e.class})"
           end
         end
 
@@ -160,7 +160,7 @@ module Puma
 
         @todo << work
 
-        if @waiting < @todo.size and @spawned < @max
+        if (@waiting < @todo.size) && (@spawned < @max)
           spawn_thread
         end
 
@@ -214,9 +214,9 @@ module Puma
     # and exit. If +force+ is true, then a trim request is requested
     # even if all threads are being utilized.
     #
-    def trim(force=false)
+    def trim(force = false)
       @mutex.synchronize do
-        if (force or @waiting > 0) and @spawned - @trim_requested > @min
+        if (force || (@waiting > 0)) && (@spawned - @trim_requested > @min)
           @trim_requested += 1
           @not_empty.signal
         end
@@ -264,7 +264,7 @@ module Puma
       end
     end
 
-    def auto_trim!(timeout=30)
+    def auto_trim!(timeout = 30)
       @auto_trim = AutoTrim.new(self, timeout)
       @auto_trim.start!
     end
@@ -293,14 +293,14 @@ module Puma
       end
     end
 
-    def auto_reap!(timeout=5)
+    def auto_reap!(timeout = 5)
       @reaper = Reaper.new(self, timeout)
       @reaper.start!
     end
 
     # Tell all threads in the pool to exit and wait for them to finish.
     #
-    def shutdown(timeout=-1)
+    def shutdown(timeout = -1)
       threads = @mutex.synchronize do
         @shutdown = true
         @not_empty.broadcast

@@ -8,10 +8,12 @@ class Module
   # option is not used.
   class DelegationError < NoMethodError; end
 
-  RUBY_RESERVED_KEYWORDS = %w(alias and BEGIN begin break case class def defined? do
-  else elsif END end ensure false for if in module next nil not or redo rescue retry
-  return self super then true undef unless until when while yield)
-  DELEGATION_RESERVED_KEYWORDS = %w(_ arg args block)
+  RUBY_RESERVED_KEYWORDS = %w(
+    alias and BEGIN begin break case class def defined? do
+    else elsif END end ensure false for if in module next nil not or redo rescue retry
+    return self super then true undef unless until when while yield
+  ).freeze
+  DELEGATION_RESERVED_KEYWORDS = %w(_ arg args block).freeze
   DELEGATION_RESERVED_METHOD_NAMES = Set.new(
     RUBY_RESERVED_KEYWORDS + DELEGATION_RESERVED_KEYWORDS
   ).freeze
@@ -192,7 +194,7 @@ class Module
           "if !_.nil? || nil.respond_to?(:#{method})",
           "  _.#{method}(#{definition})",
           "end",
-        "end"
+          "end",
         ].join ";"
       else
         exception = %(raise DelegationError, "#{self}##{method_prefix}#{method} delegated to #{to}.#{method}, but #{to} is nil: \#{self.inspect}")
@@ -207,7 +209,7 @@ class Module
           "  else",
           "    raise",
           "  end",
-          "end"
+          "end",
         ].join ";"
       end
 

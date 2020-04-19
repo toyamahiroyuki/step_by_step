@@ -20,8 +20,8 @@ class Time
       offset_format = time.formatted_offset(false)
       time.strftime("%a, %d %b %Y %H:%M:%S #{offset_format}")
     },
-    iso8601: lambda { |time| time.iso8601 }
-  }
+    iso8601: lambda { |time| time.iso8601 },
+  }.freeze
 
   # Converts to a formatted string. See DATE_FORMATS for built-in formats.
   #

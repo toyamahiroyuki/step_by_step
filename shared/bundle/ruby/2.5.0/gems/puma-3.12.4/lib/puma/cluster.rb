@@ -103,16 +103,14 @@ module Puma
       end
 
       def term
-        begin
-          if @first_term_sent && (Time.now - @first_term_sent) > @options[:worker_shutdown_timeout]
-            @signal = "KILL"
-          else
-            @first_term_sent ||= Time.now
-          end
-
-          Process.kill @signal, @pid
-        rescue Errno::ESRCH
+        if @first_term_sent && (Time.now - @first_term_sent) > @options[:worker_shutdown_timeout]
+          @signal = "KILL"
+        else
+          @first_term_sent ||= Time.now
         end
+
+        Process.kill @signal, @pid
+      rescue Errno::ESRCH
       end
 
       def kill
@@ -160,7 +158,7 @@ module Puma
 
       debug "Culling #{diff.inspect} workers"
 
-      workers_to_cull = @workers[-diff,diff]
+      workers_to_cull = @workers[-diff, diff]
       debug "Workers to cull: #{workers_to_cull.inspect}"
 
       workers_to_cull.each do |worker|
@@ -170,7 +168,7 @@ module Puma
     end
 
     def next_worker_index
-      all_positions =  0...@options[:workers]
+      all_positions = 0...@options[:workers]
       occupied_positions = @workers.map { |w| w.index }
       available_positions = all_positions.to_a - occupied_positions
       available_positions.first
@@ -180,7 +178,7 @@ module Puma
       @workers.count { |w| !w.booted? } == 0
     end
 
-    def check_workers(force=false)
+    def check_workers(force = false)
       return if !force && @next_check && @next_check >= Time.now
 
       @next_check = Time.now + WORKER_CHECK_INTERVAL
@@ -243,7 +241,7 @@ module Puma
 
     def worker(index, master)
       title  = "puma: cluster worker #{index}: #{master}"
-      title += " [#{@options[:tag]}]" if @options[:tag] && !@options[:tag].empty?
+      title += " [#{@options[:tag]}]" if @options[:tag].present?
       $0 = title
 
       Signal.trap "SIGINT", "IGNORE"
@@ -282,7 +280,7 @@ module Puma
         @worker_write << "b#{Process.pid}\n"
       rescue SystemCallError, IOError
         Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
-        STDERR.puts "Master seems to have exited, exiting."
+        warn "Master seems to have exited, exiting."
         return
       end
 
@@ -296,7 +294,7 @@ module Puma
             r = server.running || 0
             t = server.pool_capacity || 0
             m = server.max_threads || 0
-            payload = %Q!#{base_payload}{ "backlog":#{b}, "running":#{r}, "pool_capacity":#{t}, "max_threads": #{m} }\n!
+            payload = %Q(#{base_payload}{ "backlog":#{b}, "running":#{r}, "pool_capacity":#{t}, "max_threads": #{m} }\n)
             io << payload
           rescue IOError
             Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
@@ -311,7 +309,11 @@ module Puma
       # exiting until any background operations are completed
       @launcher.config.run_hooks :before_worker_shutdown, index
     ensure
-      @worker_write << "t#{Process.pid}\n" rescue nil
+      begin
+        @worker_write << "t#{Process.pid}\n"
+      rescue
+        nil
+      end
       @worker_write.close
     end
 
@@ -355,8 +357,8 @@ module Puma
     def stats
       old_worker_count = @workers.count { |w| w.phase != @phase }
       booted_worker_count = @workers.count { |w| w.booted? }
-      worker_status = '[' + @workers.map { |w| %Q!{ "pid": #{w.pid}, "index": #{w.index}, "phase": #{w.phase}, "booted": #{w.booted?}, "last_checkin": "#{w.last_checkin.utc.iso8601}", "last_status": #{w.last_status} }!}.join(",") + ']'
-      %Q!{ "workers": #{@workers.size}, "phase": #{@phase}, "booted_workers": #{booted_worker_count}, "old_workers": #{old_worker_count}, "worker_status": #{worker_status} }!
+      worker_status = '[' + @workers.map { |w| %Q({ "pid": #{w.pid}, "index": #{w.index}, "phase": #{w.phase}, "booted": #{w.booted?}, "last_checkin": "#{w.last_checkin.utc.iso8601}", "last_status": #{w.last_status} }) }.join(",") + ']'
+      %Q({ "workers": #{@workers.size}, "phase": #{@phase}, "booted_workers": #{booted_worker_count}, "old_workers": #{old_worker_count}, "worker_status": #{worker_status} })
     end
 
     def preload?
@@ -416,12 +418,12 @@ module Puma
         if after.size > before.size
           threads = (after - before)
           if threads.first.respond_to? :backtrace
-            log "! WARNING: Detected #{after.size-before.size} Thread(s) started in app boot:"
+            log "! WARNING: Detected #{after.size - before.size} Thread(s) started in app boot:"
             threads.each do |t|
               log "! #{t.inspect} - #{t.backtrace ? t.backtrace.first : ''}"
             end
           else
-            log "! WARNING: Detected #{after.size-before.size} Thread(s) started in app boot"
+            log "! WARNING: Detected #{after.size - before.size} Thread(s) started in app boot"
           end
         end
       else
@@ -507,7 +509,7 @@ module Puma
                   w.dead!
                   force_check = true
                 when "p"
-                  w.ping!(result.sub(/^\d+/,'').chomp)
+                  w.ping!(result.sub(/^\d+/, '').chomp)
                 end
               else
                 log "! Out-of-sync worker list, no #{pid} worker"

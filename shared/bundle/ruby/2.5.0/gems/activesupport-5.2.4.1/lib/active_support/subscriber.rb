@@ -63,7 +63,7 @@ module ActiveSupport
       private
 
       def add_event_subscriber(event) # :doc:
-        return if %w{ start finish }.include?(event.to_s)
+        return if %w(start finish).include?(event.to_s)
 
         pattern = "#{event}.#{namespace}"
 
@@ -97,19 +97,19 @@ module ActiveSupport
       event.end = finished
       event.payload.merge!(payload)
 
-      method = name.split(".".freeze).first
+      method = name.split(".").first
       send(method, event)
     end
 
     private
 
-      def event_stack
-        SubscriberQueueRegistry.instance.get_queue(@queue_key)
-      end
+    def event_stack
+      SubscriberQueueRegistry.instance.get_queue(@queue_key)
+    end
 
-      def now
-        Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      end
+    def now
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
   end
 
   # This is a registry for all the event stacks kept for subscribers.

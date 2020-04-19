@@ -4,6 +4,8 @@ require "spec_helper"
 require "socket"
 
 RSpec.describe NIO::Monitor do
+  subject(:peer) { selector.register(reader, :r) }
+
   let(:addr) { "127.0.0.1" }
 
   let(:reader) { TCPServer.new(addr, 0) }
@@ -12,13 +14,16 @@ RSpec.describe NIO::Monitor do
 
   let(:selector) { NIO::Selector.new }
 
-  subject(:monitor) { selector.register(writer, :rw) }
-  subject(:peer)    { selector.register(reader, :r) }
+  let(:monitor) { selector.register(writer, :rw) }
 
   before { reader }
+
   before { writer }
+
   after  { reader.close }
+
   after  { writer.close }
+
   after  { selector.close }
 
   describe "#interests" do

@@ -1,7 +1,6 @@
 require 'concurrent/atomic/atomic_reference'
 
 module Concurrent
-
   # A fixed size array with volatile (synchronized, thread safe) getters/setters.
   # Mixes in Ruby's `Enumerable` module for enhanced search, sort, and traversal.
   #
@@ -80,7 +79,7 @@ module Concurrent
     #
     # @yieldparam [Object] ref the `Concurrent::AtomicReference` object at the current index
     def each
-      @tuple.each {|ref| yield ref.get}
+      @tuple.each { |ref| yield ref.get }
     end
   end
 end

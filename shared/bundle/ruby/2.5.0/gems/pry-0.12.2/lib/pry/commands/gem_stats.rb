@@ -1,10 +1,10 @@
 class Pry::Command::GemStat < Pry::ClassCommand
   require 'json'
   require 'net/http'
-  STAT_HOST = "rubygems.org"
+  STAT_HOST = "rubygems.org".freeze
   STAT_PORT = 443
-  STAT_PATH = "/api/v1/gems/%s.json"
-  FAIL_WHALE = <<-FAILWHALE
+  STAT_PATH = "/api/v1/gems/%s.json".freeze
+  FAIL_WHALE = <<-FAILWHALE.freeze
 W     W      W
 W        W  W     W
               '.  W
@@ -47,6 +47,7 @@ FAILWHALE
   end
 
   private
+
   def format_gem(h)
     h = Pry::Config.from_hash(h, nil)
     format_str = unindent <<-FORMAT
@@ -62,12 +63,14 @@ FAILWHALE
     #{red('Dependencies')} (development)
     %{ddependencies}
     FORMAT
-    format_str % {name: green(h.name),
-                  version: bold("v#{h.version}"),
-                  downloads: h.downloads,
-                  version_downloads: h.version_downloads,
-                  rdependencies: format_dependencies(h.dependencies.runtime),
-                  ddependencies: format_dependencies(h.dependencies.development)}
+    format_str % {
+      name: green(h.name),
+      version: bold("v#{h.version}"),
+      downloads: h.downloads,
+      version_downloads: h.version_downloads,
+      rdependencies: format_dependencies(h.dependencies.runtime),
+      ddependencies: format_dependencies(h.dependencies.development),
+    }
   end
 
   def format_dependencies(rdeps)

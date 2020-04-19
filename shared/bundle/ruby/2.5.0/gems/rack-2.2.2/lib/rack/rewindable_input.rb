@@ -65,7 +65,7 @@ module Rack
       # even have a file entry on the filesystem anymore, though we can still
       # access it because we have the file handle open.
       @rewindable_io = Tempfile.new('RackRewindableInput')
-      @rewindable_io.chmod(0000)
+      @rewindable_io.chmod(0o000)
       @rewindable_io.set_encoding(Encoding::BINARY) if @rewindable_io.respond_to?(:set_encoding)
       @rewindable_io.binmode
       if filesystem_has_posix_semantics?
@@ -80,7 +80,7 @@ module Rack
           written = @rewindable_io.write(buffer)
           entire_buffer_written_out = written == buffer.bytesize
           if !entire_buffer_written_out
-            buffer.slice!(0 .. written - 1)
+            buffer.slice!(0..written - 1)
           end
         end
       end

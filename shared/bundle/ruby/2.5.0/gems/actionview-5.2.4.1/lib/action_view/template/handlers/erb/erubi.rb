@@ -26,7 +26,8 @@ module ActionView
             action_view_erb_handler_context.instance_eval(&pr)
           end
 
-        private
+          private
+
           def add_text(text)
             return if text.empty?
 
@@ -42,7 +43,7 @@ module ActionView
             end
           end
 
-          BLOCK_EXPR = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/
+          BLOCK_EXPR = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/.freeze
 
           def add_expression(indicator, code)
             flush_newline_if_pending(src)

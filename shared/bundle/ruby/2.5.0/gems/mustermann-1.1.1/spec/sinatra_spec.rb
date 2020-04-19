@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'mustermann/sinatra'
 
@@ -67,7 +68,7 @@ describe Mustermann::Sinatra do
     it { should_not match('/foo%2Fbar') }
     it { should_not match('/foo%2fbar') }
 
-    example { pattern.params('/bar/foo').should be == {"foo" => "bar", "bar" => "foo"} }
+    example { pattern.params('/bar/foo').should be == { "foo" => "bar", "bar" => "foo" } }
     example { pattern.params('').should be_nil }
 
     it { should generate_template('/{foo}/{bar}') }
@@ -83,7 +84,7 @@ describe Mustermann::Sinatra do
     it { should_not match('/foo%2Fbar') }
     it { should_not match('/foo%2fbar') }
 
-    example { pattern.params('/bar/foo').should be == {"foo" => "bar", "bar" => "foo"} }
+    example { pattern.params('/bar/foo').should be == { "foo" => "bar", "bar" => "foo" } }
     example { pattern.params('').should be_nil }
 
     it { should generate_template('/{foo}/{bar}') }
@@ -131,7 +132,7 @@ describe Mustermann::Sinatra do
     it { should match('/foo/bar') .capturing splat: 'foo/bar' }
     it { should generate_template('/{+splat}') }
 
-    example { pattern.params('/foo').should be == {"splat" => ["foo"]} }
+    example { pattern.params('/foo').should be == { "splat" => ["foo"] } }
   end
 
   pattern '/{+splat}' do
@@ -140,7 +141,7 @@ describe Mustermann::Sinatra do
     it { should match('/foo/bar') .capturing splat: 'foo/bar' }
     it { should generate_template('/{+splat}') }
 
-    example { pattern.params('/foo').should be == {"splat" => ["foo"]} }
+    example { pattern.params('/foo').should be == { "splat" => ["foo"] } }
   end
 
   pattern '/*foo' do
@@ -149,8 +150,8 @@ describe Mustermann::Sinatra do
     it { should match('/foo/bar') .capturing foo: 'foo/bar' }
     it { should generate_template('/{+foo}') }
 
-    example { pattern.params('/foo')     .should be == {"foo" => "foo"     } }
-    example { pattern.params('/foo/bar') .should be == {"foo" => "foo/bar" } }
+    example { pattern.params('/foo')     .should be == { "foo" => "foo"     } }
+    example { pattern.params('/foo/bar') .should be == { "foo" => "foo/bar" } }
   end
 
   pattern '/{+foo}' do
@@ -159,8 +160,8 @@ describe Mustermann::Sinatra do
     it { should match('/foo/bar') .capturing foo: 'foo/bar' }
     it { should generate_template('/{+foo}') }
 
-    example { pattern.params('/foo')     .should be == {"foo" => "foo"     } }
-    example { pattern.params('/foo/bar') .should be == {"foo" => "foo/bar" } }
+    example { pattern.params('/foo')     .should be == { "foo" => "foo"     } }
+    example { pattern.params('/foo/bar') .should be == { "foo" => "foo/bar" } }
   end
 
   pattern '/*foo/*bar' do
@@ -180,8 +181,8 @@ describe Mustermann::Sinatra do
     it { should_not match('/foo') }
     it { should generate_template('/{foo}/{+splat}') }
 
-    example { pattern.params('/bar/foo').should be == {"splat" => ["foo"], "foo" => "bar"} }
-    example { pattern.params('/bar/foo/f%20o').should be == {"splat" => ["foo/f o"], "foo" => "bar"} }
+    example { pattern.params('/bar/foo').should be == { "splat" => ["foo"], "foo" => "bar" } }
+    example { pattern.params('/bar/foo/f%20o').should be == { "splat" => ["foo/f o"], "foo" => "bar" } }
   end
 
   pattern '/{foo}/*' do
@@ -191,8 +192,8 @@ describe Mustermann::Sinatra do
     it { should_not match('/foo') }
     it { should generate_template('/{foo}/{+splat}') }
 
-    example { pattern.params('/bar/foo').should be == {"splat" => ["foo"], "foo" => "bar"} }
-    example { pattern.params('/bar/foo/f%20o').should be == {"splat" => ["foo/f o"], "foo" => "bar"} }
+    example { pattern.params('/bar/foo').should be == { "splat" => ["foo"], "foo" => "bar" } }
+    example { pattern.params('/bar/foo/f%20o').should be == { "splat" => ["foo/f o"], "foo" => "bar" } }
   end
 
   pattern '/test$/' do
@@ -224,15 +225,15 @@ describe Mustermann::Sinatra do
   pattern '/*/:foo/*/*' do
     it { should match('/bar/foo/bling/baz/boom') }
 
-    it "should capture all splat parts" do
+    it "captures all splat parts" do
       match = pattern.match('/bar/foo/bling/baz/boom')
       match.captures.should be == ['bar', 'foo', 'bling', 'baz/boom']
       match.names.should be == ['splat', 'foo']
     end
 
-    it 'should map to proper params' do
+    it 'maps to proper params' do
       pattern.params('/bar/foo/bling/baz/boom').should be == {
-        "foo" => "foo", "splat" => ['bar', 'bling', 'baz/boom']
+        "foo" => "foo", "splat" => ['bar', 'bling', 'baz/boom'],
       }
     end
   end
@@ -240,15 +241,15 @@ describe Mustermann::Sinatra do
   pattern '/{+splat}/{foo}/{+splat}/{+splat}' do
     it { should match('/bar/foo/bling/baz/boom') }
 
-    it "should capture all splat parts" do
+    it "captures all splat parts" do
       match = pattern.match('/bar/foo/bling/baz/boom')
       match.captures.should be == ['bar', 'foo', 'bling', 'baz/boom']
       match.names.should be == ['splat', 'foo']
     end
 
-    it 'should map to proper params' do
+    it 'maps to proper params' do
       pattern.params('/bar/foo/bling/baz/boom').should be == {
-        "foo" => "foo", "splat" => ['bar', 'bling', 'baz/boom']
+        "foo" => "foo", "splat" => ['bar', 'bling', 'baz/boom'],
       }
     end
   end
@@ -300,7 +301,7 @@ describe Mustermann::Sinatra do
     it { should match('/pony%2ejpg')     .capturing file: 'pony', ext: 'jpg' }
     it { should match('/pony.png.jpg')   .capturing file: 'pony.png', ext: 'jpg' }
     it { should match('/pony.')          .capturing file: 'pony.' }
-    it { should_not match('/.jpg')  }
+    it { should_not match('/.jpg') }
 
     it { should     generate_template('/{file}')       }
     it { should     generate_template('/{file}.{ext}') }
@@ -601,7 +602,7 @@ describe Mustermann::Sinatra do
     it { should match('/pony.tar.gz')  .capturing file: 'pony',     ext: '.tar.gz' }
     it { should match('/pony.gif')     .capturing file: 'pony.gif', ext: nil       }
     it { should match('/pony.')        .capturing file: 'pony.',    ext: nil       }
-    it { should_not match('/.jpg')  }
+    it { should_not match('/.jpg') }
   end
 
   pattern '/:a(@:b)?', capture: { b: /\d+/ } do
@@ -770,16 +771,17 @@ describe Mustermann::Sinatra do
     end
 
     describe :peek_params do
-      example { pattern.peek_params("foo bar/blah")   .should be == [{"name" => "foo bar"}, "foo bar".size] }
-      example { pattern.peek_params("foo%20bar/blah") .should be == [{"name" => "foo bar"}, "foo%20bar".size] }
+      example { pattern.peek_params("foo bar/blah")   .should be == [{ "name" => "foo bar" }, "foo bar".size] }
+      example { pattern.peek_params("foo%20bar/blah") .should be == [{ "name" => "foo bar" }, "foo%20bar".size] }
       example { pattern.peek_params("/foo bar")       .should be_nil }
     end
   end
 
   describe :| do
+    subject(:composite) { first | second }
+
     let(:first)  { Mustermann.new("a") }
     let(:second) { Mustermann.new("b") }
-    subject(:composite) { first | second }
 
     context "with no capture names" do
       its(:class) { should be == Mustermann::Sinatra }
@@ -788,12 +790,14 @@ describe Mustermann::Sinatra do
 
     context "only first has captures" do
       let(:first) { Mustermann.new(":a") }
+
       its(:class) { should be == Mustermann::Sinatra }
       its(:to_s)  { should be == "{a}|b"             }
     end
 
     context "only second has captures" do
       let(:second) { Mustermann.new(":b") }
+
       its(:class)  { should be == Mustermann::Sinatra }
       its(:to_s)   { should be == "a|{b}"             }
     end
@@ -801,36 +805,43 @@ describe Mustermann::Sinatra do
     context "both have captures" do
       let(:first)  { Mustermann.new(":a") }
       let(:second) { Mustermann.new(":b") }
+
       its(:class)  { should be == Mustermann::Composite }
     end
 
     context "options mismatch" do
       let(:second) { Mustermann.new(":b", greedy: false) }
+
       its(:class)  { should be == Mustermann::Composite  }
     end
 
     context "argument is a string" do
       let(:second) { ":b" }
+
       its(:class)  { should be == Mustermann::Sinatra }
       its(:to_s)   { should be == "a|\\:b"            }
     end
 
     context "argument is an identity pattern" do
       let(:second) { Mustermann::Identity.new(":b")   }
+
       its(:class)  { should be == Mustermann::Sinatra }
       its(:to_s)   { should be == "a|\\:b"            }
     end
 
     context "argument is an identity pattern, but options mismatch" do
       let(:second) { Mustermann::Identity.new(":b", uri_decode: false) }
+
       its(:class)  { should be == Mustermann::Composite                }
     end
   end
 
   describe "native concatination" do
     subject { Mustermann.new(prefix) + Mustermann.new(pattern) }
+
     let(:prefix)  { "/a" }
     let(:pattern) { "/:b(.:c)?" }
+
     it { should match("/a/b.json") }
   end
 end

@@ -1,30 +1,29 @@
-$:.unshift File.expand_path('../lib', __dir__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
 require 'benchmark'
 require 'mustermann'
 require 'mustermann/regexp_based'
 require 'addressable/template'
 
-
-Mustermann.register(:regexp, Class.new(Mustermann::RegexpBased) {
+Mustermann.register(:regexp, Class.new(Mustermann::RegexpBased) do
   def compile(**options)
     Regexp.new(@string)
   end
-}, load: false)
+end, load: false)
 
-Mustermann.register(:addressable, Class.new(Mustermann::RegexpBased) {
+Mustermann.register(:addressable, Class.new(Mustermann::RegexpBased) do
   def compile(**options)
     Addressable::Template.new(@string)
   end
-}, load: false)
+end, load: false)
 
 list = [
-  [:sinatra,     '/*/:name'                                ],
-  [:rails,       '/*prefix/:name'                          ],
-  [:simple,      '/*/:name'                                ],
-  [:template,    '{/prefix*}/{name}'                       ],
-  [:regexp,      '\A\/(?<splat>.*?)\/(?<name>[^\/\?#]+)\Z' ],
-  [:addressable, '{/prefix*}/{name}'                       ]
+  [:sinatra,     '/*/:name'],
+  [:rails,       '/*prefix/:name'],
+  [:simple,      '/*/:name'],
+  [:template,    '{/prefix*}/{name}'],
+  [:regexp,      '\A\/(?<splat>.*?)\/(?<name>[^\/\?#]+)\Z'],
+  [:addressable, '{/prefix*}/{name}'],
 ]
 
 def self.assert(value)

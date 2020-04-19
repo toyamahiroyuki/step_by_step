@@ -40,7 +40,7 @@ class Module
     options = syms.extract_options!
 
     syms.each do |sym|
-      raise NameError.new("invalid attribute name: #{sym}") unless /^[_A-Za-z]\w*$/.match?(sym)
+      raise NameError, "invalid attribute name: #{sym}" unless /^[_A-Za-z]\w*$/.match?(sym)
 
       # The following generated method concatenates `name` because we want it
       # to work with inheritance via polymorphism.
@@ -82,7 +82,7 @@ class Module
   def thread_mattr_writer(*syms) # :nodoc:
     options = syms.extract_options!
     syms.each do |sym|
-      raise NameError.new("invalid attribute name: #{sym}") unless /^[_A-Za-z]\w*$/.match?(sym)
+      raise NameError, "invalid attribute name: #{sym}" unless /^[_A-Za-z]\w*$/.match?(sym)
 
       # The following generated method concatenates `name` because we want it
       # to work with inheritance via polymorphism.

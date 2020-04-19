@@ -8,6 +8,6 @@ class Object
   def `(command) #:nodoc:
     super
   rescue Errno::ENOENT => e
-    STDERR.puts "#$0: #{e}"
+    warn "#{$PROGRAM_NAME}: #{e}"
   end
 end

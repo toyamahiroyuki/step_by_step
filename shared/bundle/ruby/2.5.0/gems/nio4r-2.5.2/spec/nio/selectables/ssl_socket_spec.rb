@@ -13,7 +13,7 @@ RSpec.describe OpenSSL::SSL::SSLSocket do
   let(:ssl_key) { OpenSSL::PKey::RSA.new(2048) }
 
   let(:ssl_cert) do
-    name = OpenSSL::X509::Name.new([%w[CN 127.0.0.1]])
+    name = OpenSSL::X509::Name.new([%w(CN 127.0.0.1)])
     OpenSSL::X509::Certificate.new.tap do |cert|
       cert.version = 2
       cert.serial = 1
@@ -176,16 +176,18 @@ RSpec.describe OpenSSL::SSL::SSLSocket do
 
   describe "using TLS 1.2" do
     before(:all) do
-      @tls = %i[TLS1_2 TLSv1_2]
+      @tls = %i(TLS1_2 TLSv1_2)
     end
+
     it_behaves_like "an NIO selectable"
     it_behaves_like "an NIO selectable stream"
   end
 
   describe "using TLS 1.3", if: OpenSSL::SSL.const_defined?(:TLS1_3_VERSION) do
     before(:all) do
-      @tls = %i[TLS1_3 TLSv1_3]
+      @tls = %i(TLS1_3 TLSv1_3)
     end
+
     it_behaves_like "an NIO selectable"
     it_behaves_like "an NIO selectable stream", true
   end

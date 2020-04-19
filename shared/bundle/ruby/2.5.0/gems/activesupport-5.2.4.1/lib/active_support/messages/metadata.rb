@@ -27,31 +27,36 @@ module ActiveSupport
         end
 
         private
-          def pick_expiry(expires_at, expires_in)
-            if expires_at
-              expires_at.utc.iso8601(3)
-            elsif expires_in
-              Time.now.utc.advance(seconds: expires_in).iso8601(3)
-            end
-          end
 
-          def extract_metadata(message)
-            data = JSON.decode(message) rescue nil
-
-            if data.is_a?(Hash) && data.key?("_rails")
-              new(decode(data["_rails"]["message"]), data["_rails"]["exp"], data["_rails"]["pur"])
-            else
-              new(message)
-            end
+        def pick_expiry(expires_at, expires_in)
+          if expires_at
+            expires_at.utc.iso8601(3)
+          elsif expires_in
+            Time.now.utc.advance(seconds: expires_in).iso8601(3)
           end
+        end
 
-          def encode(message)
-            ::Base64.strict_encode64(message)
-          end
+        def extract_metadata(message)
+          data = begin
+                     JSON.decode(message)
+                 rescue
+                   nil
+                   end
 
-          def decode(message)
-            ::Base64.strict_decode64(message)
+          if data.is_a?(Hash) && data.key?("_rails")
+            new(decode(data["_rails"]["message"]), data["_rails"]["exp"], data["_rails"]["pur"])
+          else
+            new(message)
           end
+        end
+
+        def encode(message)
+          ::Base64.strict_encode64(message)
+        end
+
+        def decode(message)
+          ::Base64.strict_decode64(message)
+        end
       end
 
       def verify(purpose)
@@ -59,13 +64,14 @@ module ActiveSupport
       end
 
       private
-        def match?(purpose)
-          @purpose.to_s == purpose.to_s
-        end
 
-        def fresh?
-          @expires_at.nil? || Time.now.utc < Time.iso8601(@expires_at)
-        end
+      def match?(purpose)
+        @purpose.to_s == purpose.to_s
+      end
+
+      def fresh?
+        @expires_at.nil? || Time.now.utc < Time.iso8601(@expires_at)
+      end
     end
   end
 end

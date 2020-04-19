@@ -9,15 +9,15 @@ module Minitest
   # See Minitest::Assertions
 
   class Benchmark < Test
-    def self.io # :nodoc:
-      @io
+    class << self
+      attr_reader :io
     end
 
     def io # :nodoc:
       self.class.io
     end
 
-    def self.run reporter, options = {} # :nodoc:
+    def self.run(reporter, options = {}) # :nodoc:
       @io = reporter.io
       super
     end
@@ -32,11 +32,11 @@ module Minitest
     #
     #   bench_exp(2, 16, 2) # => [2, 4, 8, 16]
 
-    def self.bench_exp min, max, base = 10
+    def self.bench_exp(min, max, base = 10)
       min = (Math.log10(min) / Math.log10(base)).to_i
       max = (Math.log10(max) / Math.log10(base)).to_i
 
-      (min..max).map { |m| base ** m }.to_a
+      (min..max).map { |m| base**m }.to_a
     end
 
     ##
@@ -45,7 +45,7 @@ module Minitest
     #
     #   bench_linear(20, 40, 10) # => [20, 30, 40]
 
-    def self.bench_linear min, max, step = 10
+    def self.bench_linear(min, max, step = 10)
       (min..max).step(step).to_a
     rescue LocalJumpError # 1.8.6
       r = []; (min..max).step(step) { |n| r << n }; r
@@ -80,10 +80,10 @@ module Minitest
     #     end
     #   end
 
-    def assert_performance validation, &work
+    def assert_performance(validation, &work)
       range = self.class.bench_range
 
-      io.print "#{self.name}"
+      io.print "#{name}"
 
       times = []
 
@@ -124,7 +124,7 @@ module Minitest
     #     end
     #   end
 
-    def assert_performance_constant threshold = 0.99, &work
+    def assert_performance_constant(threshold = 0.99, &work)
       validation = proc do |range, times|
         a, b, rr = fit_linear range, times
         assert_in_delta 0, b, 1 - threshold
@@ -150,7 +150,7 @@ module Minitest
     #     end
     #   end
 
-    def assert_performance_exponential threshold = 0.99, &work
+    def assert_performance_exponential(threshold = 0.99, &work)
       assert_performance validation_for_fit(:exponential, threshold), &work
     end
 
@@ -170,7 +170,7 @@ module Minitest
     #     end
     #   end
 
-    def assert_performance_logarithmic threshold = 0.99, &work
+    def assert_performance_logarithmic(threshold = 0.99, &work)
       assert_performance validation_for_fit(:logarithmic, threshold), &work
     end
 
@@ -190,7 +190,7 @@ module Minitest
     #     end
     #   end
 
-    def assert_performance_linear threshold = 0.99, &work
+    def assert_performance_linear(threshold = 0.99, &work)
       assert_performance validation_for_fit(:linear, threshold), &work
     end
 
@@ -210,7 +210,7 @@ module Minitest
     #     end
     #   end
 
-    def assert_performance_power threshold = 0.99, &work
+    def assert_performance_power(threshold = 0.99, &work)
       assert_performance validation_for_fit(:power, threshold), &work
     end
 
@@ -219,10 +219,10 @@ module Minitest
     #
     # See: http://en.wikipedia.org/wiki/Coefficient_of_determination
 
-    def fit_error xys
+    def fit_error(xys)
       y_bar  = sigma(xys) { |_, y| y } / xys.size.to_f
-      ss_tot = sigma(xys) { |_, y| (y    - y_bar) ** 2 }
-      ss_err = sigma(xys) { |x, y| (yield(x) - y) ** 2 }
+      ss_tot = sigma(xys) { |_, y| (y - y_bar)**2 }
+      ss_err = sigma(xys) { |x, y| (yield(x) - y)**2 }
 
       1 - (ss_err / ss_tot)
     end
@@ -234,7 +234,7 @@ module Minitest
     #
     # See: http://mathworld.wolfram.com/LeastSquaresFittingExponential.html
 
-    def fit_exponential xs, ys
+    def fit_exponential(xs, ys)
       n     = xs.size
       xys   = xs.zip(ys)
       sxlny = sigma(xys) { |x, y| x * Math.log(y) }
@@ -242,11 +242,11 @@ module Minitest
       sx2   = sigma(xys) { |x, _| x * x           }
       sx    = sigma xs
 
-      c = n * sx2 - sx ** 2
+      c = n * sx2 - sx**2
       a = (slny * sx2 - sx * sxlny) / c
-      b = ( n * sxlny - sx * slny ) / c
+      b = (n * sxlny - sx * slny) / c
 
-      return Math.exp(a), b, fit_error(xys) { |x| Math.exp(a + b * x) }
+      [Math.exp(a), b, fit_error(xys) { |x| Math.exp(a + b * x) }]
     end
 
     ##
@@ -256,19 +256,19 @@ module Minitest
     #
     # See: http://mathworld.wolfram.com/LeastSquaresFittingLogarithmic.html
 
-    def fit_logarithmic xs, ys
+    def fit_logarithmic(xs, ys)
       n     = xs.size
       xys   = xs.zip(ys)
-      slnx2 = sigma(xys) { |x, _| Math.log(x) ** 2 }
+      slnx2 = sigma(xys) { |x, _| Math.log(x)**2 }
       slnx  = sigma(xys) { |x, _| Math.log(x)      }
       sylnx = sigma(xys) { |x, y| y * Math.log(x)  }
       sy    = sigma(xys) { |_, y| y                }
 
-      c = n * slnx2 - slnx ** 2
-      b = ( n * sylnx - sy * slnx ) / c
+      c = n * slnx2 - slnx**2
+      b = (n * sylnx - sy * slnx) / c
       a = (sy - b * slnx) / n
 
-      return a, b, fit_error(xys) { |x| a + b * Math.log(x) }
+      [a, b, fit_error(xys) { |x| a + b * Math.log(x) }]
     end
 
     ##
@@ -278,19 +278,19 @@ module Minitest
     #
     # See: http://mathworld.wolfram.com/LeastSquaresFitting.html
 
-    def fit_linear xs, ys
+    def fit_linear(xs, ys)
       n   = xs.size
       xys = xs.zip(ys)
       sx  = sigma xs
       sy  = sigma ys
-      sx2 = sigma(xs)  { |x|   x ** 2 }
-      sxy = sigma(xys) { |x, y| x * y  }
+      sx2 = sigma(xs)  { |x| x**2 }
+      sxy = sigma(xys) { |x, y| x * y }
 
       c = n * sx2 - sx**2
       a = (sy * sx2 - sx * sxy) / c
-      b = ( n * sxy - sx * sy ) / c
+      b = (n * sxy - sx * sy) / c
 
-      return a, b, fit_error(xys) { |x| a + b * x }
+      [a, b, fit_error(xys) { |x| a + b * x }]
     end
 
     ##
@@ -300,18 +300,18 @@ module Minitest
     #
     # See: http://mathworld.wolfram.com/LeastSquaresFittingPowerLaw.html
 
-    def fit_power xs, ys
+    def fit_power(xs, ys)
       n       = xs.size
       xys     = xs.zip(ys)
       slnxlny = sigma(xys) { |x, y| Math.log(x) * Math.log(y) }
-      slnx    = sigma(xs)  { |x   | Math.log(x)               }
-      slny    = sigma(ys)  { |   y| Math.log(y)               }
-      slnx2   = sigma(xs)  { |x   | Math.log(x) ** 2          }
+      slnx    = sigma(xs)  { |x| Math.log(x)               }
+      slny    = sigma(ys)  { |y| Math.log(y)               }
+      slnx2   = sigma(xs)  { |x| Math.log(x)**2 }
 
-      b = (n * slnxlny - slnx * slny) / (n * slnx2 - slnx ** 2)
+      b = (n * slnxlny - slnx * slny) / (n * slnx2 - slnx**2)
       a = (slny - b * slnx) / n
 
-      return Math.exp(a), b, fit_error(xys) { |x| (Math.exp(a) * (x ** b)) }
+      [Math.exp(a), b, fit_error(xys) { |x| (Math.exp(a) * (x**b)) }]
     end
 
     ##
@@ -321,7 +321,7 @@ module Minitest
     #   sigma([1, 2, 3])                # => 1 + 2 + 3 => 6
     #   sigma([1, 2, 3]) { |n| n ** 2 } # => 1 + 4 + 9 => 14
 
-    def sigma enum, &block
+    def sigma(enum, &block)
       enum = enum.map(&block) if block
       enum.inject { |sum, n| sum + n }
     end
@@ -330,7 +330,7 @@ module Minitest
     # Returns a proc that calls the specified fit method and asserts
     # that the error is within a tolerable threshold.
 
-    def validation_for_fit msg, threshold
+    def validation_for_fit(msg, threshold)
       proc do |range, times|
         a, b, rr = send "fit_#{msg}", range, times
         assert_operator rr, :>=, threshold
@@ -354,7 +354,7 @@ module Minitest
     #
     # See ::bench_performance_linear for an example of how to use this.
 
-    def self.bench name, &block
+    def self.bench(name, &block)
       define_method "bench_#{name.gsub(/\W+/, "_")}", &block
     end
 
@@ -367,7 +367,7 @@ module Minitest
     #
     # See Minitest::Benchmark#bench_range for more details.
 
-    def self.bench_range &block
+    def self.bench_range(&block)
       return super unless block
 
       meta = (class << self; self; end)
@@ -383,7 +383,7 @@ module Minitest
     #     end
     #   end
 
-    def self.bench_performance_linear name, threshold = 0.99, &work
+    def self.bench_performance_linear(name, threshold = 0.99, &work)
       bench name do
         assert_performance_linear threshold, &work
       end
@@ -398,7 +398,7 @@ module Minitest
     #     end
     #   end
 
-    def self.bench_performance_constant name, threshold = 0.99, &work
+    def self.bench_performance_constant(name, threshold = 0.99, &work)
       bench name do
         assert_performance_constant threshold, &work
       end
@@ -413,12 +413,11 @@ module Minitest
     #     end
     #   end
 
-    def self.bench_performance_exponential name, threshold = 0.99, &work
+    def self.bench_performance_exponential(name, threshold = 0.99, &work)
       bench name do
         assert_performance_exponential threshold, &work
       end
     end
-
 
     ##
     # Create a benchmark that verifies that the performance is logarithmic.
@@ -429,7 +428,7 @@ module Minitest
     #     end
     #   end
 
-    def self.bench_performance_logarithmic name, threshold = 0.99, &work
+    def self.bench_performance_logarithmic(name, threshold = 0.99, &work)
       bench name do
         assert_performance_logarithmic threshold, &work
       end
@@ -444,7 +443,7 @@ module Minitest
     #     end
     #   end
 
-    def self.bench_performance_power name, threshold = 0.99, &work
+    def self.bench_performance_power(name, threshold = 0.99, &work)
       bench name do
         assert_performance_power threshold, &work
       end

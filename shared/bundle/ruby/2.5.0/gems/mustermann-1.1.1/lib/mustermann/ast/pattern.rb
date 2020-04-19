@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/ast/parser'
 require 'mustermann/ast/boundaries'
 require 'mustermann/ast/compiler'
@@ -18,11 +19,12 @@ module Mustermann
     class Pattern < Mustermann::RegexpBased
       supported_options :capture, :except, :greedy, :space_matches_plus
 
-      extend Forwardable, SingleForwardable
+      extend SingleForwardable
+      extend Forwardable
       single_delegate on: :parser, suffix: :parser
-      instance_delegate %i[parser compiler transformer validation template_generator param_scanner boundaries] => 'self.class'
+      instance_delegate %i(parser compiler transformer validation template_generator param_scanner boundaries) => 'self.class'
       instance_delegate parse: :parser, transform: :transformer, validate: :validation,
-        generate_templates: :template_generator, scan_params: :param_scanner, set_boundaries: :boundaries
+                        generate_templates: :template_generator, scan_params: :param_scanner, set_boundaries: :boundaries
 
       # @api private
       # @return [#parse] parser object for pattern

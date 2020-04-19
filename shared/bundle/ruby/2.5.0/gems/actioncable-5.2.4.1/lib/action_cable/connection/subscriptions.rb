@@ -66,18 +66,20 @@ module ActionCable
       # TODO Change this to private once we've dropped Ruby 2.2 support.
       # Workaround for Ruby 2.2 "private attribute?" warning.
       protected
-        attr_reader :connection, :subscriptions
+
+      attr_reader :connection, :subscriptions
 
       private
-        delegate :logger, to: :connection
 
-        def find(data)
-          if subscription = subscriptions[data["identifier"]]
-            subscription
-          else
-            raise "Unable to find subscription with identifier: #{data['identifier']}"
-          end
+      delegate :logger, to: :connection
+
+      def find(data)
+        if subscription = subscriptions[data["identifier"]]
+          subscription
+        else
+          raise "Unable to find subscription with identifier: #{data['identifier']}"
         end
+      end
     end
   end
 end

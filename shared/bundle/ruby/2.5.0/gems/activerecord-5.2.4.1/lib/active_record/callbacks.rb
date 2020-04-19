@@ -313,8 +313,8 @@ module ActiveRecord
       :after_initialize, :after_find, :after_touch, :before_validation, :after_validation,
       :before_save, :around_save, :after_save, :before_create, :around_create,
       :after_create, :before_update, :around_update, :after_update,
-      :before_destroy, :around_destroy, :after_destroy, :after_commit, :after_rollback
-    ]
+      :before_destroy, :around_destroy, :after_destroy, :after_commit, :after_rollback,
+    ].freeze
 
     def destroy #:nodoc:
       @_destroy_callback_already_called ||= false
@@ -336,7 +336,7 @@ module ActiveRecord
       touch ? _run_touch_callbacks { super } : super
     end
 
-  private
+    private
 
     def create_or_update(*)
       _run_save_callbacks { super }

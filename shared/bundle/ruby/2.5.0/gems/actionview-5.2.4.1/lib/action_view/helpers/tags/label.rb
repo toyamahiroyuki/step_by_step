@@ -18,9 +18,9 @@ module ActionView
           def translation
             method_and_value = @tag_value.present? ? "#{@method_name}.#{@tag_value}" : @method_name
 
-            content ||= Translator
-              .new(object, @object_name, method_and_value, scope: "helpers.label")
-              .translate
+            content ||= Translator.
+              new(object, @object_name, method_and_value, scope: "helpers.label").
+              translate
             content ||= @method_name.humanize
 
             content
@@ -60,11 +60,11 @@ module ActionView
           builder = LabelBuilder.new(@template_object, @object_name, @method_name, @object, tag_value)
 
           content = if block_given?
-            @template_object.capture(builder, &block)
-          elsif @content.present?
-            @content.to_s
-          else
-            render_component(builder)
+                      @template_object.capture(builder, &block)
+                    elsif @content.present?
+                      @content.to_s
+                    else
+                      render_component(builder)
           end
 
           label_tag(name_and_id["id"], content, options)
@@ -72,9 +72,9 @@ module ActionView
 
         private
 
-          def render_component(builder)
-            builder.translation
-          end
+        def render_component(builder)
+          builder.translation
+        end
       end
     end
   end

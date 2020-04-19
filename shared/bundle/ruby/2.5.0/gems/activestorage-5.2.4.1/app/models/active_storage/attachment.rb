@@ -29,11 +29,12 @@ class ActiveStorage::Attachment < ActiveRecord::Base
   end
 
   private
-    def identify_blob
-      blob.identify
-    end
 
-    def analyze_blob_later
-      blob.analyze_later unless blob.analyzed?
-    end
+  def identify_blob
+    blob.identify
+  end
+
+  def analyze_blob_later
+    blob.analyze_later unless blob.analyzed?
+  end
 end

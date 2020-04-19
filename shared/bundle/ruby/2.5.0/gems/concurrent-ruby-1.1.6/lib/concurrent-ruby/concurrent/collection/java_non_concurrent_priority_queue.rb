@@ -2,21 +2,18 @@ if Concurrent.on_jruby?
 
   module Concurrent
     module Collection
-
-
       # @!macro priority_queue
-      # 
+      #
       # @!visibility private
       # @!macro internal_implementation_note
       class JavaNonConcurrentPriorityQueue
-
         # @!macro priority_queue_method_initialize
         def initialize(opts = {})
           order = opts.fetch(:order, :max)
           if [:min, :low].include?(order)
             @queue = java.util.PriorityQueue.new(11) # 11 is the default initial capacity
           else
-            @queue = java.util.PriorityQueue.new(11, java.util.Collections.reverseOrder())
+            @queue = java.util.PriorityQueue.new(11, java.util.Collections.reverseOrder)
           end
         end
 
@@ -29,7 +26,7 @@ if Concurrent.on_jruby?
         # @!macro priority_queue_method_delete
         def delete(item)
           found = false
-          while @queue.remove(item) do
+          while @queue.remove(item)
             found = true
           end
           found
@@ -66,7 +63,7 @@ if Concurrent.on_jruby?
 
         # @!macro priority_queue_method_push
         def push(item)
-          raise ArgumentError.new('cannot enqueue nil') if item.nil?
+          raise ArgumentError, 'cannot enqueue nil' if item.nil?
           @queue.add(item)
         end
         alias_method :<<, :push
@@ -75,7 +72,7 @@ if Concurrent.on_jruby?
         # @!macro priority_queue_method_from_list
         def self.from_list(list, opts = {})
           queue = new(opts)
-          list.each{|item| queue << item }
+          list.each { |item| queue << item }
           queue
         end
       end

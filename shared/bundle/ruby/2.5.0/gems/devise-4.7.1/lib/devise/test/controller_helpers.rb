@@ -127,22 +127,22 @@ module Devise
         result = options[:result] || proxy.result
 
         ret = case result
-        when :redirect
-          body = proxy.message || "You are being redirected to #{proxy.headers['Location']}"
-          [proxy.status, proxy.headers, [body]]
-        when :custom
-          proxy.custom_response
-        else
-          request.env["PATH_INFO"] = "/#{options[:action]}"
-          request.env["warden.options"] = options
-          Warden::Manager._run_callbacks(:before_failure, env, options)
+              when :redirect
+                body = proxy.message || "You are being redirected to #{proxy.headers['Location']}"
+                [proxy.status, proxy.headers, [body]]
+              when :custom
+                proxy.custom_response
+              else
+                request.env["PATH_INFO"] = "/#{options[:action]}"
+                request.env["warden.options"] = options
+                Warden::Manager._run_callbacks(:before_failure, env, options)
 
-          status, headers, response = Devise.warden_config[:failure_app].call(env).to_a
-          @controller.response.headers.merge!(headers)
-          @controller.response.content_type = headers["Content-Type"] unless Rails::VERSION::MAJOR >= 5
-          @controller.status = status
-          @controller.response.body = response.body
-          nil # causes process return @response
+                status, headers, response = Devise.warden_config[:failure_app].call(env).to_a
+                @controller.response.headers.merge!(headers)
+                @controller.response.content_type = headers["Content-Type"] unless Rails::VERSION::MAJOR >= 5
+                @controller.status = status
+                @controller.response.body = response.body
+                nil # causes process return @response
         end
 
         # ensure that the controller response is set up. In production, this is

@@ -2,7 +2,6 @@ require 'concurrent/synchronization/abstract_struct'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # An thread-safe variation of Ruby's standard `Struct`. Values can be set at
   # construction or safely changed at any time during the object's lifecycle.
   #
@@ -186,14 +185,14 @@ module Concurrent
       if member.is_a? Integer
         length = synchronize { @values.length }
         if member >= length
-          raise IndexError.new("offset #{member} too large for struct(size:#{length})")
+          raise IndexError, "offset #{member} too large for struct(size:#{length})"
         end
         synchronize { @values[member] = value }
       else
         send("#{member}=", value)
       end
     rescue NoMethodError
-      raise NameError.new("no member '#{member}' in struct")
+      raise NameError, "no member '#{member}' in struct"
     end
 
     private
@@ -210,7 +209,7 @@ module Concurrent
     def self.new(*args, &block)
       clazz_name = nil
       if args.length == 0
-        raise ArgumentError.new('wrong number of arguments (0 for 1+)')
+        raise ArgumentError, 'wrong number of arguments (0 for 1+)'
       elsif args.length > 0 && args.first.is_a?(String)
         clazz_name = args.shift
       end

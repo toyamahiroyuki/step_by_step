@@ -1,5 +1,5 @@
-
 # frozen_string_literal: true
+
 require "mail/utilities"
 require "mail/parser_tools"
 
@@ -340,9 +340,9 @@ module Mail::Parsers
             _inds = _index_offsets[cs]
             _slen = _key_spans[cs]
             _wide = data[p].ord
-            _trans = if (_slen > 0 &&
+            _trans = if _slen > 0 &&
                          _trans_keys[_keys] <= _wide &&
-                         _wide <= _trans_keys[_keys + 1])
+                         _wide <= _trans_keys[_keys + 1]
                        _indicies[_inds + _wide - _trans_keys[_keys]]
                      else
                        _indicies[_inds + _slen]

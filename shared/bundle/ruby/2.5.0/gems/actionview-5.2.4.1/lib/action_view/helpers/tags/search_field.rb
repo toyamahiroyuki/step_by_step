@@ -15,7 +15,7 @@ module ActionView
           end
 
           if options["onsearch"]
-            options["incremental"] = true unless options.has_key?("incremental")
+            options["incremental"] = true unless options.key?("incremental")
           end
 
           @options = options

@@ -15,7 +15,7 @@ module Rack
 
     # Return whether the wrapped body responds to the method.
     def respond_to_missing?(method_name, include_all = false)
-      super or @body.respond_to?(method_name, include_all)
+      super || @body.respond_to?(method_name, include_all)
     end
 
     # If not already closed, close the wrapped body and

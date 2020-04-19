@@ -8,8 +8,8 @@ module ActiveSupport::RangeWithFormat
       else
         "BETWEEN '#{start.to_s(:db)}' AND '#{stop.to_s(:db)}'"
       end
-    end
-  }
+    end,
+  }.freeze
 
   # Convert range to a formatted string. See RANGE_FORMATS for predefined formats.
   #

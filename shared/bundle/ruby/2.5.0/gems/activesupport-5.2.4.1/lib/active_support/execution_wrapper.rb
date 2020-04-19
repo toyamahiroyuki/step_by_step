@@ -121,8 +121,9 @@ module ActiveSupport
     end
 
     private
-      def hook_state
-        @_hook_state ||= {}
-      end
+
+    def hook_state
+      @_hook_state ||= {}
+    end
   end
 end

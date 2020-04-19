@@ -125,21 +125,22 @@ module ActionView
     end
 
     private
-      def _routes_context
-        controller
-      end
 
-      def optimize_routes_generation?
-        controller.respond_to?(:optimize_routes_generation?, true) ?
-          controller.optimize_routes_generation? : super
-      end
+    def _routes_context
+      controller
+    end
 
-      def _generate_paths_by_default
-        true
-      end
+    def optimize_routes_generation?
+      controller.respond_to?(:optimize_routes_generation?, true) ?
+        controller.optimize_routes_generation? : super
+    end
 
-      def only_path?(host)
-        _generate_paths_by_default unless host
-      end
+    def _generate_paths_by_default
+      true
+    end
+
+    def only_path?(host)
+      _generate_paths_by_default unless host
+    end
   end
 end

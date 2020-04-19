@@ -4,12 +4,16 @@ module ActionDispatch
   module Http
     module Cache
       module Request
-        HTTP_IF_MODIFIED_SINCE = "HTTP_IF_MODIFIED_SINCE".freeze
-        HTTP_IF_NONE_MATCH     = "HTTP_IF_NONE_MATCH".freeze
+        HTTP_IF_MODIFIED_SINCE = "HTTP_IF_MODIFIED_SINCE"
+        HTTP_IF_NONE_MATCH     = "HTTP_IF_NONE_MATCH"
 
         def if_modified_since
           if since = get_header(HTTP_IF_MODIFIED_SINCE)
-            Time.rfc2822(since) rescue nil
+            begin
+              Time.rfc2822(since)
+            rescue
+              nil
+            end
           end
         end
 
@@ -110,7 +114,9 @@ module ActionDispatch
           set_header "ETag", generate_strong_etag(strong_validators)
         end
 
-        def etag?; etag; end
+        def etag?
+          etag
+        end
 
         # True if an ETag is set and it's a weak validator (preceded with W/)
         def weak_etag?
@@ -122,11 +128,11 @@ module ActionDispatch
           etag? && !weak_etag?
         end
 
-      private
+        private
 
-        DATE          = "Date".freeze
-        LAST_MODIFIED = "Last-Modified".freeze
-        SPECIAL_KEYS  = Set.new(%w[extras no-cache max-age public private must-revalidate])
+        DATE          = "Date"
+        LAST_MODIFIED = "Last-Modified"
+        SPECIAL_KEYS  = Set.new(%w(extras no-cache max-age public private must-revalidate))
 
         def generate_weak_etag(validators)
           "W/#{generate_strong_etag(validators)}"
@@ -166,18 +172,18 @@ module ActionDispatch
           @cache_control = cache_control_headers
         end
 
-        DEFAULT_CACHE_CONTROL = "max-age=0, private, must-revalidate".freeze
-        NO_CACHE              = "no-cache".freeze
-        PUBLIC                = "public".freeze
-        PRIVATE               = "private".freeze
-        MUST_REVALIDATE       = "must-revalidate".freeze
+        DEFAULT_CACHE_CONTROL = "max-age=0, private, must-revalidate"
+        NO_CACHE              = "no-cache"
+        PUBLIC                = "public"
+        PRIVATE               = "private"
+        MUST_REVALIDATE       = "must-revalidate"
 
         def handle_conditional_get!
           # Normally default cache control setting is handled by ETag
           # middleware. But, if an etag is already set, the middleware
           # defaults to `no-cache` unless a default `Cache-Control` value is
           # previously set. So, set a default one here.
-          if (etag? || last_modified?) && !self._cache_control
+          if (etag? || last_modified?) && !_cache_control
             self._cache_control = DEFAULT_CACHE_CONTROL
           end
         end

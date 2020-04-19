@@ -1,5 +1,5 @@
-
 # frozen_string_literal: true
+
 require "mail/utilities"
 require "mail/parser_tools"
 
@@ -7489,7 +7489,7 @@ module Mail::Parsers
     def self.parse(data)
       data = data.dup.force_encoding(Encoding::ASCII_8BIT) if data.respond_to?(:force_encoding)
 
-      raise Mail::Field::NilParseError.new(Mail::ReceivedElement) if data.nil?
+      raise Mail::Field::NilParseError, Mail::ReceivedElement if data.nil?
 
       # Parser state
       received = ReceivedStruct.new
@@ -7532,9 +7532,9 @@ module Mail::Parsers
             _inds = _index_offsets[cs]
             _slen = _key_spans[cs]
             _wide = data[p].ord
-            _trans = if (_slen > 0 &&
+            _trans = if _slen > 0 &&
                          _trans_keys[_keys] <= _wide &&
-                         _wide <= _trans_keys[_keys + 1])
+                         _wide <= _trans_keys[_keys + 1]
                        _indicies[_inds + _wide - _trans_keys[_keys]]
                      else
                        _indicies[_inds + _slen]

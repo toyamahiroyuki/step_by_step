@@ -160,7 +160,7 @@ class Pry
     def find_command_by_match_or_listing(match_or_listing)
       cmd = (@commands[match_or_listing] ||
         Pry::Helpers::BaseHelpers.find_command(match_or_listing, @commands))
-      cmd or raise ArgumentError, "Cannot find a command: '#{match_or_listing}'!"
+      cmd || raise(ArgumentError, "Cannot find a command: '#{match_or_listing}'!")
     end
 
     # Aliases a command
@@ -175,13 +175,13 @@ class Pry
     # @example Pass explicit description (overriding default).
     #   Pry.config.commands.alias_command "lM", "ls -M", :desc => "cutiepie"
     def alias_command(match, action, options = {})
-      cmd = find_command(action) or fail "Command: `#{action}` not found"
+      (cmd = find_command(action)) || fail("Command: `#{action}` not found")
       original_options = cmd.options.dup
 
       options = original_options.merge!({
-                                          desc: "Alias for `#{action}`",
-                                          listing: match
-                                        }).merge!(options)
+        desc: "Alias for `#{action}`",
+        listing: match,
+      }).merge!(options)
 
       # ensure default description is used if desc is nil
       desc = options.delete(:desc).to_s
@@ -215,7 +215,7 @@ class Pry
 
       options = {
         listing: new_match,
-        description: cmd.description
+        description: cmd.description,
       }.merge!(options)
 
       @commands[new_match] = cmd.dup
@@ -343,8 +343,8 @@ class Pry
     def find_command_for_help(search)
       find_command(search) || (begin
         find_command_by_match_or_listing(search)
-      rescue ArgumentError
-        nil
+                               rescue ArgumentError
+                                 nil
       end)
     end
 
@@ -371,7 +371,7 @@ class Pry
 
     # @private (used for testing)
     def run_command(context, match, *args)
-      command = @commands[match] or raise NoCommandError.new(match, self)
+      (command = @commands[match]) || raise(NoCommandError.new(match, self))
       command.new(context).call_safely(*args)
     end
 

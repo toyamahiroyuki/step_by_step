@@ -34,15 +34,14 @@ module ActionDispatch
 
       paths = [path, "#{path}#{ext}", "#{path}/#{@index}#{ext}"]
 
-      if match = paths.detect { |p|
+      if match = paths.detect do |p|
         path = File.join(@root, p.b)
         begin
           File.file?(path) && File.readable?(path)
         rescue SystemCallError
           false
         end
-
-      }
+      end
         return ::Rack::Utils.escape_path(match).b
       end
     end
@@ -69,33 +68,34 @@ module ActionDispatch
 
       headers["Vary"] = "Accept-Encoding" if gzip_path
 
-      return [status, headers, body]
+      [status, headers, body]
     ensure
       request.path_info = path
     end
 
     private
-      def ext
-        ::ActionController::Base.default_static_extension
-      end
 
-      def content_type(path)
-        ::Rack::Mime.mime_type(::File.extname(path), "text/plain".freeze)
-      end
+    def ext
+      ::ActionController::Base.default_static_extension
+    end
 
-      def gzip_encoding_accepted?(request)
-        request.accept_encoding.any? { |enc, quality| enc =~ /\bgzip\b/i }
-      end
+    def content_type(path)
+      ::Rack::Mime.mime_type(::File.extname(path), "text/plain")
+    end
 
-      def gzip_file_path(path)
-        can_gzip_mime = content_type(path) =~ /\A(?:text\/|application\/javascript)/
-        gzip_path     = "#{path}.gz"
-        if can_gzip_mime && File.exist?(File.join(@root, ::Rack::Utils.unescape_path(gzip_path).b))
-          gzip_path.b
-        else
-          false
-        end
+    def gzip_encoding_accepted?(request)
+      request.accept_encoding.any? { |enc, quality| enc =~ /\bgzip\b/i }
+    end
+
+    def gzip_file_path(path)
+      can_gzip_mime = content_type(path) =~ /\A(?:text\/|application\/javascript)/
+      gzip_path     = "#{path}.gz"
+      if can_gzip_mime && File.exist?(File.join(@root, ::Rack::Utils.unescape_path(gzip_path).b))
+        gzip_path.b
+      else
+        false
       end
+    end
   end
 
   # This middleware will attempt to return the contents of a file's body from
@@ -117,7 +117,7 @@ module ActionDispatch
       req = Rack::Request.new env
 
       if req.get? || req.head?
-        path = req.path_info.chomp("/".freeze)
+        path = req.path_info.chomp("/")
         if match = @file_handler.match?(path)
           req.path_info = match
           return @file_handler.serve(req)

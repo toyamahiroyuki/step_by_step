@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'action_view'
 require 'action_view/log_subscriber'
 require 'action_view/context'
@@ -16,6 +17,6 @@ module Kaminari
 end
 
 # so that this instance can actually "render"
-::Kaminari::Helpers::Paginator.send :include, ::ActionView::Context
+::Kaminari::Helpers::Paginator.include ::ActionView::Context
 
-ActionView::LogSubscriber.send :prepend, Kaminari::ActionViewExtension::LogSubscriberSilencer
+ActionView::LogSubscriber.prepend Kaminari::ActionViewExtension::LogSubscriberSilencer

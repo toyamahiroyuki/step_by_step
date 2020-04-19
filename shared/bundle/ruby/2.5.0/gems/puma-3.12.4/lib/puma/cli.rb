@@ -29,7 +29,7 @@ module Puma
     # +stdout+ and +stderr+ can be set to IO-like objects which
     # this object will report status on.
     #
-    def initialize(argv, events=Events.stdio)
+    def initialize(argv, events = Events.stdio)
       @debug = false
       @argv = argv.dup
 
@@ -80,7 +80,8 @@ module Puma
       @launcher.run
     end
 
-  private
+    private
+
     def unsupported(str)
       @events.error(str)
       raise UnsupportedOption
@@ -118,7 +119,7 @@ module Puma
           end
 
           o.on "--control-token TOKEN",
-            "The token to use as authentication for the control server" do |arg|
+               "The token to use as authentication for the control server" do |arg|
             @control_options[:auth_token] = arg
           end
 
@@ -136,7 +137,7 @@ module Puma
           end
 
           o.on "-e", "--environment ENVIRONMENT",
-            "The environment to run the Rack app on (default development)" do |arg|
+               "The environment to run the Rack app on (default development)" do |arg|
             user_config.environment arg
           end
 
@@ -145,7 +146,7 @@ module Puma
           end
 
           o.on "-p", "--port PORT", "Define the TCP port to bind to",
-            "Use -b for more advanced options" do |arg|
+               "Use -b for more advanced options" do |arg|
             user_config.bind "tcp://#{Configuration::DefaultTCPHost}:#{arg}"
           end
 
@@ -170,8 +171,8 @@ module Puma
           end
 
           o.on "-R", "--restart-cmd CMD",
-            "The puma command to run during a hot restart",
-            "Default: inferred" do |cmd|
+               "The puma command to run during a hot restart",
+               "Default: inferred" do |cmd|
             user_config.restart_command cmd
           end
 
@@ -202,7 +203,7 @@ module Puma
           end
 
           o.on "-w", "--workers COUNT",
-            "Activate cluster mode: How many worker processes to create" do |arg|
+               "Activate cluster mode: How many worker processes to create" do |arg|
             user_config.workers arg
           end
 

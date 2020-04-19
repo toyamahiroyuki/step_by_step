@@ -18,18 +18,18 @@ module ActiveSupport
       },
 
       stderr: ->(message, callstack, deprecation_horizon, gem_name) {
-        $stderr.puts(message)
-        $stderr.puts callstack.join("\n  ") if debug
+        warn(message)
+        warn callstack.join("\n  ") if debug
       },
 
       log: ->(message, callstack, deprecation_horizon, gem_name) {
         logger =
-            if defined?(Rails.logger) && Rails.logger
-              Rails.logger
-            else
-              require "active_support/logger"
-              ActiveSupport::Logger.new($stderr)
-            end
+          if defined?(Rails.logger) && Rails.logger
+            Rails.logger
+          else
+            require "active_support/logger"
+            ActiveSupport::Logger.new($stderr)
+          end
         logger.warn message
         logger.debug callstack.join("\n  ") if debug
       },
@@ -44,7 +44,7 @@ module ActiveSupport
       },
 
       silence: ->(message, callstack, deprecation_horizon, gem_name) {},
-    }
+    }.freeze
 
     # Behavior module allows to determine how to display deprecation messages.
     # You can create a custom behavior or set any from the +DEFAULT_BEHAVIORS+
@@ -93,17 +93,18 @@ module ActiveSupport
       end
 
       private
-        def arity_coerce(behavior)
-          unless behavior.respond_to?(:call)
-            raise ArgumentError, "#{behavior.inspect} is not a valid deprecation behavior."
-          end
 
-          if behavior.arity == 4 || behavior.arity == -1
-            behavior
-          else
-            -> message, callstack, _, _ { behavior.call(message, callstack) }
-          end
+      def arity_coerce(behavior)
+        unless behavior.respond_to?(:call)
+          raise ArgumentError, "#{behavior.inspect} is not a valid deprecation behavior."
         end
+
+        if behavior.arity == 4 || behavior.arity == -1
+          behavior
+        else
+          -> message, callstack, _, _ { behavior.call(message, callstack) }
+        end
+      end
     end
   end
 end

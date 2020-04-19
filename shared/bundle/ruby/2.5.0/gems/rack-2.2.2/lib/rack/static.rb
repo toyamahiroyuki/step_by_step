@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Rack
-
   # The Rack::Static middleware intercepts requests for static files
   # (javascript files, images, stylesheets, etc) based on the url prefixes or
   # route mappings passed in the options, and serves them using a Rack::Files
@@ -109,11 +108,11 @@ module Rack
     end
 
     def overwrite_file_path(path)
-      @urls.kind_of?(Hash) && @urls.key?(path) || add_index_root?(path)
+      @urls.is_a?(Hash) && @urls.key?(path) || add_index_root?(path)
     end
 
     def route_file(path)
-      @urls.kind_of?(Array) && @urls.any? { |url| path.index(url) == 0 }
+      @urls.is_a?(Array) && @urls.any? { |url| path.index(url) == 0 }
     end
 
     def can_serve(path)
@@ -182,6 +181,5 @@ module Rack
         end
       end
     end
-
   end
 end

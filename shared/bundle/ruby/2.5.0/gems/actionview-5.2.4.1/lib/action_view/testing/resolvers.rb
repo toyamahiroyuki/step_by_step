@@ -21,28 +21,27 @@ module ActionView #:nodoc:
 
     private
 
-      def query(path, exts, _, _)
-        query = "".dup
-        EXTENSIONS.each_key do |ext|
-          query << "(" << exts[ext].map { |e| e && Regexp.escape(".#{e}") }.join("|") << "|)"
-        end
-        query = /^(#{Regexp.escape(path)})#{query}$/
-
-        templates = []
-        @hash.each do |_path, array|
-          source, updated_at = array
-          next unless query.match?(_path)
-          handler, format, variant = extract_handler_and_format_and_variant(_path)
-          templates << Template.new(source, _path, handler,
-            virtual_path: path.virtual,
-            format: format,
-            variant: variant,
-            updated_at: updated_at
-          )
-        end
-
-        templates.sort_by { |t| -t.identifier.match(/^#{query}$/).captures.reject(&:blank?).size }
+    def query(path, exts, _, _)
+      query = "".dup
+      EXTENSIONS.each_key do |ext|
+        query << "(" << exts[ext].map { |e| e && Regexp.escape(".#{e}") }.join("|") << "|)"
       end
+      query = /^(#{Regexp.escape(path)})#{query}$/
+
+      templates = []
+      @hash.each do |_path, array|
+        source, updated_at = array
+        next unless query.match?(_path)
+        handler, format, variant = extract_handler_and_format_and_variant(_path)
+        templates << Template.new(source, _path, handler,
+                                  virtual_path: path.virtual,
+                                  format: format,
+                                  variant: variant,
+                                  updated_at: updated_at)
+      end
+
+      templates.sort_by { |t| -t.identifier.match(/^#{query}$/).captures.reject(&:blank?).size }
+    end
   end
 
   class NullResolver < PathResolver

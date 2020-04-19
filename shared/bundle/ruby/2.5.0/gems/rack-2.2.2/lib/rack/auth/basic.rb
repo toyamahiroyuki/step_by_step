@@ -14,7 +14,6 @@ module Rack
     # See also: <tt>example/protectedlobster.rb</tt>
 
     class Basic < AbstractHandler
-
       def call(env)
         auth = Basic::Request.new(env)
 
@@ -30,7 +29,6 @@ module Rack
 
         unauthorized
       end
-
 
       private
 
@@ -55,7 +53,6 @@ module Rack
           credentials.first
         end
       end
-
     end
   end
 end

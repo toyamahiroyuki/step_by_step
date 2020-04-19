@@ -36,8 +36,8 @@ module Devise
         #     before_action ->{ authenticate_blogger! :admin }  # Redirects to the admin login page
         #     current_blogger :user                             # Preferably returns a User if one is signed in
         #
-        def devise_group(group_name, opts={})
-          mappings = "[#{ opts[:contains].map { |m| ":#{m}" }.join(',') }]"
+        def devise_group(group_name, opts = {})
+          mappings = "[#{opts[:contains].map { |m| ":#{m}" }.join(',')}]"
 
           class_eval <<-METHODS, __FILE__, __LINE__ + 1
             def authenticate_#{group_name}!(favourite=nil, opts={})
@@ -140,7 +140,7 @@ module Devise
 
       # The main accessor for the warden proxy instance
       def warden
-        request.env['warden'] or raise MissingWarden
+        request.env['warden'] || raise(MissingWarden)
       end
 
       # Return true if it's a devise_controller. false to all controllers unless
@@ -274,7 +274,7 @@ module Devise
       private
 
       def expire_data_after_sign_out!
-        Devise.mappings.each { |_,m| instance_variable_set("@current_#{m.name}", nil) }
+        Devise.mappings.each { |_, m| instance_variable_set("@current_#{m.name}", nil) }
         super
       end
     end
@@ -282,11 +282,11 @@ module Devise
 
   class MissingWarden < StandardError
     def initialize
-      super "Devise could not find the `Warden::Proxy` instance on your request environment.\n" + \
-        "Make sure that your application is loading Devise and Warden as expected and that " + \
-        "the `Warden::Manager` middleware is present in your middleware stack.\n" + \
-        "If you are seeing this on one of your tests, ensure that your tests are either " + \
-        "executing the Rails middleware stack or that your tests are using the `Devise::Test::ControllerHelpers` " + \
+      super "Devise could not find the `Warden::Proxy` instance on your request environment.\n" \
+        "Make sure that your application is loading Devise and Warden as expected and that " \
+        "the `Warden::Manager` middleware is present in your middleware stack.\n" \
+        "If you are seeing this on one of your tests, ensure that your tests are either " \
+        "executing the Rails middleware stack or that your tests are using the `Devise::Test::ControllerHelpers` " \
         "module to inject the `request.env['warden']` object for you."
     end
   end

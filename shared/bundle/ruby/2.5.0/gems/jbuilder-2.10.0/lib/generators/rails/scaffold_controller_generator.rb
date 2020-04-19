@@ -10,9 +10,11 @@ module Rails
 
       private
 
+      unless private_method_defined? :permitted_params
         def permitted_params
           attributes_names.map { |name| ":#{name}" }.join(', ')
-        end unless private_method_defined? :permitted_params
+        end
+        end
     end
   end
 end

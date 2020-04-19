@@ -47,10 +47,10 @@ module DataMapper
         object.destroy if valid_object?(object)
       end
 
-    protected
+      protected
 
       def order_clause(order)
-        order.map {|pair| pair.first.send(pair.last)}
+        order.map { |pair| pair.first.send(pair.last) }
       end
     end
   end

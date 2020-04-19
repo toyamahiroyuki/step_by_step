@@ -2,7 +2,6 @@ require 'rubygems'
 
 class Pry
   module Rubygem
-
     class << self
       def installed?(name)
         if Gem::Specification.respond_to?(:find_all_by_name)
@@ -25,7 +24,7 @@ class Pry
 
         first_spec = specs.sort_by { |spec| Gem::Version.new(spec.version) }.last
 
-        first_spec or raise CommandError, "Gem `#{name}` not found"
+        first_spec || raise(CommandError, "Gem `#{name}` not found")
       end
 
       # List gems matching a pattern.
@@ -46,9 +45,9 @@ class Pry
       # @return [Array<String>] completions
       def complete(so_far)
         if so_far =~ / ([^ ]*)\z/
-          self.list(%r{\A#{$2}}).map(&:name)
+          list(%r{\A#{Regexp.last_match(2)}}).map(&:name)
         else
-          self.list.map(&:name)
+          list.map(&:name)
         end
       end
 
@@ -71,14 +70,13 @@ class Pry
         installer.install(name)
       rescue Errno::EACCES
         raise CommandError,
-          "Insufficient permissions to install #{green(name)}."
+              "Insufficient permissions to install #{green(name)}."
       rescue Gem::GemNotFoundException
         raise CommandError,
-          "Gem #{green(name)} not found. Aborting installation."
+              "Gem #{green(name)} not found. Aborting installation."
       else
         Gem.refresh
       end
     end
-
   end
 end

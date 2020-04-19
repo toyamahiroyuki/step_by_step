@@ -38,7 +38,7 @@ module ActionView
       def view_context_class
         @view_context_class ||= begin
           supports_path = supports_path?
-          routes  = respond_to?(:_routes)  && _routes
+          routes = respond_to?(:_routes) && _routes
           helpers = respond_to?(:_helpers) && _helpers
 
           Class.new(ActionView::Base) do
@@ -90,62 +90,62 @@ module ActionView
 
     private
 
-      # Find and render a template based on the options given.
-      def _render_template(options)
-        variant = options.delete(:variant)
-        assigns = options.delete(:assigns)
-        context = view_context
+    # Find and render a template based on the options given.
+    def _render_template(options)
+      variant = options.delete(:variant)
+      assigns = options.delete(:assigns)
+      context = view_context
 
-        context.assign assigns if assigns
-        lookup_context.rendered_format = nil if options[:formats]
-        lookup_context.variants = variant if variant
+      context.assign assigns if assigns
+      lookup_context.rendered_format = nil if options[:formats]
+      lookup_context.variants = variant if variant
 
-        view_renderer.render(context, options)
-      end
+      view_renderer.render(context, options)
+    end
 
-      # Assign the rendered format to look up context.
-      def _process_format(format)
-        super
-        lookup_context.formats = [format.to_sym]
-        lookup_context.rendered_format = lookup_context.formats.first
-      end
+    # Assign the rendered format to look up context.
+    def _process_format(format)
+      super
+      lookup_context.formats = [format.to_sym]
+      lookup_context.rendered_format = lookup_context.formats.first
+    end
 
-      # Normalize args by converting render "foo" to render :action => "foo" and
-      # render "foo/bar" to render :template => "foo/bar".
-      def _normalize_args(action = nil, options = {})
-        options = super(action, options)
-        case action
-        when NilClass
-        when Hash
+    # Normalize args by converting render "foo" to render :action => "foo" and
+    # render "foo/bar" to render :template => "foo/bar".
+    def _normalize_args(action = nil, options = {})
+      options = super(action, options)
+      case action
+      when NilClass
+      when Hash
+        options = action
+      when String, Symbol
+        action = action.to_s
+        key = action.include?(?/) ? :template : :action
+        options[key] = action
+      else
+        if action.respond_to?(:permitted?) && action.permitted?
           options = action
-        when String, Symbol
-          action = action.to_s
-          key = action.include?(?/) ? :template : :action
-          options[key] = action
         else
-          if action.respond_to?(:permitted?) && action.permitted?
-            options = action
-          else
-            options[:partial] = action
-          end
+          options[:partial] = action
         end
-
-        options
       end
 
-      # Normalize options.
-      def _normalize_options(options)
-        options = super(options)
-        if options[:partial] == true
-          options[:partial] = action_name
-        end
+      options
+    end
 
-        if (options.keys & [:partial, :file, :template]).empty?
-          options[:prefixes] ||= _prefixes
-        end
-
-        options[:template] ||= (options[:action] || action_name).to_s
-        options
+    # Normalize options.
+    def _normalize_options(options)
+      options = super(options)
+      if options[:partial] == true
+        options[:partial] = action_name
       end
+
+      if (options.keys & [:partial, :file, :template]).empty?
+        options[:prefixes] ||= _prefixes
+      end
+
+      options[:template] ||= (options[:action] || action_name).to_s
+      options
+    end
   end
 end

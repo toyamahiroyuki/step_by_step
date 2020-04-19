@@ -78,10 +78,10 @@ module ActionDispatch # :nodoc:
       x
     end
 
-    CONTENT_TYPE = "Content-Type".freeze
-    SET_COOKIE   = "Set-Cookie".freeze
-    LOCATION     = "Location".freeze
-    NO_CONTENT_CODES = [100, 101, 102, 204, 205, 304]
+    CONTENT_TYPE = "Content-Type"
+    SET_COOKIE   = "Set-Cookie"
+    LOCATION     = "Location"
+    NO_CONTENT_CODES = [100, 101, 102, 204, 205, 304].freeze
 
     cattr_accessor :default_charset, default: "utf-8"
     cattr_accessor :default_headers
@@ -143,9 +143,9 @@ module ActionDispatch # :nodoc:
 
       private
 
-        def each_chunk(&block)
-          @buf.each(&block)
-        end
+      def each_chunk(&block)
+        @buf.each(&block)
+      end
     end
 
     def self.create(status = 200, header = {}, body = [], default_headers: self.default_headers)
@@ -177,10 +177,21 @@ module ActionDispatch # :nodoc:
       yield self if block_given?
     end
 
-    def has_header?(key);   headers.key? key;   end
-    def get_header(key);    headers[key];       end
-    def set_header(key, v); headers[key] = v;   end
-    def delete_header(key); headers.delete key; end
+    def has_header?(key)
+      headers.key? key
+    end
+
+    def get_header(key)
+      headers[key]
+    end
+
+    def set_header(key, v)
+      headers[key] = v
+    end
+
+    def delete_header(key)
+      headers.delete key
+    end
 
     def await_commit
       synchronize do
@@ -215,9 +226,17 @@ module ActionDispatch # :nodoc:
       end
     end
 
-    def sending?;   synchronize { @sending };   end
-    def committed?; synchronize { @committed }; end
-    def sent?;      synchronize { @sent };      end
+    def sending?
+      synchronize { @sending }
+    end
+
+    def committed?
+      synchronize { @committed }
+    end
+
+    def sent?
+      synchronize { @sent }
+    end
 
     # Sets the HTTP status code.
     def status=(status)
@@ -403,7 +422,7 @@ module ActionDispatch # :nodoc:
       cookies
     end
 
-  private
+    private
 
     ContentTypeHeader = Struct.new :mime_type, :charset
     NullContentTypeHeader = ContentTypeHeader.new nil, nil

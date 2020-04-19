@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-# frozen_string_literal: true
 # encoding: us-ascii
+# frozen_string_literal: true
 
 #--
 # Portions copyright 2004 by Jim Weirich (jim@weirichhouse.org).
@@ -12,7 +12,7 @@
 # above copyright notice is included.
 #++
 
-#!/usr/bin/env ruby
+# !/usr/bin/env ruby
 
 require 'helper'
 require 'builder/xchar'
@@ -22,12 +22,12 @@ if String.method_defined?(:encode)
     ENCODING_BINARY = Encoding.find('BINARY')
 
     # shim method for testing purposes
-    def to_xs(escape=true)
+    def to_xs(escape = true)
       # raise NameError.new('to_xs') unless caller[0].index(__FILE__)
 
-      result = Builder::XChar.encode(self.dup)
+      result = Builder::XChar.encode(dup)
       if escape
-        result.gsub(/[^\u0000-\u007F]/) {|c| "&##{c.ord};"}
+        result.gsub(/[^\u0000-\u007F]/) { |c| "&##{c.ord};" }
       else
         # really only useful for testing purposes
         result.force_encoding(ENCODING_BINARY)
@@ -71,10 +71,10 @@ class TestXmlEscaping < Builder::Test
   end
 
   def test_utf8_verbatim
-    assert_equal binary("\xE2\x80\x99"), "\xE2\x80\x99".to_xs(false)  # right single quote
-    assert_equal binary("\xC2\xA9"),  "\xC2\xA9".to_xs(false)         # copy
+    assert_equal binary("\xE2\x80\x99"), "\xE2\x80\x99".to_xs(false) # right single quote
+    assert_equal binary("\xC2\xA9"), "\xC2\xA9".to_xs(false) # copy
     assert_equal binary("\xC2\xA9&amp;\xC2\xA9"),
-      "\xC2\xA9&\xC2\xA9".to_xs(false)                                # copy with ampersand
+                 "\xC2\xA9&\xC2\xA9".to_xs(false) # copy with ampersand
   end
 
   private

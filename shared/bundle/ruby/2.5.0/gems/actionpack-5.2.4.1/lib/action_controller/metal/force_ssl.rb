@@ -19,9 +19,9 @@ module ActionController
     extend ActiveSupport::Concern
     include AbstractController::Callbacks
 
-    ACTION_OPTIONS = [:only, :except, :if, :unless]
-    URL_OPTIONS = [:protocol, :host, :domain, :subdomain, :port, :path]
-    REDIRECT_OPTIONS = [:status, :flash, :alert, :notice]
+    ACTION_OPTIONS = [:only, :except, :if, :unless].freeze
+    URL_OPTIONS = [:protocol, :host, :domain, :subdomain, :port, :path].freeze
+    REDIRECT_OPTIONS = [:status, :flash, :alert, :notice].freeze
 
     module ClassMethods
       # Force the request to this particular controller or specified actions to be
@@ -81,7 +81,7 @@ module ActionController
           protocol: "https://",
           host: request.host,
           path: request.fullpath,
-          status: :moved_permanently
+          status: :moved_permanently,
         }
 
         if host_or_options.is_a?(Hash)

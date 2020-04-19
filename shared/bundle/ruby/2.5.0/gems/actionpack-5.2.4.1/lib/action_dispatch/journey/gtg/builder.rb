@@ -47,9 +47,9 @@ module ActionDispatch
 
                   accepting = ps.find_all { |l| followpos(l).include?(DUMMY) }
 
-                  accepting.each { |accepting_state|
+                  accepting.each do |accepting_state|
                     dtrans.add_memo(to, accepting_state.memo)
-                  }
+                  end
 
                   dtrans.add_accepting(state_id[u])
                 end
@@ -129,35 +129,35 @@ module ActionDispatch
 
         private
 
-          def followpos_table
-            @followpos ||= build_followpos
-          end
+        def followpos_table
+          @followpos ||= build_followpos
+        end
 
-          def build_followpos
-            table = Hash.new { |h, k| h[k] = [] }
-            @ast.each do |n|
-              case n
-              when Nodes::Cat
-                lastpos(n.left).each do |i|
-                  table[i] += firstpos(n.right)
-                end
-              when Nodes::Star
-                lastpos(n).each do |i|
-                  table[i] += firstpos(n)
-                end
+        def build_followpos
+          table = Hash.new { |h, k| h[k] = [] }
+          @ast.each do |n|
+            case n
+            when Nodes::Cat
+              lastpos(n.left).each do |i|
+                table[i] += firstpos(n.right)
+              end
+            when Nodes::Star
+              lastpos(n).each do |i|
+                table[i] += firstpos(n)
               end
             end
-            table
           end
+          table
+        end
 
-          def symbol(edge)
-            case edge
-            when Journey::Nodes::Symbol
-              edge.regexp
-            else
-              edge.left
-            end
+        def symbol(edge)
+          case edge
+          when Journey::Nodes::Symbol
+            edge.regexp
+          else
+            edge.left
           end
+        end
       end
     end
   end

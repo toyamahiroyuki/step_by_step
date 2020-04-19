@@ -11,8 +11,8 @@ if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
         find_header("ffi.h", "/usr/local/include", "/usr/include/ffi")
 
     # Ensure we can link to ffi_call
-    libffi_ok &&= have_library("ffi", "ffi_call", [ "ffi.h" ]) ||
-                  have_library("libffi", "ffi_call", [ "ffi.h" ])
+    libffi_ok &&= have_library("ffi", "ffi_call", ["ffi.h"]) ||
+                  have_library("libffi", "ffi_call", ["ffi.h"])
 
     # And we need a libffi version recent enough to provide ffi_closure_alloc
     libffi_ok &&= have_func("ffi_closure_alloc")
@@ -62,7 +62,7 @@ if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
   create_makefile("ffi_c")
   unless system_libffi
     File.open("Makefile", "a") do |mf|
-      mf.puts "LIBFFI_HOST=--host=#{RbConfig::CONFIG['host_alias']}" if RbConfig::CONFIG.has_key?("host_alias")
+      mf.puts "LIBFFI_HOST=--host=#{RbConfig::CONFIG['host_alias']}" if RbConfig::CONFIG.key?("host_alias")
       if RbConfig::CONFIG['host_os'].downcase =~ /darwin/
         mf.puts "include ${srcdir}/libffi.darwin.mk"
       elsif RbConfig::CONFIG['host_os'].downcase =~ /bsd/

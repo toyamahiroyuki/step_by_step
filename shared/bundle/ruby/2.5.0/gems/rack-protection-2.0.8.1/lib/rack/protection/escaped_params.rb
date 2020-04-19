@@ -30,7 +30,7 @@ module Rack
       end
 
       default_options :escape => :html,
-        :escaper => defined?(EscapeUtils) ? EscapeUtils : self
+                      :escaper => defined?(EscapeUtils) ? EscapeUtils : self
 
       def initialize(*)
         super
@@ -41,7 +41,7 @@ module Rack
         @javascript = modes.include? :javascript
         @url        = modes.include? :url
 
-        if @javascript and not @escaper.respond_to? :escape_javascript
+        if @javascript && (!@escaper.respond_to? :escape_javascript)
           fail("Use EscapeUtils for JavaScript escaping.")
         end
       end
@@ -49,7 +49,11 @@ module Rack
       def call(env)
         request  = Request.new(env)
         get_was  = handle(request.GET)
-        post_was = handle(request.POST) rescue nil
+        post_was = begin
+                     handle(request.POST)
+                   rescue
+                     nil
+                   end
         app.call env
       ensure
         request.GET.replace  get_was  if get_was
@@ -74,7 +78,7 @@ module Rack
 
       def escape_hash(hash)
         hash = hash.dup
-        hash.each { |k,v| hash[k] = escape(v) }
+        hash.each { |k, v| hash[k] = escape(v) }
         hash
       end
 

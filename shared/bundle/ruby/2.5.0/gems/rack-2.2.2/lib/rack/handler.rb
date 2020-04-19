@@ -36,10 +36,8 @@ module Rack
     def self.pick(server_names)
       server_names = Array(server_names)
       server_names.each do |server_name|
-        begin
-          return get(server_name.to_s)
-        rescue LoadError, NameError
-        end
+        return get(server_name.to_s)
+      rescue LoadError, NameError
       end
 
       raise LoadError, "Couldn't find handler for: #{server_names.join(', ')}."
@@ -55,7 +53,7 @@ module Rack
       elsif ENV.include?(REQUEST_METHOD)
         Rack::Handler::CGI
       elsif ENV.include?("RACK_HANDLER")
-        self.get(ENV["RACK_HANDLER"])
+        get(ENV["RACK_HANDLER"])
       else
         pick SERVER_NAMES
       end

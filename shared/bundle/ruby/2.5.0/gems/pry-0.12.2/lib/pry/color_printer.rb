@@ -12,7 +12,7 @@ class Pry
 
     CodeRay::Encoders::Terminal::TOKEN_COLORS[:comment][:self] = "\e[1;34m"
 
-    def self.pp(obj, out = $>, width = 79, newline = "\n")
+    def self.pp(obj, out = $DEFAULT_OUTPUT, width = 79, newline = "\n")
       q = ColorPrinter.new(out, width, newline)
       q.guard_inspect_key { q.pp obj }
       q.flush
@@ -43,13 +43,17 @@ class Pry
 
       begin
         str = obj.inspect
-      rescue Exception 
+      rescue Exception
         # Read the class name off of the singleton class to provide a default
         # inspect.
         singleton = class << obj; self; end
         ancestors = Pry::Method.safe_send(singleton, :ancestors)
-        klass  = ancestors.reject { |k| k == singleton }.first
-        obj_id = obj.__id__.to_s(16) rescue 0
+        klass = ancestors.reject { |k| k == singleton }.first
+        obj_id = begin
+                   obj.__id__.to_s(16)
+                 rescue
+                   0
+                 end
         str    = "#<#{klass}:0x#{obj_id}>"
       end
 

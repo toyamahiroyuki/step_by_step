@@ -13,7 +13,7 @@ module Rack
       default_reaction :deny
 
       def accepts?(env)
-        safe?(env) or referrer(env) == Request.new(env).host
+        safe?(env) || (referrer(env) == Request.new(env).host)
       end
     end
   end

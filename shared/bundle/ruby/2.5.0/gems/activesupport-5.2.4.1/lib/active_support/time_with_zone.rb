@@ -43,10 +43,11 @@ module ActiveSupport
       "Time"
     end
 
-    PRECISIONS = Hash.new { |h, n| h[n] = "%FT%T.%#{n}N".freeze }
-    PRECISIONS[0] = "%FT%T".freeze
+    PRECISIONS = Hash.new { |h, n| h[n] = "%FT%T.%#{n}N" }
+    PRECISIONS[0] = "%FT%T"
 
-    include Comparable, DateAndTime::Compatibility
+    include DateAndTime::Compatibility
+    include Comparable
     attr_reader :time_zone
 
     def initialize(utc_time, time_zone, local_time = nil, period = nil)
@@ -147,7 +148,7 @@ module ActiveSupport
     #
     #   Time.zone.now.xmlschema  # => "2014-12-04T11:02:37-05:00"
     def xmlschema(fraction_digits = 0)
-      "#{time.strftime(PRECISIONS[fraction_digits.to_i])}#{formatted_offset(true, 'Z'.freeze)}"
+      "#{time.strftime(PRECISIONS[fraction_digits.to_i])}#{formatted_offset(true, 'Z')}"
     end
     alias_method :iso8601, :xmlschema
     alias_method :rfc3339, :xmlschema
@@ -277,7 +278,11 @@ module ActiveSupport
       if duration_of_variable_length?(other)
         method_missing(:+, other)
       else
-        result = utc.acts_like?(:date) ? utc.since(other) : utc + other rescue utc.since(other)
+        result = begin
+                   utc.acts_like?(:date) ? utc.since(other) : utc + other
+                 rescue
+                   utc.since(other)
+                 end
         result.in_time_zone(time_zone)
       end
     end
@@ -306,7 +311,11 @@ module ActiveSupport
       elsif duration_of_variable_length?(other)
         method_missing(:-, other)
       else
-        result = utc.acts_like?(:date) ? utc.ago(other) : utc - other rescue utc.ago(other)
+        result = begin
+                   utc.acts_like?(:date) ? utc.ago(other) : utc - other
+                 rescue
+                   utc.ago(other)
+                 end
         result.in_time_zone(time_zone)
       end
     end
@@ -514,38 +523,39 @@ module ActiveSupport
     end
 
     private
-      def get_period_and_ensure_valid_local_time(period)
-        # we don't want a Time.local instance enforcing its own DST rules as well,
-        # so transfer time values to a utc constructor if necessary
-        @time = transfer_time_values_to_utc_constructor(@time) unless @time.utc?
-        begin
-          period || @time_zone.period_for_local(@time)
-        rescue ::TZInfo::PeriodNotFound
-          # time is in the "spring forward" hour gap, so we're moving the time forward one hour and trying again
-          @time += 1.hour
-          retry
-        end
-      end
 
-      def transfer_time_values_to_utc_constructor(time)
-        # avoid creating another Time object if possible
-        return time if time.instance_of?(::Time) && time.utc?
-        ::Time.utc(time.year, time.month, time.day, time.hour, time.min, time.sec + time.subsec)
+    def get_period_and_ensure_valid_local_time(period)
+      # we don't want a Time.local instance enforcing its own DST rules as well,
+      # so transfer time values to a utc constructor if necessary
+      @time = transfer_time_values_to_utc_constructor(@time) unless @time.utc?
+      begin
+        period || @time_zone.period_for_local(@time)
+      rescue ::TZInfo::PeriodNotFound
+        # time is in the "spring forward" hour gap, so we're moving the time forward one hour and trying again
+        @time += 1.hour
+        retry
       end
+    end
 
-      def duration_of_variable_length?(obj)
-        ActiveSupport::Duration === obj && obj.parts.any? { |p| [:years, :months, :weeks, :days].include?(p[0]) }
-      end
+    def transfer_time_values_to_utc_constructor(time)
+      # avoid creating another Time object if possible
+      return time if time.instance_of?(::Time) && time.utc?
+      ::Time.utc(time.year, time.month, time.day, time.hour, time.min, time.sec + time.subsec)
+    end
 
-      def wrap_with_time_zone(time)
-        if time.acts_like?(:time)
-          periods = time_zone.periods_for_local(time)
-          self.class.new(nil, time_zone, time, periods.include?(period) ? period : nil)
-        elsif time.is_a?(Range)
-          wrap_with_time_zone(time.begin)..wrap_with_time_zone(time.end)
-        else
-          time
-        end
+    def duration_of_variable_length?(obj)
+      ActiveSupport::Duration === obj && obj.parts.any? { |p| [:years, :months, :weeks, :days].include?(p[0]) }
+    end
+
+    def wrap_with_time_zone(time)
+      if time.acts_like?(:time)
+        periods = time_zone.periods_for_local(time)
+        self.class.new(nil, time_zone, time, periods.include?(period) ? period : nil)
+      elsif time.is_a?(Range)
+        wrap_with_time_zone(time.begin)..wrap_with_time_zone(time.end)
+      else
+        time
       end
+    end
   end
 end

@@ -22,9 +22,9 @@ module ActiveRecord
           end
 
           rows = res.values
-          return rows unless ftypes.any? { |_, x|
+          return rows unless ftypes.any? do |_, x|
             x == BYTEA_COLUMN_TYPE_OID || x == MONEY_COLUMN_TYPE_OID
-          }
+          end
 
           typehash = ftypes.group_by { |_, type| type }
           binaries = typehash[BYTEA_COLUMN_TYPE_OID] || []
@@ -47,9 +47,9 @@ module ActiveRecord
               #  (1) $12,345,678.12
               #  (2) $12.345.678,12
               case data
-              when /^-?\D+[\d,]+\.\d{2}$/  # (1)
+              when /^-?\D+[\d,]+\.\d{2}$/ # (1)
                 data.gsub!(/[^-\d.]/, "")
-              when /^-?\D+[\d.]+,\d{2}$/  # (2)
+              when /^-?\D+[\d.]+,\d{2}$/ # (2)
                 data.gsub!(/[^-\d,]/, "").sub!(/,/, ".")
               end
             end
@@ -149,14 +149,15 @@ module ActiveRecord
         end
 
         private
-          # Returns the current ID of a table's sequence.
-          def last_insert_id_result(sequence_name)
-            exec_query("SELECT currval(#{quote(sequence_name)})", "SQL")
-          end
 
-          def suppress_composite_primary_key(pk)
-            pk unless pk.is_a?(Array)
-          end
+        # Returns the current ID of a table's sequence.
+        def last_insert_id_result(sequence_name)
+          exec_query("SELECT currval(#{quote(sequence_name)})", "SQL")
+        end
+
+        def suppress_composite_primary_key(pk)
+          pk unless pk.is_a?(Array)
+        end
       end
     end
   end

@@ -18,10 +18,10 @@ class Converter
       files -= contents.keys
       log_http_get_files files, full_path, false
       files.map do |name|
-        Thread.start {
+        Thread.start do
           contents[name] = open("#{full_path}/#{name}").read
           Thread.exclusive { write_cached_files path, name => contents[name] }
-        }
+        end
       end.each(&:join)
       contents
     end
@@ -46,7 +46,6 @@ class Converter
       end
     end
 
-
     def get_file(url)
       uri = URI(url)
       cache_path = "./#@cache_path#{uri.path}#{uri.query.tr('?&=', '-') if uri.query}"
@@ -65,13 +64,13 @@ class Converter
     # get sha of the branch (= the latest commit)
     def get_branch_sha
       @branch_sha ||= begin
-        if @branch + "\n" == %x[git rev-parse #@branch]
+        if @branch + "\n" == `git rev-parse #@branch`
           @branch
         else
           cmd = "git ls-remote #{Shellwords.escape "https://github.com/#@repo"} #@branch"
           log cmd
-          result = %x[#{cmd}]
-          raise 'Could not get branch sha!' unless $?.success? && !result.empty?
+          result = `#{cmd}`
+          raise 'Could not get branch sha!' unless $CHILD_STATUS.success? && !result.empty?
           result.split(/\s+/).first
         end
       end

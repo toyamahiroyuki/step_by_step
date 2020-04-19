@@ -1,5 +1,5 @@
 class GoalsController < ApplicationController
-    before_action :authenticate_user!
+  before_action :authenticate_user!
   def new
     if current_user.goals.empty?
       @goal = Goal.new
@@ -43,10 +43,10 @@ class GoalsController < ApplicationController
   def update
     goal = Goal.find_by(params[:user_id])
     if goal.update(goal_params)
-       redirect_to goal_path
+      redirect_to goal_path
     else
-       @goal = Goal.find_by(params[:user_id])
-       render action: :edit
+      @goal = Goal.find_by(params[:user_id])
+      render action: :edit
     end
   end
 

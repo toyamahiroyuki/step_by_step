@@ -3,7 +3,6 @@
 module Rack
   module Auth
     class AbstractRequest
-
       def initialize(env)
         @env = env
       end
@@ -32,16 +31,13 @@ module Rack
         @params ||= parts.last
       end
 
-
       private
 
-      AUTHORIZATION_KEYS = ['HTTP_AUTHORIZATION', 'X-HTTP_AUTHORIZATION', 'X_HTTP_AUTHORIZATION']
+      AUTHORIZATION_KEYS = ['HTTP_AUTHORIZATION', 'X-HTTP_AUTHORIZATION', 'X_HTTP_AUTHORIZATION'].freeze
 
       def authorization_key
-        @authorization_key ||= AUTHORIZATION_KEYS.detect { |key| @env.has_key?(key) }
+        @authorization_key ||= AUTHORIZATION_KEYS.detect { |key| @env.key?(key) }
       end
-
     end
-
   end
 end

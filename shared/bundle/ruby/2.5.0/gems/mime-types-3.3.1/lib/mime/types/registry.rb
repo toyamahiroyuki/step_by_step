@@ -53,7 +53,7 @@ Lazy loading ($RUBY_MIME_TYPES_LAZY_LOAD) is deprecated and will be removed.
   end
 
   def __types__
-    (defined?(@__types__) and @__types__) or load_default_mime_types
+    (defined?(@__types__) && @__types__) || load_default_mime_types
   end
 
   unless private_method_defined?(:load_mode)

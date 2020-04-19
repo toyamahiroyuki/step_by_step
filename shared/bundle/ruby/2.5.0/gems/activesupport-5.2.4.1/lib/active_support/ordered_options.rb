@@ -46,7 +46,7 @@ module ActiveSupport
         bangs = name_string.chomp!("!")
 
         if bangs
-          self[name_string].presence || raise(KeyError.new(":#{name_string} is blank"))
+          self[name_string].presence || raise(KeyError, ":#{name_string} is blank")
         else
           self[name_string]
         end
@@ -68,7 +68,7 @@ module ActiveSupport
   #   h.boy  # => 'John'
   class InheritableOptions < OrderedOptions
     def initialize(parent = nil)
-      if parent.kind_of?(OrderedOptions)
+      if parent.is_a?(OrderedOptions)
         # use the faster _get when dealing with OrderedOptions
         super() { |h, k| parent._get(k) }
       elsif parent

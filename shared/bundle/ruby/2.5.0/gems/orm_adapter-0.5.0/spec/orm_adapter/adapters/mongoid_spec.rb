@@ -1,7 +1,11 @@
 require 'spec_helper'
 require 'orm_adapter/example_app_shared'
 
-if !defined?(Mongoid) || !(Mongo::Connection.new.db('orm_adapter_spec') rescue nil)
+if !defined?(Mongoid) || !(begin
+                             Mongo::Connection.new.db('orm_adapter_spec')
+                           rescue
+                             nil
+                           end)
   puts "** require 'mongoid' and start mongod to run the specs in #{__FILE__}"
 else
 

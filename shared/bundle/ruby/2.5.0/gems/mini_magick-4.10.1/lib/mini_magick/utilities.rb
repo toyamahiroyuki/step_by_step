@@ -3,7 +3,6 @@ require "tempfile"
 module MiniMagick
   # @private
   module Utilities
-
     module_function
 
     ##
@@ -30,6 +29,5 @@ module MiniMagick
         tempfile.close
       end
     end
-
   end
 end

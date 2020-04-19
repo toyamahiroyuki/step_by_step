@@ -1,4 +1,3 @@
-
 require 'bundler'
 Bundler::GemHelper.install_tasks
 
@@ -18,7 +17,7 @@ end
 
 desc 'Generate YARD document'
 YARD::Rake::YardocTask.new(:doc) do |t|
-  t.files   = ['lib/msgpack/version.rb','doclib/**/*.rb']
+  t.files   = ['lib/msgpack/version.rb', 'doclib/**/*.rb']
   t.options = []
   t.options << '--debug' << '--verbose' if $trace
 end

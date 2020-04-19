@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 require 'net/imap' # for decode_utf7
 
 module Mail
@@ -10,33 +11,33 @@ module Mail
     # Escapes any parenthesis in a string that are unescaped. This can't
     # use the Ruby 1.9.1 regexp feature of negative look behind so we have
     # to do two replacement, first unescape everything, then re-escape it
-    def Ruby18.escape_paren( str )
+    def Ruby18.escape_paren(str)
       re = /\\\)/
-      str = str.gsub(re) { |s| ')'}
+      str = str.gsub(re) { |s| ')' }
       re = /\\\(/
-      str = str.gsub(re) { |s| '('}
+      str = str.gsub(re) { |s| '(' }
       re = /([\(\)])/          # Only match unescaped parens
       str.gsub(re) { |s| '\\' + s }
     end
 
-    def Ruby18.paren( str )
-      str = $1 if str =~ /^\((.*)?\)$/
-      str = escape_paren( str )
+    def Ruby18.paren(str)
+      str = Regexp.last_match(1) if str =~ /^\((.*)?\)$/
+      str = escape_paren(str)
       '(' + str + ')'
     end
 
-    def Ruby18.escape_bracket( str )
+    def Ruby18.escape_bracket(str)
       re = /\\\>/
-      str = str.gsub(re) { |s| '>'}
+      str = str.gsub(re) { |s| '>' }
       re = /\\\</
-      str = str.gsub(re) { |s| '<'}
+      str = str.gsub(re) { |s| '<' }
       re = /([\<\>])/          # Only match unescaped parens
       str.gsub(re) { |s| '\\' + s }
     end
 
-    def Ruby18.bracket( str )
-      str = $1 if str =~ /^\<(.*)?\>$/
-      str = escape_bracket( str )
+    def Ruby18.bracket(str)
+      str = Regexp.last_match(1) if str =~ /^\<(.*)?\>$/
+      str = escape_bracket(str)
       '<' + str + '>'
     end
 
@@ -49,11 +50,11 @@ module Mail
     end
 
     def Ruby18.has_constant?(klass, string)
-      klass.constants.include?( string )
+      klass.constants.include?(string)
     end
 
     def Ruby18.get_constant(klass, string)
-      klass.const_get( string )
+      klass.const_get(string)
     end
 
     def Ruby18.transcode_charset(str, from_encoding, to_encoding = 'UTF-8')

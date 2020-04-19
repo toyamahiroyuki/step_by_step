@@ -18,7 +18,7 @@ module Byebug
       while (input = interface.read_command(prompt))
         safely do
           command = command_list.match(input)
-          raise CommandNotFound.new(input) unless command
+          raise CommandNotFound, input unless command
 
           command.new(self, input).execute
         end

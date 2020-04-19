@@ -34,8 +34,8 @@ module ActiveRecord
 
     module Rails41
       def self.convert(klass, coder)
-        attributes = klass.attributes_builder
-          .build_from_database(coder["attributes"])
+        attributes = klass.attributes_builder.
+          build_from_database(coder["attributes"])
         new_record = coder["attributes"][klass.primary_key].blank?
 
         {

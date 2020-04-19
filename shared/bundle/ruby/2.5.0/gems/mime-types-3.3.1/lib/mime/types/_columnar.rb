@@ -49,7 +49,7 @@ module MIME::Types::Columnar
         line.chomp!
 
         if lookup
-          type = @__mime_data__[i += 1] or next
+          (type = @__mime_data__[i += 1]) || next
           yield type, line
         else
           yield line
@@ -89,15 +89,15 @@ module MIME::Types::Columnar
   end
 
   def load_xrefs
-    each_file_line('xrefs') { |type, line|
+    each_file_line('xrefs') do |type, line|
       type.instance_variable_set(:@xrefs, dict(line, array: true))
-    }
+    end
   end
 
   def load_friendly
-    each_file_line('friendly') { |type, line|
+    each_file_line('friendly') do |type, line|
       type.instance_variable_set(:@friendly, dict(line))
-    }
+    end
   end
 
   def load_use_instead
@@ -110,11 +110,11 @@ module MIME::Types::Columnar
     if line == '-'
       {}
     else
-      line.split('|').each_with_object({}) { |l, h|
+      line.split('|').each_with_object({}) do |l, h|
         k, v = l.split('^')
         v = nil if v.empty?
         h[k] = array ? Array(v) : v
-      }
+      end
     end
   end
 

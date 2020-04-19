@@ -5,7 +5,9 @@ class Regexp #:nodoc:
     options & MULTILINE == MULTILINE
   end
 
-  def match?(string, pos = 0)
-    !!match(string, pos)
-  end unless //.respond_to?(:match?)
+  unless //.respond_to?(:match?)
+    def match?(string, pos = 0)
+      !!match(string, pos)
+    end
+  end
 end

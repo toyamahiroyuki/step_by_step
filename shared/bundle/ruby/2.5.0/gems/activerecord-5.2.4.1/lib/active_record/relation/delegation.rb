@@ -12,13 +12,13 @@ module ActiveRecord
         [
           ActiveRecord::Relation,
           ActiveRecord::Associations::CollectionProxy,
-          ActiveRecord::AssociationRelation
+          ActiveRecord::AssociationRelation,
         ].each do |klass|
-          delegate = Class.new(klass) {
+          delegate = Class.new(klass) do
             include ClassSpecificRelation
-          }
+          end
           include_relation_methods(delegate)
-          mangled_name = klass.name.gsub("::".freeze, "_".freeze)
+          mangled_name = klass.name.gsub("::", "_")
           const_set mangled_name, delegate
           private_constant mangled_name
 
@@ -32,33 +32,35 @@ module ActiveRecord
       end
 
       protected
-        def include_relation_methods(delegate)
-          superclass.include_relation_methods(delegate) unless base_class == self
-          delegate.include generated_relation_methods
-        end
+
+      def include_relation_methods(delegate)
+        superclass.include_relation_methods(delegate) unless base_class == self
+        delegate.include generated_relation_methods
+      end
 
       private
-        def generated_relation_methods
-          @generated_relation_methods ||= Module.new.tap do |mod|
-            mod_name = "GeneratedRelationMethods"
-            const_set mod_name, mod
-            private_constant mod_name
-          end
-        end
 
-        def generate_relation_method(method)
-          if /\A[a-zA-Z_]\w*[!?]?\z/.match?(method)
-            generated_relation_methods.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def generated_relation_methods
+        @generated_relation_methods ||= Module.new.tap do |mod|
+          mod_name = "GeneratedRelationMethods"
+          const_set mod_name, mod
+          private_constant mod_name
+        end
+      end
+
+      def generate_relation_method(method)
+        if /\A[a-zA-Z_]\w*[!?]?\z/.match?(method)
+          generated_relation_methods.module_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{method}(*args, &block)
                 scoping { klass.#{method}(*args, &block) }
               end
             RUBY
-          else
-            generated_relation_methods.send(:define_method, method) do |*args, &block|
-              scoping { klass.public_send(method, *args, &block) }
-            end
+        else
+          generated_relation_methods.send(:define_method, method) do |*args, &block|
+            scoping { klass.public_send(method, *args, &block) }
           end
         end
+      end
     end
 
     extend ActiveSupport::Concern
@@ -108,23 +110,23 @@ module ActiveRecord
 
       private
 
-        def method_missing(method, *args, &block)
-          if @klass.respond_to?(method)
-            self.class.delegate_to_scoped_klass(method)
-            scoping { @klass.public_send(method, *args, &block) }
-          elsif @delegate_to_klass && @klass.respond_to?(method, true)
-            ActiveSupport::Deprecation.warn \
-              "Delegating missing #{method} method to #{@klass}. " \
-              "Accessibility of private/protected class methods in :scope is deprecated and will be removed in Rails 6.0."
-            @klass.send(method, *args, &block)
-          elsif arel.respond_to?(method)
-            ActiveSupport::Deprecation.warn \
-              "Delegating #{method} to arel is deprecated and will be removed in Rails 6.0."
-            arel.public_send(method, *args, &block)
-          else
-            super
-          end
+      def method_missing(method, *args, &block)
+        if @klass.respond_to?(method)
+          self.class.delegate_to_scoped_klass(method)
+          scoping { @klass.public_send(method, *args, &block) }
+        elsif @delegate_to_klass && @klass.respond_to?(method, true)
+          ActiveSupport::Deprecation.warn \
+            "Delegating missing #{method} method to #{@klass}. " \
+            "Accessibility of private/protected class methods in :scope is deprecated and will be removed in Rails 6.0."
+          @klass.send(method, *args, &block)
+        elsif arel.respond_to?(method)
+          ActiveSupport::Deprecation.warn \
+            "Delegating #{method} to arel is deprecated and will be removed in Rails 6.0."
+          arel.public_send(method, *args, &block)
+        else
+          super
         end
+      end
     end
 
     module ClassMethods # :nodoc:
@@ -134,14 +136,15 @@ module ActiveRecord
 
       private
 
-        def relation_class_for(klass)
-          klass.relation_delegate_class(self)
-        end
+      def relation_class_for(klass)
+        klass.relation_delegate_class(self)
+      end
     end
 
     private
-      def respond_to_missing?(method, _)
-        super || @klass.respond_to?(method) || arel.respond_to?(method)
-      end
+
+    def respond_to_missing?(method, _)
+      super || @klass.respond_to?(method) || arel.respond_to?(method)
+    end
   end
 end

@@ -4,8 +4,8 @@ module Rack
   class QueryParser
     (require_relative 'core_ext/regexp'; using ::Rack::RegexpExtensions) if RUBY_VERSION < '2.4'
 
-    DEFAULT_SEP = /[&;] */n
-    COMMON_SEP = { ";" => /[;] */n, ";," => /[;,] */n, "&" => /[&] */n }
+    DEFAULT_SEP = /[&;] */n.freeze
+    COMMON_SEP = { ";" => /[;] */n, ";," => /[;,] */n, "&" => /[&] */n }.freeze
 
     # ParameterTypeError is the error that is raised when incoming structural
     # parameters (parsed by parse_nested_query) contain conflicting types.
@@ -53,7 +53,7 @@ module Rack
         end
       end
 
-      return params.to_h
+      params.to_h
     end
 
     # parse_nested_query expands a query string into structural types. Supported
@@ -64,7 +64,7 @@ module Rack
     def parse_nested_query(qs, d = nil)
       params = make_params
 
-      unless qs.nil? || qs.empty?
+      if qs.present?
         (qs || '').split(d ? (COMMON_SEP[d] || /[#{d}] */n) : DEFAULT_SEP).each do |p|
           k, v = p.split('=', 2).map! { |s| unescape(s) }
 
@@ -72,7 +72,7 @@ module Rack
         end
       end
 
-      return params.to_h
+      params.to_h
     rescue ArgumentError => e
       raise InvalidParameterError, e.message, e.backtrace
     end
@@ -83,8 +83,8 @@ module Rack
     def normalize_params(params, name, v, depth)
       raise RangeError if depth <= 0
 
-      name =~ %r(\A[\[\]]*([^\[\]]+)\]*)
-      k = $1 || ''
+      name =~ %r{\A[\[\]]*([^\[\]]+)\]*}
+      k = Regexp.last_match(1) || ''
       after = $' || ''
 
       if k.empty?
@@ -103,8 +103,8 @@ module Rack
         params[k] ||= []
         raise ParameterTypeError, "expected Array (got #{params[k].class.name}) for param `#{k}'" unless params[k].is_a?(Array)
         params[k] << v
-      elsif after =~ %r(^\[\]\[([^\[\]]+)\]$) || after =~ %r(^\[\](.+)$)
-        child_key = $1
+      elsif after =~ %r{^\[\]\[([^\[\]]+)\]$} || after =~ %r{^\[\](.+)$}
+        child_key = Regexp.last_match(1)
         params[k] ||= []
         raise ParameterTypeError, "expected Array (got #{params[k].class.name}) for param `#{k}'" unless params[k].is_a?(Array)
         if params_hash_type?(params[k].last) && !params_hash_has_key?(params[k].last, child_key)
@@ -136,7 +136,7 @@ module Rack
     private
 
     def params_hash_type?(obj)
-      obj.kind_of?(@params_class)
+      obj.is_a?(@params_class)
     end
 
     def params_hash_has_key?(hash, key)
@@ -203,7 +203,7 @@ module Rack
           when Params
             @params[key] = value.to_h
           when Array
-            value.map! { |v| v.kind_of?(Params) ? v.to_h : v }
+            value.map! { |v| v.is_a?(Params) ? v.to_h : v }
           else
             # Ignore anything that is not a `Params` object or
             # a collection that can contain one.

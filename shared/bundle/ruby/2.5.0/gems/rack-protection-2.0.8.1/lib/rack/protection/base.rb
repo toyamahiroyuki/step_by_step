@@ -8,13 +8,13 @@ module Rack
   module Protection
     class Base
       DEFAULT_OPTIONS = {
-        :reaction    => :default_reaction, :logging   => true,
-        :message     => 'Forbidden',       :encryptor => Digest::SHA1,
-        :session_key => 'rack.session',    :status    => 403,
+        :reaction => :default_reaction, :logging => true,
+        :message => 'Forbidden', :encryptor => Digest::SHA1,
+        :session_key => 'rack.session', :status => 403,
         :allow_empty_referrer => true,
-        :report_key           => "protection.failed",
-        :html_types           => %w[text/html application/xhtml text/xml application/xml]
-      }
+        :report_key => "protection.failed",
+        :html_types => %w(text/html application/xhtml text/xml application/xml),
+      }.freeze
 
       attr_reader :app, :options
 
@@ -35,7 +35,7 @@ module Rack
       end
 
       def safe?(env)
-        %w[GET HEAD OPTIONS TRACE].include? env['REQUEST_METHOD']
+        %w(GET HEAD OPTIONS TRACE).include? env['REQUEST_METHOD']
       end
 
       def accepts?(env)
@@ -47,12 +47,12 @@ module Rack
           instrument env
           result = react env
         end
-        result or app.call(env)
+        result || app.call(env)
       end
 
       def react(env)
         result = send(options[:reaction], env)
-        result if Array === result and result.size == 3
+        result if (Array === result) && (result.size == 3)
       end
 
       def warn(env, message)
@@ -69,7 +69,7 @@ module Rack
 
       def deny(env)
         warn env, "attack prevented by #{self.class}"
-        [options[:status], {'Content-Type' => 'text/plain'}, [options[:message]]]
+        [options[:status], { 'Content-Type' => 'text/plain' }, [options[:message]]]
       end
 
       def report(env)
@@ -92,7 +92,7 @@ module Rack
 
       def referrer(env)
         ref = env['HTTP_REFERER'].to_s
-        return if !options[:allow_empty_referrer] and ref.empty?
+        return if !options[:allow_empty_referrer] && ref.empty?
         URI.parse(ref).host || Request.new(env).host
       rescue URI::InvalidURIError
       end
@@ -102,7 +102,7 @@ module Rack
       end
 
       def random_string(secure = defined? SecureRandom)
-        secure ? SecureRandom.hex(16) : "%032x" % rand(2**128-1)
+        secure ? SecureRandom.hex(16) : "%032x" % rand(2**128 - 1)
       rescue NotImplementedError
         random_string false
       end
@@ -118,7 +118,7 @@ module Rack
       alias default_reaction deny
 
       def html?(headers)
-        return false unless header = headers.detect { |k,v| k.downcase == 'content-type' }
+        return false unless header = headers.detect { |k, v| k.downcase == 'content-type' }
         options[:html_types].include? header.last[/^\w+\/\w+/]
       end
     end

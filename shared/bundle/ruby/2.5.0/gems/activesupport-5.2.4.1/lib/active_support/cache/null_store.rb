@@ -28,16 +28,17 @@ module ActiveSupport
       end
 
       private
-        def read_entry(key, options)
-        end
 
-        def write_entry(key, entry, options)
-          true
-        end
+      def read_entry(key, options)
+      end
 
-        def delete_entry(key, options)
-          false
-        end
+      def write_entry(key, entry, options)
+        true
+      end
+
+      def delete_entry(key, options)
+        false
+      end
     end
   end
 end

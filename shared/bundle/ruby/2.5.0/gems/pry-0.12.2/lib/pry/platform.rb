@@ -40,9 +40,9 @@ class Pry
     #   Returns true when Pry is running on Windows with ANSI support.
     #
     def windows_ansi?
-      return false if not windows?
+      return false if !windows?
 
-      !!(defined?(Win32::Console) or ENV['ANSICON'] or mri_2?)
+      !!(defined?(Win32::Console) || ENV['ANSICON'] || mri_2?)
     end
 
     #
@@ -58,7 +58,7 @@ class Pry
     #   Returns true when Pry is being run from JRuby in 1.9 mode.
     #
     def jruby_19?
-      jruby? and RbConfig::CONFIG['ruby_version'] == '1.9'
+      jruby? && (RbConfig::CONFIG['ruby_version'] == '1.9')
     end
 
     #
@@ -74,7 +74,7 @@ class Pry
     #   Returns true when Pry is being run from MRI v1.9+ (CRuby).
     #
     def mri_19?
-      !!(mri? and RUBY_VERSION =~ /\A1\.9/)
+      !!(mri? && RUBY_VERSION =~ /\A1\.9/)
     end
 
     #
@@ -82,7 +82,7 @@ class Pry
     #   Returns true when Pry is being run from MRI v2+ (CRuby).
     #
     def mri_2?
-      !!(mri? and RUBY_VERSION =~ /\A2/)
+      !!(mri? && RUBY_VERSION =~ /\A2/)
     end
   end
 

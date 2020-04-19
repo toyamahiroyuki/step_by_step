@@ -33,8 +33,8 @@ module Mime
   end
 
   SET              = Mimes.new
-  EXTENSION_LOOKUP = {}
-  LOOKUP           = {}
+  EXTENSION_LOOKUP = {}.freeze
+  LOOKUP           = {}.freeze
 
   class << self
     def [](type)
@@ -74,7 +74,7 @@ module Mime
       def initialize(index, name, q = nil)
         @index = index
         @name = name
-        q ||= 0.0 if @name == "*/*".freeze # Default wildcard match to end of list.
+        q ||= 0.0 if @name == "*/*" # Default wildcard match to end of list.
         @q = ((q || 1.0).to_f * 100).to_i
       end
 
@@ -98,11 +98,11 @@ module Mime
           text_xml = list[text_xml_idx]
 
           app_xml.q = [text_xml.q, app_xml.q].max # Set the q value to the max of the two.
-          if app_xml_idx > text_xml_idx  # Make sure app_xml is ahead of text_xml in the list.
+          if app_xml_idx > text_xml_idx # Make sure app_xml is ahead of text_xml in the list.
             list[app_xml_idx], list[text_xml_idx] = text_xml, app_xml
             app_xml_idx, text_xml_idx = text_xml_idx, app_xml_idx
           end
-          list.delete_at(text_xml_idx)  # Delete text_xml from the list.
+          list.delete_at(text_xml_idx) # Delete text_xml from the list.
         elsif text_xml_idx
           list[text_xml_idx].name = Mime[:xml].to_s
         end
@@ -134,8 +134,8 @@ module Mime
     end
 
     class << self
-      TRAILING_STAR_REGEXP = /^(text|application)\/\*/
-      PARAMETER_SEPARATOR_REGEXP = /;\s*\w+="?\w+"?/
+      TRAILING_STAR_REGEXP = /^(text|application)\/\*/.freeze
+      PARAMETER_SEPARATOR_REGEXP = /;\s*\w+="?\w+"?/.freeze
 
       def register_callback(&block)
         @register_callbacks << block
@@ -194,7 +194,7 @@ module Mime
       end
 
       def parse_trailing_star(accept_header)
-        parse_data_with_trailing_star($1) if accept_header =~ TRAILING_STAR_REGEXP
+        parse_data_with_trailing_star(Regexp.last_match(1)) if accept_header =~ TRAILING_STAR_REGEXP
       end
 
       # For an input of <tt>'text'</tt>, returns <tt>[Mime[:json], Mime[:xml], Mime[:ics],
@@ -247,7 +247,7 @@ module Mime
 
     def ===(list)
       if list.is_a?(Array)
-        (@synonyms + [ self ]).any? { |synonym| list.include?(synonym) }
+        (@synonyms + [self]).any? { |synonym| list.include?(synonym) }
       else
         super
       end
@@ -255,7 +255,7 @@ module Mime
 
     def ==(mime_type)
       return false unless mime_type
-      (@synonyms + [ self ]).any? do |synonym|
+      (@synonyms + [self]).any? do |synonym|
         synonym.to_s == mime_type.to_s || synonym.to_sym == mime_type.to_sym
       end
     end
@@ -277,30 +277,33 @@ module Mime
       symbol == :html || @string =~ /html/
     end
 
-    def all?; false; end
+    def all?
+      false
+    end
 
     # TODO Change this to private once we've dropped Ruby 2.2 support.
     # Workaround for Ruby 2.2 "private attribute?" warning.
     protected
 
-      attr_reader :string, :synonyms
+    attr_reader :string, :synonyms
 
     private
 
-      def to_ary; end
-      def to_a; end
+    def to_ary; end
 
-      def method_missing(method, *args)
-        if method.to_s.ends_with? "?"
-          method[0..-2].downcase.to_sym == to_sym
-        else
-          super
-        end
-      end
+    def to_a; end
 
-      def respond_to_missing?(method, include_private = false)
-        (method.to_s.ends_with? "?") || super
+    def method_missing(method, *args)
+      if method.to_s.ends_with? "?"
+        method[0..-2].downcase.to_sym == to_sym
+      else
+        super
       end
+    end
+
+    def respond_to_missing?(method, include_private = false)
+      (method.to_s.ends_with? "?") || super
+    end
   end
 
   class AllType < Type
@@ -310,8 +313,13 @@ module Mime
       super "*/*", :all
     end
 
-    def all?; true; end
-    def html?; true; end
+    def all?
+      true
+    end
+
+    def html?
+      true
+    end
   end
 
   # ALL isn't a real MIME type, so we don't register it for lookup with the
@@ -329,13 +337,14 @@ module Mime
     def ref; end
 
     private
-      def respond_to_missing?(method, _)
-        method.to_s.ends_with? "?"
-      end
 
-      def method_missing(method, *args)
-        false if method.to_s.ends_with? "?"
-      end
+    def respond_to_missing?(method, _)
+      method.to_s.ends_with? "?"
+    end
+
+    def method_missing(method, *args)
+      false if method.to_s.ends_with? "?"
+    end
   end
 end
 

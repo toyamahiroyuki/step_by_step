@@ -1,10 +1,9 @@
 module Nokogiri
   module CSS
     class XPathVisitor # :nodoc:
-      def visit_function node
-
+      def visit_function(node)
         msg = :"visit_function_#{node.value.first.gsub(/[(]/, '')}"
-        return self.send(msg, node) if self.respond_to?(msg)
+        return send(msg, node) if respond_to?(msg)
 
         case node.value.first
         when /^text\(/
@@ -14,29 +13,29 @@ module Nokogiri
         when /^eq\(/
           "position() = #{node.value[1]}"
         when /^(nth|nth-of-type)\(/
-          if node.value[1].is_a?(Nokogiri::CSS::Node) and node.value[1].type == :NTH
+          if node.value[1].is_a?(Nokogiri::CSS::Node) && (node.value[1].type == :NTH)
             nth(node.value[1])
           else
             "position() = #{node.value[1]}"
           end
         when /^nth-child\(/
-          if node.value[1].is_a?(Nokogiri::CSS::Node) and node.value[1].type == :NTH
+          if node.value[1].is_a?(Nokogiri::CSS::Node) && (node.value[1].type == :NTH)
             nth(node.value[1], :child => true)
           else
-            "count(preceding-sibling::*) = #{node.value[1].to_i-1}"
+            "count(preceding-sibling::*) = #{node.value[1].to_i - 1}"
           end
         when /^nth-last-of-type\(/
-          if node.value[1].is_a?(Nokogiri::CSS::Node) and node.value[1].type == :NTH
+          if node.value[1].is_a?(Nokogiri::CSS::Node) && (node.value[1].type == :NTH)
             nth(node.value[1], :last => true)
           else
             index = node.value[1].to_i - 1
             index == 0 ? "position() = last()" : "position() = last() - #{index}"
           end
         when /^nth-last-child\(/
-          if node.value[1].is_a?(Nokogiri::CSS::Node) and node.value[1].type == :NTH
+          if node.value[1].is_a?(Nokogiri::CSS::Node) && (node.value[1].type == :NTH)
             nth(node.value[1], :last => true, :child => true)
           else
-            "count(following-sibling::*) = #{node.value[1].to_i-1}"
+            "count(following-sibling::*) = #{node.value[1].to_i - 1}"
           end
         when /^(first|first-of-type)\(/
           "position() = 1"
@@ -58,7 +57,7 @@ module Nokogiri
         end
       end
 
-      def visit_not node
+      def visit_not(node)
         child = node.value.first
         if :ELEMENT_NAME == child.type
           "not(self::#{child.accept(self)})"
@@ -67,17 +66,17 @@ module Nokogiri
         end
       end
 
-      def visit_id node
+      def visit_id(node)
         node.value.first =~ /^#(.*)$/
-        "@id = '#{$1}'"
+        "@id = '#{Regexp.last_match(1)}'"
       end
 
-      def visit_attribute_condition node
-         attribute = if (node.value.first.type == :FUNCTION) or (node.value.first.value.first =~ /::/)
-                       ''
-                     else
-                       '@'
-                     end
+      def visit_attribute_condition(node)
+        attribute = if (node.value.first.type == :FUNCTION) || (node.value.first.value.first =~ /::/)
+                      ''
+                    else
+                      '@'
+                    end
         attribute += node.value.first.accept(self)
 
         # Support non-standard css
@@ -88,10 +87,10 @@ module Nokogiri
         value = node.value.last
         value = "'#{value}'" if value !~ /^['"]/
 
-        if (value[0]==value[-1]) && %q{"'}.include?(value[0])
+        if (value[0] == value[-1]) && %q("').include?(value[0])
           str_value = value[1..-2]
           if str_value.include?(value[0])
-            value = 'concat("' + str_value.split('"', -1).join(%q{", '"', "}) + '", "")'
+            value = 'concat("' + str_value.split('"', -1).join(%q(", '"', ")) + '", "")'
           end
         end
 
@@ -109,19 +108,19 @@ module Nokogiri
         when :includes
           "contains(concat(\" \", #{attribute}, \" \"),concat(\" \", #{value}, \" \"))"
         when :suffix_match
-          "substring(#{attribute}, string-length(#{attribute}) - " +
+          "substring(#{attribute}, string-length(#{attribute}) - " \
             "string-length(#{value}) + 1, string-length(#{value})) = #{value}"
         else
           attribute + " #{node.value[1]} " + "#{value}"
         end
       end
 
-      def visit_pseudo_class node
-        if node.value.first.is_a?(Nokogiri::CSS::Node) and node.value.first.type == :FUNCTION
+      def visit_pseudo_class(node)
+        if node.value.first.is_a?(Nokogiri::CSS::Node) && (node.value.first.type == :FUNCTION)
           node.value.first.accept(self)
         else
           msg = :"visit_pseudo_class_#{node.value.first.gsub(/[(]/, '')}"
-          return self.send(msg, node) if self.respond_to?(msg)
+          return send(msg, node) if respond_to?(msg)
 
           case node.value.first
           when "first" then "position() = 1"
@@ -141,11 +140,11 @@ module Nokogiri
         end
       end
 
-      def visit_class_condition node
+      def visit_class_condition(node)
         "contains(concat(' ', normalize-space(@class), ' '), ' #{node.value.first} ')"
       end
 
-      def visit_combinator node
+      def visit_combinator(node)
         if is_of_type_pseudo_class?(node.value.last)
           "#{node.value.first.accept(self) if node.value.first}][#{node.value.last.accept(self)}"
         else
@@ -154,11 +153,11 @@ module Nokogiri
       end
 
       {
-        'direct_adjacent_selector'  => "/following-sibling::*[1]/self::",
-        'following_selector'        => "/following-sibling::",
-        'descendant_selector'       => '//',
-        'child_selector'            => '/',
-      }.each do |k,v|
+        'direct_adjacent_selector' => "/following-sibling::*[1]/self::",
+        'following_selector' => "/following-sibling::",
+        'descendant_selector' => '//',
+        'child_selector' => '/',
+      }.each do |k, v|
         class_eval %{
           def visit_#{k} node
             "\#{node.value.first.accept(self) if node.value.first}#{v}\#{node.value.last.accept(self)}"
@@ -166,28 +165,29 @@ module Nokogiri
         }
       end
 
-      def visit_conditional_selector node
+      def visit_conditional_selector(node)
         node.value.first.accept(self) + '[' +
         node.value.last.accept(self) + ']'
       end
 
-      def visit_element_name node
+      def visit_element_name(node)
         node.value.first
       end
 
-      def accept node
+      def accept(node)
         node.accept(self)
       end
 
-    private
-      def nth node, options={}
+      private
+
+      def nth(node, options = {})
         raise ArgumentError, "expected an+b node to contain 4 tokens, but is #{node.value.inspect}" unless node.value.size == 4
 
         a, b = read_a_and_positive_b node.value
         position = if options[:child]
-          options[:last] ? "(count(following-sibling::*) + 1)" : "(count(preceding-sibling::*) + 1)"
-        else
-          options[:last] ? "(last()-position()+1)" : "position()"
+                     options[:last] ? "(count(following-sibling::*) + 1)" : "(count(preceding-sibling::*) + 1)"
+                   else
+                     options[:last] ? "(last()-position()+1)" : "position()"
         end
 
         if b.zero?
@@ -202,7 +202,7 @@ module Nokogiri
         end
       end
 
-      def read_a_and_positive_b values
+      def read_a_and_positive_b(values)
         op = values[2]
         if op == "+"
           a = values[0].to_i
@@ -216,9 +216,9 @@ module Nokogiri
         [a, b]
       end
 
-      def is_of_type_pseudo_class? node
-        if node.type==:PSEUDO_CLASS
-          if node.value[0].is_a?(Nokogiri::CSS::Node) and node.value[0].type == :FUNCTION
+      def is_of_type_pseudo_class?(node)
+        if node.type == :PSEUDO_CLASS
+          if node.value[0].is_a?(Nokogiri::CSS::Node) && (node.value[0].type == :FUNCTION)
             node.value[0].value[0]
           else
             node.value[0]

@@ -4,23 +4,23 @@ describe Thingy do                     # class TestThingy < Minitest::Test
   before do                            #   def setup
     do_some_setup                      #     super
   end                                  #     do_some_setup
-                                       #   end
+  #   end
   it "should do the first thing" do    #
     1.must_equal 1                     #   def test_first_thing
   end                                  #     assert_equal 1, 1
-                                       #   end
+  #   end
   describe SubThingy do                # end
     before do                          #
       do_more_setup                    # class TestSubThingy < TestThingy
     end                                #   def setup
-                                       #     super
+    #     super
     it "should do the second thing" do #     do_more_setup
       2.must_equal 2                   #   end
     end                                #
   end                                  #   def test_second_thing
 end                                    #     assert_equal 2, 2
-                                       #   end
-                                       # end
+#   end
+# end
 ###############################################################################
 # runs 2 specs                         # runs 3 tests
 ###############################################################################

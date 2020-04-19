@@ -82,69 +82,74 @@ module ActionDispatch
     end
 
     private
-      def set_hsts_header!(headers)
-        headers["Strict-Transport-Security".freeze] ||= @hsts_header
+
+    def set_hsts_header!(headers)
+      headers["Strict-Transport-Security"] ||= @hsts_header
+    end
+
+    def normalize_hsts_options(options)
+      case options
+      # Explicitly disabling HSTS clears the existing setting from browsers
+      # by setting expiry to 0.
+      when false
+        self.class.default_hsts_options.merge(expires: 0)
+      # Default to enabled, with default options.
+      when nil, true
+        self.class.default_hsts_options
+      else
+        self.class.default_hsts_options.merge(options)
       end
+    end
 
-      def normalize_hsts_options(options)
-        case options
-        # Explicitly disabling HSTS clears the existing setting from browsers
-        # by setting expiry to 0.
-        when false
-          self.class.default_hsts_options.merge(expires: 0)
-        # Default to enabled, with default options.
-        when nil, true
-          self.class.default_hsts_options
-        else
-          self.class.default_hsts_options.merge(options)
-        end
+    # https://tools.ietf.org/html/rfc6797#section-6.1
+    def build_hsts_header(hsts)
+      value = "max-age=#{hsts[:expires].to_i}".dup
+      value << "; includeSubDomains" if hsts[:subdomains]
+      value << "; preload" if hsts[:preload]
+      value
+    end
+
+    def flag_cookies_as_secure!(headers)
+      if cookies = headers["Set-Cookie"]
+        cookies = cookies.split("\n")
+
+        headers["Set-Cookie"] = cookies.map do |cookie|
+          if cookie !~ /;\s*secure\s*(;|$)/i
+            "#{cookie}; secure"
+          else
+            cookie
+          end
+        end.join("\n")
       end
+    end
 
-      # https://tools.ietf.org/html/rfc6797#section-6.1
-      def build_hsts_header(hsts)
-        value = "max-age=#{hsts[:expires].to_i}".dup
-        value << "; includeSubDomains" if hsts[:subdomains]
-        value << "; preload" if hsts[:preload]
-        value
+    def redirect_to_https(request)
+      [
+        @redirect.fetch(:status, redirection_status(request)),
+        {
+          "Content-Type" => "text/html",
+          "Location" => https_location_for(request),
+        },
+        @redirect.fetch(:body, []),
+      ]
+    end
+
+    def redirection_status(request)
+      if request.get? || request.head?
+        301 # Issue a permanent redirect via a GET request.
+      else
+        307 # Issue a fresh request redirect to preserve the HTTP method.
       end
+    end
 
-      def flag_cookies_as_secure!(headers)
-        if cookies = headers["Set-Cookie".freeze]
-          cookies = cookies.split("\n".freeze)
+    def https_location_for(request)
+      host = @redirect[:host] || request.host
+      port = @redirect[:port] || request.port
 
-          headers["Set-Cookie".freeze] = cookies.map { |cookie|
-            if cookie !~ /;\s*secure\s*(;|$)/i
-              "#{cookie}; secure"
-            else
-              cookie
-            end
-          }.join("\n".freeze)
-        end
-      end
-
-      def redirect_to_https(request)
-        [ @redirect.fetch(:status, redirection_status(request)),
-          { "Content-Type" => "text/html",
-            "Location" => https_location_for(request) },
-          @redirect.fetch(:body, []) ]
-      end
-
-      def redirection_status(request)
-        if request.get? || request.head?
-          301 # Issue a permanent redirect via a GET request.
-        else
-          307 # Issue a fresh request redirect to preserve the HTTP method.
-        end
-      end
-
-      def https_location_for(request)
-        host = @redirect[:host] || request.host
-        port = @redirect[:port] || request.port
-
-        location = "https://#{host}".dup
-        location << ":#{port}" if port != 80 && port != 443
-        location << request.fullpath
-        location
-      end
+      location = "https://#{host}".dup
+      location << ":#{port}" if port != 80 && port != 443
+      location << request.fullpath
+      location
+    end
   end
 end

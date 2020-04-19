@@ -5,11 +5,11 @@ end
 
 module Hoe::Minitest
   def minitest?
-    self.name == "minitest"
+    name == "minitest"
   end
 
   def initialize_minitest
-    unless minitest? then
+    unless minitest?
       dir = "../../minitest/dev/lib"
       Hoe.add_include_dirs dir if File.directory? dir
     end
@@ -19,7 +19,7 @@ module Hoe::Minitest
     version = Minitest::VERSION.split(/\./).first(2).join(".")
 
     dependency "minitest", "~> #{version}", :development unless
-      minitest? or ENV["MT_NO_ISOLATE"]
+      minitest? || ENV["MT_NO_ISOLATE"]
   end
 
   def define_minitest_tasks
@@ -27,6 +27,6 @@ module Hoe::Minitest
 
     # make sure we use the gemmed minitest on 1.9
     self.test_prelude = 'gem "minitest"' unless
-      minitest? or ENV["MT_NO_ISOLATE"]
+      minitest? || ENV["MT_NO_ISOLATE"]
   end
 end

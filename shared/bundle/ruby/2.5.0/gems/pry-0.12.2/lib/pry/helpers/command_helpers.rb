@@ -1,6 +1,5 @@
 class Pry
   module Helpers
-
     module CommandHelpers
       include OptionsHelpers
 
@@ -142,8 +141,8 @@ class Pry
         Range.new(a, b)
       end
 
-      def set_file_and_dir_locals(file_name, _pry_ = _pry_(), target = target())
-        return if !target or !file_name
+      def set_file_and_dir_locals(file_name, _pry_ = _pry_, target = target)
+        return if !target || !file_name
 
         _pry_.last_file = File.expand_path(file_name)
         _pry_.inject_local("_file_", _pry_.last_file, target)
@@ -152,6 +151,5 @@ class Pry
         _pry_.inject_local("_dir_", _pry_.last_dir, target)
       end
     end
-
   end
 end

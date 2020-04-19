@@ -2,7 +2,7 @@ class Pry::Slop
   require_relative 'slop/option'
   require_relative 'slop/commands'
   include Enumerable
-  VERSION = '3.4.0'
+  VERSION = '3.4.0'.freeze
 
   # The main Error class, all Exception classes inherit from this class.
   class Error < StandardError; end
@@ -32,8 +32,8 @@ class Pry::Slop
     arguments: false,
     optional_arguments: false,
     multiple_switches: true,
-    longest_flag: 0
-  }
+    longest_flag: 0,
+  }.freeze
 
   class << self
     # items  - The Array of items to extract options from (default: ARGV).
@@ -134,7 +134,7 @@ class Pry::Slop
 
     if config[:help]
       on('-h', '--help', 'Display this help message.', tail: true) do
-        $stderr.puts help
+        warn help
       end
     end
   end
@@ -229,7 +229,7 @@ class Pry::Slop
     missing_options = options.select { |opt| opt.required? && opt.count < 1 }
     if missing_options.any?
       raise MissingOptionError,
-      "Missing required option(s): #{missing_options.map(&:key).join(', ')}"
+            "Missing required option(s): #{missing_options.map(&:key).join(', ')}"
     end
 
     if @unknown_options.any?
@@ -410,9 +410,9 @@ class Pry::Slop
     heads  = options.reject(&:tail?)
     tails  = (options - heads)
     opts = (heads + tails).select(&:help).map(&:to_s)
-    optstr = opts.each_with_index.map { |o, i|
+    optstr = opts.each_with_index.map do |o, i|
       (str = @separators[i + 1]) ? [o, str].join("\n") : o
-    }.join("\n")
+    end.join("\n")
 
     if @commands.any?
       optstr << "\n" if !optstr.empty?
@@ -422,7 +422,7 @@ class Pry::Slop
     end
 
     banner = config[:banner]
-    banner = "Usage: #{File.basename($0, '.*')}#{' [command]' if @commands.any?} [options]" if banner.nil?
+    banner = "Usage: #{File.basename($PROGRAM_NAME, '.*')}#{' [command]' if @commands.any?} [options]" if banner.nil?
     if banner
       "#{banner}\n#{@separators[0] ? "#{@separators[0]}\n" : ''}#{optstr}"
     else
@@ -564,7 +564,7 @@ class Pry::Slop
     unless option
       case flag
       when /\A--?([^=]+)=(.+)\z/, /\A-([a-zA-Z])(.+)\z/, /\A--no-(.+)\z/
-        option, argument = fetch_option($1), ($2 || false)
+        option, argument = fetch_option(Regexp.last_match(1)), (Regexp.last_match(2) || false)
         option.argument_in_value = true if option
       end
     end

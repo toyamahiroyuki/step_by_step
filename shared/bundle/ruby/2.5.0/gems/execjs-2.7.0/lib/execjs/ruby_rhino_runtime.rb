@@ -38,7 +38,7 @@ module ExecJS
       end
 
       def unbox(value)
-        case value = ::Rhino::to_ruby(value)
+        case value = ::Rhino.to_ruby(value)
         when Java::OrgMozillaJavascript::NativeFunction
           nil
         when Java::OrgMozillaJavascript::NativeObject
@@ -73,14 +73,15 @@ module ExecJS
       end
 
       private
-        # Disables bytecode compiling which limits you to 64K scripts
-        def fix_memory_limit!(context)
-          if context.respond_to?(:optimization_level=)
-            context.optimization_level = -1
-          else
-            context.instance_eval { @native.setOptimizationLevel(-1) }
-          end
+
+      # Disables bytecode compiling which limits you to 64K scripts
+      def fix_memory_limit!(context)
+        if context.respond_to?(:optimization_level=)
+          context.optimization_level = -1
+        else
+          context.instance_eval { @native.setOptimizationLevel(-1) }
         end
+      end
     end
 
     def name

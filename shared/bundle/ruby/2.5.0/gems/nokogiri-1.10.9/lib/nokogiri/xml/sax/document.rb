@@ -70,7 +70,7 @@ module Nokogiri
       class Document
         ###
         # Called when an XML declaration is parsed
-        def xmldecl version, encoding, standalone
+        def xmldecl(version, encoding, standalone)
         end
 
         ###
@@ -88,13 +88,13 @@ module Nokogiri
         # * +name+ is the name of the tag
         # * +attrs+ are an assoc list of namespaces and attributes, e.g.:
         #     [ ["xmlns:foo", "http://sample.net"], ["size", "large"] ]
-        def start_element name, attrs = []
+        def start_element(name, attrs = [])
         end
 
         ###
         # Called at the end of an element
         # +name+ is the tag name
-        def end_element name
+        def end_element(name)
         end
 
         ###
@@ -104,15 +104,15 @@ module Nokogiri
         # +prefix+ is the namespace prefix for the element
         # +uri+ is the associated namespace URI
         # +ns+ is a hash of namespace prefix:urls associated with the element
-        def start_element_namespace name, attrs = [], prefix = nil, uri = nil, ns = []
+        def start_element_namespace(name, attrs = [], prefix = nil, uri = nil, ns = [])
           ###
           # Deal with SAX v1 interface
           name = [prefix, name].compact.join(':')
-          attributes = ns.map { |ns_prefix,ns_uri|
+          attributes = ns.map do |ns_prefix, ns_uri|
             [['xmlns', ns_prefix].compact.join(':'), ns_uri]
-          } + attrs.map { |attr|
+          end + attrs.map do |attr|
             [[attr.prefix, attr.localname].compact.join(':'), attr.value]
-          }
+          end
           start_element name, attributes
         end
 
@@ -121,7 +121,7 @@ module Nokogiri
         # +name+ is the element's name
         # +prefix+ is the namespace prefix associated with the element
         # +uri+ is the associated namespace URI
-        def end_element_namespace name, prefix = nil, uri = nil
+        def end_element_namespace(name, prefix = nil, uri = nil)
           ###
           # Deal with SAX v1 interface
           end_element [prefix, name].compact.join(':')
@@ -132,38 +132,38 @@ module Nokogiri
         # times given one contiguous string of characters.
         #
         # +string+ contains the character data
-        def characters string
+        def characters(string)
         end
 
         ###
         # Called when comments are encountered
         # +string+ contains the comment data
-        def comment string
+        def comment(string)
         end
 
         ###
         # Called on document warnings
         # +string+ contains the warning
-        def warning string
+        def warning(string)
         end
 
         ###
         # Called on document errors
         # +string+ contains the error
-        def error string
+        def error(string)
         end
 
         ###
         # Called when cdata blocks are found
         # +string+ contains the cdata content
-        def cdata_block string
+        def cdata_block(string)
         end
 
         ###
         # Called when processing instructions are found
         # +name+ is the target of the instruction
         # +content+ is the value of the instruction
-        def processing_instruction name, content
+        def processing_instruction(name, content)
         end
       end
     end

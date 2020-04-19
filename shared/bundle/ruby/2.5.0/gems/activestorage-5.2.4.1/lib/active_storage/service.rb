@@ -120,19 +120,21 @@ module ActiveStorage
     end
 
     private
-      def instrument(operation, payload = {}, &block)
-        ActiveSupport::Notifications.instrument(
-          "service_#{operation}.active_storage",
-          payload.merge(service: service_name), &block)
-      end
 
-      def service_name
-        # ActiveStorage::Service::DiskService => Disk
-        self.class.name.split("::").third.remove("Service")
-      end
+    def instrument(operation, payload = {}, &block)
+      ActiveSupport::Notifications.instrument(
+        "service_#{operation}.active_storage",
+        payload.merge(service: service_name), &block
+      )
+    end
 
-      def content_disposition_with(type: "inline", filename:)
-        (type.to_s.presence_in(%w( attachment inline )) || "inline") + "; #{filename.parameters}"
-      end
+    def service_name
+      # ActiveStorage::Service::DiskService => Disk
+      self.class.name.split("::").third.remove("Service")
+    end
+
+    def content_disposition_with(type: "inline", filename:)
+      (type.to_s.presence_in(%w(attachment inline)) || "inline") + "; #{filename.parameters}"
+    end
   end
 end

@@ -30,7 +30,7 @@ module ActionView #:nodoc:
       #   safe_join([raw("<p>foo</p>"), raw("<p>bar</p>")], raw("<br />"))
       #   # => "<p>foo</p><br /><p>bar</p>"
       #
-      def safe_join(array, sep = $,)
+      def safe_join(array, sep = $OUTPUT_FIELD_SEPARATOR)
         sep = ERB::Util.unwrapped_html_escape(sep)
 
         array.flatten.map! { |i| ERB::Util.unwrapped_html_escape(i) }.join(sep).html_safe
@@ -46,7 +46,7 @@ module ActionView #:nodoc:
         default_connectors = {
           words_connector: ", ",
           two_words_connector: " and ",
-          last_word_connector: ", and "
+          last_word_connector: ", and ",
         }
         if defined?(I18n)
           i18n_connectors = I18n.translate(:'support.array', locale: options[:locale], default: {})

@@ -31,7 +31,7 @@ module ActiveSupport
           # of the number of decimal digits (1234 with precision 2 becomes 1200, 1.23543 becomes 1.2)
           significant: false,
           # If set, the zeros after the decimal separator will always be stripped (eg.: 1.200 will be 1.2)
-          strip_insignificant_zeros: false
+          strip_insignificant_zeros: false,
         },
 
         # Used in number_to_currency
@@ -45,23 +45,23 @@ module ActiveSupport
             delimiter: ",",
             precision: 2,
             significant: false,
-            strip_insignificant_zeros: false
-          }
+            strip_insignificant_zeros: false,
+          },
         },
 
         # Used in number_to_percentage
         percentage: {
           format: {
             delimiter: "",
-            format: "%n%"
-          }
+            format: "%n%",
+          },
         },
 
         # Used in number_to_rounded
         precision: {
           format: {
-            delimiter: ""
-          }
+            delimiter: "",
+          },
         },
 
         # Used in number_to_human_size and number_to_human
@@ -71,7 +71,7 @@ module ActiveSupport
             delimiter: "",
             precision: 3,
             significant: true,
-            strip_insignificant_zeros: true
+            strip_insignificant_zeros: true,
           },
           # Used in number_to_human_size
           storage_units: {
@@ -83,8 +83,8 @@ module ActiveSupport
               kb: "KB",
               mb: "MB",
               gb: "GB",
-              tb: "TB"
-            }
+              tb: "TB",
+            },
           },
           # Used in number_to_human
           decimal_units: {
@@ -110,11 +110,11 @@ module ActiveSupport
               million: "Million",
               billion: "Billion",
               trillion: "Trillion",
-              quadrillion: "Quadrillion"
-            }
-          }
-        }
-      }
+              quadrillion: "Quadrillion",
+            },
+          },
+        },
+      }.freeze
 
       def self.convert(number, options)
         new(number, options).execute
@@ -137,48 +137,48 @@ module ActiveSupport
 
       private
 
-        def options
-          @options ||= format_options.merge(opts)
+      def options
+        @options ||= format_options.merge(opts)
+      end
+
+      def format_options
+        default_format_options.merge!(i18n_format_options)
+      end
+
+      def default_format_options
+        options = DEFAULTS[:format].dup
+        options.merge!(DEFAULTS[namespace][:format]) if namespace
+        options
+      end
+
+      def i18n_format_options
+        locale = opts[:locale]
+        options = I18n.translate(:'number.format', locale: locale, default: {}).dup
+
+        if namespace
+          options.merge!(I18n.translate(:"number.#{namespace}.format", locale: locale, default: {}))
         end
 
-        def format_options
-          default_format_options.merge!(i18n_format_options)
-        end
+        options
+      end
 
-        def default_format_options
-          options = DEFAULTS[:format].dup
-          options.merge!(DEFAULTS[namespace][:format]) if namespace
-          options
-        end
+      def translate_number_value_with_default(key, i18n_options = {})
+        I18n.translate(key, { default: default_value(key), scope: :number }.merge!(i18n_options))
+      end
 
-        def i18n_format_options
-          locale = opts[:locale]
-          options = I18n.translate(:'number.format', locale: locale, default: {}).dup
+      def translate_in_locale(key, i18n_options = {})
+        translate_number_value_with_default(key, { locale: options[:locale] }.merge(i18n_options))
+      end
 
-          if namespace
-            options.merge!(I18n.translate(:"number.#{namespace}.format", locale: locale, default: {}))
-          end
+      def default_value(key)
+        key.split(".").reduce(DEFAULTS) { |defaults, k| defaults[k.to_sym] }
+      end
 
-          options
-        end
-
-        def translate_number_value_with_default(key, i18n_options = {})
-          I18n.translate(key, { default: default_value(key), scope: :number }.merge!(i18n_options))
-        end
-
-        def translate_in_locale(key, i18n_options = {})
-          translate_number_value_with_default(key, { locale: options[:locale] }.merge(i18n_options))
-        end
-
-        def default_value(key)
-          key.split(".").reduce(DEFAULTS) { |defaults, k| defaults[k.to_sym] }
-        end
-
-        def valid_float?
-          Float(number)
-        rescue ArgumentError, TypeError
-          false
-        end
+      def valid_float?
+        Float(number)
+      rescue ArgumentError, TypeError
+        false
+      end
     end
   end
 end

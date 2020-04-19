@@ -3,7 +3,6 @@ require 'concurrent/atomic/ruby_thread_local_var'
 require 'concurrent/atomic/java_thread_local_var'
 
 module Concurrent
-
   ###################################################################
 
   # @!macro thread_local_var_method_initialize
@@ -35,7 +34,6 @@ module Concurrent
   #   @param [Object] value the value to bind
   #   @yield the operation to be performed with the bound variable
   #   @return [Object] the value
-
 
   ###################################################################
 

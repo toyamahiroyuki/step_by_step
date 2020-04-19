@@ -99,16 +99,16 @@ module ActiveRecord
       # for updating all records in a single query.
       def update(id = :all, attributes)
         if id.is_a?(Array)
-          id.map { |one_id| find(one_id) }.each_with_index { |object, idx|
+          id.map { |one_id| find(one_id) }.each_with_index do |object, idx|
             object.update(attributes[idx])
-          }
+          end
         elsif id == :all
           all.each { |record| record.update(attributes) }
         else
           if ActiveRecord::Base === id
             raise ArgumentError,
-              "You are passing an instance of ActiveRecord::Base to `update`. " \
-              "Please pass the id of the object by calling `.id`."
+                  "You are passing an instance of ActiveRecord::Base to `update`. " \
+                  "Please pass the id of the object by calling `.id`."
           end
           object = find(id)
           object.update(attributes)
@@ -208,22 +208,23 @@ module ActiveRecord
       end
 
       private
-        # Called by +instantiate+ to decide which class to use for a new
-        # record instance.
-        #
-        # See +ActiveRecord::Inheritance#discriminate_class_for_record+ for
-        # the single-table inheritance discriminator.
-        def discriminate_class_for_record(record)
-          self
-        end
 
-        def _substitute_values(values)
-          values.map do |name, value|
-            attr = arel_attribute(name)
-            bind = predicate_builder.build_bind_attribute(name, value)
-            [attr, bind]
-          end
+      # Called by +instantiate+ to decide which class to use for a new
+      # record instance.
+      #
+      # See +ActiveRecord::Inheritance#discriminate_class_for_record+ for
+      # the single-table inheritance discriminator.
+      def discriminate_class_for_record(record)
+        self
+      end
+
+      def _substitute_values(values)
+        values.map do |name, value|
+          attr = arel_attribute(name)
+          bind = predicate_builder.build_bind_attribute(name, value)
+          [attr, bind]
         end
+      end
     end
 
     # Returns true if this object hasn't been saved yet -- that is, a record
@@ -338,9 +339,9 @@ module ActiveRecord
       destroy_associations
       self.class.connection.add_transaction_record(self)
       @_trigger_destroy_callback = if persisted?
-        destroy_row > 0
-      else
-        true
+                                     destroy_row > 0
+                                   else
+                                     true
       end
       @destroyed = true
       freeze
@@ -659,15 +660,15 @@ module ActiveRecord
       attribute_names = timestamp_attributes_for_update_in_model
       attribute_names |= names.map(&:to_s)
 
-      unless attribute_names.empty?
+      if attribute_names.empty?
+        true
+      else
         affected_rows = _touch_row(attribute_names, time)
         @_trigger_update_callback = affected_rows == 1
-      else
-        true
       end
     end
 
-  private
+    private
 
     # A hook to be overridden by association modules.
     def destroy_associations

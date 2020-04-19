@@ -69,9 +69,9 @@
 
     <table class="income-list-table">
 
-    <% if current_user.incomes == nil %>
+    <%# if current_user.incomes == nil %>
 
-    <% else %>
+    <%# else %>
 
         <tr>
           <th>日付</th>
@@ -81,7 +81,7 @@
           <th></th>
           <th></th>
         </tr>
-    <% end %>
+    <%# end %>
 
     <% @incomes.each do |income| %>
 
@@ -100,4 +100,5 @@
 
  </div>
 </div>
+
 

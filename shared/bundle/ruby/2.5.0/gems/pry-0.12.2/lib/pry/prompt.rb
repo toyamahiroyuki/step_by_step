@@ -28,7 +28,7 @@ class Pry
     SAFE_CONTEXTS = [String, Numeric, Symbol, nil, true, false].freeze
 
     # @deprecated Use {Pry::Prompt.add} instead.
-    MAP = {}
+    MAP = {}.freeze
     deprecate_constant(:MAP) if respond_to?(:deprecate_constant)
 
     # A Hash that holds all prompts. The keys of the Hash are prompt
@@ -70,7 +70,7 @@ class Pry
       # @return [nil]
       # @raise [ArgumentError] if the size of `separators` is not 2
       # @since v0.12.0
-      def add(prompt_name, description = '', separators = %w[> *])
+      def add(prompt_name, description = '', separators = %w(> *))
         unless separators.size == 2
           raise ArgumentError, "separators size must be 2, given #{separators.size}"
         end
@@ -79,7 +79,7 @@ class Pry
           description: description,
           value: separators.map do |sep|
             proc { |context, nesting, _pry_| yield(context, nesting, _pry_, sep) }
-          end
+          end,
         }
 
         nil
@@ -113,7 +113,7 @@ DESC
       sep
     end
 
-    add(:nav, <<DESC, %w[> *]) do |context, nesting, _pry_, sep|
+    add(:nav, <<DESC, %w(> *)) do |context, nesting, _pry_, sep|
 A prompt that displays the binding stack as a path and includes information
 about #{Helpers::Text.bold('_in_')} and #{Helpers::Text.bold('_out_')}.
 DESC
@@ -128,7 +128,7 @@ DESC
       )
     end
 
-    add(:shell, <<DESC, %w[$ *]) do |context, nesting, _pry_, sep|
+    add(:shell, <<DESC, %w($ *)) do |context, nesting, _pry_, sep|
 A prompt that displays `$PWD` as you change it.
 DESC
       format(

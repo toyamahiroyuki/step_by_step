@@ -6,7 +6,7 @@ module ActiveModel
       MESSAGES  = { is: :wrong_length, minimum: :too_short, maximum: :too_long }.freeze
       CHECKS    = { is: :==, minimum: :>=, maximum: :<= }.freeze
 
-      RESERVED_OPTIONS = [:minimum, :maximum, :within, :is, :too_short, :too_long]
+      RESERVED_OPTIONS = [:minimum, :maximum, :within, :is, :too_short, :too_long].freeze
 
       def initialize(options)
         if range = (options.delete(:in) || options.delete(:within))
@@ -64,9 +64,10 @@ module ActiveModel
       end
 
       private
-        def skip_nil_check?(key)
-          key == :maximum && options[:allow_nil].nil? && options[:allow_blank].nil?
-        end
+
+      def skip_nil_check?(key)
+        key == :maximum && options[:allow_nil].nil? && options[:allow_blank].nil?
+      end
     end
 
     module HelperMethods

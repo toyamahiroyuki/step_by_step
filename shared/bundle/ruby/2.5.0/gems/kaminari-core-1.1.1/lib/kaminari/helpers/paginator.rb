@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'active_support/inflector'
 require 'kaminari/helpers/tags'
 
@@ -7,19 +8,19 @@ module Kaminari
     # The main container tag
     class Paginator < Tag
       def initialize(template, window: nil, outer_window: Kaminari.config.outer_window, left: Kaminari.config.left, right: Kaminari.config.right, inner_window: Kaminari.config.window, **options) #:nodoc:
-        @window_options = {window: window || inner_window, left: left.zero? ? outer_window : left, right: right.zero? ? outer_window : right}
+        @window_options = { window: window || inner_window, left: left.zero? ? outer_window : left, right: right.zero? ? outer_window : right }
 
         @template, @options, @theme, @views_prefix, @last = template, options, options[:theme], options[:views_prefix], nil
         @window_options.merge! @options
         @window_options[:current_page] = @options[:current_page] = PageProxy.new(@window_options, @options[:current_page], nil)
 
-        #XXX Using parent template's buffer class for rendering each partial here. This might cause problems if the handler mismatches
+        # XXX Using parent template's buffer class for rendering each partial here. This might cause problems if the handler mismatches
         @output_buffer = if defined?(::ActionView::OutputBuffer)
-          ::ActionView::OutputBuffer.new
-        elsif template.instance_variable_get(:@output_buffer)
-          template.instance_variable_get(:@output_buffer).class.new
-        else
-          ActiveSupport::SafeBuffer.new
+                           ::ActionView::OutputBuffer.new
+                         elsif template.instance_variable_get(:@output_buffer)
+                           template.instance_variable_get(:@output_buffer).class.new
+                         else
+                           ActiveSupport::SafeBuffer.new
         end
       end
 
@@ -49,7 +50,7 @@ module Kaminari
         right_window_plus_one = [*options[:total_pages] - options[:right]..options[:total_pages]]
         inside_window_plus_each_sides = [*options[:current_page] - options[:window] - 1..options[:current_page] + options[:window] + 1]
 
-        (left_window_plus_one | inside_window_plus_each_sides | right_window_plus_one).sort.reject {|x| (x < 1) || (x > options[:total_pages])}
+        (left_window_plus_one | inside_window_plus_each_sides | right_window_plus_one).sort.reject { |x| (x < 1) || (x > options[:total_pages]) }
       end
       private :relevant_pages
 
@@ -57,7 +58,7 @@ module Kaminari
         @last = Page.new @template, @options.merge(page: page)
       end
 
-      %w[first_page prev_page next_page last_page gap].each do |tag|
+      %w(first_page prev_page next_page last_page gap).each do |tag|
         eval <<-DEF, nil, __FILE__, __LINE__ + 1
           def #{tag}_tag
             @last = #{tag.classify}.new @template, @options
@@ -156,7 +157,7 @@ module Kaminari
           @last.is_a? Gap
         end
 
-        #Should we display the link tag?
+        # Should we display the link tag?
         def display_tag?
           left_outer? || right_outer? || inside_window? || single_gap?
         end

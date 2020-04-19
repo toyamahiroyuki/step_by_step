@@ -42,12 +42,12 @@ module ActiveSupport
 
       private
 
-        def unstub_object(stub)
-          singleton_class = stub.object.singleton_class
-          singleton_class.send :silence_redefinition_of_method, stub.method_name
-          singleton_class.send :alias_method, stub.method_name, stub.original_method
-          singleton_class.send :undef_method, stub.original_method
-        end
+      def unstub_object(stub)
+        singleton_class = stub.object.singleton_class
+        singleton_class.send :silence_redefinition_of_method, stub.method_name
+        singleton_class.send :alias_method, stub.method_name, stub.original_method
+        singleton_class.send :undef_method, stub.original_method
+      end
     end
 
     # Contains helpers that help you test passage of time.
@@ -192,9 +192,9 @@ module ActiveSupport
 
       private
 
-        def simple_stubs
-          @simple_stubs ||= SimpleStubs.new
-        end
+      def simple_stubs
+        @simple_stubs ||= SimpleStubs.new
+      end
     end
   end
 end

@@ -6,7 +6,6 @@ require 'concurrent/concern/observable'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # An `IVar` is like a future that you can assign. As a future is a value that
   # is being computed that you can wait on, an `IVar` is a value that is waiting
   # to be assigned, that you can wait on. `IVars` are single assignment and
@@ -60,7 +59,7 @@ module Concurrent
     #   the internal value and returning the value returned from the proc
     def initialize(value = NULL, opts = {}, &block)
       if value != NULL && block_given?
-        raise ArgumentError.new('provide only a value or a block')
+        raise ArgumentError, 'provide only a value or a block'
       end
       super(&nil)
       synchronize { ns_initialize(value, opts, &block) }
@@ -78,7 +77,7 @@ module Concurrent
     # @param [Symbol] func symbol naming the method to call when this
     #   `Observable` has changes`
     def add_observer(observer = nil, func = :update, &block)
-      raise ArgumentError.new('cannot provide both an observer and a block') if observer && block
+      raise ArgumentError, 'cannot provide both an observer and a block' if observer && block
       direct_notification = false
 
       if block
@@ -94,7 +93,7 @@ module Concurrent
         end
       end
 
-      observer.send(func, Time.now, self.value, reason) if direct_notification
+      observer.send(func, Time.now, value, reason) if direct_notification
       observer
     end
 
@@ -187,7 +186,7 @@ module Concurrent
 
     # @!visibility private
     def notify_observers(value, reason)
-      observers.notify_and_delete_observers{ [Time.now, value, reason] }
+      observers.notify_and_delete_observers { [Time.now, value, reason] }
     end
 
     # @!visibility private
@@ -199,8 +198,8 @@ module Concurrent
 
     # @!visibility private
     def check_for_block_or_value!(block_given, value) # :nodoc:
-      if (block_given && value != NULL) || (! block_given && value == NULL)
-        raise ArgumentError.new('must set with either a value or a block')
+      if (block_given && value != NULL) || (!block_given && value == NULL)
+        raise ArgumentError, 'must set with either a value or a block'
       end
     end
   end

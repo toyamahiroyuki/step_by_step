@@ -12,7 +12,7 @@ module Rack
     class PathTraversal < Base
       def call(env)
         path_was         = env["PATH_INFO"]
-        env["PATH_INFO"] = cleanup path_was if path_was && !path_was.empty?
+        env["PATH_INFO"] = cleanup path_was if path_was.present?
         app.call env
       ensure
         env["PATH_INFO"] = path_was
@@ -20,7 +20,7 @@ module Rack
 
       def cleanup(path)
         encoding = path.encoding
-        dot   = '.'.encode(encoding)
+        dot = '.'.encode(encoding)
         slash = '/'.encode(encoding)
         backslash = '\\'.encode(encoding)
 
@@ -29,12 +29,12 @@ module Rack
         unescaped = unescaped.gsub(backslash, slash)
 
         unescaped.split(slash).each do |part|
-          next if part.empty? or part == dot
+          next if part.empty? || (part == dot)
           part == '..' ? parts.pop : parts << part
         end
 
         cleaned = slash + parts.join(slash)
-        cleaned << slash if parts.any? and unescaped =~ %r{/\.{0,2}$}
+        cleaned << slash if parts.any? && unescaped =~ %r{/\.{0,2}$}
         cleaned
       end
     end

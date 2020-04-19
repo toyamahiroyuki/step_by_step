@@ -18,7 +18,7 @@ task :release => [:guard_version]
 task :guard_version do
   def check_version(file, pattern, constant)
     body = File.read("vendor/assets/javascripts/#{file}")
-    match = body.match(pattern) or abort "Version check failed: no pattern matched in #{file}"
+    (match = body.match(pattern)) || abort("Version check failed: no pattern matched in #{file}")
     file_version = match[1]
     constant_version = Jquery::Rails.const_get(constant)
 

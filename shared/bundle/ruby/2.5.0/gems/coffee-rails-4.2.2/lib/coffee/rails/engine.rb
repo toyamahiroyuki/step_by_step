@@ -13,7 +13,7 @@ module Coffee
 
       initializer 'override js_template hook' do |app|
         if app.config.generators.rails[:javascript_engine] == :coffee
-          ::Rails::Generators::NamedBase.send :include, Coffee::Rails::JsHook
+          ::Rails::Generators::NamedBase.include Coffee::Rails::JsHook
         end
       end
     end

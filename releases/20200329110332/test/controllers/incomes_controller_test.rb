@@ -5,5 +5,4 @@ class IncomesControllerTest < ActionDispatch::IntegrationTest
     get incomes_new_url
     assert_response :success
   end
-
 end

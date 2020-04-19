@@ -3,7 +3,7 @@ class Pry
     module Behavior
       ASSIGNMENT = "=".freeze
       NODUP = [TrueClass, FalseClass, NilClass, Symbol, Numeric, Module, Proc].freeze
-      INSPECT_REGEXP = /#{Regexp.escape "default=#<"}/
+      INSPECT_REGEXP = /#{Regexp.escape "default=#<"}/.freeze
       ReservedKeyError = Class.new(RuntimeError)
 
       module Builder
@@ -36,7 +36,7 @@ class Pry
         #
         def from_hash(attributes, default = nil)
           new(default).tap do |config|
-            attributes.each do |key,value|
+            attributes.each do |key, value|
               config[key] = Hash === value ? from_hash(value, nil) : value
             end
           end
@@ -70,7 +70,7 @@ class Pry
       #
       def [](key)
         key = key.to_s
-        key?(key) ? @lookup[key] : (@default and @default[key])
+        key?(key) ? @lookup[key] : (@default && @default[key])
       end
 
       #
@@ -91,7 +91,7 @@ class Pry
           raise ReservedKeyError, "It is not possible to use '#{key}' as a key name, please choose a different key name."
         end
 
-        __push(key,value)
+        __push(key, value)
       end
 
       #
@@ -171,7 +171,7 @@ class Pry
 
       def last_default
         last = @default
-        last = last.default while last and last.default
+        last = last.default while last && last.default
         last
       end
 
@@ -210,7 +210,7 @@ class Pry
 
       def respond_to_missing?(key, include_all = false)
         key = key.to_s.chomp(ASSIGNMENT)
-        key?(key) or @default.respond_to?(key) or super(key, include_all)
+        key?(key) || @default.respond_to?(key) || super(key, include_all)
       end
 
       private
@@ -239,7 +239,7 @@ class Pry
         end
       end
 
-      def __push(key,value)
+      def __push(key, value)
         unless singleton_class.method_defined? key
           define_singleton_method(key) { self[key] }
           define_singleton_method("#{key}=") { |val| @lookup[key] = val }

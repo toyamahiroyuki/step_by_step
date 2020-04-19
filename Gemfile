@@ -43,6 +43,7 @@ group :development, :test do
   gem 'capistrano-rails'
   gem 'capistrano3-puma'
   gem 'capistrano-rbenv'
+
 end
 
 group :development do
@@ -77,13 +78,13 @@ gem 'chart-js-rails', '~> 0.1.4'
 
 # Devise
 gem 'devise'
-  # Deviseの日本語化
-  gem 'devise-i18n'
-  gem 'devise-i18n-views'
+# Deviseの日本語化
+gem 'devise-i18n'
+gem 'devise-i18n-views'
 
 # Refile
-gem 'refile', require: 'refile/rails', github: 'manfe/refile'
-gem 'refile-mini_magick'
+# gem 'refile', require: 'refile/rails', github: 'manfe/refile'
+# gem 'refile-mini_magick'
 
 # Bootostrap
 gem 'bootstrap-sass', '~> 3.3.6'
@@ -105,3 +106,9 @@ end
 
 # rubocop(コーディング)
 gem 'rubocop-airbnb'
+
+# rubocopのupdate用
+gem 'mry'
+
+# seedの簡単作成
+gem 'faker', :git => 'https://github.com/stympy/faker.git', :branch => 'master'

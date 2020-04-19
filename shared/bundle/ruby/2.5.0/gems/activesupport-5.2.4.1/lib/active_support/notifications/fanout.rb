@@ -76,10 +76,10 @@ module ActiveSupport
             subscriber = Timed.new pattern, listener
           end
 
-          unless pattern
-            AllMessages.new(subscriber)
-          else
+          if pattern
             subscriber
+          else
+            AllMessages.new(subscriber)
           end
         end
 

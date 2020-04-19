@@ -37,9 +37,10 @@ module ActiveRecord
       end
 
       private
-        def _infinity?(value)
-          value.respond_to?(:infinite?) && value.infinite?
-        end
+
+      def _infinity?(value)
+        value.respond_to?(:infinite?) && value.infinite?
+      end
     end
   end
 end

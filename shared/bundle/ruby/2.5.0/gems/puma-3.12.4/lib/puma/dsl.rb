@@ -69,7 +69,7 @@ module Puma
       instance_eval(&blk)
     end
 
-    def get(key,default=nil)
+    def get(key, default = nil)
       @options[key.to_sym] || default
     end
 
@@ -82,7 +82,7 @@ module Puma
     # Use +obj+ or +block+ as the Rack app. This allows a config file to
     # be the app itself.
     #
-    def app(obj=nil, &block)
+    def app(obj = nil, &block)
       obj ||= block
 
       raise "Provide either a #call'able or a block" unless obj
@@ -93,7 +93,7 @@ module Puma
     # Start the Puma control rack app on +url+. This app can be communicated
     # with to control the main server.
     #
-    def activate_control_app(url="auto", opts={})
+    def activate_control_app(url = "auto", opts = {})
       if url == "auto"
         path = Configuration.temp_path
         @options[:control_url] = "unix://#{path}"
@@ -147,7 +147,7 @@ module Puma
 
     # Define the TCP port to bind to. Use +bind+ for more advanced options.
     #
-    def port(port, host=nil)
+    def port(port, host = nil)
       host ||= default_host
       bind "tcp://#{host}:#{port}"
     end
@@ -168,13 +168,13 @@ module Puma
     # Work around leaky apps that leave garbage in Thread locals
     # across requests
     #
-    def clean_thread_locals(which=true)
+    def clean_thread_locals(which = true)
       @options[:clean_thread_locals] = which
     end
 
     # Daemonize the server into the background. Highly suggest that
     # this be combined with +pidfile+ and +stdout_redirect+.
-    def daemonize(which=true)
+    def daemonize(which = true)
       @options[:daemon] = which
     end
 
@@ -182,7 +182,7 @@ module Puma
     # connections and process them. This loops over the accept
     # socket until there are no more read events and then stops
     # looking and waits for the requests to finish.
-    def drain_on_shutdown(which=true)
+    def drain_on_shutdown(which = true)
       @options[:drain_on_shutdown] = which
     end
 
@@ -198,7 +198,7 @@ module Puma
     #
     # Puma always waits a few seconds after killing a thread for it to try
     # to finish up it's work, even in :immediately mode.
-    def force_shutdown_after(val=:forever)
+    def force_shutdown_after(val = :forever)
       i = case val
           when :forever
             -1
@@ -236,13 +236,13 @@ module Puma
 
     # Disable request logging.
     #
-    def quiet(which=true)
+    def quiet(which = true)
       @options[:log_requests] = !which
     end
 
     # Enable request logging
     #
-    def log_requests(which=true)
+    def log_requests(which = true)
       @options[:log_requests] = which
     end
 
@@ -264,12 +264,12 @@ module Puma
       @options[:mode] = :tcp
     end
 
-    def early_hints(answer=true)
+    def early_hints(answer = true)
       @options[:early_hints] = answer
     end
 
     # Redirect STDOUT and STDERR to files specified.
-    def stdout_redirect(stdout=nil, stderr=nil, append=false)
+    def stdout_redirect(stdout = nil, stderr = nil, append = false)
       @options[:redirect_stdout] = stdout
       @options[:redirect_stderr] = stderr
       @options[:redirect_append] = append
@@ -382,7 +382,7 @@ module Puma
 
     # DEPRECATED: The directory to operate out of.
     def worker_directory(dir)
-      $stderr.puts "worker_directory is deprecated. Please use `directory`"
+      warn "worker_directory is deprecated. Please use `directory`"
       directory dir
     end
 
@@ -395,14 +395,14 @@ module Puma
     # the workers and setting up the listen ports. This conflicts
     # with using the phased restart feature, you can't use both.
     #
-    def preload_app!(answer=true)
+    def preload_app!(answer = true)
       @options[:preload_app] = answer
     end
 
     # Use +obj+ or +block+ as the low level error handler. This allows a config file to
     # change the default error on the server.
     #
-    def lowlevel_error_handler(obj=nil, &block)
+    def lowlevel_error_handler(obj = nil, &block)
       obj ||= block
       raise "Provide either a #call'able or a block" unless obj
       @options[:lowlevel_error_handler] = obj
@@ -420,7 +420,7 @@ module Puma
     # context and when each worker loads, it will be loading a
     # new Bundler context and thus can float around as the release
     # dictates.
-    def prune_bundler(answer=true)
+    def prune_bundler(answer = true)
       @options[:prune_bundler] = answer
     end
 
@@ -460,14 +460,14 @@ module Puma
     # slow clients will occupy a handler thread while the request
     # is being sent. A reverse proxy, such as nginx, can handle
     # slow clients and queue requests before they reach puma.
-    def queue_requests(answer=true)
+    def queue_requests(answer = true)
       @options[:queue_requests] = answer
     end
 
     # When a shutdown is requested, the backtraces of all the
     # threads will be written to $stdout. This can help figure
     # out why shutdown is hanging.
-    def shutdown_debug(val=true)
+    def shutdown_debug(val = true)
       @options[:shutdown_debug] = val
     end
 
@@ -490,13 +490,13 @@ module Puma
     # * Any string - this allows you to hardcode remote address to any value
     #                you wish. Because puma never uses this field anyway, it's
     #                format is entirely in your hands.
-    def set_remote_address(val=:socket)
+    def set_remote_address(val = :socket)
       case val
       when :socket
         @options[:remote_address] = val
       when :localhost
         @options[:remote_address] = :value
-        @options[:remote_address_value] = "127.0.0.1".freeze
+        @options[:remote_address_value] = "127.0.0.1"
       when String
         @options[:remote_address] = :value
         @options[:remote_address_value] = val
@@ -511,6 +511,5 @@ module Puma
         raise "Invalid value for set_remote_address - #{val}"
       end
     end
-
   end
 end

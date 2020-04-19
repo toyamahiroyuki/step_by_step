@@ -5,10 +5,12 @@
 
 module Rack
   module RegexpExtensions
-    refine Regexp do
-      def match?(string, pos = 0)
-        !!match(string, pos)
+    unless //.respond_to?(:match?)
+      refine Regexp do
+        def match?(string, pos = 0)
+          !!match(string, pos)
+        end
       end
-    end unless //.respond_to?(:match?)
+    end
   end
 end

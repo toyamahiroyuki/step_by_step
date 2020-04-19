@@ -59,7 +59,7 @@ module Dotenv
         root.join(".env.#{Rails.env}.local"),
         (root.join(".env.local") unless Rails.env.test?),
         root.join(".env.#{Rails.env}"),
-        root.join(".env")
+        root.join(".env"),
       ].compact
     end
 

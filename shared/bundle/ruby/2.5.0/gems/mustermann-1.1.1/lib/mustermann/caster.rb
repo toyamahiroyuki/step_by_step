@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'delegate'
 
 module Mustermann
@@ -23,7 +24,7 @@ module Mustermann
     # @param [Array<Symbol, Regexp, #cast, #===>] types identifier for cast type (some need block)
     # @!visibility private
     def register(*types, &block)
-      return if types.empty? and block.nil?
+      return if types.empty? && block.nil?
       types << Any.new(&block) if types.empty?
       types.each { |type| self << caster_for(type, &block) }
     end

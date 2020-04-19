@@ -114,20 +114,20 @@ module Rack
       # for form-data / param parsing.
       FORM_DATA_MEDIA_TYPES = [
         'application/x-www-form-urlencoded',
-        'multipart/form-data'
-      ]
+        'multipart/form-data',
+      ].freeze
 
       # The set of media-types. Requests that do not indicate
       # one of the media types present in this list will not be eligible
       # for param parsing like soap attachments or generic multiparts
       PARSEABLE_DATA_MEDIA_TYPES = [
         'multipart/related',
-        'multipart/mixed'
-      ]
+        'multipart/mixed',
+      ].freeze
 
       # Default ports depending on scheme. Used to decide whether or not
       # to include the port in a generated URI.
-      DEFAULT_PORTS = { 'http' => 80, 'https' => 443, 'coffee' => 80 }
+      DEFAULT_PORTS = { 'http' => 80, 'https' => 443, 'coffee' => 80 }.freeze
 
       # The address of the client which connected to the proxy.
       HTTP_X_FORWARDED_FOR = 'HTTP_X_FORWARDED_FOR'
@@ -147,22 +147,54 @@ module Rack
       # Another way for specifing https scheme was used.
       HTTP_X_FORWARDED_SSL = 'HTTP_X_FORWARDED_SSL'
 
-      def body;            get_header(RACK_INPUT)                         end
-      def script_name;     get_header(SCRIPT_NAME).to_s                   end
-      def script_name=(s); set_header(SCRIPT_NAME, s.to_s)                end
+      def body
+        get_header(RACK_INPUT)
+      end
 
-      def path_info;       get_header(PATH_INFO).to_s                     end
-      def path_info=(s);   set_header(PATH_INFO, s.to_s)                  end
+      def script_name
+        get_header(SCRIPT_NAME).to_s
+      end
 
-      def request_method;  get_header(REQUEST_METHOD)                     end
-      def query_string;    get_header(QUERY_STRING).to_s                  end
-      def content_length;  get_header('CONTENT_LENGTH')                   end
-      def logger;          get_header(RACK_LOGGER)                        end
-      def user_agent;      get_header('HTTP_USER_AGENT')                  end
-      def multithread?;    get_header(RACK_MULTITHREAD)                   end
+      def script_name=(s)
+        set_header(SCRIPT_NAME, s.to_s)
+      end
+
+      def path_info
+        get_header(PATH_INFO).to_s
+      end
+
+      def path_info=(s)
+        set_header(PATH_INFO, s.to_s)
+      end
+
+      def request_method
+        get_header(REQUEST_METHOD)
+      end
+
+      def query_string
+        get_header(QUERY_STRING).to_s
+      end
+
+      def content_length
+        get_header('CONTENT_LENGTH')
+      end
+
+      def logger
+        get_header(RACK_LOGGER)
+      end
+
+      def user_agent
+        get_header('HTTP_USER_AGENT')
+      end
+
+      def multithread?
+        get_header(RACK_MULTITHREAD)
+      end
 
       # the referer of the client
-      def referer;         get_header('HTTP_REFERER')                     end
+      def referer
+        get_header('HTTP_REFERER')
+      end
       alias referrer referer
 
       def session
@@ -178,34 +210,54 @@ module Rack
       end
 
       # Checks the HTTP request method (or verb) to see if it was of type DELETE
-      def delete?;  request_method == DELETE  end
+      def delete?
+        request_method == DELETE
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type GET
-      def get?;     request_method == GET     end
+      def get?
+        request_method == GET
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type HEAD
-      def head?;    request_method == HEAD    end
+      def head?
+        request_method == HEAD
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type OPTIONS
-      def options?; request_method == OPTIONS end
+      def options?
+        request_method == OPTIONS
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type LINK
-      def link?;    request_method == LINK    end
+      def link?
+        request_method == LINK
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type PATCH
-      def patch?;   request_method == PATCH   end
+      def patch?
+        request_method == PATCH
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type POST
-      def post?;    request_method == POST    end
+      def post?
+        request_method == POST
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type PUT
-      def put?;     request_method == PUT     end
+      def put?
+        request_method == PUT
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type TRACE
-      def trace?;   request_method == TRACE   end
+      def trace?
+        request_method == TRACE
+      end
 
       # Checks the HTTP request method (or verb) to see if it was of type UNLINK
-      def unlink?;  request_method == UNLINK  end
+      def unlink?
+        request_method == UNLINK
+      end
 
       def scheme
         if get_header(HTTPS) == 'on'
@@ -231,8 +283,8 @@ module Rack
       # The authority as defined by the `SERVER_NAME` and `SERVER_PORT`
       # variables.
       def server_authority
-        host = self.server_name
-        port = self.server_port
+        host = server_name
+        port = server_port
 
         if host
           if port
@@ -270,7 +322,7 @@ module Rack
 
       def content_type
         content_type = get_header('CONTENT_TYPE')
-        content_type.nil? || content_type.empty? ? nil : content_type
+        content_type.blank? ? nil : content_type
       end
 
       def xhr?
@@ -285,7 +337,7 @@ module Rack
       def host_with_port(authority = self.authority)
         host, _, port = split_authority(authority)
 
-        if port == DEFAULT_PORTS[self.scheme]
+        if port == DEFAULT_PORTS[scheme]
           host
         else
           authority
@@ -294,7 +346,7 @@ module Rack
 
       # Returns a formatted host, suitable for being used in a URI.
       def host
-        split_authority(self.authority)[0]
+        split_authority(authority)[0]
       end
 
       # Returns an address suitable for being to resolve to an address.
@@ -302,7 +354,7 @@ module Rack
       # as +host+. In the case of IPv6 or future address formats, the square
       # brackets are removed.
       def hostname
-        split_authority(self.authority)[1]
+        split_authority(authority)[1]
       end
 
       def port
@@ -324,7 +376,7 @@ module Rack
           end
         end
 
-        self.server_port
+        server_port
       end
 
       def forwarded_for
@@ -476,11 +528,11 @@ module Rack
       # <tt>env['rack.input']</tt> is not touched.
       def update_param(k, v)
         found = false
-        if self.GET.has_key?(k)
+        if self.GET.key?(k)
           found = true
           self.GET[k] = v
         end
-        if self.POST.has_key?(k)
+        if self.POST.key?(k)
           found = true
           self.POST[k] = v
         end
@@ -555,7 +607,9 @@ module Rack
 
       private
 
-      def default_session; {}; end
+      def default_session
+        {}
+      end
 
       # Assist with compatibility when processing `X-Forwarded-For`.
       def wrap_ipv6(host)
@@ -575,8 +629,8 @@ module Rack
         header.to_s.split(/\s*,\s*/).map do |part|
           attribute, parameters = part.split(/\s*;\s*/, 2)
           quality = 1.0
-          if parameters and /\Aq=([\d.]+)/ =~ parameters
-            quality = $1.to_f
+          if parameters && /\Aq=([\d.]+)/ =~ parameters
+            quality = Regexp.last_match(1).to_f
           end
           [attribute, quality]
         end
@@ -612,7 +666,7 @@ module Rack
         )
         # The optional port:
         (:(?<port>\d+))?
-      $/x
+      $/x.freeze
 
       private_constant :AUTHORITY
 
@@ -626,7 +680,7 @@ module Rack
         end
 
         # Give up!
-        return authority, authority, nil
+        [authority, authority, nil]
       end
 
       def reject_trusted_ip_addresses(ip_addresses)

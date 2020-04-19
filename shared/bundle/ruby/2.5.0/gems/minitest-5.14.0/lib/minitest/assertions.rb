@@ -29,8 +29,8 @@ module Minitest
     def self.diff
       return @diff if defined? @diff
 
-      @diff = if (RbConfig::CONFIG["host_os"] =~ /mswin|mingw/ &&
-                  system("diff.exe", __FILE__, __FILE__)) then
+      @diff = if RbConfig::CONFIG["host_os"] =~ /mswin|mingw/ &&
+                  system("diff.exe", __FILE__, __FILE__)
                 "diff.exe -u"
               elsif system("gdiff", __FILE__, __FILE__)
                 "gdiff -u" # solaris and kin suck
@@ -44,7 +44,7 @@ module Minitest
     ##
     # Set the diff command to use in #diff.
 
-    def self.diff= o
+    def self.diff=(o)
       @diff = o
     end
 
@@ -56,7 +56,7 @@ module Minitest
     #
     # See +things_to_diff+ for more info.
 
-    def diff exp, act
+    def diff(exp, act)
       result = nil
 
       expect, butwas = things_to_diff(exp, act)
@@ -76,14 +76,14 @@ module Minitest
           result.sub!(/^\-\-\- .+/, "--- expected")
           result.sub!(/^\+\+\+ .+/, "+++ actual")
 
-          if result.empty? then
+          if result.empty?
             klass = exp.class
             result = [
-                      "No visible difference in the #{klass}#inspect output.\n",
-                      "You should look at the implementation of #== on ",
-                      "#{klass} or its members.\n",
-                      expect,
-                     ].join
+              "No visible difference in the #{klass}#inspect output.\n",
+              "You should look at the implementation of #== on ",
+              "#{klass} or its members.\n",
+              expect,
+            ].join
           end
         end
       end
@@ -101,7 +101,7 @@ module Minitest
     # 3. or:  Strings are equal to each other (but maybe different encodings?).
     # 4. and: we found a diff executable.
 
-    def things_to_diff exp, act
+    def things_to_diff(exp, act)
       expect = mu_pp_for_diff exp
       butwas = mu_pp_for_diff act
 
@@ -113,7 +113,7 @@ module Minitest
          b1 ^ b2                  ||
          expect.size > 30         ||
          butwas.size > 30         ||
-         expect == butwas)        &&
+         expect == butwas) &&
         Minitest::Assertions.diff
 
       need_to_diff && [expect, butwas]
@@ -126,14 +126,14 @@ module Minitest
     #
     # See Minitest::Test.make_my_diffs_pretty!
 
-    def mu_pp obj
+    def mu_pp(obj)
       s = obj.inspect
 
-      if defined? Encoding then
+      if defined? Encoding
         s = s.encode Encoding.default_external
 
         if String === obj && (obj.encoding != Encoding.default_external ||
-                              !obj.valid_encoding?) then
+                              !obj.valid_encoding?)
           enc = "# encoding: #{obj.encoding}"
           val = "#    valid: #{obj.valid_encoding?}"
           s = "#{enc}\n#{val}\n#{s}"
@@ -149,7 +149,7 @@ module Minitest
     # newlines and makes hex-values (like object_ids) generic. This
     # uses mu_pp to do the first pass and then cleans it up.
 
-    def mu_pp_for_diff obj
+    def mu_pp_for_diff(obj)
       str = mu_pp obj
 
       # both '\n' & '\\n' (_after_ mu_pp (aka inspect))
@@ -157,8 +157,8 @@ module Minitest
       double = !!str.match(/(?<=\\|^)\\n/)
 
       process =
-        if single ^ double then
-          if single then
+        if single ^ double
+          if single
             lambda { |s| s == "\\n"   ? "\n"    : s } # unescape
           else
             lambda { |s| s == "\\\\n" ? "\\n\n" : s } # unescape a bit, add nls
@@ -175,9 +175,9 @@ module Minitest
     ##
     # Fails unless +test+ is truthy.
 
-    def assert test, msg = nil
+    def assert(test, msg = nil)
       self.assertions += 1
-      unless test then
+      unless test
         msg ||= "Expected #{mu_pp test} to be truthy."
         msg = msg.call if Proc === msg
         raise Minitest::Assertion, msg
@@ -192,13 +192,13 @@ module Minitest
     ##
     # Fails unless +obj+ is empty.
 
-    def assert_empty obj, msg = nil
+    def assert_empty(obj, msg = nil)
       msg = message(msg) { "Expected #{mu_pp(obj)} to be empty" }
       assert_respond_to obj, :empty?
       assert obj.empty?, msg
     end
 
-    E = "" # :nodoc:
+    E = "".freeze # :nodoc:
 
     ##
     # Fails unless <tt>exp == act</tt> printing the difference between
@@ -213,12 +213,12 @@ module Minitest
     #
     # See also: Minitest::Assertions.diff
 
-    def assert_equal exp, act, msg = nil
+    def assert_equal(exp, act, msg = nil)
       msg = message(msg, E) { diff exp, act }
       result = assert exp == act, msg
 
-      if nil == exp then
-        if Minitest::VERSION =~ /^6/ then
+      if nil == exp
+        if Minitest::VERSION =~ /^6/
           refute_nil exp, "Use assert_nil if expecting nil."
         else
           where = Minitest.filter_backtrace(caller).first
@@ -237,11 +237,11 @@ module Minitest
     #
     #   assert_in_delta Math::PI, (22.0 / 7.0), 0.01
 
-    def assert_in_delta exp, act, delta = 0.001, msg = nil
+    def assert_in_delta(exp, act, delta = 0.001, msg = nil)
       n = (exp - act).abs
-      msg = message(msg) {
+      msg = message(msg) do
         "Expected |#{exp} - #{act}| (#{n}) to be <= #{delta}"
-      }
+      end
       assert delta >= n, msg
     end
 
@@ -249,17 +249,17 @@ module Minitest
     # For comparing Floats.  Fails unless +exp+ and +act+ have a relative
     # error less than +epsilon+.
 
-    def assert_in_epsilon exp, act, epsilon = 0.001, msg = nil
+    def assert_in_epsilon(exp, act, epsilon = 0.001, msg = nil)
       assert_in_delta exp, act, [exp.abs, act.abs].min * epsilon, msg
     end
 
     ##
     # Fails unless +collection+ includes +obj+.
 
-    def assert_includes collection, obj, msg = nil
-      msg = message(msg) {
+    def assert_includes(collection, obj, msg = nil)
+      msg = message(msg) do
         "Expected #{mu_pp(collection)} to include #{mu_pp(obj)}"
-      }
+      end
       assert_respond_to collection, :include?
       assert collection.include?(obj), msg
     end
@@ -267,10 +267,10 @@ module Minitest
     ##
     # Fails unless +obj+ is an instance of +cls+.
 
-    def assert_instance_of cls, obj, msg = nil
-      msg = message(msg) {
+    def assert_instance_of(cls, obj, msg = nil)
+      msg = message(msg) do
         "Expected #{mu_pp(obj)} to be an instance of #{cls}, not #{obj.class}"
-      }
+      end
 
       assert obj.instance_of?(cls), msg
     end
@@ -278,17 +278,18 @@ module Minitest
     ##
     # Fails unless +obj+ is a kind of +cls+.
 
-    def assert_kind_of cls, obj, msg = nil
-      msg = message(msg) {
-        "Expected #{mu_pp(obj)} to be a kind of #{cls}, not #{obj.class}" }
+    def assert_kind_of(cls, obj, msg = nil)
+      msg = message(msg) do
+        "Expected #{mu_pp(obj)} to be a kind of #{cls}, not #{obj.class}"
+      end
 
-      assert obj.kind_of?(cls), msg
+      assert obj.is_a?(cls), msg
     end
 
     ##
     # Fails unless +matcher+ <tt>=~</tt> +obj+.
 
-    def assert_match matcher, obj, msg = nil
+    def assert_match(matcher, obj, msg = nil)
       msg = message(msg) { "Expected #{mu_pp matcher} to match #{mu_pp obj}" }
       assert_respond_to matcher, :"=~"
       matcher = Regexp.new Regexp.escape matcher if String === matcher
@@ -298,7 +299,7 @@ module Minitest
     ##
     # Fails unless +obj+ is nil
 
-    def assert_nil obj, msg = nil
+    def assert_nil(obj, msg = nil)
       msg = message(msg) { "Expected #{mu_pp(obj)} to be nil" }
       assert obj.nil?, msg
     end
@@ -308,7 +309,7 @@ module Minitest
     #
     #   assert_operator 5, :<=, 4
 
-    def assert_operator o1, op, o2 = UNDEFINED, msg = nil
+    def assert_operator(o1, op, o2 = UNDEFINED, msg = nil)
       return assert_predicate o1, op, msg if UNDEFINED == o2
       msg = message(msg) { "Expected #{mu_pp(o1)} to be #{op} #{mu_pp(o2)}" }
       assert o1.__send__(op, o2), msg
@@ -326,7 +327,7 @@ module Minitest
     #
     # See also: #assert_silent
 
-    def assert_output stdout = nil, stderr = nil
+    def assert_output(stdout = nil, stderr = nil)
       flunk "assert_output requires a block to capture output." unless
         block_given?
 
@@ -350,7 +351,7 @@ module Minitest
     ##
     # Fails unless +path+ exists.
 
-    def assert_path_exists path, msg = nil
+    def assert_path_exists(path, msg = nil)
       msg = message(msg) { "Expected path '#{path}' to exist" }
       assert File.exist?(path), msg
     end
@@ -364,7 +365,7 @@ module Minitest
     #
     #   str.must_be :empty?
 
-    def assert_predicate o1, op, msg = nil
+    def assert_predicate(o1, op, msg = nil)
       msg = message(msg) { "Expected #{mu_pp(o1)} to be #{op}" }
       assert o1.__send__(op), msg
     end
@@ -391,7 +392,7 @@ module Minitest
     #
     #   assert_equal 'This is really bad', error.message
 
-    def assert_raises *exp
+    def assert_raises(*exp)
       flunk "assert_raises requires a block to capture errors." unless
         block_given?
 
@@ -422,21 +423,21 @@ module Minitest
     ##
     # Fails unless +obj+ responds to +meth+.
 
-    def assert_respond_to obj, meth, msg = nil
-      msg = message(msg) {
+    def assert_respond_to(obj, meth, msg = nil)
+      msg = message(msg) do
         "Expected #{mu_pp(obj)} (#{obj.class}) to respond to ##{meth}"
-      }
+      end
       assert obj.respond_to?(meth), msg
     end
 
     ##
     # Fails unless +exp+ and +act+ are #equal?
 
-    def assert_same exp, act, msg = nil
-      msg = message(msg) {
+    def assert_same(exp, act, msg = nil)
+      msg = message(msg) do
         data = [mu_pp(act), act.object_id, mu_pp(exp), exp.object_id]
         "Expected %s (oid=%d) to be the same as %s (oid=%d)" % data
-      }
+      end
       assert exp.equal?(act), msg
     end
 
@@ -445,14 +446,15 @@ module Minitest
     #
     # Fails unless the call returns a true value
 
-    def assert_send send_ary, m = nil
+    def assert_send(send_ary, m = nil)
       where = Minitest.filter_backtrace(caller).first
       where = where.split(/:in /, 2).first # clean up noise
       warn "DEPRECATED: assert_send. From #{where}"
 
       recv, msg, *args = send_ary
-      m = message(m) {
-        "Expected #{mu_pp(recv)}.#{msg}(*#{mu_pp(args)}) to return true" }
+      m = message(m) do
+        "Expected #{mu_pp(recv)}.#{msg}(*#{mu_pp(args)}) to return true"
+      end
       assert recv.__send__(msg, *args), m
     end
 
@@ -470,7 +472,7 @@ module Minitest
     ##
     # Fails unless the block throws +sym+
 
-    def assert_throws sym, msg = nil
+    def assert_throws(sym, msg = nil)
       default = "Expected #{mu_pp(sym)} to have been thrown"
       caught = true
       catch(sym) do
@@ -512,19 +514,17 @@ module Minitest
 
     def capture_io
       _synchronize do
-        begin
-          captured_stdout, captured_stderr = StringIO.new, StringIO.new
+        captured_stdout, captured_stderr = StringIO.new, StringIO.new
 
-          orig_stdout, orig_stderr = $stdout, $stderr
-          $stdout, $stderr         = captured_stdout, captured_stderr
+        orig_stdout, orig_stderr = $stdout, $stderr
+        $stdout, $stderr         = captured_stdout, captured_stderr
 
-          yield
+        yield
 
-          return captured_stdout.string, captured_stderr.string
-        ensure
-          $stdout = orig_stdout
-          $stderr = orig_stderr
-        end
+        return captured_stdout.string, captured_stderr.string
+      ensure
+        $stdout = orig_stdout
+        $stderr = orig_stderr
       end
     end
 
@@ -545,46 +545,44 @@ module Minitest
 
     def capture_subprocess_io
       _synchronize do
-        begin
-          require "tempfile"
+        require "tempfile"
 
-          captured_stdout, captured_stderr = Tempfile.new("out"), Tempfile.new("err")
+        captured_stdout, captured_stderr = Tempfile.new("out"), Tempfile.new("err")
 
-          orig_stdout, orig_stderr = $stdout.dup, $stderr.dup
-          $stdout.reopen captured_stdout
-          $stderr.reopen captured_stderr
+        orig_stdout, orig_stderr = $stdout.dup, $stderr.dup
+        $stdout.reopen captured_stdout
+        $stderr.reopen captured_stderr
 
-          yield
+        yield
 
-          $stdout.rewind
-          $stderr.rewind
+        $stdout.rewind
+        $stderr.rewind
 
-          return captured_stdout.read, captured_stderr.read
-        ensure
-          captured_stdout.unlink
-          captured_stderr.unlink
-          $stdout.reopen orig_stdout
-          $stderr.reopen orig_stderr
+        return captured_stdout.read, captured_stderr.read
+      ensure
+        captured_stdout.unlink
+        captured_stderr.unlink
+        $stdout.reopen orig_stdout
+        $stderr.reopen orig_stderr
 
-          orig_stdout.close
-          orig_stderr.close
-          captured_stdout.close
-          captured_stderr.close
-        end
+        orig_stdout.close
+        orig_stderr.close
+        captured_stdout.close
+        captured_stderr.close
       end
     end
 
     ##
     # Returns details for exception +e+
 
-    def exception_details e, msg
+    def exception_details(e, msg)
       [
-       "#{msg}",
-       "Class: <#{e.class}>",
-       "Message: <#{e.message.inspect}>",
-       "---Backtrace---",
-       "#{Minitest.filter_backtrace(e.backtrace).join("\n")}",
-       "---------------",
+        "#{msg}",
+        "Class: <#{e.class}>",
+        "Message: <#{e.message.inspect}>",
+        "---Backtrace---",
+        "#{Minitest.filter_backtrace(e.backtrace).join("\n")}",
+        "---------------",
       ].join "\n"
     end
 
@@ -593,14 +591,14 @@ module Minitest
     # you to put time-bombs in your tests if you need to keep
     # something around until a later date lest you forget about it.
 
-    def fail_after y,m,d,msg
+    def fail_after(y, m, d, msg)
       flunk msg if Time.now > Time.local(y, m, d)
     end
 
     ##
     # Fails with +msg+.
 
-    def flunk msg = nil
+    def flunk(msg = nil)
       msg ||= "Epic Fail!"
       assert false, msg
     end
@@ -608,10 +606,10 @@ module Minitest
     ##
     # Returns a proc that will output +msg+ along with the default message.
 
-    def message msg = nil, ending = nil, &default
+    def message(msg = nil, ending = nil, &default)
       proc {
         msg = msg.call.chomp(".") if Proc === msg
-        custom_message = "#{msg}.\n" unless msg.nil? or msg.to_s.empty?
+        custom_message = "#{msg}.\n" unless msg.nil? || msg.to_s.empty?
         "#{custom_message}#{default.call}#{ending || "."}"
       }
     end
@@ -619,22 +617,22 @@ module Minitest
     ##
     # used for counting assertions
 
-    def pass _msg = nil
+    def pass(_msg = nil)
       assert true
     end
 
     ##
     # Fails if +test+ is truthy.
 
-    def refute test, msg = nil
+    def refute(test, msg = nil)
       msg ||= message { "Expected #{mu_pp(test)} to not be truthy" }
-      not assert !test, msg
+      !assert !test, msg
     end
 
     ##
     # Fails if +obj+ is empty.
 
-    def refute_empty obj, msg = nil
+    def refute_empty(obj, msg = nil)
       msg = message(msg) { "Expected #{mu_pp(obj)} to not be empty" }
       assert_respond_to obj, :empty?
       refute obj.empty?, msg
@@ -645,10 +643,10 @@ module Minitest
     #
     # For floats use refute_in_delta.
 
-    def refute_equal exp, act, msg = nil
-      msg = message(msg) {
+    def refute_equal(exp, act, msg = nil)
+      msg = message(msg) do
         "Expected #{mu_pp(act)} to not be equal to #{mu_pp(exp)}"
-      }
+      end
       refute exp == act, msg
     end
 
@@ -657,11 +655,11 @@ module Minitest
     #
     #   refute_in_delta Math::PI, (22.0 / 7.0)
 
-    def refute_in_delta exp, act, delta = 0.001, msg = nil
+    def refute_in_delta(exp, act, delta = 0.001, msg = nil)
       n = (exp - act).abs
-      msg = message(msg) {
+      msg = message(msg) do
         "Expected |#{exp} - #{act}| (#{n}) to not be <= #{delta}"
-      }
+      end
       refute delta >= n, msg
     end
 
@@ -669,17 +667,17 @@ module Minitest
     # For comparing Floats.  Fails if +exp+ and +act+ have a relative error
     # less than +epsilon+.
 
-    def refute_in_epsilon a, b, epsilon = 0.001, msg = nil
+    def refute_in_epsilon(a, b, epsilon = 0.001, msg = nil)
       refute_in_delta a, b, a * epsilon, msg
     end
 
     ##
     # Fails if +collection+ includes +obj+.
 
-    def refute_includes collection, obj, msg = nil
-      msg = message(msg) {
+    def refute_includes(collection, obj, msg = nil)
+      msg = message(msg) do
         "Expected #{mu_pp(collection)} to not include #{mu_pp(obj)}"
-      }
+      end
       assert_respond_to collection, :include?
       refute collection.include?(obj), msg
     end
@@ -687,25 +685,25 @@ module Minitest
     ##
     # Fails if +obj+ is an instance of +cls+.
 
-    def refute_instance_of cls, obj, msg = nil
-      msg = message(msg) {
+    def refute_instance_of(cls, obj, msg = nil)
+      msg = message(msg) do
         "Expected #{mu_pp(obj)} to not be an instance of #{cls}"
-      }
+      end
       refute obj.instance_of?(cls), msg
     end
 
     ##
     # Fails if +obj+ is a kind of +cls+.
 
-    def refute_kind_of cls, obj, msg = nil
+    def refute_kind_of(cls, obj, msg = nil)
       msg = message(msg) { "Expected #{mu_pp(obj)} to not be a kind of #{cls}" }
-      refute obj.kind_of?(cls), msg
+      refute obj.is_a?(cls), msg
     end
 
     ##
     # Fails if +matcher+ <tt>=~</tt> +obj+.
 
-    def refute_match matcher, obj, msg = nil
+    def refute_match(matcher, obj, msg = nil)
       msg = message(msg) { "Expected #{mu_pp matcher} to not match #{mu_pp obj}" }
       assert_respond_to matcher, :"=~"
       matcher = Regexp.new Regexp.escape matcher if String === matcher
@@ -715,7 +713,7 @@ module Minitest
     ##
     # Fails if +obj+ is nil.
 
-    def refute_nil obj, msg = nil
+    def refute_nil(obj, msg = nil)
       msg = message(msg) { "Expected #{mu_pp(obj)} to not be nil" }
       refute obj.nil?, msg
     end
@@ -726,7 +724,7 @@ module Minitest
     #   refute_operator 1, :>, 2 #=> pass
     #   refute_operator 1, :<, 2 #=> fail
 
-    def refute_operator o1, op, o2 = UNDEFINED, msg = nil
+    def refute_operator(o1, op, o2 = UNDEFINED, msg = nil)
       return refute_predicate o1, op, msg if UNDEFINED == o2
       msg = message(msg) { "Expected #{mu_pp(o1)} to not be #{op} #{mu_pp(o2)}" }
       refute o1.__send__(op, o2), msg
@@ -735,7 +733,7 @@ module Minitest
     ##
     # Fails if +path+ exists.
 
-    def refute_path_exists path, msg = nil
+    def refute_path_exists(path, msg = nil)
       msg = message(msg) { "Expected path '#{path}' to not exist" }
       refute File.exist?(path), msg
     end
@@ -749,7 +747,7 @@ module Minitest
     #
     #   str.wont_be :empty?
 
-    def refute_predicate o1, op, msg = nil
+    def refute_predicate(o1, op, msg = nil)
       msg = message(msg) { "Expected #{mu_pp(o1)} to not be #{op}" }
       refute o1.__send__(op), msg
     end
@@ -757,7 +755,7 @@ module Minitest
     ##
     # Fails if +obj+ responds to the message +meth+.
 
-    def refute_respond_to obj, meth, msg = nil
+    def refute_respond_to(obj, meth, msg = nil)
       msg = message(msg) { "Expected #{mu_pp(obj)} to not respond to #{meth}" }
 
       refute obj.respond_to?(meth), msg
@@ -766,11 +764,11 @@ module Minitest
     ##
     # Fails if +exp+ is the same (by object identity) as +act+.
 
-    def refute_same exp, act, msg = nil
-      msg = message(msg) {
+    def refute_same(exp, act, msg = nil)
+      msg = message(msg) do
         data = [mu_pp(act), act.object_id, mu_pp(exp), exp.object_id]
         "Expected %s (oid=%d) to not be the same as %s (oid=%d)" % data
-      }
+      end
       refute exp.equal?(act), msg
     end
 
@@ -779,7 +777,7 @@ module Minitest
     # gets listed at the end of the run but doesn't cause a failure
     # exit code.
 
-    def skip msg = nil, bt = caller
+    def skip(msg = nil, bt = caller)
       msg ||= "Skipped, no message given"
       @skip = true
       raise Minitest::Skip, msg, bt
@@ -791,7 +789,7 @@ module Minitest
     # date, but still holds you accountable and prevents you from
     # forgetting it.
 
-    def skip_until y,m,d,msg
+    def skip_until(y, m, d, msg)
       skip msg if Time.now < Time.local(y, m, d)
       where = caller.first.split(/:/, 3).first(2).join ":"
       warn "Stale skip_until %p at %s" % [msg, where]
@@ -801,7 +799,7 @@ module Minitest
     # Was this testcase skipped? Meant for #teardown.
 
     def skipped?
-      defined?(@skip) and @skip
+      defined?(@skip) && @skip
     end
   end
 end

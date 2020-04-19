@@ -17,7 +17,11 @@ if RUBY_VERSION < '1.9.3'
             original_tlsconnect(s).tap { verified = true }
           ensure
             unless verified
-              s.close rescue nil
+              begin
+                s.close
+              rescue
+                nil
+              end
             end
           end
         end

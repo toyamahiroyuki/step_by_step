@@ -23,7 +23,7 @@ else
       belongs_to :owner, 'User'
     end
 
-    require  'dm-migrations'
+    require 'dm-migrations'
     DataMapper.finalize
     DataMapper.auto_migrate!
 

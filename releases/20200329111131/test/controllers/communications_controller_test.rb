@@ -15,5 +15,4 @@ class CommunicationsControllerTest < ActionDispatch::IntegrationTest
     get communications_edit_url
     assert_response :success
   end
-
 end

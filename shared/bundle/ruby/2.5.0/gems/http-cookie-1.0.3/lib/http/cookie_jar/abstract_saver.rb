@@ -40,13 +40,13 @@ class HTTP::CookieJar::AbstractSaver
   # Called by the constructor of each subclass using super().
   def initialize(options = nil)
     options ||= {}
-    @logger  = options[:logger]
+    @logger = options[:logger]
     @session = options[:session]
     # Initializes each instance variable of the same name as option
     # keyword.
-    default_options.each_pair { |key, default|
+    default_options.each_pair do |key, default|
       instance_variable_set("@#{key}", options.fetch(key, default))
-    }
+    end
   end
 
   # Implements HTTP::CookieJar#save().

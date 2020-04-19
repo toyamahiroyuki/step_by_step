@@ -1,12 +1,10 @@
 require 'concurrent/constants'
 
 module Concurrent
-
   # @!macro thread_local_var
   # @!macro internal_implementation_note
   # @!visibility private
   class AbstractThreadLocalVar
-
     # @!macro thread_local_var_method_initialize
     def initialize(default = nil, &default_block)
       if default && block_given?

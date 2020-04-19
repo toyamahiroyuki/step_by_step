@@ -7,7 +7,11 @@ module Enumerable
   # We tried shimming it to attempt the fast native method, rescue TypeError,
   # and fall back to the compatible implementation, but that's much slower than
   # just calling the compat method in the first place.
-  if Enumerable.instance_methods(false).include?(:sum) && !((?a..?b).sum rescue false)
+  if Enumerable.instance_methods(false).include?(:sum) && !(begin
+                                                              (?a..?b).sum
+                                                            rescue
+                                                              false
+                                                            end)
     # :stopdoc:
 
     # We can't use Refinements here because Refinements with Module which will be prepended
@@ -143,7 +147,11 @@ end
 # We tried shimming it to attempt the fast native method, rescue TypeError,
 # and fall back to the compatible implementation, but that's much slower than
 # just calling the compat method in the first place.
-if Array.instance_methods(false).include?(:sum) && !(%w[a].sum rescue false)
+if Array.instance_methods(false).include?(:sum) && !(begin
+                                                       %w(a).sum
+                                                     rescue
+                                                       false
+                                                     end)
   # Using Refinements here in order not to expose our internal method
   using Module.new {
     refine Array do

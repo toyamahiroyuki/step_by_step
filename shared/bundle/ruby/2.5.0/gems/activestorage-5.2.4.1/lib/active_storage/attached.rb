@@ -15,23 +15,24 @@ module ActiveStorage
     end
 
     private
-      def create_blob_from(attachable)
-        case attachable
-        when ActiveStorage::Blob
-          attachable
-        when ActionDispatch::Http::UploadedFile, Rack::Test::UploadedFile
-          ActiveStorage::Blob.create_after_upload! \
-            io: attachable.open,
-            filename: attachable.original_filename,
-            content_type: attachable.content_type
-        when Hash
-          ActiveStorage::Blob.create_after_upload!(attachable)
-        when String
-          ActiveStorage::Blob.find_signed(attachable)
-        else
-          nil
-        end
+
+    def create_blob_from(attachable)
+      case attachable
+      when ActiveStorage::Blob
+        attachable
+      when ActionDispatch::Http::UploadedFile, Rack::Test::UploadedFile
+        ActiveStorage::Blob.create_after_upload! \
+          io: attachable.open,
+          filename: attachable.original_filename,
+          content_type: attachable.content_type
+      when Hash
+        ActiveStorage::Blob.create_after_upload!(attachable)
+      when String
+        ActiveStorage::Blob.find_signed(attachable)
+      else
+        nil
       end
+    end
   end
 end
 

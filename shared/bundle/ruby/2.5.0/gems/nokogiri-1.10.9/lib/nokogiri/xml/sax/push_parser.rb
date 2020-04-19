@@ -23,7 +23,6 @@ module Nokogiri
       #   parser << "/div>"
       #   parser.finish
       class PushParser
-
         # The Nokogiri::XML::SAX::Document on which the PushParser will be
         # operating
         attr_accessor :document
@@ -43,7 +42,7 @@ module Nokogiri
         ###
         # Write a +chunk+ of XML to the PushParser.  Any callback methods
         # that can be called will be called immediately.
-        def write chunk, last_chunk = false
+        def write(chunk, last_chunk = false)
           native_write(chunk, last_chunk)
         end
         alias :<< :write

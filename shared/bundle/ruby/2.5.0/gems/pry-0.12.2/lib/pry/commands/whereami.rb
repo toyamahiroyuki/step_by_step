@@ -45,16 +45,16 @@ class Pry
     def options(opt)
       opt.on :q, :quiet,             "Don't display anything in case of an error"
       opt.on :n, :"no-line-numbers", "Do not display line numbers"
-      opt.on :m, :"method", "Show the complete source for the current method."
-      opt.on :c, :"class", "Show the complete source for the current class or module."
-      opt.on :f, :"file", "Show the complete source for the current file."
+      opt.on :m, :method, "Show the complete source for the current method."
+      opt.on :c, :class, "Show the complete source for the current class or module."
+      opt.on :f, :file, "Show the complete source for the current file."
     end
 
     def code
       @code ||= if opts.present?(:m)
-                  method_code or raise CommandError, "Cannot find method code."
+                  method_code || raise(CommandError, "Cannot find method code.")
                 elsif opts.present?(:c)
-                  class_code or raise CommandError, "Cannot find class code."
+                  class_code || raise(CommandError, "Cannot find class code.")
                 elsif opts.present?(:f)
                   Pry::Code.from_file(@file)
                 elsif args.any?
@@ -71,8 +71,10 @@ class Pry
     end
 
     def bad_option_combination?
-      [opts.present?(:m), opts.present?(:f),
-       opts.present?(:c), args.any?].count(true) > 1
+      [
+        opts.present?(:m), opts.present?(:f),
+        opts.present?(:c), args.any?,
+      ].count(true) > 1
     end
 
     def location

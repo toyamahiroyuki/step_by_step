@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 #
 # domain_name.rb - Domain Name manipulation library for Ruby
 #
@@ -71,26 +72,26 @@ class DomainName
     @canonical_tld_p && (@domain ? true : false)
   end
 
-  DOT = '.'.freeze	# :nodoc:
+  DOT = '.'.freeze # :nodoc:
 
   # Parses _hostname_ into a DomainName object.  An IP address is also
   # accepted.  An IPv6 address may be enclosed in square brackets.
   def initialize(hostname)
-    hostname.is_a?(String) or
-      (hostname.respond_to?(:to_str) && (hostname = hostname.to_str).is_a?(String)) or
-      raise TypeError, "#{hostname.class} is not a String"
+    hostname.is_a?(String) ||
+      (hostname.respond_to?(:to_str) && (hostname = hostname.to_str).is_a?(String)) ||
+      raise(TypeError, "#{hostname.class} is not a String")
     if hostname.start_with?(DOT)
       raise ArgumentError, "domain name must not start with a dot: #{hostname}"
     end
     case hostname
     when /\A([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\z/
-      @ipaddr = IPAddr.new($1)
+      @ipaddr = IPAddr.new(Regexp.last_match(1))
       @uri_host = @hostname = @ipaddr.to_s
       @domain = @tld = nil
       return
     when /\A([0-9A-Fa-f:]*:[0-9A-Fa-f:]*:[0-9A-Fa-f:]*)\z/,
       /\A\[([0-9A-Fa-f:]*:[0-9A-Fa-f:]*:[0-9A-Fa-f:]*)\]\z/
-      @ipaddr = IPAddr.new($1)
+      @ipaddr = IPAddr.new(Regexp.last_match(1))
       @hostname = @ipaddr.to_s
       @uri_host = "[#{@hostname}]"
       @domain = @tld = nil
@@ -108,7 +109,7 @@ class DomainName
     if @canonical_tld_p = etld_data.key?(@tld)
       subdomain = domain = nil
       parent = @hostname
-      loop {
+      loop do
         case etld_data[parent]
         when 0
           @domain = domain
@@ -122,9 +123,9 @@ class DomainName
         end
         subdomain = domain
         domain = parent
-        pos = @hostname.index(DOT, -domain.length) or break
+        (pos = @hostname.index(DOT, -domain.length)) || break
         parent = @hostname[(pos + 1)..-1]
-      }
+      end
     else
       # unknown/local TLD
       if last_dot
@@ -167,7 +168,7 @@ class DomainName
   # Returns the superdomain of this domain name.
   def superdomain
     return nil if ipaddr?
-    pos = @hostname.index(DOT) or return nil
+    (pos = @hostname.index(DOT)) || (return nil)
     self.class.new(@hostname[(pos + 1)..-1])
   end
 

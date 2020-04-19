@@ -43,14 +43,12 @@ module I18n
 
         fallback_options = options.merge(:fallback_in_progress => true)
         I18n.fallbacks[locale].each do |fallback|
-          begin
-            catch(:exception) do
-              result = super(fallback, key, fallback_options)
-              return result unless result.nil?
-            end
-          rescue I18n::InvalidLocale
-            # we do nothing when the locale is invalid, as this is a fallback anyways.
+          catch(:exception) do
+            result = super(fallback, key, fallback_options)
+            return result unless result.nil?
           end
+        rescue I18n::InvalidLocale
+          # we do nothing when the locale is invalid, as this is a fallback anyways.
         end
 
         return if options.key?(:default) && options[:default].nil?
@@ -61,20 +59,18 @@ module I18n
 
       def extract_non_symbol_default!(options)
         defaults = [options[:default]].flatten
-        first_non_symbol_default = defaults.detect{|default| !default.is_a?(Symbol)}
+        first_non_symbol_default = defaults.detect { |default| !default.is_a?(Symbol) }
         if first_non_symbol_default
           options[:default] = defaults[0, defaults.index(first_non_symbol_default)]
         end
-        return first_non_symbol_default
+        first_non_symbol_default
       end
 
       def exists?(locale, key)
         I18n.fallbacks[locale].each do |fallback|
-          begin
-            return true if super(fallback, key)
-          rescue I18n::InvalidLocale
-            # we do nothing when the locale is invalid, as this is a fallback anyways.
-          end
+          return true if super(fallback, key)
+        rescue I18n::InvalidLocale
+          # we do nothing when the locale is invalid, as this is a fallback anyways.
         end
 
         false

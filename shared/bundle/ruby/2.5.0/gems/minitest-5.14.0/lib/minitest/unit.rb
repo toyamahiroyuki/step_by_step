@@ -1,6 +1,6 @@
 # :stopdoc:
 
-unless defined?(Minitest) then
+unless defined?(Minitest)
   # all of this crap is just to avoid circular requires and is only
   # needed if a user requires "minitest/unit" directly instead of
   # "minitest/autorun", so we also warn
@@ -21,7 +21,7 @@ module Minitest
   class Unit
     VERSION = Minitest::VERSION
     class TestCase < Minitest::Test
-      def self.inherited klass # :nodoc:
+      def self.inherited(klass) # :nodoc:
         from = caller.first
         warn "MiniTest::Unit::TestCase is now Minitest::Test. From #{from}"
         super
@@ -34,7 +34,7 @@ module Minitest
       Minitest.autorun
     end
 
-    def self.after_tests &b # :nodoc:
+    def self.after_tests(&b) # :nodoc:
       from = caller.first
       warn "MiniTest::Unit.after_tests is now Minitest.after_run. From #{from}"
       Minitest.after_run(&b)

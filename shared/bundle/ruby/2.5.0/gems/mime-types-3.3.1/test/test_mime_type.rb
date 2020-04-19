@@ -8,36 +8,36 @@ describe MIME::Type do
     MIME::Type.new(content_type) { |mt| yield mt if block_given? }
   end
 
-  let(:x_appl_x_zip) {
+  let(:x_appl_x_zip) do
     mime_type('x-appl/x-zip') { |t| t.extensions = %w(zip zp) }
-  }
+  end
   let(:text_plain) { mime_type('text/plain') }
   let(:text_html) { mime_type('text/html') }
   let(:image_jpeg) { mime_type('image/jpeg') }
-  let(:application_javascript) {
+  let(:application_javascript) do
     mime_type('application/javascript') do |js|
       js.friendly('en' => 'JavaScript')
       js.xrefs = {
         'rfc' => %w(rfc4239 rfc4239),
-        'template' => %w(application/javascript)
+        'template' => %w(application/javascript),
       }
       js.encoding = '8bit'
       js.extensions = %w(js sj)
       js.registered = true
     end
-  }
-  let(:text_x_yaml) {
+  end
+  let(:text_x_yaml) do
     mime_type('text/x-yaml') do |yaml|
       yaml.extensions = %w(yaml yml)
       yaml.encoding   = '8bit'
       yaml.friendly('en' => 'YAML Structured Document')
     end
-  }
-  let(:text_x_yaml_with_docs) {
+  end
+  let(:text_x_yaml_with_docs) do
     text_x_yaml.dup.tap do |yaml|
       yaml.docs = 'Test YAML'
     end
-  }
+  end
 
   describe '.simplified' do
     it 'leaves normal types alone' do
@@ -461,9 +461,9 @@ describe MIME::Type do
   end
 
   describe '#to_json' do
-    let(:expected) {
+    let(:expected) do
       '{"content-type":"a/b","encoding":"base64","registered":false}'
-    }
+    end
 
     it 'converts to JSON when requested' do
       assert_equal expected, mime_type('a/b').to_json
@@ -485,13 +485,13 @@ describe MIME::Type do
   end
 
   describe '#xrefs, #xrefs=' do
-    let(:expected) {
+    let(:expected) do
       MIME::Types::Container.new('rfc' => Set['rfc1234', 'rfc5678'])
-    }
+    end
 
     it 'returns the expected results' do
       application_javascript.xrefs = {
-        'rfc' => %w(rfc5678 rfc1234 rfc1234)
+        'rfc' => %w(rfc5678 rfc1234 rfc1234),
       }
 
       assert_equal expected, application_javascript.xrefs
@@ -499,7 +499,7 @@ describe MIME::Type do
   end
 
   describe '#xref_urls' do
-    let(:expected) {
+    let(:expected) do
       [
         'http://www.iana.org/go/draft1',
         'http://www.iana.org/assignments/media-types/a/b',
@@ -507,11 +507,11 @@ describe MIME::Type do
         'http://www.iana.org/go/rfc-1',
         'http://www.rfc-editor.org/errata_search.php?eid=err-1',
         'http://example.org',
-        'text'
+        'text',
       ]
-    }
+    end
 
-    let(:type) {
+    let(:type) do
       mime_type('a/b').tap do |t|
         t.xrefs = {
           'draft' => ['RFC1'],
@@ -520,10 +520,10 @@ describe MIME::Type do
           'rfc' => ['rfc-1'],
           'rfc-errata' => ['err-1'],
           'uri' => ['http://example.org'],
-          'text' => ['text']
+          'text' => ['text'],
         }
       end
-    }
+    end
 
     it 'translates according to given rules' do
       assert_equal expected, type.xref_urls

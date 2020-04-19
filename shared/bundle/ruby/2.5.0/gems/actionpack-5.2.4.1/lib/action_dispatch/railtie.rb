@@ -29,7 +29,7 @@ module ActionDispatch
       "X-Content-Type-Options" => "nosniff",
       "X-Download-Options" => "noopen",
       "X-Permitted-Cross-Domain-Policies" => "none",
-      "Referrer-Policy" => "strict-origin-when-cross-origin"
+      "Referrer-Policy" => "strict-origin-when-cross-origin",
     }
 
     config.action_dispatch.cookies_rotations = ActiveSupport::Messages::RotationConfiguration.new

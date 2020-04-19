@@ -1,19 +1,18 @@
 # encoding: utf-8
+
 module CodeRay
   module Scanners
-    
     # Clojure scanner by Licenser.
     class Clojure < Scanner
-      
       register_for :clojure
       file_extension 'clj'
-      
-      SPECIAL_FORMS = %w[
+
+      SPECIAL_FORMS = %w(
         def if do let quote var fn loop recur throw try catch monitor-enter monitor-exit .
-        new 
-      ]  # :nodoc:
-      
-      CORE_FORMS = %w[
+        new
+      ).freeze  # :nodoc:
+
+      CORE_FORMS = %w(
         + - -> ->> .. / * <= < = == >= > accessor aclone add-classpath add-watch
         agent agent-error agent-errors aget alength alias all-ns alter alter-meta!
         alter-var-root amap ancestors and apply areduce array-map aset aset-boolean
@@ -72,83 +71,82 @@ module CodeRay
         use val vals var-get var-set var? vary-meta vec vector vector-of vector?
         when when-first when-let when-not while with-bindings with-bindings*
         with-in-str with-local-vars with-meta with-open with-out-str
-        with-precision xml-seq zero? zipmap 
-      ]  # :nodoc:
-      
-      PREDEFINED_CONSTANTS = %w[
+        with-precision xml-seq zero? zipmap
+      ).freeze  # :nodoc:
+
+      PREDEFINED_CONSTANTS = %w(
         true false nil *1 *2 *3 *agent* *clojure-version* *command-line-args*
         *compile-files* *compile-path* *e *err* *file* *flush-on-newline*
         *in* *ns* *out* *print-dup* *print-length* *print-level* *print-meta*
         *print-readably* *read-eval* *warn-on-reflection*
-      ]  # :nodoc:
-      
+      ).freeze  # :nodoc:
+
       IDENT_KIND = WordList.new(:ident).
         add(SPECIAL_FORMS, :keyword).
         add(CORE_FORMS, :keyword).
         add(PREDEFINED_CONSTANTS, :predefined_constant)
-      
+
       KEYWORD_NEXT_TOKEN_KIND = WordList.new(nil).
-        add(%w[ def defn defn- definline defmacro defmulti defmethod defstruct defonce declare ], :function).
-        add(%w[ ns ], :namespace).
-        add(%w[ defprotocol defrecord ], :class)
-      
-      BASIC_IDENTIFIER = /[a-zA-Z$%*\/_+!?&<>\-=]=?[a-zA-Z0-9$&*+!\/_?<>\-\#]*/
-      IDENTIFIER = /(?!-\d)(?:(?:#{BASIC_IDENTIFIER}\.)*#{BASIC_IDENTIFIER}(?:\/#{BASIC_IDENTIFIER})?\.?)|\.\.?/
-      SYMBOL = /::?#{IDENTIFIER}/o
-      DIGIT = /\d/
+        add(%w(def defn defn- definline defmacro defmulti defmethod defstruct defonce declare), :function).
+        add(%w(ns), :namespace).
+        add(%w(defprotocol defrecord), :class)
+
+      BASIC_IDENTIFIER = /[a-zA-Z$%*\/_+!?&<>\-=]=?[a-zA-Z0-9$&*+!\/_?<>\-\#]*/.freeze
+      IDENTIFIER = /(?!-\d)(?:(?:#{BASIC_IDENTIFIER}\.)*#{BASIC_IDENTIFIER}(?:\/#{BASIC_IDENTIFIER})?\.?)|\.\.?/.freeze
+      SYMBOL = /::?#{IDENTIFIER}/o.freeze
+      DIGIT = /\d/.freeze
       DIGIT10 = DIGIT
-      DIGIT16 = /[0-9a-f]/i
-      DIGIT8 = /[0-7]/
-      DIGIT2 = /[01]/
-      RADIX16 = /\#x/i
-      RADIX8 = /\#o/i
-      RADIX2 = /\#b/i
-      RADIX10 = /\#d/i
-      EXACTNESS = /#i|#e/i
-      SIGN = /[\+-]?/
-      EXP_MARK = /[esfdl]/i
-      EXP = /#{EXP_MARK}#{SIGN}#{DIGIT}+/
-      SUFFIX = /#{EXP}?/
-      PREFIX10 = /#{RADIX10}?#{EXACTNESS}?|#{EXACTNESS}?#{RADIX10}?/
-      PREFIX16 = /#{RADIX16}#{EXACTNESS}?|#{EXACTNESS}?#{RADIX16}/
-      PREFIX8 = /#{RADIX8}#{EXACTNESS}?|#{EXACTNESS}?#{RADIX8}/
-      PREFIX2 = /#{RADIX2}#{EXACTNESS}?|#{EXACTNESS}?#{RADIX2}/
-      UINT10 = /#{DIGIT10}+#*/
-      UINT16 = /#{DIGIT16}+#*/
-      UINT8 = /#{DIGIT8}+#*/
-      UINT2 = /#{DIGIT2}+#*/
-      DECIMAL = /#{DIGIT10}+#+\.#*#{SUFFIX}|#{DIGIT10}+\.#{DIGIT10}*#*#{SUFFIX}|\.#{DIGIT10}+#*#{SUFFIX}|#{UINT10}#{EXP}/
-      UREAL10 = /#{UINT10}\/#{UINT10}|#{DECIMAL}|#{UINT10}/
-      UREAL16 = /#{UINT16}\/#{UINT16}|#{UINT16}/
-      UREAL8 = /#{UINT8}\/#{UINT8}|#{UINT8}/
-      UREAL2 = /#{UINT2}\/#{UINT2}|#{UINT2}/
-      REAL10 = /#{SIGN}#{UREAL10}/
-      REAL16 = /#{SIGN}#{UREAL16}/
-      REAL8 = /#{SIGN}#{UREAL8}/
-      REAL2 = /#{SIGN}#{UREAL2}/
-      IMAG10 = /i|#{UREAL10}i/
-      IMAG16 = /i|#{UREAL16}i/
-      IMAG8 = /i|#{UREAL8}i/
-      IMAG2 = /i|#{UREAL2}i/
-      COMPLEX10 = /#{REAL10}@#{REAL10}|#{REAL10}\+#{IMAG10}|#{REAL10}-#{IMAG10}|\+#{IMAG10}|-#{IMAG10}|#{REAL10}/
-      COMPLEX16 = /#{REAL16}@#{REAL16}|#{REAL16}\+#{IMAG16}|#{REAL16}-#{IMAG16}|\+#{IMAG16}|-#{IMAG16}|#{REAL16}/
-      COMPLEX8 = /#{REAL8}@#{REAL8}|#{REAL8}\+#{IMAG8}|#{REAL8}-#{IMAG8}|\+#{IMAG8}|-#{IMAG8}|#{REAL8}/
-      COMPLEX2 = /#{REAL2}@#{REAL2}|#{REAL2}\+#{IMAG2}|#{REAL2}-#{IMAG2}|\+#{IMAG2}|-#{IMAG2}|#{REAL2}/
-      NUM10 = /#{PREFIX10}?#{COMPLEX10}/
-      NUM16 = /#{PREFIX16}#{COMPLEX16}/
-      NUM8 = /#{PREFIX8}#{COMPLEX8}/
-      NUM2 = /#{PREFIX2}#{COMPLEX2}/
-      NUM = /#{NUM10}|#{NUM16}|#{NUM8}|#{NUM2}/
-      
-    protected
-      
-      def scan_tokens encoder, options
-        
+      DIGIT16 = /[0-9a-f]/i.freeze
+      DIGIT8 = /[0-7]/.freeze
+      DIGIT2 = /[01]/.freeze
+      RADIX16 = /\#x/i.freeze
+      RADIX8 = /\#o/i.freeze
+      RADIX2 = /\#b/i.freeze
+      RADIX10 = /\#d/i.freeze
+      EXACTNESS = /#i|#e/i.freeze
+      SIGN = /[\+-]?/.freeze
+      EXP_MARK = /[esfdl]/i.freeze
+      EXP = /#{EXP_MARK}#{SIGN}#{DIGIT}+/.freeze
+      SUFFIX = /#{EXP}?/.freeze
+      PREFIX10 = /#{RADIX10}?#{EXACTNESS}?|#{EXACTNESS}?#{RADIX10}?/.freeze
+      PREFIX16 = /#{RADIX16}#{EXACTNESS}?|#{EXACTNESS}?#{RADIX16}/.freeze
+      PREFIX8 = /#{RADIX8}#{EXACTNESS}?|#{EXACTNESS}?#{RADIX8}/.freeze
+      PREFIX2 = /#{RADIX2}#{EXACTNESS}?|#{EXACTNESS}?#{RADIX2}/.freeze
+      UINT10 = /#{DIGIT10}+#*/.freeze
+      UINT16 = /#{DIGIT16}+#*/.freeze
+      UINT8 = /#{DIGIT8}+#*/.freeze
+      UINT2 = /#{DIGIT2}+#*/.freeze
+      DECIMAL = /#{DIGIT10}+#+\.#*#{SUFFIX}|#{DIGIT10}+\.#{DIGIT10}*#*#{SUFFIX}|\.#{DIGIT10}+#*#{SUFFIX}|#{UINT10}#{EXP}/.freeze
+      UREAL10 = /#{UINT10}\/#{UINT10}|#{DECIMAL}|#{UINT10}/.freeze
+      UREAL16 = /#{UINT16}\/#{UINT16}|#{UINT16}/.freeze
+      UREAL8 = /#{UINT8}\/#{UINT8}|#{UINT8}/.freeze
+      UREAL2 = /#{UINT2}\/#{UINT2}|#{UINT2}/.freeze
+      REAL10 = /#{SIGN}#{UREAL10}/.freeze
+      REAL16 = /#{SIGN}#{UREAL16}/.freeze
+      REAL8 = /#{SIGN}#{UREAL8}/.freeze
+      REAL2 = /#{SIGN}#{UREAL2}/.freeze
+      IMAG10 = /i|#{UREAL10}i/.freeze
+      IMAG16 = /i|#{UREAL16}i/.freeze
+      IMAG8 = /i|#{UREAL8}i/.freeze
+      IMAG2 = /i|#{UREAL2}i/.freeze
+      COMPLEX10 = /#{REAL10}@#{REAL10}|#{REAL10}\+#{IMAG10}|#{REAL10}-#{IMAG10}|\+#{IMAG10}|-#{IMAG10}|#{REAL10}/.freeze
+      COMPLEX16 = /#{REAL16}@#{REAL16}|#{REAL16}\+#{IMAG16}|#{REAL16}-#{IMAG16}|\+#{IMAG16}|-#{IMAG16}|#{REAL16}/.freeze
+      COMPLEX8 = /#{REAL8}@#{REAL8}|#{REAL8}\+#{IMAG8}|#{REAL8}-#{IMAG8}|\+#{IMAG8}|-#{IMAG8}|#{REAL8}/.freeze
+      COMPLEX2 = /#{REAL2}@#{REAL2}|#{REAL2}\+#{IMAG2}|#{REAL2}-#{IMAG2}|\+#{IMAG2}|-#{IMAG2}|#{REAL2}/.freeze
+      NUM10 = /#{PREFIX10}?#{COMPLEX10}/.freeze
+      NUM16 = /#{PREFIX16}#{COMPLEX16}/.freeze
+      NUM8 = /#{PREFIX8}#{COMPLEX8}/.freeze
+      NUM2 = /#{PREFIX2}#{COMPLEX2}/.freeze
+      NUM = /#{NUM10}|#{NUM16}|#{NUM8}|#{NUM2}/.freeze
+
+      protected
+
+      def scan_tokens(encoder, options)
         state = :initial
         kind = nil
-        
+
         until eos?
-          
+
           case state
           when :initial
             if match = scan(/ \s+ | \\\n | , /x)
@@ -156,7 +154,7 @@ module CodeRay
             elsif match = scan(/['`\(\[\)\]\{\}]|\#[({]|~@?|[@\^]/)
               encoder.text_token match, :operator
             elsif match = scan(/;.*/)
-              encoder.text_token match, :comment  # TODO: recognize (comment ...) too
+              encoder.text_token match, :comment # TODO: recognize (comment ...) too
             elsif match = scan(/\#?\\(?:newline|space|.?)/)
               encoder.text_token match, :char
             elsif match = scan(/\#[ft]/)
@@ -180,12 +178,12 @@ module CodeRay
               state = self[1] ? :regexp : :string
               encoder.begin_group state
               encoder.text_token match, :delimiter
-            elsif match = scan(/#{NUM}/o) and not matched.empty?
+            elsif (match = scan(/#{NUM}/o)) && !matched.empty?
               encoder.text_token match, match[/[.e\/]/i] ? :float : :integer
             else
               encoder.text_token getch, :error
             end
-            
+
           when :string, :regexp
             if match = scan(/[^"\\]+|\\.?/)
               encoder.text_token match, :content
@@ -195,22 +193,21 @@ module CodeRay
               state = :initial
             else
               raise_inspect "else case \" reached; %p not handled." % peek(1),
-                encoder, state
+                            encoder, state
             end
-            
+
           else
             raise 'else case reached'
-            
+
           end
-          
+
         end
-        
+
         if [:string, :regexp].include? state
           encoder.end_group state
         end
-        
+
         encoder
-        
       end
     end
   end

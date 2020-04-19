@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Rack
-
   # Sets the Content-Length header on responses that do not specify
   # a Content-Length or Transfer-Encoding header.  Note that this
   # does not fix responses that have an invalid Content-Length

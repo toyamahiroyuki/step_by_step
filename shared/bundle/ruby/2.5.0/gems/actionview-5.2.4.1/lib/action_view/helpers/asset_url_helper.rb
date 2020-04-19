@@ -117,7 +117,7 @@ module ActionView
     #   )
     #
     module AssetUrlHelper
-      URI_REGEXP = %r{^[-a-z]+://|^(?:cid|data):|^//}i
+      URI_REGEXP = %r{^[-a-z]+://|^(?:cid|data):|^//}i.freeze
 
       # This is the entry point for all assets.
       # When using the asset pipeline (i.e. sprockets and sprockets-rails), the
@@ -187,7 +187,7 @@ module ActionView
         return "" if source.blank?
         return source if URI_REGEXP.match?(source)
 
-        tail, source = source[/([\?#].+)$/], source.sub(/([\?#].+)$/, "".freeze)
+        tail, source = source[/([\?#].+)$/], source.sub(/([\?#].+)$/, "")
 
         if extname = compute_asset_extname(source, options)
           source = "#{source}#{extname}"
@@ -231,8 +231,8 @@ module ActionView
 
       ASSET_EXTENSIONS = {
         javascript: ".js",
-        stylesheet: ".css"
-      }
+        stylesheet: ".css",
+      }.freeze
 
       # Compute extname to append to asset path. Returns +nil+ if
       # nothing should be added.
@@ -248,13 +248,13 @@ module ActionView
 
       # Maps asset types to public directory.
       ASSET_PUBLIC_DIRECTORIES = {
-        audio:      "/audios",
-        font:       "/fonts",
-        image:      "/images",
+        audio: "/audios",
+        font: "/fonts",
+        image: "/images",
         javascript: "/javascripts",
         stylesheet: "/stylesheets",
-        video:      "/videos"
-      }
+        video: "/videos",
+      }.freeze
 
       # Computes asset path to public directory. Plugins and
       # extensions can override this method to point to custom assets

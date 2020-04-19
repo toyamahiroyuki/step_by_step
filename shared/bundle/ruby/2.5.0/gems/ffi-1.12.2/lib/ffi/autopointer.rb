@@ -75,20 +75,20 @@ module FFI
     #  The last calling idiom (only one parameter) is generally only
     #  going to be useful if you subclass {AutoPointer}, and override
     #  #release, which by default does nothing.
-    def initialize(ptr, proc=nil, &block)
+    def initialize(ptr, proc = nil, &block)
       super(ptr.type_size, ptr)
-      raise TypeError, "Invalid pointer" if ptr.nil? || !ptr.kind_of?(Pointer) \
-        || ptr.kind_of?(MemoryPointer) || ptr.kind_of?(AutoPointer)
+      raise TypeError, "Invalid pointer" if ptr.nil? || !ptr.is_a?(Pointer) \
+        || ptr.is_a?(MemoryPointer) || ptr.is_a?(AutoPointer)
 
       @releaser = if proc
-                    if not proc.respond_to?(:call)
-                      raise RuntimeError.new("proc must be callable")
+                    if !proc.respond_to?(:call)
+                      raise "proc must be callable"
                     end
                     CallableReleaser.new(ptr, proc)
 
                   else
-                    if not self.class.respond_to?(:release)
-                      raise RuntimeError.new("no release method defined")
+                    if !self.class.respond_to?(:release)
+                      raise "no release method defined"
                     end
                     DefaultReleaser.new(ptr, self.class)
                   end
@@ -107,7 +107,7 @@ module FFI
     # @return [Boolean] +autorelease+
     # Set +autorelease+ property. See {Pointer Autorelease section at Pointer}.
     def autorelease=(autorelease)
-      @releaser.autorelease=(autorelease)
+      @releaser.autorelease = autorelease
     end
 
     # @return [Boolean] +autorelease+
@@ -117,7 +117,7 @@ module FFI
     end
 
     # @abstract Base class for {AutoPointer}'s releasers.
-    #  
+    #
     #  All subclasses of Releaser should define a +#release(ptr)+ method.
     # A releaser is an object in charge of release an {AutoPointer}.
     class Releaser
@@ -182,8 +182,8 @@ module FFI
     # @return [Type::POINTER]
     # @raise {RuntimeError} if class does not implement a +#release+ method
     def self.native_type
-      if not self.respond_to?(:release)
-        raise RuntimeError.new("no release method defined for #{self.inspect}")
+      if !respond_to?(:release)
+        raise "no release method defined for #{inspect}"
       end
       Type::POINTER
     end
@@ -196,8 +196,7 @@ module FFI
     #   @param ctx not used. Please set +nil+.
     # @return [AutoPointer]
     def self.from_native(val, ctx)
-      self.new(val)
+      new(val)
     end
   end
-
 end

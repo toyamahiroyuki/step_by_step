@@ -7,6 +7,6 @@ cli = Puma::ControlCLI.new ARGV.dup
 begin
   cli.run
 rescue => e
-  STDERR.puts e.message
+  warn e.message
   exit 1
 end

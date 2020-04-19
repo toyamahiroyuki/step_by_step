@@ -19,7 +19,7 @@ module Puma
 
     class PidFormatter
       def call(str)
-        "[#{$$}] #{str}"
+        "[#{$PROCESS_ID}] #{str}"
       end
     end
 
@@ -37,7 +37,7 @@ module Puma
 
       @debug = ENV.key? 'PUMA_DEBUG'
 
-      @hooks = Hash.new { |h,k| h[k] = [] }
+      @hooks = Hash.new { |h, k| h[k] = [] }
     end
 
     attr_reader :stdout, :stderr
@@ -51,8 +51,8 @@ module Puma
 
     # Register a callback for a given hook
     #
-    def register(hook, obj=nil, &blk)
-      if obj and blk
+    def register(hook, obj = nil, &blk)
+      if obj && blk
         raise "Specify either an object or a block, not both"
       end
 
@@ -109,15 +109,15 @@ module Puma
     # +server+ is the Server object, +error+ an exception object,
     # +kind+ some additional info, and +env+ the request.
     #
-    def unknown_error(server, error, kind="Unknown", env=nil)
+    def unknown_error(server, error, kind = "Unknown", env = nil)
       if error.respond_to? :render
         error.render "#{Time.now}: #{kind} error", @stderr
       else
         if env
-          string_block = [ "#{Time.now}: #{kind} error handling request { #{env['REQUEST_METHOD']} #{env['PATH_INFO']} }" ]
+          string_block = ["#{Time.now}: #{kind} error handling request { #{env['REQUEST_METHOD']} #{env['PATH_INFO']} }"]
           string_block << error.inspect
         else
-          string_block = [ "#{Time.now}: #{kind} error: #{error.inspect}" ]
+          string_block = ["#{Time.now}: #{kind} error: #{error.inspect}"]
         end
         string_block << error.backtrace
         @stderr.puts string_block.join("\n")

@@ -13,7 +13,9 @@ class Pry
     VOID_VALUE = Object.new
 
     # give it a nice inspect
-    def VOID_VALUE.inspect() "void" end
+    def VOID_VALUE.inspect()
+      "void"
+    end
 
     # Properties of the command itself (as passed as arguments to
     # {CommandSet#command} or {CommandSet#create_command}).
@@ -86,25 +88,39 @@ class Pry
           shellwords: true,
           listing: (String === match ? match : match.inspect),
           use_prefix: true,
-          takes_block: false
+          takes_block: false,
         }
       end
     end
 
     # Make those properties accessible to instances
-    def name; self.class.name; end
+    def name
+      self.class.name
+    end
 
-    def match; self.class.match; end
+    def match
+      self.class.match
+    end
 
-    def description; self.class.description; end
+    def description
+      self.class.description
+    end
 
-    def block; self.class.block; end
+    def block
+      self.class.block
+    end
 
-    def command_options; self.class.options; end
+    def command_options
+      self.class.options
+    end
 
-    def command_name; self.class.command_name; end
+    def command_name
+      self.class.command_name
+    end
 
-    def source; self.class.source; end
+    def source
+      self.class.source
+    end
 
     class << self
       def name
@@ -116,7 +132,7 @@ class Pry
       end
 
       def command_name
-        self.options[:listing]
+        options[:listing]
       end
 
       # Create a new command with the given properties.
@@ -200,9 +216,9 @@ class Pry
                    else
                      case Pry::Method(block).source_file
                      when %r{/pry/.*_commands/(.*).rb}
-                       $1.capitalize.gsub(/_/, " ")
+                       Regexp.last_match(1).capitalize.gsub(/_/, " ")
                      when %r{(pry-\w+)-([\d\.]+([\w\.]+)?)}
-                       name, version = $1, $2
+                       name, version = Regexp.last_match(1), Regexp.last_match(2)
                        "#{name} (v#{version})"
                      when /pryrc/
                        "pryrc"
@@ -285,7 +301,9 @@ class Pry
     end
 
     # @return [Object] The value of `self` inside the `target` binding.
-    def target_self; target.eval('self'); end
+    def target_self
+      target.eval('self')
+    end
 
     # @return [Hash] Pry commands can store arbitrary state
     #   here. This state persists between subsequent command invocations.
@@ -391,7 +409,7 @@ class Pry
       # Workaround for weird JRuby bug where rindex in this case can return nil
       # even when there's a match.
       arg_string.scan(/\| *(?:do|\{)/)
-      block_index = $~ && $~.offset(0)[0]
+      block_index = $LAST_MATCH_INFO && $LAST_MATCH_INFO.offset(0)[0]
 
       return if !block_index
 
@@ -425,7 +443,7 @@ class Pry
       unless dependencies_met?
         gems_needed = Array(command_options[:requires_gem])
         gems_not_installed = gems_needed.select { |g| !Rubygem.installed?(g) }
-        output.puts "\nThe command '#{command_name}' is #{text.bold("unavailable")} because it requires the following gems to be installed: #{(gems_not_installed.join(", "))}"
+        output.puts "\nThe command '#{command_name}' is #{text.bold("unavailable")} because it requires the following gems to be installed: #{gems_not_installed.join(", ")}"
         output.puts "-"
         output.puts "Type `install-command #{command_name}` to install the required gems and activate this command."
         return void
@@ -468,7 +486,7 @@ class Pry
 
     def find_hooks(event)
       event_name = "#{event}_#{command_name}"
-      (self.hooks || self.class.hooks).get_hooks(event_name).values
+      (hooks || self.class.hooks).get_hooks(event_name).values
     end
 
     def before_hooks
@@ -604,7 +622,7 @@ class Pry
       setup
 
       self.opts = slop
-      self.args = self.opts.parse!(args)
+      self.args = opts.parse!(args)
 
       if opts.present?(:help)
         output.puts slop.help
@@ -718,6 +736,8 @@ class Pry
     #       gist_method
     #     end
     #   end
-    def process; raise CommandError, "command '#{command_name}' not implemented" end
+    def process
+      raise CommandError, "command '#{command_name}' not implemented"
+    end
   end
 end

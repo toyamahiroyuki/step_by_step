@@ -1,23 +1,22 @@
 # frozen_string_literal: true
+
 require 'cgi'
 require 'crass'
 
 module Loofah
   module HTML5 # :nodoc:
     module Scrub
-
-      CONTROL_CHARACTERS = /[`\u0000-\u0020\u007f\u0080-\u0101]/
-      CSS_KEYWORDISH = /\A(#[0-9a-fA-F]+|rgb\(\d+%?,\d*%?,?\d*%?\)?|-?\d{0,3}\.?\d{0,10}(cm|r?em|ex|in|mm|pc|pt|px|%|,|\))?)\z/
-      CRASS_SEMICOLON = {:node => :semicolon, :raw => ";"}
+      CONTROL_CHARACTERS = /[`\u0000-\u0020\u007f\u0080-\u0101]/.freeze
+      CSS_KEYWORDISH = /\A(#[0-9a-fA-F]+|rgb\(\d+%?,\d*%?,?\d*%?\)?|-?\d{0,3}\.?\d{0,10}(cm|r?em|ex|in|mm|pc|pt|px|%|,|\))?)\z/.freeze
+      CRASS_SEMICOLON = { :node => :semicolon, :raw => ";" }.freeze
 
       class << self
-
-        def allowed_element? element_name
+        def allowed_element?(element_name)
           ::Loofah::HTML5::SafeList::ALLOWED_ELEMENTS_WITH_LIBXML2.include? element_name
         end
 
         #  alternative implementation of the html5lib attribute scrubbing algorithm
-        def scrub_attributes node
+        def scrub_attributes(node)
           node.attribute_nodes.each do |attr_node|
             attr_name = if attr_node.namespace
                           "#{attr_node.namespace.prefix}:#{attr_node.node_name}"
@@ -36,8 +35,8 @@ module Loofah
 
             if SafeList::ATTR_VAL_IS_URI.include?(attr_name)
               # this block lifted nearly verbatim from HTML5 sanitization
-              val_unescaped = CGI.unescapeHTML(attr_node.value).gsub(CONTROL_CHARACTERS,'').downcase
-              if val_unescaped =~ /^[a-z0-9][-+.a-z0-9]*:/ && ! SafeList::ALLOWED_PROTOCOLS.include?(val_unescaped.split(SafeList::PROTOCOL_SEPARATOR)[0])
+              val_unescaped = CGI.unescapeHTML(attr_node.value).gsub(CONTROL_CHARACTERS, '').downcase
+              if val_unescaped =~ /^[a-z0-9][-+.a-z0-9]*:/ && !SafeList::ALLOWED_PROTOCOLS.include?(val_unescaped.split(SafeList::PROTOCOL_SEPARATOR)[0])
                 attr_node.remove
                 next
               elsif val_unescaped.split(SafeList::PROTOCOL_SEPARATOR)[0] == 'data'
@@ -68,12 +67,12 @@ module Loofah
           force_correct_attribute_escaping! node
         end
 
-        def scrub_css_attribute node
+        def scrub_css_attribute(node)
           style = node.attributes['style']
           style.value = scrub_css(style.value) if style
         end
 
-        def scrub_css style
+        def scrub_css(style)
           style_tree = Crass.parse_properties style
           sanitized_tree = []
 
@@ -107,7 +106,7 @@ module Loofah
         #
         #  see comments about CVE-2018-8048 within the tests for more information
         #
-        def force_correct_attribute_escaping! node
+        def force_correct_attribute_escaping!(node)
           return unless Nokogiri::VersionInfo.instance.libxml2?
 
           node.attribute_nodes.each do |attr_node|
@@ -127,7 +126,6 @@ module Loofah
             end.force_encoding(encoding)
           end
         end
-
       end
     end
   end

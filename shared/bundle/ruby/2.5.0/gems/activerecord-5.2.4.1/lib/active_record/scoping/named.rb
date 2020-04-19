@@ -201,12 +201,12 @@ module ActiveRecord
 
         private
 
-          def valid_scope_name?(name)
-            if respond_to?(name, true) && logger
-              logger.warn "Creating scope :#{name}. " \
-                "Overwriting existing method #{self.name}.#{name}."
-            end
+        def valid_scope_name?(name)
+          if respond_to?(name, true) && logger
+            logger.warn "Creating scope :#{name}. " \
+              "Overwriting existing method #{self.name}.#{name}."
           end
+        end
       end
     end
   end

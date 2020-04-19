@@ -59,7 +59,7 @@ module ActiveModel
         begin
           require "bcrypt"
         rescue LoadError
-          $stderr.puts "You don't have bcrypt installed in your application. Please add it to your Gemfile and run bundle install"
+          warn "You don't have bcrypt installed in your application. Please add it to your Gemfile and run bundle install"
           raise
         end
 
@@ -73,7 +73,7 @@ module ActiveModel
           # when there is an error, the message is added to the password attribute instead
           # so that the error message will make sense to the end-user.
           validate do |record|
-            record.errors.add(:password, :blank) unless record.password_digest.present?
+            record.errors.add(:password, :blank) if record.password_digest.blank?
           end
 
           validates_length_of :password, maximum: ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED

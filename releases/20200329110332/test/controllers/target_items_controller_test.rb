@@ -10,5 +10,4 @@ class TargetItemsControllerTest < ActionDispatch::IntegrationTest
     get target_items_edit_url
     assert_response :success
   end
-
 end

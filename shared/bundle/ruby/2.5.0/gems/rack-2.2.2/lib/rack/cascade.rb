@@ -8,7 +8,7 @@ module Rack
 
   class Cascade
     # deprecated, no longer used
-    NotFound = [404, { CONTENT_TYPE => "text/plain" }, []]
+    NotFound = [404, { CONTENT_TYPE => "text/plain" }, []].freeze
 
     # An array of applications to try in order.
     attr_reader :apps

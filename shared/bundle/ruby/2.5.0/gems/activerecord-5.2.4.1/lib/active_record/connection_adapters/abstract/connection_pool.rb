@@ -147,63 +147,63 @@ module ActiveRecord
 
         private
 
-          def internal_poll(timeout)
-            no_wait_poll || (timeout && wait_poll(timeout))
-          end
+        def internal_poll(timeout)
+          no_wait_poll || (timeout && wait_poll(timeout))
+        end
 
-          def synchronize(&block)
-            @lock.synchronize(&block)
-          end
+        def synchronize(&block)
+          @lock.synchronize(&block)
+        end
 
-          # Test if the queue currently contains any elements.
-          def any?
-            !@queue.empty?
-          end
+        # Test if the queue currently contains any elements.
+        def any?
+          !@queue.empty?
+        end
 
-          # A thread can remove an element from the queue without
-          # waiting if and only if the number of currently available
-          # connections is strictly greater than the number of waiting
-          # threads.
-          def can_remove_no_wait?
-            @queue.size > @num_waiting
-          end
+        # A thread can remove an element from the queue without
+        # waiting if and only if the number of currently available
+        # connections is strictly greater than the number of waiting
+        # threads.
+        def can_remove_no_wait?
+          @queue.size > @num_waiting
+        end
 
-          # Removes and returns the head of the queue if possible, or +nil+.
-          def remove
-            @queue.pop
-          end
+        # Removes and returns the head of the queue if possible, or +nil+.
+        def remove
+          @queue.pop
+        end
 
-          # Remove and return the head the queue if the number of
-          # available elements is strictly greater than the number of
-          # threads currently waiting.  Otherwise, return +nil+.
-          def no_wait_poll
-            remove if can_remove_no_wait?
-          end
+        # Remove and return the head the queue if the number of
+        # available elements is strictly greater than the number of
+        # threads currently waiting.  Otherwise, return +nil+.
+        def no_wait_poll
+          remove if can_remove_no_wait?
+        end
 
-          # Waits on the queue up to +timeout+ seconds, then removes and
-          # returns the head of the queue.
-          def wait_poll(timeout)
-            @num_waiting += 1
+        # Waits on the queue up to +timeout+ seconds, then removes and
+        # returns the head of the queue.
+        def wait_poll(timeout)
+          @num_waiting += 1
 
-            t0 = Time.now
-            elapsed = 0
-            loop do
-              ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
-                @cond.wait(timeout - elapsed)
-              end
-
-              return remove if any?
-
-              elapsed = Time.now - t0
-              if elapsed >= timeout
-                msg = "could not obtain a connection from the pool within %0.3f seconds (waited %0.3f seconds); all pooled connections were in use" %
-                  [timeout, elapsed]
-                raise ConnectionTimeoutError, msg
-              end
+          t0 = Time.now
+          elapsed = 0
+          loop do
+            ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+              @cond.wait(timeout - elapsed)
             end
-          ensure
-            @num_waiting -= 1
+
+            return remove if any?
+
+            elapsed = Time.now - t0
+            if elapsed >= timeout
+              msg = "could not obtain a connection from the pool within %0.3f seconds (waited %0.3f seconds); all pooled connections were in use" %
+                [timeout, elapsed]
+              raise ConnectionTimeoutError, msg
+            end
           end
+        ensure
+          @num_waiting -= 1
+        end
       end
 
       # Adds the ability to turn a basic fair FIFO queue into one
@@ -273,11 +273,12 @@ module ActiveRecord
         include BiasableQueue
 
         private
-          def internal_poll(timeout)
-            conn = super
-            conn.lease if conn
-            conn
-          end
+
+        def internal_poll(timeout)
+          conn = super
+          conn.lease if conn
+          conn
+        end
       end
 
       # Every +frequency+ seconds, the reaper will call +reap+ and +flush+ on
@@ -296,13 +297,13 @@ module ActiveRecord
 
         def run
           return unless frequency && frequency > 0
-          Thread.new(frequency, pool) { |t, p|
+          Thread.new(frequency, pool) do |t, p|
             loop do
               sleep t
               p.reap
               p.flush
             end
-          }
+          end
         end
       end
 
@@ -656,234 +657,235 @@ module ActiveRecord
             dead: @connections.count { |c| c.in_use? && !c.owner.alive? },
             idle: @connections.count { |c| !c.in_use? },
             waiting: num_waiting_in_queue,
-            checkout_timeout: checkout_timeout
+            checkout_timeout: checkout_timeout,
           }
         end
       end
 
       private
-        #--
-        # this is unfortunately not concurrent
-        def bulk_make_new_connections(num_new_conns_needed)
-          num_new_conns_needed.times do
-            # try_to_checkout_new_connection will not exceed pool's @size limit
-            if new_conn = try_to_checkout_new_connection
-              # make the new_conn available to the starving threads stuck @available Queue
-              checkin(new_conn)
+
+      #--
+      # this is unfortunately not concurrent
+      def bulk_make_new_connections(num_new_conns_needed)
+        num_new_conns_needed.times do
+          # try_to_checkout_new_connection will not exceed pool's @size limit
+          if new_conn = try_to_checkout_new_connection
+            # make the new_conn available to the starving threads stuck @available Queue
+            checkin(new_conn)
+          end
+        end
+      end
+
+      #--
+      # From the discussion on GitHub:
+      #  https://github.com/rails/rails/pull/14938#commitcomment-6601951
+      # This hook-in method allows for easier monkey-patching fixes needed by
+      # JRuby users that use Fibers.
+      def connection_cache_key(thread)
+        thread
+      end
+
+      def current_thread
+        @lock_thread || Thread.current
+      end
+
+      # Take control of all existing connections so a "group" action such as
+      # reload/disconnect can be performed safely. It is no longer enough to
+      # wrap it in +synchronize+ because some pool's actions are allowed
+      # to be performed outside of the main +synchronize+ block.
+      def with_exclusively_acquired_all_connections(raise_on_acquisition_timeout = true)
+        with_new_connections_blocked do
+          attempt_to_checkout_all_existing_connections(raise_on_acquisition_timeout)
+          yield
+        end
+      end
+
+      def attempt_to_checkout_all_existing_connections(raise_on_acquisition_timeout = true)
+        collected_conns = synchronize do
+          # account for our own connections
+          @connections.select { |conn| conn.owner == Thread.current }
+        end
+
+        newly_checked_out = []
+        timeout_time      = Time.now + (@checkout_timeout * 2)
+
+        @available.with_a_bias_for(Thread.current) do
+          loop do
+            synchronize do
+              return if collected_conns.size == @connections.size && @now_connecting == 0
+              remaining_timeout = timeout_time - Time.now
+              remaining_timeout = 0 if remaining_timeout < 0
+              conn = checkout_for_exclusive_access(remaining_timeout)
+              collected_conns   << conn
+              newly_checked_out << conn
             end
           end
         end
+      rescue ExclusiveConnectionTimeoutError
+        # <tt>raise_on_acquisition_timeout == false</tt> means we are directed to ignore any
+        # timeouts and are expected to just give up: we've obtained as many connections
+        # as possible, note that in a case like that we don't return any of the
+        # +newly_checked_out+ connections.
 
-        #--
-        # From the discussion on GitHub:
-        #  https://github.com/rails/rails/pull/14938#commitcomment-6601951
-        # This hook-in method allows for easier monkey-patching fixes needed by
-        # JRuby users that use Fibers.
-        def connection_cache_key(thread)
-          thread
-        end
-
-        def current_thread
-          @lock_thread || Thread.current
-        end
-
-        # Take control of all existing connections so a "group" action such as
-        # reload/disconnect can be performed safely. It is no longer enough to
-        # wrap it in +synchronize+ because some pool's actions are allowed
-        # to be performed outside of the main +synchronize+ block.
-        def with_exclusively_acquired_all_connections(raise_on_acquisition_timeout = true)
-          with_new_connections_blocked do
-            attempt_to_checkout_all_existing_connections(raise_on_acquisition_timeout)
-            yield
-          end
-        end
-
-        def attempt_to_checkout_all_existing_connections(raise_on_acquisition_timeout = true)
-          collected_conns = synchronize do
-            # account for our own connections
-            @connections.select { |conn| conn.owner == Thread.current }
-          end
-
-          newly_checked_out = []
-          timeout_time      = Time.now + (@checkout_timeout * 2)
-
-          @available.with_a_bias_for(Thread.current) do
-            loop do
-              synchronize do
-                return if collected_conns.size == @connections.size && @now_connecting == 0
-                remaining_timeout = timeout_time - Time.now
-                remaining_timeout = 0 if remaining_timeout < 0
-                conn = checkout_for_exclusive_access(remaining_timeout)
-                collected_conns   << conn
-                newly_checked_out << conn
-              end
-            end
-          end
-        rescue ExclusiveConnectionTimeoutError
-          # <tt>raise_on_acquisition_timeout == false</tt> means we are directed to ignore any
-          # timeouts and are expected to just give up: we've obtained as many connections
-          # as possible, note that in a case like that we don't return any of the
-          # +newly_checked_out+ connections.
-
-          if raise_on_acquisition_timeout
-            release_newly_checked_out = true
-            raise
-          end
-        rescue Exception # if something else went wrong
-          # this can't be a "naked" rescue, because we have should return conns
-          # even for non-StandardErrors
+        if raise_on_acquisition_timeout
           release_newly_checked_out = true
           raise
-        ensure
-          if release_newly_checked_out && newly_checked_out
-            # releasing only those conns that were checked out in this method, conns
-            # checked outside this method (before it was called) are not for us to release
-            newly_checked_out.each { |conn| checkin(conn) }
+        end
+      rescue Exception # if something else went wrong
+        # this can't be a "naked" rescue, because we have should return conns
+        # even for non-StandardErrors
+        release_newly_checked_out = true
+        raise
+      ensure
+        if release_newly_checked_out && newly_checked_out
+          # releasing only those conns that were checked out in this method, conns
+          # checked outside this method (before it was called) are not for us to release
+          newly_checked_out.each { |conn| checkin(conn) }
+        end
+      end
+
+      #--
+      # Must be called in a synchronize block.
+      def checkout_for_exclusive_access(checkout_timeout)
+        checkout(checkout_timeout)
+      rescue ConnectionTimeoutError
+        # this block can't be easily moved into attempt_to_checkout_all_existing_connections's
+        # rescue block, because doing so would put it outside of synchronize section, without
+        # being in a critical section thread_report might become inaccurate
+        msg = "could not obtain ownership of all database connections in #{checkout_timeout} seconds".dup
+
+        thread_report = []
+        @connections.each do |conn|
+          unless conn.owner == Thread.current
+            thread_report << "#{conn} is owned by #{conn.owner}"
           end
         end
 
-        #--
-        # Must be called in a synchronize block.
-        def checkout_for_exclusive_access(checkout_timeout)
-          checkout(checkout_timeout)
-        rescue ConnectionTimeoutError
-          # this block can't be easily moved into attempt_to_checkout_all_existing_connections's
-          # rescue block, because doing so would put it outside of synchronize section, without
-          # being in a critical section thread_report might become inaccurate
-          msg = "could not obtain ownership of all database connections in #{checkout_timeout} seconds".dup
+        msg << " (#{thread_report.join(', ')})" if thread_report.any?
 
-          thread_report = []
-          @connections.each do |conn|
-            unless conn.owner == Thread.current
-              thread_report << "#{conn} is owned by #{conn.owner}"
+        raise ExclusiveConnectionTimeoutError, msg
+      end
+
+      def with_new_connections_blocked
+        synchronize do
+          @threads_blocking_new_connections += 1
+        end
+
+        yield
+      ensure
+        num_new_conns_required = 0
+
+        synchronize do
+          @threads_blocking_new_connections -= 1
+
+          if @threads_blocking_new_connections.zero?
+            @available.clear
+
+            num_new_conns_required = num_waiting_in_queue
+
+            @connections.each do |conn|
+              next if conn.in_use?
+
+              @available.add conn
+              num_new_conns_required -= 1
             end
           end
-
-          msg << " (#{thread_report.join(', ')})" if thread_report.any?
-
-          raise ExclusiveConnectionTimeoutError, msg
         end
 
-        def with_new_connections_blocked
-          synchronize do
-            @threads_blocking_new_connections += 1
+        bulk_make_new_connections(num_new_conns_required) if num_new_conns_required > 0
+      end
+
+      # Acquire a connection by one of 1) immediately removing one
+      # from the queue of available connections, 2) creating a new
+      # connection if the pool is not at capacity, 3) waiting on the
+      # queue for a connection to become available.
+      #
+      # Raises:
+      # - ActiveRecord::ConnectionTimeoutError if a connection could not be acquired
+      #
+      #--
+      # Implementation detail: the connection returned by +acquire_connection+
+      # will already be "+connection.lease+ -ed" to the current thread.
+      def acquire_connection(checkout_timeout)
+        # NOTE: we rely on <tt>@available.poll</tt> and +try_to_checkout_new_connection+ to
+        # +conn.lease+ the returned connection (and to do this in a +synchronized+
+        # section). This is not the cleanest implementation, as ideally we would
+        # <tt>synchronize { conn.lease }</tt> in this method, but by leaving it to <tt>@available.poll</tt>
+        # and +try_to_checkout_new_connection+ we can piggyback on +synchronize+ sections
+        # of the said methods and avoid an additional +synchronize+ overhead.
+        if conn = @available.poll || try_to_checkout_new_connection
+          conn
+        else
+          reap
+          @available.poll(checkout_timeout)
+        end
+      end
+
+      #--
+      # if owner_thread param is omitted, this must be called in synchronize block
+      def remove_connection_from_thread_cache(conn, owner_thread = conn.owner)
+        @thread_cached_conns.delete_pair(connection_cache_key(owner_thread), conn)
+      end
+      alias_method :release, :remove_connection_from_thread_cache
+
+      def new_connection
+        Base.send(spec.adapter_method, spec.config).tap do |conn|
+          conn.schema_cache = schema_cache.dup if schema_cache
+        end
+      end
+
+      # If the pool is not at a <tt>@size</tt> limit, establish new connection. Connecting
+      # to the DB is done outside main synchronized section.
+      #--
+      # Implementation constraint: a newly established connection returned by this
+      # method must be in the +.leased+ state.
+      def try_to_checkout_new_connection
+        # first in synchronized section check if establishing new conns is allowed
+        # and increment @now_connecting, to prevent overstepping this pool's @size
+        # constraint
+        do_checkout = synchronize do
+          if @threads_blocking_new_connections.zero? && (@connections.size + @now_connecting) < @size
+            @now_connecting += 1
           end
-
-          yield
-        ensure
-          num_new_conns_required = 0
-
-          synchronize do
-            @threads_blocking_new_connections -= 1
-
-            if @threads_blocking_new_connections.zero?
-              @available.clear
-
-              num_new_conns_required = num_waiting_in_queue
-
-              @connections.each do |conn|
-                next if conn.in_use?
-
-                @available.add conn
-                num_new_conns_required -= 1
+        end
+        if do_checkout
+          begin
+            # if successfully incremented @now_connecting establish new connection
+            # outside of synchronized section
+            conn = checkout_new_connection
+          ensure
+            synchronize do
+              if conn
+                adopt_connection(conn)
+                # returned conn needs to be already leased
+                conn.lease
               end
-            end
-          end
-
-          bulk_make_new_connections(num_new_conns_required) if num_new_conns_required > 0
-        end
-
-        # Acquire a connection by one of 1) immediately removing one
-        # from the queue of available connections, 2) creating a new
-        # connection if the pool is not at capacity, 3) waiting on the
-        # queue for a connection to become available.
-        #
-        # Raises:
-        # - ActiveRecord::ConnectionTimeoutError if a connection could not be acquired
-        #
-        #--
-        # Implementation detail: the connection returned by +acquire_connection+
-        # will already be "+connection.lease+ -ed" to the current thread.
-        def acquire_connection(checkout_timeout)
-          # NOTE: we rely on <tt>@available.poll</tt> and +try_to_checkout_new_connection+ to
-          # +conn.lease+ the returned connection (and to do this in a +synchronized+
-          # section). This is not the cleanest implementation, as ideally we would
-          # <tt>synchronize { conn.lease }</tt> in this method, but by leaving it to <tt>@available.poll</tt>
-          # and +try_to_checkout_new_connection+ we can piggyback on +synchronize+ sections
-          # of the said methods and avoid an additional +synchronize+ overhead.
-          if conn = @available.poll || try_to_checkout_new_connection
-            conn
-          else
-            reap
-            @available.poll(checkout_timeout)
-          end
-        end
-
-        #--
-        # if owner_thread param is omitted, this must be called in synchronize block
-        def remove_connection_from_thread_cache(conn, owner_thread = conn.owner)
-          @thread_cached_conns.delete_pair(connection_cache_key(owner_thread), conn)
-        end
-        alias_method :release, :remove_connection_from_thread_cache
-
-        def new_connection
-          Base.send(spec.adapter_method, spec.config).tap do |conn|
-            conn.schema_cache = schema_cache.dup if schema_cache
-          end
-        end
-
-        # If the pool is not at a <tt>@size</tt> limit, establish new connection. Connecting
-        # to the DB is done outside main synchronized section.
-        #--
-        # Implementation constraint: a newly established connection returned by this
-        # method must be in the +.leased+ state.
-        def try_to_checkout_new_connection
-          # first in synchronized section check if establishing new conns is allowed
-          # and increment @now_connecting, to prevent overstepping this pool's @size
-          # constraint
-          do_checkout = synchronize do
-            if @threads_blocking_new_connections.zero? && (@connections.size + @now_connecting) < @size
-              @now_connecting += 1
-            end
-          end
-          if do_checkout
-            begin
-              # if successfully incremented @now_connecting establish new connection
-              # outside of synchronized section
-              conn = checkout_new_connection
-            ensure
-              synchronize do
-                if conn
-                  adopt_connection(conn)
-                  # returned conn needs to be already leased
-                  conn.lease
-                end
-                @now_connecting -= 1
-              end
+              @now_connecting -= 1
             end
           end
         end
+      end
 
-        def adopt_connection(conn)
-          conn.pool = self
-          @connections << conn
-        end
+      def adopt_connection(conn)
+        conn.pool = self
+        @connections << conn
+      end
 
-        def checkout_new_connection
-          raise ConnectionNotEstablished unless @automatic_reconnect
-          new_connection
-        end
+      def checkout_new_connection
+        raise ConnectionNotEstablished unless @automatic_reconnect
+        new_connection
+      end
 
-        def checkout_and_verify(c)
-          c._run_checkout_callbacks do
-            c.verify!
-          end
-          c
-        rescue
-          remove c
-          c.disconnect!
-          raise
+      def checkout_and_verify(c)
+        c._run_checkout_callbacks do
+          c.verify!
         end
+        c
+      rescue
+        remove c
+        c.disconnect!
+        raise
+      end
     end
 
     # ConnectionHandler is a collection of ConnectionPool objects. It is used
@@ -978,7 +980,7 @@ module ActiveRecord
 
         message_bus = ActiveSupport::Notifications.instrumenter
         payload = {
-          connection_id: object_id
+          connection_id: object_id,
         }
         if spec
           payload[:spec_name] = spec.name
@@ -1074,14 +1076,14 @@ module ActiveRecord
 
       private
 
-        def owner_to_pool
-          @owner_to_pool[Process.pid]
-        end
+      def owner_to_pool
+        @owner_to_pool[Process.pid]
+      end
 
-        def pool_from_any_process_for(spec_name)
-          owner_to_pool = @owner_to_pool.values.reverse.find { |v| v[spec_name] }
-          owner_to_pool && owner_to_pool[spec_name]
-        end
+      def pool_from_any_process_for(spec_name)
+        owner_to_pool = @owner_to_pool.values.reverse.find { |v| v[spec_name] }
+        owner_to_pool && owner_to_pool[spec_name]
+      end
     end
   end
 end

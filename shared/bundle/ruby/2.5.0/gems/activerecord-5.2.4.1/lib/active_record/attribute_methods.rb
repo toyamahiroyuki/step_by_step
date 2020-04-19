@@ -22,16 +22,16 @@ module ActiveRecord
       delegate :column_for_attribute, to: :class
     end
 
-    AttrNames = Module.new {
+    AttrNames = Module.new do
       def self.set_name_cache(name, value)
         const_name = "ATTR_#{name}"
         unless const_defined? const_name
           const_set const_name, value.dup.freeze
         end
       end
-    }
+    end
 
-    BLACKLISTED_CLASS_METHODS = %w(private public protected allocate new name parent superclass)
+    BLACKLISTED_CLASS_METHODS = %w(private public protected allocate new name parent superclass).freeze
 
     class GeneratedAttributeMethods < Module #:nodoc:
       include Mutex_m
@@ -97,7 +97,7 @@ module ActiveRecord
           # If ThisClass < ... < SomeSuperClass < ... < Base and SomeSuperClass
           # defines its own attribute method, then we don't want to overwrite that.
           defined = method_defined_within?(method_name, superclass, Base) &&
-            ! superclass.instance_method(method_name).owner.is_a?(GeneratedAttributeMethods)
+            !superclass.instance_method(method_name).owner.is_a?(GeneratedAttributeMethods)
           defined || super
         end
       end
@@ -161,16 +161,16 @@ module ActiveRecord
       #   # => ["id", "created_at", "updated_at", "name", "age"]
       def attribute_names
         @attribute_names ||= if !abstract_class? && table_exists?
-          attribute_types.keys
-        else
-          []
+                               attribute_types.keys
+                             else
+                               []
         end
       end
 
       # Regexp whitelist. Matches the following:
       #   "#{table_name}.#{column_name}"
       #   "#{column_name}"
-      COLUMN_NAME_WHITELIST = /\A(?:\w+\.)?\w+\z/i
+      COLUMN_NAME_WHITELIST = /\A(?:\w+\.)?\w+\z/i.freeze
 
       # Regexp whitelist. Matches the following:
       #   "#{table_name}.#{column_name}"
@@ -188,11 +188,11 @@ module ActiveRecord
         (?:\s+asc|\s+desc)?
         (?:\s+nulls\s+(?:first|last))?
         \z
-      /ix
+      /ix.freeze
 
       def enforce_raw_sql_whitelist(args, whitelist: COLUMN_NAME_WHITELIST) # :nodoc:
         unexpected = args.reject do |arg|
-          arg.kind_of?(Arel::Node) ||
+          arg.is_a?(Arel::Node) ||
             arg.is_a?(Arel::Nodes::SqlLiteral) ||
             arg.is_a?(Arel::Attributes::Attribute) ||
             arg.to_s.split(/\s*,\s*/).all? { |part| whitelist.match?(part) }
@@ -212,9 +212,8 @@ module ActiveRecord
           )
         else
           raise(ActiveRecord::UnknownAttributeReference,
-            "Query method called with non-attribute argument(s): " +
-            unexpected.map(&:inspect).join(", ")
-          )
+                "Query method called with non-attribute argument(s): " +
+                unexpected.map(&:inspect).join(", "))
         end
       end
 
@@ -272,9 +271,9 @@ module ActiveRecord
 
       case name
       when :to_partial_path
-        name = "to_partial_path".freeze
+        name = "to_partial_path"
       when :to_model
-        name = "to_model".freeze
+        name = "to_model"
       else
         name = name.to_s
       end
@@ -445,48 +444,48 @@ module ActiveRecord
 
     protected
 
-      def attribute_method?(attr_name) # :nodoc:
-        # We check defined? because Syck calls respond_to? before actually calling initialize.
-        defined?(@attributes) && @attributes.key?(attr_name)
-      end
+    def attribute_method?(attr_name) # :nodoc:
+      # We check defined? because Syck calls respond_to? before actually calling initialize.
+      defined?(@attributes) && @attributes.key?(attr_name)
+    end
 
     private
 
-      def attributes_with_values_for_create(attribute_names)
-        attributes_with_values(attributes_for_create(attribute_names))
-      end
+    def attributes_with_values_for_create(attribute_names)
+      attributes_with_values(attributes_for_create(attribute_names))
+    end
 
-      def attributes_with_values_for_update(attribute_names)
-        attributes_with_values(attributes_for_update(attribute_names))
-      end
+    def attributes_with_values_for_update(attribute_names)
+      attributes_with_values(attributes_for_update(attribute_names))
+    end
 
-      def attributes_with_values(attribute_names)
-        attribute_names.each_with_object({}) do |name, attrs|
-          attrs[name] = _read_attribute(name)
-        end
+    def attributes_with_values(attribute_names)
+      attribute_names.each_with_object({}) do |name, attrs|
+        attrs[name] = _read_attribute(name)
       end
+    end
 
-      # Filters the primary keys and readonly attributes from the attribute names.
-      def attributes_for_update(attribute_names)
-        attribute_names.reject do |name|
-          readonly_attribute?(name)
-        end
+    # Filters the primary keys and readonly attributes from the attribute names.
+    def attributes_for_update(attribute_names)
+      attribute_names.reject do |name|
+        readonly_attribute?(name)
       end
+    end
 
-      # Filters out the primary keys, from the attribute names, when the primary
-      # key is to be generated (e.g. the id attribute has no value).
-      def attributes_for_create(attribute_names)
-        attribute_names.reject do |name|
-          pk_attribute?(name) && id.nil?
-        end
+    # Filters out the primary keys, from the attribute names, when the primary
+    # key is to be generated (e.g. the id attribute has no value).
+    def attributes_for_create(attribute_names)
+      attribute_names.reject do |name|
+        pk_attribute?(name) && id.nil?
       end
+    end
 
-      def readonly_attribute?(name)
-        self.class.readonly_attributes.include?(name)
-      end
+    def readonly_attribute?(name)
+      self.class.readonly_attributes.include?(name)
+    end
 
-      def pk_attribute?(name)
-        name == self.class.primary_key
-      end
+    def pk_attribute?(name)
+      name == self.class.primary_key
+    end
   end
 end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Rakefile for rake        -*- ruby -*-
 
 # Copyright 2004, 2005, 2006 by Jim Weirich (jim@weirichhouse.org).
@@ -51,13 +52,13 @@ end
 # Create a task to build the RDOC documentation tree.
 
 if defined?(RDoc)
-  rd = RDoc::Task.new("rdoc") { |rdoc|
+  rd = RDoc::Task.new("rdoc") do |rdoc|
     rdoc.rdoc_dir = 'html'
     rdoc.title    = "Builder for Markup"
     rdoc.options << '--line-numbers' << '--inline-source' << '--main' << 'README.rdoc'
     rdoc.rdoc_files.include('lib/**/*.rb', '[A-Z]*', 'doc/**/*.rdoc').exclude("TAGS")
     rdoc.template = 'doc/jamis.rb'
-  }
+  end
 else
   rd = Struct.new(:rdoc_files).new([])
 end
@@ -82,23 +83,22 @@ BLANKSLATE_FILES = FileList[
   'test/test_blankslate.rb'
 ]
 
-if ! defined?(Gem)
+if !defined?(Gem)
   puts "Package Target requires RubyGEMs"
 else
   spec = Gem::Specification.new do |s|
-
     #### Basic information.
 
     s.name = 'builder'
     s.version = PKG_VERSION
     s.summary = "Builders for MarkUp."
-    s.description = %{\
+    s.description = %(\
 Builder provides a number of builder objects that make creating structured data
 simple to do.  Currently the following builder objects are supported:
 
 * XML Markup
 * XML Events
-}
+)
 
     s.files = PKG_FILES.to_a
     s.require_path = 'lib'
@@ -107,8 +107,8 @@ simple to do.  Currently the following builder objects are supported:
 
     s.extra_rdoc_files = rd.rdoc_files.reject { |fn| fn =~ /\.rb$/ }.to_a
     s.rdoc_options <<
-      '--title' <<  'Builder -- Easy XML Building' <<
-      '--main' << 'README.rdoc' <<
+      '--title' << 'Builder -- Easy XML Building' \
+      '--main' << 'README.rdoc' \
       '--line-numbers'
 
     s.author = "Jim Weirich"
@@ -118,17 +118,16 @@ simple to do.  Currently the following builder objects are supported:
   end
 
   blankslate_spec = Gem::Specification.new do |s|
-
     #### Basic information.
 
     s.name = 'blankslate'
     s.version = PKG_VERSION
     s.summary = "Blank Slate base class."
-    s.description = %{\
+    s.description = %(\
 BlankSlate provides a base class where almost all of the methods from Object and
 Kernel have been removed.  This is useful when providing proxy object and other
 classes that make heavy use of method_missing.
-}
+)
 
     s.files = BLANKSLATE_FILES.to_a
     s.require_path = 'lib'
@@ -137,8 +136,8 @@ classes that make heavy use of method_missing.
 
     s.extra_rdoc_files = rd.rdoc_files.reject { |fn| fn =~ /\.rb$/ }.to_a
     s.rdoc_options <<
-      '--title' <<  'BlankSlate -- Base Class for building proxies.' <<
-      '--main' << 'README.rdoc' <<
+      '--title' << 'BlankSlate -- Base Class for building proxies.' \
+      '--main' << 'README.rdoc' \
       '--line-numbers'
 
     s.author = "Jim Weirich"
@@ -163,7 +162,9 @@ classes that make heavy use of method_missing.
 end
 
 task :remove_tags do
-  rm "TAGS" rescue nil
+  rm "TAGS"
+rescue
+  nil
 end
 
 # RCov ---------------------------------------------------------------
@@ -173,7 +174,7 @@ begin
   Rcov::RcovTask.new do |t|
     t.libs << "test"
     t.rcov_opts = [
-      '-xRakefile', '--text-report'
+      '-xRakefile', '--text-report',
     ]
     t.test_files = FileList[
       'test/test*.rb'

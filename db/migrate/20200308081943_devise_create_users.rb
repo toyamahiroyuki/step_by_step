@@ -40,7 +40,7 @@ class DeviseCreateUsers < ActiveRecord::Migration[5.2]
       t.string :profile_image_id
       t.integer :old
       t.integer :sex
-      t.integer :job
+      t.string :job
       t.integer :deposit
       t.integer :member
     end

@@ -20,9 +20,9 @@ module Puma::Rack
     end
 
     def remap(map)
-      @mapping = map.map { |location, app|
+      @mapping = map.map do |location, app|
         if location =~ %r{\Ahttps?://(.*?)(/.*)}
-          host, location = $1, $2
+          host, location = Regexp.last_match(1), Regexp.last_match(2)
         else
           host = nil
         end
@@ -35,7 +35,7 @@ module Puma::Rack
         match = Regexp.new("^#{Regexp.quote(location).gsub('/', '/+')}(.*)", nil, 'n')
 
         [host, location, match, app]
-      }.sort_by do |(host, location, _, _)|
+      end.sort_by do |(host, location, _, _)|
         [host ? -host.size : INFINITY, -location.size]
       end
     end
@@ -60,7 +60,7 @@ module Puma::Rack
         next unless m = match.match(path.to_s)
 
         rest = m[1]
-        next unless !rest || rest.empty? || rest[0] == ?/
+        next unless rest.blank? || rest[0] == ?/
 
         env['SCRIPT_NAME'] = (script_name + location)
         env['PATH_INFO'] = rest
@@ -68,7 +68,7 @@ module Puma::Rack
         return app.call(env)
       end
 
-      [404, {'Content-Type' => "text/plain", "X-Cascade" => "pass"}, ["Not Found: #{path}"]]
+      [404, { 'Content-Type' => "text/plain", "X-Cascade" => "pass" }, ["Not Found: #{path}"]]
 
     ensure
       env['PATH_INFO'] = path
@@ -76,6 +76,7 @@ module Puma::Rack
     end
 
     private
+
     def casecmp?(v1, v2)
       # if both nil, or they're the same string
       return true if v1 == v2

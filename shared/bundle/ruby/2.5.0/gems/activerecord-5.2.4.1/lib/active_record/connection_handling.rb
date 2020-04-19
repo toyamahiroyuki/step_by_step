@@ -73,14 +73,15 @@ module ActiveRecord
       end
 
       private
-        def config
-          @raw_config.dup.tap do |cfg|
-            if url = ENV["DATABASE_URL"]
-              cfg[@env] ||= {}
-              cfg[@env]["url"] ||= url
-            end
+
+      def config
+        @raw_config.dup.tap do |cfg|
+          if url = ENV["DATABASE_URL"]
+            cfg[@env] ||= {}
+            cfg[@env]["url"] ||= url
           end
         end
+      end
     end
 
     # Returns the connection currently associated with the class. This can
@@ -140,6 +141,6 @@ module ActiveRecord
     end
 
     delegate :clear_active_connections!, :clear_reloadable_connections!,
-      :clear_all_connections!, :flush_idle_connections!, to: :connection_handler
+             :clear_all_connections!, :flush_idle_connections!, to: :connection_handler
   end
 end

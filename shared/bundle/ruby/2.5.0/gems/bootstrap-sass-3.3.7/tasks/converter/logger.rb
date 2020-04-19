@@ -42,7 +42,7 @@ class Converter
     end
 
     def puts(*args)
-      STDERR.puts *args unless @silence
+      warn *args unless @silence
     end
 
     alias log puts

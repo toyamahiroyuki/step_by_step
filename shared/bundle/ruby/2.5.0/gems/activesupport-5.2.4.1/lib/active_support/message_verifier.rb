@@ -122,7 +122,7 @@ module ActiveSupport
     def valid_message?(signed_message)
       return if signed_message.nil? || !signed_message.valid_encoding? || signed_message.blank?
 
-      data, digest = signed_message.split("--".freeze)
+      data, digest = signed_message.split("--")
       data.present? && digest.present? && ActiveSupport::SecurityUtils.secure_compare(digest, generate_digest(data))
     end
 
@@ -150,7 +150,7 @@ module ActiveSupport
     def verified(signed_message, purpose: nil, **)
       if valid_message?(signed_message)
         begin
-          data = signed_message.split("--".freeze)[0]
+          data = signed_message.split("--")[0]
           message = Messages::Metadata.verify(decode(data), purpose)
           @serializer.load(message) if message
         rescue ArgumentError => argument_error
@@ -189,17 +189,18 @@ module ActiveSupport
     end
 
     private
-      def encode(data)
-        ::Base64.strict_encode64(data)
-      end
 
-      def decode(data)
-        ::Base64.strict_decode64(data)
-      end
+    def encode(data)
+      ::Base64.strict_encode64(data)
+    end
 
-      def generate_digest(data)
-        require "openssl" unless defined?(OpenSSL)
-        OpenSSL::HMAC.hexdigest(OpenSSL::Digest.const_get(@digest).new, @secret, data)
-      end
+    def decode(data)
+      ::Base64.strict_decode64(data)
+    end
+
+    def generate_digest(data)
+      require "openssl" unless defined?(OpenSSL)
+      OpenSSL::HMAC.hexdigest(OpenSSL::Digest.const_get(@digest).new, @secret, data)
+    end
   end
 end

@@ -7,9 +7,9 @@ module ActiveRecord
         # Returns an ActiveRecord::Result instance.
         def select_all(*) # :nodoc:
           result = if ExplainRegistry.collect? && prepared_statements
-            unprepared_statement { super }
-          else
-            super
+                     unprepared_statement { super }
+                   else
+                     super
           end
           discard_remaining_results
           result
@@ -50,90 +50,91 @@ module ActiveRecord
         alias :exec_update :exec_delete
 
         private
-          def default_insert_value(column)
-            Arel.sql("DEFAULT") unless column.auto_increment?
-          end
 
-          def last_inserted_id(result)
-            @connection.last_id
-          end
+        def default_insert_value(column)
+          Arel.sql("DEFAULT") unless column.auto_increment?
+        end
 
-          def discard_remaining_results
-            @connection.next_result while @connection.more_results?
-          end
+        def last_inserted_id(result)
+          @connection.last_id
+        end
 
-          def supports_set_server_option?
-            @connection.respond_to?(:set_server_option)
-          end
+        def discard_remaining_results
+          @connection.next_result while @connection.more_results?
+        end
 
-          def multi_statements_enabled?(flags)
-            if flags.is_a?(Array)
-              flags.include?("MULTI_STATEMENTS")
+        def supports_set_server_option?
+          @connection.respond_to?(:set_server_option)
+        end
+
+        def multi_statements_enabled?(flags)
+          if flags.is_a?(Array)
+            flags.include?("MULTI_STATEMENTS")
+          else
+            (flags & Mysql2::Client::MULTI_STATEMENTS) != 0
+          end
+        end
+
+        def with_multi_statements
+          previous_flags = @config[:flags]
+
+          unless multi_statements_enabled?(previous_flags)
+            if supports_set_server_option?
+              @connection.set_server_option(Mysql2::Client::OPTION_MULTI_STATEMENTS_ON)
             else
-              (flags & Mysql2::Client::MULTI_STATEMENTS) != 0
+              @config[:flags] = Mysql2::Client::MULTI_STATEMENTS
+              reconnect!
             end
           end
 
-          def with_multi_statements
-            previous_flags = @config[:flags]
-
-            unless multi_statements_enabled?(previous_flags)
-              if supports_set_server_option?
-                @connection.set_server_option(Mysql2::Client::OPTION_MULTI_STATEMENTS_ON)
-              else
-                @config[:flags] = Mysql2::Client::MULTI_STATEMENTS
-                reconnect!
-              end
-            end
-
-            yield
-          ensure
-            unless multi_statements_enabled?(previous_flags)
-              if supports_set_server_option?
-                @connection.set_server_option(Mysql2::Client::OPTION_MULTI_STATEMENTS_OFF)
-              else
-                @config[:flags] = previous_flags
-                reconnect!
-              end
+          yield
+        ensure
+          unless multi_statements_enabled?(previous_flags)
+            if supports_set_server_option?
+              @connection.set_server_option(Mysql2::Client::OPTION_MULTI_STATEMENTS_OFF)
+            else
+              @config[:flags] = previous_flags
+              reconnect!
             end
           end
+        end
 
-          def exec_stmt_and_free(sql, name, binds, cache_stmt: false)
-            # make sure we carry over any changes to ActiveRecord::Base.default_timezone that have been
-            # made since we established the connection
-            @connection.query_options[:database_timezone] = ActiveRecord::Base.default_timezone
+        def exec_stmt_and_free(sql, name, binds, cache_stmt: false)
+          # make sure we carry over any changes to ActiveRecord::Base.default_timezone that have been
+          # made since we established the connection
+          @connection.query_options[:database_timezone] = ActiveRecord::Base.default_timezone
 
-            type_casted_binds = type_casted_binds(binds)
+          type_casted_binds = type_casted_binds(binds)
 
-            log(sql, name, binds, type_casted_binds) do
+          log(sql, name, binds, type_casted_binds) do
+            if cache_stmt
+              cache = @statements[sql] ||= {
+                stmt: @connection.prepare(sql),
+              }
+              stmt = cache[:stmt]
+            else
+              stmt = @connection.prepare(sql)
+            end
+
+            begin
+              result = ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+                stmt.execute(*type_casted_binds)
+              end
+            rescue Mysql2::Error => e
               if cache_stmt
-                cache = @statements[sql] ||= {
-                  stmt: @connection.prepare(sql)
-                }
-                stmt = cache[:stmt]
+                @statements.delete(sql)
               else
-                stmt = @connection.prepare(sql)
+                stmt.close
               end
-
-              begin
-                result = ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
-                  stmt.execute(*type_casted_binds)
-                end
-              rescue Mysql2::Error => e
-                if cache_stmt
-                  @statements.delete(sql)
-                else
-                  stmt.close
-                end
-                raise e
-              end
-
-              ret = yield stmt, result
-              result.free if result
-              stmt.close unless cache_stmt
-              ret
+              raise e
             end
+
+            ret = yield stmt, result
+            result.free if result
+            stmt.close unless cache_stmt
+            ret
           end
+        end
       end
     end
   end

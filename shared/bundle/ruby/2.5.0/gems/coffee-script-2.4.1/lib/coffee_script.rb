@@ -16,7 +16,7 @@ module CoffeeScript
       @path = path
     end
 
-    COMPILE_FUNCTION_SOURCE = <<-JS
+    COMPILE_FUNCTION_SOURCE = <<-JS.freeze
       ;function compile(script, options) {
         try {
           return CoffeeScript.compile(script, options);

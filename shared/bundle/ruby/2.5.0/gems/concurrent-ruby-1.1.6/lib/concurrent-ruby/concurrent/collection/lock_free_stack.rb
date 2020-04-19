@@ -1,8 +1,6 @@
 module Concurrent
-
   # @!macro warn.edge
   class LockFreeStack < Synchronization::Object
-
     safe_initialization!
 
     class Node
@@ -53,7 +51,7 @@ module Concurrent
 
     # @param [Node] head
     # @return [true, false]
-    def empty?(head = head())
+    def empty?(head = head)
       head.equal? EMPTY
     end
 

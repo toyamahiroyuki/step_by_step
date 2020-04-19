@@ -53,7 +53,7 @@ class Module
   #   Person.new.hair_colors # => [:brown, :black, :blonde, :red]
   def mattr_reader(*syms, instance_reader: true, instance_accessor: true, default: nil)
     syms.each do |sym|
-      raise NameError.new("invalid attribute name: #{sym}") unless /\A[_A-Za-z]\w*\z/.match?(sym)
+      raise NameError, "invalid attribute name: #{sym}" unless /\A[_A-Za-z]\w*\z/.match?(sym)
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
         @@#{sym} = nil unless defined? @@#{sym}
 
@@ -120,7 +120,7 @@ class Module
   #   Person.class_variable_get("@@hair_colors") # => [:brown, :black, :blonde, :red]
   def mattr_writer(*syms, instance_writer: true, instance_accessor: true, default: nil)
     syms.each do |sym|
-      raise NameError.new("invalid attribute name: #{sym}") unless /\A[_A-Za-z]\w*\z/.match?(sym)
+      raise NameError, "invalid attribute name: #{sym}" unless /\A[_A-Za-z]\w*\z/.match?(sym)
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
         @@#{sym} = nil unless defined? @@#{sym}
 

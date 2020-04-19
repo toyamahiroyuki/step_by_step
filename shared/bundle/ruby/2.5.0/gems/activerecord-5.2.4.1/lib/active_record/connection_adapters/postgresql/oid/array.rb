@@ -35,10 +35,10 @@ module ActiveRecord
             if value.is_a?(::String)
               value = begin
                 @pg_decoder.decode(value)
-              rescue TypeError
-                # malformed array string is treated as [], will raise in PG 2.0 gem
-                # this keeps a consistent implementation
-                []
+                      rescue TypeError
+                        # malformed array string is treated as [], will raise in PG 2.0 gem
+                        # this keeps a consistent implementation
+                        []
               end
             end
             type_cast_array(value, :cast)
@@ -78,13 +78,13 @@ module ActiveRecord
 
           private
 
-            def type_cast_array(value, method)
-              if value.is_a?(::Array)
-                value.map { |item| type_cast_array(item, method) }
-              else
-                @subtype.public_send(method, value)
-              end
+          def type_cast_array(value, method)
+            if value.is_a?(::Array)
+              value.map { |item| type_cast_array(item, method) }
+            else
+              @subtype.public_send(method, value)
             end
+          end
         end
       end
     end

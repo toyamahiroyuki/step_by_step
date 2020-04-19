@@ -8,13 +8,12 @@ class Runnable
 end
 
 class TestMinitestReporter < MetaMetaMetaTestCase
-
   attr_accessor :r, :io
 
   def new_composite_reporter
     reporter = Minitest::CompositeReporter.new
-    reporter << Minitest::SummaryReporter.new(self.io)
-    reporter << Minitest::ProgressReporter.new(self.io)
+    reporter << Minitest::SummaryReporter.new(io)
+    reporter << Minitest::ProgressReporter.new(io)
 
     def reporter.first
       reporters.first
@@ -41,7 +40,7 @@ class TestMinitestReporter < MetaMetaMetaTestCase
   end
 
   def error_test
-    unless defined? @et then
+    unless defined? @et
       @et = Minitest::Test.new(:woot)
       @et.failures << Minitest::UnexpectedError.new(begin
                                                       raise "no"
@@ -54,12 +53,12 @@ class TestMinitestReporter < MetaMetaMetaTestCase
   end
 
   def fail_test
-    unless defined? @ft then
+    unless defined? @ft
       @ft = Minitest::Test.new(:woot)
-      @ft.failures <<   begin
+      @ft.failures << begin
                           raise Minitest::Assertion, "boo"
-                        rescue Minitest::Assertion => e
-                          e
+                      rescue Minitest::Assertion => e
+                        e
                         end
       @ft = Minitest::Result.from @ft
     end
@@ -71,7 +70,7 @@ class TestMinitestReporter < MetaMetaMetaTestCase
   end
 
   def skip_test
-    unless defined? @st then
+    unless defined? @st
       @st = Minitest::Test.new(:woot)
       @st.failures << begin
                         raise Minitest::Skip
@@ -99,7 +98,7 @@ class TestMinitestReporter < MetaMetaMetaTestCase
     refute_predicate r, :passed?
   end
 
-  SKIP_MSG = "\n\nYou have skipped tests. Run with --verbose for details."
+  SKIP_MSG = "\n\nYou have skipped tests. Run with --verbose for details.".freeze
 
   def test_passed_eh_error
     r.start

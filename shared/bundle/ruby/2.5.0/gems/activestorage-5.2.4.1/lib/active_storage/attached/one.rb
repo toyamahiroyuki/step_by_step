@@ -69,14 +69,15 @@ module ActiveStorage
     end
 
     private
-      delegate :transaction, to: :record
 
-      def build_attachment(blob:)
-        ActiveStorage::Attachment.new(record: record, name: name, blob: blob)
-      end
+    delegate :transaction, to: :record
 
-      def write_attachment(attachment)
-        record.public_send("#{name}_attachment=", attachment)
-      end
+    def build_attachment(blob:)
+      ActiveStorage::Attachment.new(record: record, name: name, blob: blob)
+    end
+
+    def write_attachment(attachment)
+      record.public_send("#{name}_attachment=", attachment)
+    end
   end
 end

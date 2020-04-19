@@ -6,14 +6,13 @@ require File.expand_path("#{File.dirname(__FILE__)}/../lib/netrc")
 require "rbconfig"
 
 class TestNetrc < Minitest::Test
-
   def setup
-    Dir.glob('data/*.netrc').each{|f| File.chmod(0600, f)}
-    File.chmod(0644, "data/permissive.netrc")
+    Dir.glob('data/*.netrc').each { |f| File.chmod(0o600, f) }
+    File.chmod(0o644, "data/permissive.netrc")
   end
 
   def teardown
-    Dir.glob('data/*.netrc').each{|f| File.chmod(0644, f)}
+    Dir.glob('data/*.netrc').each { |f| File.chmod(0o644, f) }
   end
 
   def test_parse_empty
@@ -25,35 +24,41 @@ class TestNetrc < Minitest::Test
   def test_parse_file
     pre, items = Netrc.parse(Netrc.lex(IO.readlines("data/sample.netrc")))
     assert_equal("# this is my netrc\n", pre)
-    exp = [["machine ",
-            "m",
-            "\n  login ",
-            "l",
-            " # this is my username\n  password ",
-            "p",
-            "\n"]]
+    exp = [[
+      "machine ",
+      "m",
+      "\n  login ",
+      "l",
+      " # this is my username\n  password ",
+      "p",
+      "\n",
+    ]]
     assert_equal(exp, items)
   end
 
   def test_login_file
     pre, items = Netrc.parse(Netrc.lex(IO.readlines("data/login.netrc")))
     assert_equal("# this is my login netrc\n", pre)
-    exp = [["machine ",
-            "m",
-            "\n  login ",
-            "l",
-            " # this is my username\n"]]
+    exp = [[
+      "machine ",
+      "m",
+      "\n  login ",
+      "l",
+      " # this is my username\n",
+    ]]
     assert_equal(exp, items)
   end
 
   def test_password_file
     pre, items = Netrc.parse(Netrc.lex(IO.readlines("data/password.netrc")))
     assert_equal("# this is my password netrc\n", pre)
-    exp = [["machine ",
-            "m",
-            "\n  password ",
-            "p",
-            " # this is my password\n"]]
+    exp = [[
+      "machine ",
+      "m",
+      "\n  password ",
+      "p",
+      " # this is my password\n",
+    ]]
     assert_equal(exp, items)
   end
 
@@ -114,9 +119,9 @@ class TestNetrc < Minitest::Test
   def test_set
     n = Netrc.read("data/sample.netrc")
     n["m"] = "a", "b"
-    exp = "# this is my netrc\n"+
-          "machine m\n"+
-          "  login a # this is my username\n"+
+    exp = "# this is my netrc\n" \
+          "machine m\n" \
+          "  login a # this is my username\n" \
           "  password b\n"
     assert_equal(exp, n.unparse)
   end
@@ -131,13 +136,13 @@ class TestNetrc < Minitest::Test
     n = Netrc.read("data/sample.netrc")
     n.new_item_prefix = "# added\n"
     n["x"] = "a", "b"
-    exp = "# this is my netrc\n"+
-          "machine m\n"+
-          "  login l # this is my username\n"+
-          "  password p\n"+
-          "# added\n"+
-          "machine x\n"+
-          "  login a\n"+
+    exp = "# this is my netrc\n" \
+          "machine m\n" \
+          "  login l # this is my username\n" \
+          "  password p\n" \
+          "# added\n" \
+          "machine x\n" \
+          "  login a\n" \
           "  password b\n"
     assert_equal(exp, n.unparse)
   end
@@ -146,13 +151,13 @@ class TestNetrc < Minitest::Test
     n = Netrc.read("data/newlineless.netrc")
     n.new_item_prefix = "# added\n"
     n["x"] = "a", "b"
-    exp = "# this is my netrc\n"+
-          "machine m\n"+
-          "  login l # this is my username\n"+
-          "  password p\n"+
-          "# added\n"+
-          "machine x\n"+
-          "  login a\n"+
+    exp = "# this is my netrc\n" \
+          "machine m\n" \
+          "  login l # this is my username\n" \
+          "  password p\n" \
+          "# added\n" \
+          "machine x\n" \
+          "  login a\n" \
           "  password b\n"
     assert_equal(exp, n.unparse)
   end
@@ -180,7 +185,7 @@ class TestNetrc < Minitest::Test
     n = Netrc.read("/tmp/created.netrc")
     n.save
     unless Netrc::WINDOWS
-      assert_equal(0600, File.stat("/tmp/created.netrc").mode & 0777)
+      assert_equal(0o600, File.stat("/tmp/created.netrc").mode & 0o777)
     end
   end
 
@@ -190,7 +195,7 @@ class TestNetrc < Minitest::Test
       n = Netrc.read("/tmp/test.netrc.gpg")
       n["m"] = "a", "b"
       n.save
-      assert_equal(0600, File.stat("/tmp/test.netrc.gpg").mode & 0777)
+      assert_equal(0o600, File.stat("/tmp/test.netrc.gpg").mode & 0o777)
       netrc = Netrc.read("/tmp/test.netrc.gpg")["m"]
       assert_equal("a", netrc.login)
       assert_equal("b", netrc.password)

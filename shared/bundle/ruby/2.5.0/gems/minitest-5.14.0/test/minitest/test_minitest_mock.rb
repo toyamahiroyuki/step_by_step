@@ -175,7 +175,7 @@ class TestMinitestMock < Minitest::Test
     @mock.expect :kind_of?, true, [String]
     @mock.expect :==, true, [1]
 
-    assert @mock.kind_of?(String), "didn't mock :kind_of\?"
+    assert @mock.is_a?(String), "didn't mock :kind_of\?"
     assert @mock == 1, "didn't mock :=="
   end
 
@@ -323,7 +323,7 @@ class TestMinitestMock < Minitest::Test
     assert_equal rs, 32
   end
 
-  def util_verify_bad exp
+  def util_verify_bad(exp)
     e = assert_raises MockExpectationError do
       @mock.verify
     end
@@ -354,7 +354,6 @@ class TestMinitestMock < Minitest::Test
     mock.send(:foo, 1, 2, 3)
     assert_mock mock
   end
-
 end
 
 require "minitest/metametameta"
@@ -372,7 +371,7 @@ class TestMinitestStub < Minitest::Test
 
   def teardown
     super
-    assert_equal @assertion_count, @tc.assertions if self.passed?
+    assert_equal @assertion_count, @tc.assertions if passed?
   end
 
   class Time
@@ -381,7 +380,7 @@ class TestMinitestStub < Minitest::Test
     end
   end
 
-  def assert_stub val_or_callable
+  def assert_stub(val_or_callable)
     @assertion_count += 1
 
     t = Time.now.to_i
@@ -398,7 +397,7 @@ class TestMinitestStub < Minitest::Test
 
     t0 = Time.now
 
-    self.stub :sleep, nil do
+    stub :sleep, nil do
       @tc.assert_nil sleep(10)
     end
 
@@ -471,11 +470,11 @@ class TestMinitestStub < Minitest::Test
     @assertion_count = 2
 
     dynamic = Class.new do
-      def self.respond_to? meth
+      def self.respond_to?(meth)
         meth == :found
       end
 
-      def self.method_missing meth, *args, &block
+      def self.method_missing(meth, *args, &block)
         if meth == :found
           false
         else
@@ -586,7 +585,7 @@ class TestMinitestStub < Minitest::Test
   end
 
   class Thingy
-    def self.identity arg
+    def self.identity(arg)
       arg
     end
   end
@@ -616,19 +615,19 @@ class TestMinitestStub < Minitest::Test
   end
 
   def test_stub_lambda
-    Thread.stub :new, lambda { 21+21 } do
+    Thread.stub :new, lambda { 21 + 21 } do
       @tc.assert_equal 42, Thread.new
     end
   end
 
   def test_stub_lambda_args
-    Thread.stub :new, lambda { 21+21 }, :wtf do
+    Thread.stub :new, lambda { 21 + 21 }, :wtf do
       @tc.assert_equal 42, Thread.new
     end
   end
 
   def test_stub_lambda_block_5
-    Thread.stub5 :new, lambda { 21+21 } do
+    Thread.stub5 :new, lambda { 21 + 21 } do
       result = Thread.new do
         @tc.flunk "shouldn't ever hit this"
       end
@@ -639,7 +638,7 @@ class TestMinitestStub < Minitest::Test
   def test_stub_lambda_block_6
     skip_stub6
 
-    Thread.stub6 :new, lambda { 21+21 } do
+    Thread.stub6 :new, lambda { 21 + 21 } do
       result = Thread.new do
         @tc.flunk "shouldn't ever hit this"
       end
@@ -649,7 +648,7 @@ class TestMinitestStub < Minitest::Test
 
   def test_stub_lambda_block_args_5
     @assertion_count += 1
-    Thingy.stub5 :identity, lambda { |y| @tc.assert_equal :nope, y; 21+21 }, :WTF? do
+    Thingy.stub5 :identity, lambda { |y| @tc.assert_equal :nope, y; 21 + 21 }, :WTF? do
       result = Thingy.identity :nope do |x|
         @tc.flunk "shouldn't reach this"
       end
@@ -661,7 +660,7 @@ class TestMinitestStub < Minitest::Test
     skip_stub6
 
     @assertion_count += 1
-    Thingy.stub6 :identity, lambda { |y| @tc.assert_equal :nope, y; 21+21 }, :WTF? do
+    Thingy.stub6 :identity, lambda { |y| @tc.assert_equal :nope, y; 21 + 21 }, :WTF? do
       result = Thingy.identity :nope do |x|
         @tc.flunk "shouldn't reach this"
       end
@@ -683,7 +682,7 @@ class TestMinitestStub < Minitest::Test
     @assertion_count += 1
     rs = nil
     io = StringIO.new "", "w"
-    File.stub5 :open, lambda { |p, m, &blk| blk and blk.call io } do
+    File.stub5 :open, lambda { |p, m, &blk| blk && blk.call(io) } do
       File.open "foo.txt", "r" do |f|
         rs = f && f.write("woot")
       end
@@ -711,7 +710,7 @@ class TestMinitestStub < Minitest::Test
     @assertion_count += 1
     rs = nil
     io = StringIO.new "", "w"
-    File.stub5(:open, lambda { |p, m, &blk| blk and blk.call io }, :WTF?) do
+    File.stub5(:open, lambda { |p, m, &blk| blk && blk.call(io) }, :WTF?) do
       File.open "foo.txt", "r" do |f|
         rs = f.write("woot")
       end
@@ -849,7 +848,7 @@ class TestMinitestStub < Minitest::Test
     @tc.assert_equal "", io.string
   end
 
-  def assert_deprecated re = /deprecated/
+  def assert_deprecated(re = /deprecated/)
     assert_output "", re do
       yield
     end
@@ -862,7 +861,7 @@ end
 
 STUB6 = ENV["STUB6"]
 
-if STUB6 then
+if STUB6
   require "minitest/mock6" if STUB6
 else
   class Object

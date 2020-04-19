@@ -16,7 +16,7 @@ end
 
 desc "Find missing expectations"
 task :specs do
-  $:.unshift "lib"
+  $LOAD_PATH.unshift "lib"
   require "minitest/test"
   require "minitest/spec"
 
@@ -25,13 +25,13 @@ task :specs do
   dont_flip_re = /(must|wont)_(include|respond_to)/
 
   map = {
-    /(must_throw)s/                        => '\1',
-    /(?!not)_same/                         => "_be_same_as",
-    /_in_/                                 => "_be_within_",
-    /_operator/                            => "_be",
-    /_includes/                            => "_include",
+    /(must_throw)s/ => '\1',
+    /(?!not)_same/ => "_be_same_as",
+    /_in_/ => "_be_within_",
+    /_operator/ => "_be",
+    /_includes/ => "_include",
     /(must|wont)_(.*_of|nil|silent|empty)/ => '\1_be_\2',
-    /must_raises/                          => "must_raise",
+    /must_raises/ => "must_raise",
   }
 
   expectations = Minitest::Expectations.public_instance_methods.map(&:to_s)
@@ -39,9 +39,9 @@ task :specs do
 
   assertions.sort.each do |assertion|
     expectation = case assertion
-                  when /^assert/ then
+                  when /^assert/
                     assertion.sub(/^assert/, pos_prefix.to_s)
-                  when /^refute/ then
+                  when /^refute/
                     assertion.sub(/^refute/, neg_prefix.to_s)
                   end
 

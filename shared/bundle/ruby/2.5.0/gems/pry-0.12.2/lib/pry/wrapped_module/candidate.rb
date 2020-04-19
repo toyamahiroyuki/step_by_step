@@ -21,8 +21,10 @@ class Pry
       # Methods to delegate to associated `Pry::WrappedModule
       # instance`.
       private_delegates = [:lines_for_file, :method_candidates, :yard_docs?, :name]
-      public_delegates = [:wrapped, :module?, :class?, :nonblank_name,
-                          :number_of_candidates]
+      public_delegates = [
+        :wrapped, :module?, :class?, :nonblank_name,
+        :number_of_candidates,
+      ]
 
       def_delegators :@wrapper, *public_delegates
       def_private_delegators :@wrapper, *private_delegates
@@ -97,9 +99,11 @@ class Pry
 
       def class_regexes
         mod_type_string = wrapped.class.to_s.downcase
-        [/^\s*#{mod_type_string}\s+(?:(?:\w*)::)*?#{wrapped.name.split(/::/).last}/,
-         /^\s*(::)?#{wrapped.name.split(/::/).last}\s*?=\s*?#{wrapped.class}/,
-         /^\s*(::)?#{wrapped.name.split(/::/).last}\.(class|instance)_eval/]
+        [
+          /^\s*#{mod_type_string}\s+(?:(?:\w*)::)*?#{wrapped.name.split(/::/).last}/,
+          /^\s*(::)?#{wrapped.name.split(/::/).last}\s*?=\s*?#{wrapped.class}/,
+          /^\s*(::)?#{wrapped.name.split(/::/).last}\.(class|instance)_eval/,
+        ]
       end
 
       # This method is used by `Candidate#source_location` as a

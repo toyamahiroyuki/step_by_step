@@ -13,15 +13,17 @@ module ActionView
       include CaptureHelper
       include OutputSafetyHelper
 
-      BOOLEAN_ATTRIBUTES = %w(allowfullscreen async autofocus autoplay checked
-                              compact controls declare default defaultchecked
-                              defaultmuted defaultselected defer disabled
-                              enabled formnovalidate hidden indeterminate inert
-                              ismap itemscope loop multiple muted nohref
-                              noresize noshade novalidate nowrap open
-                              pauseonexit readonly required reversed scoped
-                              seamless selected sortable truespeed typemustmatch
-                              visible).to_set
+      BOOLEAN_ATTRIBUTES = %w(
+        allowfullscreen async autofocus autoplay checked
+        compact controls declare default defaultchecked
+        defaultmuted defaultselected defer disabled
+        enabled formnovalidate hidden indeterminate inert
+        ismap itemscope loop multiple muted nohref
+        noresize noshade novalidate nowrap open
+        pauseonexit readonly required reversed scoped
+        seamless selected sortable truespeed typemustmatch
+        visible
+      ).to_set
 
       BOOLEAN_ATTRIBUTES.merge(BOOLEAN_ATTRIBUTES.map(&:to_sym))
 
@@ -86,29 +88,30 @@ module ActionView
 
         def tag_option(key, value, escape)
           if value.is_a?(Array)
-            value = escape ? safe_join(value, " ".freeze) : value.join(" ".freeze)
+            value = escape ? safe_join(value, " ") : value.join(" ")
           else
             value = escape ? ERB::Util.unwrapped_html_escape(value) : value.to_s
           end
-          %(#{key}="#{value.gsub('"'.freeze, '&quot;'.freeze)}")
+          %(#{key}="#{value.gsub('"', '&quot;')}")
         end
 
         private
-          def prefix_tag_option(prefix, key, value, escape)
-            key = "#{prefix}-#{key.to_s.dasherize}"
-            unless value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(BigDecimal)
-              value = value.to_json
-            end
-            tag_option(key, value, escape)
-          end
 
-          def respond_to_missing?(*args)
-            true
+        def prefix_tag_option(prefix, key, value, escape)
+          key = "#{prefix}-#{key.to_s.dasherize}"
+          unless value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(BigDecimal)
+            value = value.to_json
           end
+          tag_option(key, value, escape)
+        end
 
-          def method_missing(called, *args, &block)
-            tag_string(called, *args, &block)
-          end
+        def respond_to_missing?(*args)
+          true
+        end
+
+        def method_missing(called, *args, &block)
+          tag_string(called, *args, &block)
+        end
       end
 
       # Returns an HTML tag.
@@ -305,9 +308,10 @@ module ActionView
       end
 
       private
-        def tag_builder
-          @tag_builder ||= TagBuilder.new(self)
-        end
+
+      def tag_builder
+        @tag_builder ||= TagBuilder.new(self)
+      end
     end
   end
 end

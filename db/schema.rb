@@ -147,7 +147,7 @@ ActiveRecord::Schema.define(version: 2020_03_16_112735) do
     t.string "profile_image_id"
     t.integer "old"
     t.integer "sex"
-    t.integer "job"
+    t.string "job"
     t.integer "deposit"
     t.integer "member"
     t.index ["email"], name: "index_users_on_email", unique: true

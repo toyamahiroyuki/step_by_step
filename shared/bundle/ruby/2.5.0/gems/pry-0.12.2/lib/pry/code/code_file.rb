@@ -1,29 +1,29 @@
 class Pry
   class CodeFile
-    DEFAULT_EXT = '.rb'
+    DEFAULT_EXT = '.rb'.freeze
 
     # List of all supported languages.
     # @return [Hash]
     EXTENSIONS = {
-      %w(.py)        => :python,
-      %w(.js)        => :javascript,
-      %w(.css)       => :css,
-      %w(.xml)       => :xml,
-      %w(.php)       => :php,
-      %w(.html)      => :html,
-      %w(.diff)      => :diff,
-      %w(.java)      => :java,
-      %w(.json)      => :json,
-      %w(.c .h)      => :c,
-      %w(.rhtml)     => :rhtml,
+      %w(.py) => :python,
+      %w(.js) => :javascript,
+      %w(.css) => :css,
+      %w(.xml) => :xml,
+      %w(.php) => :php,
+      %w(.html) => :html,
+      %w(.diff) => :diff,
+      %w(.java) => :java,
+      %w(.json) => :json,
+      %w(.c .h) => :c,
+      %w(.rhtml) => :rhtml,
       %w(.yaml .yml) => :yaml,
       %w(.cpp .hpp .cc .h .cxx) => :cpp,
       %w(.rb .ru .irbrc .gemspec .pryrc .rake) => :ruby,
-    }
+    }.freeze
 
     FILES = {
-      %w(Gemfile Rakefile Guardfile Capfile) => :ruby
-    }
+      %w(Gemfile Rakefile Guardfile Capfile) => :ruby,
+    }.freeze
 
     # Store the current working directory. This allows show-source etc. to work if
     # your process has changed directory since boot. [Issue #675]
@@ -58,16 +58,16 @@ class Pry
     #   readable for some reason.
     # @return [String] absolute path for the given `filename`.
     def abs_path
-      code_path.detect { |path| readable?(path) } or
-        raise MethodSource::SourceNotFoundError,
-              "Cannot open #{ @filename.inspect } for reading."
+      code_path.detect { |path| readable?(path) } ||
+        raise(MethodSource::SourceNotFoundError,
+              "Cannot open #{@filename.inspect} for reading.")
     end
 
     # @param [String] path
     # @return [Boolean] if the path, with or without the default ext,
     #   is a readable file then `true`, otherwise `false`.
     def readable?(path)
-      File.readable?(path) && !File.directory?(path) or
+      File.readable?(path) && !File.directory?(path) ||
         File.readable?(path << DEFAULT_EXT)
     end
 

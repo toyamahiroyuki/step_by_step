@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Collectors
     class PlainString
@@ -10,7 +11,7 @@ module Arel
         @str
       end
 
-      def << str
+      def <<(str)
         @str << str
         self
       end

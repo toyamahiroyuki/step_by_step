@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'mustermann/ast/node'
 require 'forwardable'
 require 'ruby2_keywords'
@@ -88,7 +89,7 @@ module Mustermann
         start  = pos
         char   = getch
         method = "read %p" % char
-        element= respond_to?(method) ? send(method, char) : default_node(char)
+        element = respond_to?(method) ? send(method, char) : default_node(char)
         min_size(start, pos, element)
         read_suffix(element)
       end
@@ -100,8 +101,8 @@ module Mustermann
       def min_size(start, stop, node)
         stop  ||= start
         start ||= stop
-        node.start = start unless node.start and node.start < start
-        node.stop  = stop  unless node.stop  and node.stop  > stop
+        node.start = start unless node.start && (node.start < start)
+        node.stop  = stop  unless node.stop  && (node.stop > stop)
         node
       end
 
@@ -111,7 +112,7 @@ module Mustermann
       # @!visibility private
       def read_suffix(element)
         self.class.suffix.inject(element) do |ele, (regexp, after, callback)|
-          next ele unless ele.is_a?(after) and payload = scan(regexp)
+          next ele unless ele.is_a?(after) && (payload = scan(regexp))
           content = instance_exec(payload, ele, &callback)
           min_size(element.start, pos, content)
         end
@@ -164,7 +165,6 @@ module Mustermann
         end
         unexpected(char, **options)
       end
-
 
       # Reads an argument string of the format arg1,args2,key:value
       #

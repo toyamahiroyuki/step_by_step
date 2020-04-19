@@ -9,13 +9,12 @@ describe "The BCrypt engine" do
 end
 
 describe "Generating BCrypt salts" do
-
   specify "should produce strings" do
     expect(BCrypt::Engine.generate_salt).to be_an_instance_of(String)
   end
 
   specify "should produce random data" do
-    expect(BCrypt::Engine.generate_salt).to_not equal(BCrypt::Engine.generate_salt)
+    expect(BCrypt::Engine.generate_salt).not_to equal(BCrypt::Engine.generate_salt)
   end
 
   specify "should raise a InvalidCostError if the cost parameter isn't numeric" do
@@ -28,17 +27,14 @@ describe "Generating BCrypt salts" do
 end
 
 describe "Autodetecting of salt cost" do
-
   specify "should work" do
     expect(BCrypt::Engine.autodetect_cost("$2a$08$hRx2IVeHNsTSYYtUWn61Ou")).to eq 8
     expect(BCrypt::Engine.autodetect_cost("$2a$05$XKd1bMnLgUnc87qvbAaCUu")).to eq 5
     expect(BCrypt::Engine.autodetect_cost("$2a$13$Lni.CZ6z5A7344POTFBBV.")).to eq 13
   end
-
 end
 
 describe "Generating BCrypt hashes" do
-
   class MyInvalidSecret
     undef to_s
   end
@@ -93,9 +89,9 @@ describe "Generating BCrypt hashes" do
       ["\xa3" "ab", "$2y$05$/OK.fbVrR/bpIqNJ5ianF.", "$2y$05$/OK.fbVrR/bpIqNJ5ianF.6IflQkJytoRVc1yuaNtHfiuq.FRlSIS"],
       ["\xd1\x91", "$2x$05$6bNw2HLQYeqHYyBfLMsv/O", "$2x$05$6bNw2HLQYeqHYyBfLMsv/OiwqTymGIGzFsA4hOTWebfehXHNprcAS"],
       ["\xd0\xc1\xd2\xcf\xcc\xd8", "$2x$05$6bNw2HLQYeqHYyBfLMsv/O", "$2x$05$6bNw2HLQYeqHYyBfLMsv/O9LIGgn8OMzuDoHfof8AQimSGfcSWxnS"],
-      ["\xaa"*72+"chars after 72 are ignored as usual", "$2a$05$/OK.fbVrR/bpIqNJ5ianF.", "$2a$05$/OK.fbVrR/bpIqNJ5ianF.swQOIzjOiJ9GHEPuhEkvqrUyvWhEMx6"],
-      ["\xaa\x55"*36, "$2a$05$/OK.fbVrR/bpIqNJ5ianF.", "$2a$05$/OK.fbVrR/bpIqNJ5ianF.R9xrDjiycxMbQE2bp.vgqlYpW5wx2yy"],
-      ["\x55\xaa\xff"*24, "$2a$05$/OK.fbVrR/bpIqNJ5ianF.", "$2a$05$/OK.fbVrR/bpIqNJ5ianF.9tQZzcJfm3uj2NvJ/n5xkhpqLrMpWCe"],
+      ["\xaa" * 72 + "chars after 72 are ignored as usual", "$2a$05$/OK.fbVrR/bpIqNJ5ianF.", "$2a$05$/OK.fbVrR/bpIqNJ5ianF.swQOIzjOiJ9GHEPuhEkvqrUyvWhEMx6"],
+      ["\xaa\x55" * 36, "$2a$05$/OK.fbVrR/bpIqNJ5ianF.", "$2a$05$/OK.fbVrR/bpIqNJ5ianF.R9xrDjiycxMbQE2bp.vgqlYpW5wx2yy"],
+      ["\x55\xaa\xff" * 24, "$2a$05$/OK.fbVrR/bpIqNJ5ianF.", "$2a$05$/OK.fbVrR/bpIqNJ5ianF.9tQZzcJfm3uj2NvJ/n5xkhpqLrMpWCe"],
       ["", "$2a$05$CCCCCCCCCCCCCCCCCCCCC.", "$2a$05$CCCCCCCCCCCCCCCCCCCCC.7uG0VCzI2bS7j6ymqJi9CdcdxiRTWNy"],
 
       # test vectors from the Java implementation, found in https://github.com/spring-projects/spring-security/blob/master/crypto/src/test/java/org/springframework/security/crypto/bcrypt/BCryptTests.java
@@ -138,7 +134,7 @@ describe "Generating BCrypt hashes" do
       ["~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2b$06$FGWA8OlY6RtQhXBXuCJ8Wu", "$2b$06$FGWA8OlY6RtQhXBXuCJ8WusVipRI15cWOgJK8MYpBHEkktMfbHRIG"],
       ["~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2b$06$G6aYU7UhUEUDJBdTgq3CRe", "$2b$06$G6aYU7UhUEUDJBdTgq3CRekiopCN4O4sNitFXrf5NUscsVZj3a2r6"],
       ["~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2y$06$sYDFHqOcXTjBgOsqC0WCKe", "$2y$06$sYDFHqOcXTjBgOsqC0WCKeMd3T1UhHuWQSxncLGtXDLMrcE6vFDti"],
-      ["~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2y$06$6Xm0gCw4g7ZNDCEp4yTise", "$2y$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq"]
+      ["~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2y$06$6Xm0gCw4g7ZNDCEp4yTise", "$2y$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq"],
     ]
     for secret, salt, test_vector in test_vectors
       expect(BCrypt::Engine.hash_secret(secret, salt)).to eql(test_vector)

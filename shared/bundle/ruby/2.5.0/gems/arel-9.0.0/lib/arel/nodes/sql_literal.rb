@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class SqlLiteral < String
@@ -8,7 +9,7 @@ module Arel
       include Arel::OrderPredications
 
       def encode_with(coder)
-        coder.scalar = self.to_s
+        coder.scalar = to_s
       end
     end
   end

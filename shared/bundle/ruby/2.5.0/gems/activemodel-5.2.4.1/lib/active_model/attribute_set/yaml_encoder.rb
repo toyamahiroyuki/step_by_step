@@ -35,7 +35,7 @@ module ActiveModel
 
       protected
 
-        attr_reader :default_types
+      attr_reader :default_types
     end
   end
 end

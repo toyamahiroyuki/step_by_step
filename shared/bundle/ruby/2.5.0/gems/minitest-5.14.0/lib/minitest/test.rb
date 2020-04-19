@@ -16,7 +16,7 @@ module Minitest
       self.class.name # for Minitest::Reportable
     end
 
-    PASSTHROUGH_EXCEPTIONS = [NoMemoryError, SignalException, SystemExit] # :nodoc:
+    PASSTHROUGH_EXCEPTIONS = [NoMemoryError, SignalException, SystemExit].freeze # :nodoc:
 
     # :stopdoc:
     class << self; attr_accessor :io_lock; end
@@ -65,14 +65,14 @@ module Minitest
     def self.runnable_methods
       methods = methods_matching(/^test_/)
 
-      case self.test_order
+      case test_order
       when :random, :parallel then
         max = methods.size
         methods.sort.sort_by { rand max }
-      when :alpha, :sorted then
+      when :alpha, :sorted
         methods.sort
       else
-        raise "Unknown test_order: #{self.test_order.inspect}"
+        raise "Unknown test_order: #{test_order.inspect}"
       end
     end
 
@@ -84,7 +84,7 @@ module Minitest
       :random
     end
 
-    TEARDOWN_METHODS = %w[ before_teardown teardown after_teardown ] # :nodoc:
+    TEARDOWN_METHODS = %w(before_teardown teardown after_teardown).freeze # :nodoc:
 
     ##
     # Runs a single test with setup/teardown hooks.
@@ -95,12 +95,12 @@ module Minitest
           capture_exceptions do
             before_setup; setup; after_setup
 
-            self.send self.name
+            send name
           end
 
           TEARDOWN_METHODS.each do |hook|
             capture_exceptions do
-              self.send hook
+              send hook
             end
           end
         end
@@ -115,7 +115,6 @@ module Minitest
     # #before_setup for an example.
 
     module LifecycleHooks
-
       ##
       # Runs before every test, before setup. This hook is meant for
       # libraries to extend minitest. It is not meant to be used by
@@ -196,16 +195,16 @@ module Minitest
     rescue *PASSTHROUGH_EXCEPTIONS
       raise
     rescue Assertion => e
-      self.failures << e
+      failures << e
     rescue Exception => e
-      self.failures << UnexpectedError.new(e)
+      failures << UnexpectedError.new(e)
     end
 
-    def with_info_handler &block # :nodoc:
+    def with_info_handler(&block) # :nodoc:
       t0 = Minitest.clock_time
 
       handler = lambda do
-        warn "\nCurrent: %s#%s %.2fs" % [self.class, self.name, Minitest.clock_time - t0]
+        warn "\nCurrent: %s#%s %.2fs" % [self.class, name, Minitest.clock_time - t0]
       end
 
       self.class.on_signal ::Minitest.info_signal, handler, &block

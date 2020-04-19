@@ -1,5 +1,4 @@
 module MessagePack
-
   #
   # MessagePack::Packer is a class to serialize objects.
   #

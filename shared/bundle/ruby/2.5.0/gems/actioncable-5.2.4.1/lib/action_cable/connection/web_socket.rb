@@ -37,7 +37,8 @@ module ActionCable
       # TODO Change this to private once we've dropped Ruby 2.2 support.
       # Workaround for Ruby 2.2 "private attribute?" warning.
       protected
-        attr_reader :websocket
+
+      attr_reader :websocket
     end
   end
 end

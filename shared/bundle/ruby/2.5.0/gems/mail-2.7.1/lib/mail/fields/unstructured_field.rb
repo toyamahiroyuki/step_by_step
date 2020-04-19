@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 require 'mail/fields/common/common_field'
 
 module Mail
@@ -16,7 +17,6 @@ module Mail
   #     with no further processing (except for header "folding" and
   #     "unfolding" as described in section 2.2.3).
   class UnstructuredField
-
     include Mail::CommonField
     include Mail::Utilities
 
@@ -73,7 +73,7 @@ module Mail
     private
 
     def do_encode
-      if value && !value.empty?
+      if value.present?
         "#{wrapped_value}\r\n"
       else
         ''
@@ -150,7 +150,7 @@ module Mail
         words = decoded_string.split(/[ \t]/)
       end
 
-      folded_lines   = []
+      folded_lines = []
       while !words.empty?
         limit = 78 - prepend
         limit = limit - 7 - encoding.length if should_encode
@@ -217,6 +217,5 @@ module Mail
       encoding = 'UTF-8' if encoding == 'UTF8' # Ruby 1.8.x and $KCODE == 'u'
       encoding
     end
-
   end
 end

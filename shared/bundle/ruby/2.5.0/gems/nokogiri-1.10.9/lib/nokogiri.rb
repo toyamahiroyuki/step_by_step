@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Modify the PATH on windows so that the external DLLs will get loaded.
 
 require 'rbconfig'
@@ -27,7 +28,7 @@ end
 
 begin
   RUBY_VERSION =~ /(\d+\.\d+)/
-  require "nokogiri/#{$1}/nokogiri"
+  require "nokogiri/#{Regexp.last_match(1)}/nokogiri"
 rescue LoadError
   require 'nokogiri/nokogiri'
 end
@@ -70,25 +71,25 @@ module Nokogiri
   class << self
     ###
     # Parse an HTML or XML document.  +string+ contains the document.
-    def parse string, url = nil, encoding = nil, options = nil
+    def parse(string, url = nil, encoding = nil, options = nil)
       if string.respond_to?(:read) ||
           /^\s*<(?:!DOCTYPE\s+)?html[\s>]/i === string[0, 512]
         # Expect an HTML indicator to appear within the first 512
         # characters of a document. (<?xml ?> + <?xml-stylesheet ?>
         # shouldn't be that long)
         Nokogiri.HTML(string, url, encoding,
-          options || XML::ParseOptions::DEFAULT_HTML)
+                      options || XML::ParseOptions::DEFAULT_HTML)
       else
         Nokogiri.XML(string, url, encoding,
-          options || XML::ParseOptions::DEFAULT_XML)
-      end.tap { |doc|
+                     options || XML::ParseOptions::DEFAULT_XML)
+      end.tap do |doc|
         yield doc if block_given?
-      }
+      end
     end
 
     ###
     # Create a new Nokogiri::XML::DocumentFragment
-    def make input = nil, opts = {}, &blk
+    def make(input = nil, opts = {}, &blk)
       if input
         Nokogiri::HTML.fragment(input).children.first
       else
@@ -119,10 +120,10 @@ module Nokogiri
       # Make sure to support some popular encoding aliases not known by
       # all iconv implementations.
       {
-        'Windows-31J' => 'CP932',	# Windows-31J is the IANA registered name of CP932.
-      }.each { |alias_name, name|
+        'Windows-31J' => 'CP932', # Windows-31J is the IANA registered name of CP932.
+      }.each do |alias_name, name|
         EncodingHandler.alias(name, alias_name) if EncodingHandler[alias_name].nil?
-      }
+      end
     end
   end
 

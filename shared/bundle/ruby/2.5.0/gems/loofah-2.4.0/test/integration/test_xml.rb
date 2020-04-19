@@ -12,13 +12,13 @@ class IntegrationTestXml < Loofah::TestCase
             </root>
           EOXML
           bring_out_your_dead = Loofah::Scrubber.new do |node|
-            if node.name == "employee" and node["deceased"] == "true"
+            if (node.name == "employee") && (node["deceased"] == "true")
               node.remove
               Loofah::Scrubber::STOP # don't bother with the rest of the subtree
             end
           end
           assert_equal 2, xml.css("employee").length
-          
+
           xml.scrub!(bring_out_your_dead)
 
           employees = xml.css "employee"
@@ -36,13 +36,13 @@ class IntegrationTestXml < Loofah::TestCase
             <employee deceased='false'>Abe Vigoda</employee>
           EOXML
           bring_out_your_dead = Loofah::Scrubber.new do |node|
-            if node.name == "employee" and node["deceased"] == "true"
+            if (node.name == "employee") && (node["deceased"] == "true")
               node.remove
               Loofah::Scrubber::STOP # don't bother with the rest of the subtree
             end
           end
           assert_equal 2, xml.css("employee").length
-          
+
           xml.scrub!(bring_out_your_dead)
 
           employees = xml.css "employee"

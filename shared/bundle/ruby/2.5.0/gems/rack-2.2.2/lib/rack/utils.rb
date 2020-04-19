@@ -68,7 +68,7 @@ module Rack
     end
 
     def self.param_depth_limit=(v)
-      self.default_query_parser = self.default_query_parser.new_depth_limit(v)
+      self.default_query_parser = default_query_parser.new_depth_limit(v)
     end
 
     def self.key_space_limit
@@ -76,7 +76,7 @@ module Rack
     end
 
     def self.key_space_limit=(v)
-      self.default_query_parser = self.default_query_parser.new_space_limit(v)
+      self.default_query_parser = default_query_parser.new_space_limit(v)
     end
 
     if defined?(Process::CLOCK_MONOTONIC)
@@ -100,25 +100,25 @@ module Rack
     end
 
     def build_query(params)
-      params.map { |k, v|
+      params.map do |k, v|
         if v.class == Array
           build_query(v.map { |x| [k, x] })
         else
           v.nil? ? escape(k) : "#{escape(k)}=#{escape(v)}"
         end
-      }.join("&")
+      end.join("&")
     end
 
     def build_nested_query(value, prefix = nil)
       case value
       when Array
-        value.map { |v|
+        value.map do |v|
           build_nested_query(v, "#{prefix}[]")
-        }.join("&")
+        end.join("&")
       when Hash
-        value.map { |k, v|
+        value.map do |k, v|
           build_nested_query(v, prefix ? "#{prefix}[#{escape(k)}]" : escape(k))
-        }.delete_if(&:empty?).join('&')
+        end.delete_if(&:empty?).join('&')
       when nil
         prefix
       else
@@ -161,14 +161,14 @@ module Rack
       ">" => "&gt;",
       "'" => "&#x27;",
       '"' => "&quot;",
-      "/" => "&#x2F;"
-    }
+      "/" => "&#x2F;",
+    }.freeze
 
     ESCAPE_HTML_PATTERN = Regexp.union(*ESCAPE_HTML.keys)
 
     # Escape ampersands, brackets and quotes to their HTML/XML entities.
     def escape_html(string)
-      string.to_s.gsub(ESCAPE_HTML_PATTERN){|c| ESCAPE_HTML[c] }
+      string.to_s.gsub(ESCAPE_HTML_PATTERN) { |c| ESCAPE_HTML[c] }
     end
 
     def select_best_encoding(available_encodings, accept_encoding)
@@ -188,9 +188,9 @@ module Rack
         end
       end
 
-      encoding_candidates = expanded_accept_encoding
-        .sort_by { |_, q, p| [-q, p] }
-        .map!(&:first)
+      encoding_candidates = expanded_accept_encoding.
+        sort_by { |_, q, p| [-q, p] }.
+        map!(&:first)
 
       unless encoding_candidates.include?("identity")
         encoding_candidates.push("identity")
@@ -212,7 +212,11 @@ module Rack
       # The syntax for cookie headers only supports semicolons
       # User Agent -> Server ==
       # Cookie: SID=31d4d96e407aad42; lang=en-US
-      cookies = parse_query(header, ';') { |s| unescape(s) rescue s }
+      cookies = parse_query(header, ';') do |s|
+        unescape(s)
+      rescue
+        s
+      end
       cookies.each_with_object({}) { |(k, v), hash| hash[k] = Array === v ? v.first : v }
     end
 
@@ -223,8 +227,8 @@ module Rack
         path    = "; path=#{value[:path]}"       if value[:path]
         max_age = "; max-age=#{value[:max_age]}" if value[:max_age]
         expires = "; expires=#{value[:expires].httpdate}" if value[:expires]
-        secure = "; secure"  if value[:secure]
-        httponly = "; HttpOnly" if (value.key?(:httponly) ? value[:httponly] : value[:http_only])
+        secure = "; secure" if value[:secure]
+        httponly = "; HttpOnly" if value.key?(:httponly) ? value[:httponly] : value[:http_only]
         same_site =
           case value[:same_site]
           when false, nil
@@ -303,10 +307,11 @@ module Rack
       new_header = make_delete_cookie_header(header, key, value)
 
       add_cookie_to_header(new_header, key,
-                 { value: '', path: nil, domain: nil,
-                   max_age: '0',
-                   expires: Time.at(0) }.merge(value))
-
+                           {
+                             value: '', path: nil, domain: nil,
+                             max_age: '0',
+                             expires: Time.at(0),
+                           }.merge(value))
     end
 
     def rfc2822(time)
@@ -340,14 +345,14 @@ module Rack
       # See <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35>
       return nil unless http_range && http_range =~ /bytes=([^;]+)/
       ranges = []
-      $1.split(/,\s*/).each do |range_spec|
-        return nil  unless range_spec =~ /(\d*)-(\d*)/
-        r0, r1 = $1, $2
+      Regexp.last_match(1).split(/,\s*/).each do |range_spec|
+        return nil unless range_spec =~ /(\d*)-(\d*)/
+        r0, r1 = Regexp.last_match(1), Regexp.last_match(2)
         if r0.empty?
           return nil  if r1.empty?
           # suffix-byte-range-spec, represents trailing suffix of file
           r0 = size - r1.to_i
-          r0 = 0  if r0 < 0
+          r0 = 0 if r0 < 0
           r1 = size - 1
         else
           r0 = r0.to_i
@@ -355,11 +360,11 @@ module Rack
             r1 = size - 1
           else
             r1 = r1.to_i
-            return nil  if r1 < r0  # backwards range is syntactically invalid
+            return nil  if r1 < r0 # backwards range is syntactically invalid
             r1 = size - 1  if r1 >= size
           end
         end
-        ranges << (r0..r1)  if r0 <= r1
+        ranges << (r0..r1) if r0 <= r1
       end
       ranges
     end
@@ -413,9 +418,9 @@ module Rack
     class HeaderHash < Hash # :nodoc:
       def self.[](headers)
         if headers.is_a?(HeaderHash) && !headers.frozen?
-          return headers
+          headers
         else
-          return self.new(headers)
+          new(headers)
         end
       end
 
@@ -491,9 +496,8 @@ module Rack
       end
 
       protected
-        def names
-          @names
-        end
+
+      attr_reader :names
     end
 
     # Every standard HTTP code mapped to the appropriate message.
@@ -564,15 +568,15 @@ module Rack
       508 => 'Loop Detected',
       509 => 'Bandwidth Limit Exceeded',
       510 => 'Not Extended',
-      511 => 'Network Authentication Required'
-    }
+      511 => 'Network Authentication Required',
+    }.freeze
 
     # Responses with HTTP status codes that should not have an entity body
     STATUS_WITH_NO_ENTITY_BODY = Hash[((100..199).to_a << 204 << 304).product([true])]
 
-    SYMBOL_TO_STATUS_CODE = Hash[*HTTP_STATUS_CODES.map { |code, message|
+    SYMBOL_TO_STATUS_CODE = Hash[*HTTP_STATUS_CODES.map do |code, message|
       [message.downcase.gsub(/\s|-|'/, '_').to_sym, code]
-    }.flatten]
+    end.flatten]
 
     def status_code(status)
       if status.is_a?(Symbol)
@@ -604,6 +608,5 @@ module Rack
     def valid_path?(path)
       path.valid_encoding? && !path.include?(NULL_BYTE)
     end
-
   end
 end

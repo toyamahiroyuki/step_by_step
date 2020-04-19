@@ -251,9 +251,9 @@ module ActionController #:nodoc:
       def custom(mime_type, &block)
         mime_type = Mime::Type.lookup(mime_type.to_s) unless mime_type.is_a?(Mime::Type)
         @responses[mime_type] ||= if block_given?
-          block
-        else
-          VariantCollector.new(@variant)
+                                    block
+                                  else
+                                    VariantCollector.new(@variant)
         end
       end
 
@@ -304,9 +304,10 @@ module ActionController #:nodoc:
         end
 
         private
-          def variant_key
-            @variant.find { |variant| @variants.key?(variant) } || :any
-          end
+
+        def variant_key
+          @variant.find { |variant| @variants.key?(variant) } || :any
+        end
       end
     end
   end

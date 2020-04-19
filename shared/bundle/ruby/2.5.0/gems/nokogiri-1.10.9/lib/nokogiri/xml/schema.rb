@@ -4,7 +4,7 @@ module Nokogiri
       ###
       # Create a new Nokogiri::XML::Schema object using a +string_or_io+
       # object.
-      def Schema string_or_io
+      def Schema(string_or_io)
         Schema.new(string_or_io)
       end
     end
@@ -33,7 +33,7 @@ module Nokogiri
       ###
       # Create a new Nokogiri::XML::Schema object using a +string_or_io+
       # object.
-      def self.new string_or_io
+      def self.new(string_or_io)
         from_document Nokogiri::XML(string_or_io)
       end
 
@@ -42,9 +42,9 @@ module Nokogiri
       # Nokogiri::XML::Document object, or a filename.  An Array of
       # Nokogiri::XML::SyntaxError objects found while validating the
       # +thing+ is returned.
-      def validate thing
-        if thing.is_a?(Nokogiri::XML::Document) 
-          validate_document(thing) 
+      def validate(thing)
+        if thing.is_a?(Nokogiri::XML::Document)
+          validate_document(thing)
         elsif File.file?(thing)
           validate_file(thing)
         else
@@ -55,7 +55,7 @@ module Nokogiri
       ###
       # Returns true if +thing+ is a valid Nokogiri::XML::Document or
       # file.
-      def valid? thing
+      def valid?(thing)
         validate(thing).length == 0
       end
     end

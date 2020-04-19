@@ -32,7 +32,7 @@ module Rack
 
       def initialize(app, options = {})
         super
-        @pool = Hash.new
+        @pool = {}
         @mutex = Mutex.new
       end
 
@@ -45,7 +45,7 @@ module Rack
 
       def find_session(req, sid)
         with_lock(req) do
-          unless sid and session = get_session_with_fallback(sid)
+          unless sid && (session = get_session_with_fallback(sid))
             sid, session = generate_sid, {}
             @pool.store sid.private_id, session
           end

@@ -71,7 +71,7 @@ module ActionController
   module ParamsWrapper
     extend ActiveSupport::Concern
 
-    EXCLUDE_PARAMETERS = %w(authenticity_token _method utf8)
+    EXCLUDE_PARAMETERS = %w(authenticity_token _method utf8).freeze
 
     require "mutex_m"
 
@@ -142,30 +142,31 @@ module ActionController
       end
 
       private
-        # Determine the wrapper model from the controller's name. By convention,
-        # this could be done by trying to find the defined model that has the
-        # same singular name as the controller. For example, +UsersController+
-        # will try to find if the +User+ model exists.
-        #
-        # This method also does namespace lookup. Foo::Bar::UsersController will
-        # try to find Foo::Bar::User, Foo::User and finally User.
-        def _default_wrap_model
-          return nil if klass.anonymous?
-          model_name = klass.name.sub(/Controller$/, "").classify
 
-          begin
-            if model_klass = model_name.safe_constantize
-              model_klass
-            else
-              namespaces = model_name.split("::")
-              namespaces.delete_at(-2)
-              break if namespaces.last == model_name
-              model_name = namespaces.join("::")
-            end
-          end until model_klass
+      # Determine the wrapper model from the controller's name. By convention,
+      # this could be done by trying to find the defined model that has the
+      # same singular name as the controller. For example, +UsersController+
+      # will try to find if the +User+ model exists.
+      #
+      # This method also does namespace lookup. Foo::Bar::UsersController will
+      # try to find Foo::Bar::User, Foo::User and finally User.
+      def _default_wrap_model
+        return nil if klass.anonymous?
+        model_name = klass.name.sub(/Controller$/, "").classify
 
-          model_klass
-        end
+        begin
+          if model_klass = model_name.safe_constantize
+            model_klass
+          else
+            namespaces = model_name.split("::")
+            namespaces.delete_at(-2)
+            break if namespaces.last == model_name
+            model_name = namespaces.join("::")
+          end
+        end until model_klass
+
+        model_klass
+      end
     end
 
     included do
@@ -258,36 +259,36 @@ module ActionController
 
     private
 
-      # Returns the wrapper key which will be used to store wrapped parameters.
-      def _wrapper_key
-        _wrapper_options.name
-      end
+    # Returns the wrapper key which will be used to store wrapped parameters.
+    def _wrapper_key
+      _wrapper_options.name
+    end
 
-      # Returns the list of enabled formats.
-      def _wrapper_formats
-        _wrapper_options.format
-      end
+    # Returns the list of enabled formats.
+    def _wrapper_formats
+      _wrapper_options.format
+    end
 
-      # Returns the list of parameters which will be selected for wrapped.
-      def _wrap_parameters(parameters)
-        { _wrapper_key => _extract_parameters(parameters) }
-      end
+    # Returns the list of parameters which will be selected for wrapped.
+    def _wrap_parameters(parameters)
+      { _wrapper_key => _extract_parameters(parameters) }
+    end
 
-      def _extract_parameters(parameters)
-        if include_only = _wrapper_options.include
-          parameters.slice(*include_only)
-        else
-          exclude = _wrapper_options.exclude || []
-          parameters.except(*(exclude + EXCLUDE_PARAMETERS))
-        end
+    def _extract_parameters(parameters)
+      if include_only = _wrapper_options.include
+        parameters.slice(*include_only)
+      else
+        exclude = _wrapper_options.exclude || []
+        parameters.except(*(exclude + EXCLUDE_PARAMETERS))
       end
+    end
 
-      # Checks if we should perform parameters wrapping.
-      def _wrapper_enabled?
-        return false unless request.has_content_type?
+    # Checks if we should perform parameters wrapping.
+    def _wrapper_enabled?
+      return false unless request.has_content_type?
 
-        ref = request.content_mime_type.ref
-        _wrapper_formats.include?(ref) && _wrapper_key && !request.parameters.key?(_wrapper_key)
-      end
+      ref = request.content_mime_type.ref
+      _wrapper_formats.include?(ref) && _wrapper_key && !request.parameters.key?(_wrapper_key)
+    end
   end
 end

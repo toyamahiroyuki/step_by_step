@@ -1,11 +1,14 @@
 # frozen_string_literal: true
+
 module Mail
   module CheckDeliveryParams #:nodoc:
     class << self
       def check(mail)
-        [ check_from(mail.smtp_envelope_from),
+        [
+          check_from(mail.smtp_envelope_from),
           check_to(mail.smtp_envelope_to),
-          check_message(mail) ]
+          check_message(mail),
+        ]
       end
 
       def check_from(addr)

@@ -1,4 +1,5 @@
 # coding: utf-8
+
 class Pry::Terminal
   class << self
     # Return a pair of [rows, columns] which gives the size of the window.
@@ -14,7 +15,7 @@ class Pry::Terminal
     end
 
     # Return a screen size or a default if that fails.
-    def size! default = [27, 80]
+    def size!(default = [27, 80])
       screen_size || default
     end
 
@@ -30,12 +31,12 @@ class Pry::Terminal
 
     def actual_screen_size
       # The best way, if possible (requires non-jruby ≥1.9 or io-console gem)
-      screen_size_according_to_io_console or
+      screen_size_according_to_io_console ||
         # Fall back to the old standby, though it might be stale:
-        screen_size_according_to_env or
+        screen_size_according_to_env ||
         # Fall further back, though this one is also out of date without something
         # calling Readline.set_screen_size
-        screen_size_according_to_readline or
+        screen_size_according_to_readline ||
         # Windows users can otherwise run ansicon and get a decent answer:
         screen_size_according_to_ansicon_env
     end
@@ -78,7 +79,7 @@ class Pry::Terminal
     def screen_size_according_to_ansicon_env
       return unless ENV['ANSICON'] =~ /\((.*)x(.*)\)/
 
-      size = [$2, $1]
+      size = [Regexp.last_match(2), Regexp.last_match(1)]
       size if nonzero_column?(size)
     end
 

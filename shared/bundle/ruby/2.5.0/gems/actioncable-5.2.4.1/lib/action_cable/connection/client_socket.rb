@@ -11,7 +11,7 @@ module ActionCable
     class ClientSocket # :nodoc:
       def self.determine_url(env)
         scheme = secure_request?(env) ? "wss:" : "ws:"
-        "#{ scheme }//#{ env['HTTP_HOST'] }#{ env['REQUEST_URI'] }"
+        "#{scheme}//#{env['HTTP_HOST']}#{env['REQUEST_URI']}"
       end
 
       def self.secure_request?(env)
@@ -68,7 +68,7 @@ module ActionCable
 
       def rack_response
         start_driver
-        [ -1, {}, [] ]
+        [-1, {}, []]
       end
 
       def write(data)
@@ -118,40 +118,41 @@ module ActionCable
       end
 
       private
-        def open
-          return unless @ready_state == CONNECTING
-          @ready_state = OPEN
 
-          @event_target.on_open
-        end
+      def open
+        return unless @ready_state == CONNECTING
+        @ready_state = OPEN
 
-        def receive_message(data)
-          return unless @ready_state == OPEN
+        @event_target.on_open
+      end
 
-          @event_target.on_message(data)
-        end
+      def receive_message(data)
+        return unless @ready_state == OPEN
 
-        def emit_error(message)
-          return if @ready_state >= CLOSING
+        @event_target.on_message(data)
+      end
 
-          @event_target.on_error(message)
-        end
+      def emit_error(message)
+        return if @ready_state >= CLOSING
 
-        def begin_close(reason, code)
-          return if @ready_state == CLOSED
-          @ready_state = CLOSING
-          @close_params = [reason, code]
+        @event_target.on_error(message)
+      end
 
-          @stream.shutdown if @stream
-          finalize_close
-        end
+      def begin_close(reason, code)
+        return if @ready_state == CLOSED
+        @ready_state = CLOSING
+        @close_params = [reason, code]
 
-        def finalize_close
-          return if @ready_state == CLOSED
-          @ready_state = CLOSED
+        @stream.shutdown if @stream
+        finalize_close
+      end
 
-          @event_target.on_close(*@close_params)
-        end
+      def finalize_close
+        return if @ready_state == CLOSED
+        @ready_state = CLOSED
+
+        @event_target.on_close(*@close_params)
+      end
     end
   end
 end

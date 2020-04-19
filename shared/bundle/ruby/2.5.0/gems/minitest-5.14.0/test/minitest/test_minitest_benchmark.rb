@@ -84,7 +84,7 @@ class TestMinitestBenchmark < Minitest::Test
   end
 
   def test_fit_linear_noisy
-    x = [ 60,  61,  62,  63,  65]
+    x = [60,  61, 62, 63,  65]
     y = [3.1, 3.6, 3.8, 4.0, 4.1]
 
     # verified in numbers and R
@@ -118,7 +118,7 @@ class TestMinitestBenchmark < Minitest::Test
     assert_fit :power, x, y, 0.96, 3.119e-5, 0.8959
   end
 
-  def assert_fit msg, x, y, fit, exp_a, exp_b
+  def assert_fit(msg, x, y, fit, exp_a, exp_b)
     bench = Minitest::Benchmark.new :blah
 
     a, b, rr = bench.send "fit_#{msg}", x, y

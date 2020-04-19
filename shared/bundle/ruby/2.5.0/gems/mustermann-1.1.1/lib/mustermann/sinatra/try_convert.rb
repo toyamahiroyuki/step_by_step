@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Mustermann
   class Sinatra < AST::Pattern
     # Tries to translate objects to Sinatra patterns.
@@ -40,7 +41,11 @@ module Mustermann
 
       translate AST::Pattern do
         next unless options == t.options
-        t.new(SafeRenderer.translate(to_ast)) rescue nil
+        begin
+          t.new(SafeRenderer.translate(to_ast))
+        rescue
+          nil
+        end
       end
     end
 

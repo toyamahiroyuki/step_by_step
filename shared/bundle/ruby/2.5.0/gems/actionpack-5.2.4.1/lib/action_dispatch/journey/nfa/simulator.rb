@@ -24,15 +24,15 @@ module ActionDispatch
           input = StringScanner.new(string)
           state = tt.eclosure(0)
           until input.eos?
-            sym   = input.scan(%r([/.?]|[^/.?]+))
+            sym = input.scan(%r{[/.?]|[^/.?]+})
 
             # FIXME: tt.eclosure is not needed for the GTG
             state = tt.eclosure(tt.move(state, sym))
           end
 
-          acceptance_states = state.find_all { |s|
+          acceptance_states = state.find_all do |s|
             tt.accepting?(tt.eclosure(s).sort.last)
-          }
+          end
 
           return if acceptance_states.empty?
 

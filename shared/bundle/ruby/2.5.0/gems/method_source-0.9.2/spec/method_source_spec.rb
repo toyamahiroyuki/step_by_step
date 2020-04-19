@@ -1,29 +1,6 @@
 require 'spec_helper'
 
 describe MethodSource do
-
-  describe "source_location (testing 1.8 implementation)" do
-    it 'should return correct source_location for a method' do
-      expect(method(:hello).source_location.first).to match(/spec_helper/)
-    end
-
-    it 'should not raise for immediate instance methods' do
-      [Symbol, Integer, TrueClass, FalseClass, NilClass].each do |immediate_class|
-        expect do
-          immediate_class.instance_method(:to_s).source_location
-        end.not_to raise_error
-      end
-    end
-
-    it 'should not raise for immediate methods' do
-      [:a, 1, true, false, nil].each do |immediate|
-        expect do
-          immediate.method(:to_s).source_location
-        end.not_to raise_error
-      end
-    end
-  end
-
   before do
     @hello_module_source = "  def hello; :hello_module; end\n"
     @hello_singleton_source = "def $o.hello; :hello_singleton; end\n"
@@ -38,38 +15,60 @@ describe MethodSource do
     @hi_module_evaled_source = "  def hi_\#{name}\n    @var = \#{name}\n  end\n"
   end
 
-  it 'should define methods on Method and UnboundMethod and Proc' do
+  describe "source_location (testing 1.8 implementation)" do
+    it 'returns correct source_location for a method' do
+      expect(method(:hello).source_location.first).to match(/spec_helper/)
+    end
+
+    it 'does not raise for immediate instance methods' do
+      [Symbol, Integer, TrueClass, FalseClass, NilClass].each do |immediate_class|
+        expect do
+          immediate_class.instance_method(:to_s).source_location
+        end.not_to raise_error
+      end
+    end
+
+    it 'does not raise for immediate methods' do
+      [:a, 1, true, false, nil].each do |immediate|
+        expect do
+          immediate.method(:to_s).source_location
+        end.not_to raise_error
+      end
+    end
+  end
+
+  it 'defines methods on Method and UnboundMethod and Proc' do
     expect(Method.method_defined?(:source)).to be_truthy
     expect(UnboundMethod.method_defined?(:source)).to be_truthy
     expect(Proc.method_defined?(:source)).to be_truthy
   end
 
   describe "Methods" do
-    it 'should return source for method' do
+    it 'returns source for method' do
       expect(method(:hello).source).to eq(@hello_source)
     end
 
-    it 'should return source for a method defined in a module' do
+    it 'returns source for a method defined in a module' do
       expect(M.instance_method(:hello).source).to eq(@hello_module_source)
     end
 
-    it 'should return source for a singleton method as an instance method' do
+    it 'returns source for a singleton method as an instance method' do
       expect(class << $o
-        self
+               self
       end.instance_method(:hello).source).to eq(@hello_singleton_source)
     end
 
-    it 'should return source for a singleton method' do
+    it 'returns source for a singleton method' do
       expect($o.method(:hello).source).to eq(@hello_singleton_source)
     end
 
-    it 'should return a comment for method' do
+    it 'returns a comment for method' do
       expect(method(:hello).comment).to eq(@hello_comment)
     end
 
     # These tests fail because of http://jira.codehaus.org/browse/JRUBY-4576
     unless defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
-      it 'should return source for an *_evaled method' do
+      it 'returns source for an *_evaled method' do
         expect(M.method(:hello_name).source).to eq(@hello_instance_evaled_source)
         expect(M.method(:name_two).source).to eq(@hello_instance_evaled_source_2)
         expect(M.instance_method(:hello_name).source).to eq(@hello_class_evaled_source)
@@ -77,14 +76,14 @@ describe MethodSource do
       end
     end
 
-    it "should raise error for evaled methods that do not pass __FILE__ and __LINE__ + 1 as its arguments" do
+    it "raises error for evaled methods that do not pass __FILE__ and __LINE__ + 1 as its arguments" do
       expect do
         M.instance_method(:name_three).source
       end.to raise_error(MethodSource::SourceNotFoundError)
     end
 
     if !is_rbx?
-      it 'should raise for C methods' do
+      it 'raises for C methods' do
         expect do
           method(:puts).source
         end.to raise_error(MethodSource::SourceNotFoundError)
@@ -94,23 +93,24 @@ describe MethodSource do
 
   # if RUBY_VERSION =~ /1.9/ || is_rbx?
   describe "Lambdas and Procs" do
-    it 'should return source for proc' do
+    it 'returns source for proc' do
       expect(MyProc.source).to eq(@proc_source)
     end
 
-    it 'should return an empty string if there is no comment' do
+    it 'returns an empty string if there is no comment' do
       expect(MyProc.comment).to eq('')
     end
 
-    it 'should return source for lambda' do
+    it 'returns source for lambda' do
       expect(MyLambda.source).to eq(@lambda_source)
     end
 
-    it 'should return comment for lambda' do
+    it 'returns comment for lambda' do
       expect(MyLambda.comment).to eq(@lambda_comment)
     end
   end
   # end
+
   describe "Comment tests" do
     before do
       @comment1 = "# a\n# b\n"
@@ -120,23 +120,23 @@ describe MethodSource do
       @comment5 = "# a\n# b\n# c\n# d\n"
     end
 
-    it "should correctly extract multi-line comments" do
+    it "correctly extract multi-line comments" do
       expect(method(:comment_test1).comment).to eq(@comment1)
     end
 
-    it "should correctly strip leading whitespace before comments" do
+    it "correctly strip leading whitespace before comments" do
       expect(method(:comment_test2).comment).to eq(@comment2)
     end
 
-    it "should keep empty comment lines" do
+    it "keeps empty comment lines" do
       expect(method(:comment_test3).comment).to eq(@comment3)
     end
 
-    it "should ignore blank lines between comments" do
+    it "ignores blank lines between comments" do
       expect(method(:comment_test4).comment).to eq(@comment4)
     end
 
-    it "should align all comments to same indent level" do
+    it "aligns all comments to same indent level" do
       expect(method(:comment_test5).comment).to eq(@comment5)
     end
   end

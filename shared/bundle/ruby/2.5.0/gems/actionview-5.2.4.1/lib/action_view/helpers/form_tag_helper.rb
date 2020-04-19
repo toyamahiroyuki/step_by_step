@@ -144,15 +144,15 @@ module ActionView
           end
 
           if include_blank
-            option_tags = content_tag("option".freeze, include_blank, options_for_blank_options_tag).safe_concat(option_tags)
+            option_tags = content_tag("option", include_blank, options_for_blank_options_tag).safe_concat(option_tags)
           end
         end
 
         if prompt = options.delete(:prompt)
-          option_tags = content_tag("option".freeze, prompt, value: "").safe_concat(option_tags)
+          option_tags = content_tag("option", prompt, value: "").safe_concat(option_tags)
         end
 
-        content_tag "select".freeze, option_tags, { "name" => html_name, "id" => sanitize_to_id(name) }.update(options.stringify_keys)
+        content_tag "select", option_tags, { "name" => html_name, "id" => sanitize_to_id(name) }.update(options.stringify_keys)
       end
 
       # Creates a standard text field; use these text fields to input smaller chunks of text like a username
@@ -216,7 +216,7 @@ module ActionView
           options ||= {}
           options = options.stringify_keys
         end
-        options["for"] = sanitize_to_id(name) unless name.blank? || options.has_key?("for")
+        options["for"] = sanitize_to_id(name) unless name.blank? || options.key?("for")
         content_tag :label, content_or_options || name.to_s.humanize, options, &block
       end
 
@@ -577,7 +577,7 @@ module ActionView
       #   # => <fieldset class="format"><p><input id="name" name="name" type="text" /></p></fieldset>
       def field_set_tag(legend = nil, options = nil, &block)
         output = tag(:fieldset, options, true)
-        output.safe_concat(content_tag("legend".freeze, legend)) unless legend.blank?
+        output.safe_concat(content_tag("legend", legend)) if legend.present?
         output.concat(capture(&block)) if block_given?
         output.safe_concat("</fieldset>")
       end
@@ -823,97 +823,98 @@ module ActionView
       end
 
       private
-        def html_options_for_form(url_for_options, options)
-          options.stringify_keys.tap do |html_options|
-            html_options["enctype"] = "multipart/form-data" if html_options.delete("multipart")
-            # The following URL is unescaped, this is just a hash of options, and it is the
-            # responsibility of the caller to escape all the values.
-            html_options["action"]  = url_for(url_for_options)
-            html_options["accept-charset"] = "UTF-8"
 
-            html_options["data-remote"] = true if html_options.delete("remote")
+      def html_options_for_form(url_for_options, options)
+        options.stringify_keys.tap do |html_options|
+          html_options["enctype"] = "multipart/form-data" if html_options.delete("multipart")
+          # The following URL is unescaped, this is just a hash of options, and it is the
+          # responsibility of the caller to escape all the values.
+          html_options["action"]  = url_for(url_for_options)
+          html_options["accept-charset"] = "UTF-8"
 
-            if html_options["data-remote"] &&
-               !embed_authenticity_token_in_remote_forms &&
-               html_options["authenticity_token"].blank?
-              # The authenticity token is taken from the meta tag in this case
-              html_options["authenticity_token"] = false
-            elsif html_options["authenticity_token"] == true
-              # Include the default authenticity_token, which is only generated when its set to nil,
-              # but we needed the true value to override the default of no authenticity_token on data-remote.
-              html_options["authenticity_token"] = nil
-            end
+          html_options["data-remote"] = true if html_options.delete("remote")
+
+          if html_options["data-remote"] &&
+             !embed_authenticity_token_in_remote_forms &&
+             html_options["authenticity_token"].blank?
+            # The authenticity token is taken from the meta tag in this case
+            html_options["authenticity_token"] = false
+          elsif html_options["authenticity_token"] == true
+            # Include the default authenticity_token, which is only generated when its set to nil,
+            # but we needed the true value to override the default of no authenticity_token on data-remote.
+            html_options["authenticity_token"] = nil
           end
         end
+      end
 
-        def extra_tags_for_form(html_options)
-          authenticity_token = html_options.delete("authenticity_token")
-          method = html_options.delete("method").to_s.downcase
+      def extra_tags_for_form(html_options)
+        authenticity_token = html_options.delete("authenticity_token")
+        method = html_options.delete("method").to_s.downcase
 
-          method_tag = \
-            case method
-            when "get"
-              html_options["method"] = "get"
-              ""
-            when "post", ""
-              html_options["method"] = "post"
-              token_tag(authenticity_token, form_options: {
-                action: html_options["action"],
-                method: "post"
-              })
-            else
-              html_options["method"] = "post"
-              method_tag(method) + token_tag(authenticity_token, form_options: {
-                action: html_options["action"],
-                method: method
-              })
-            end
-
-          if html_options.delete("enforce_utf8") { true }
-            utf8_enforcer_tag + method_tag
+        method_tag = \
+          case method
+          when "get"
+            html_options["method"] = "get"
+            ""
+          when "post", ""
+            html_options["method"] = "post"
+            token_tag(authenticity_token, form_options: {
+              action: html_options["action"],
+              method: "post",
+            })
           else
-            method_tag
-          end
-        end
-
-        def form_tag_html(html_options)
-          extra_tags = extra_tags_for_form(html_options)
-          tag(:form, html_options, true) + extra_tags
-        end
-
-        def form_tag_with_body(html_options, content)
-          output = form_tag_html(html_options)
-          output << content
-          output.safe_concat("</form>")
-        end
-
-        # see http://www.w3.org/TR/html4/types.html#type-name
-        def sanitize_to_id(name)
-          name.to_s.delete("]").tr("^-a-zA-Z0-9:.", "_")
-        end
-
-        def set_default_disable_with(value, tag_options)
-          return unless ActionView::Base.automatically_disable_submit_tag
-          data = tag_options["data"]
-
-          unless tag_options["data-disable-with"] == false || (data && data["disable_with"] == false)
-            disable_with_text = tag_options["data-disable-with"]
-            disable_with_text ||= data["disable_with"] if data
-            disable_with_text ||= value.to_s.clone
-            tag_options.deep_merge!("data" => { "disable_with" => disable_with_text })
-          else
-            data.delete("disable_with") if data
+            html_options["method"] = "post"
+            method_tag(method) + token_tag(authenticity_token, form_options: {
+              action: html_options["action"],
+              method: method,
+            })
           end
 
-          tag_options.delete("data-disable-with")
+        if html_options.delete("enforce_utf8") { true }
+          utf8_enforcer_tag + method_tag
+        else
+          method_tag
         end
+      end
 
-        def convert_direct_upload_option_to_url(options)
-          if options.delete(:direct_upload) && respond_to?(:rails_direct_uploads_url)
-            options["data-direct-upload-url"] = rails_direct_uploads_url
+      def form_tag_html(html_options)
+        extra_tags = extra_tags_for_form(html_options)
+        tag(:form, html_options, true) + extra_tags
+      end
+
+      def form_tag_with_body(html_options, content)
+        output = form_tag_html(html_options)
+        output << content
+        output.safe_concat("</form>")
+      end
+
+      # see http://www.w3.org/TR/html4/types.html#type-name
+      def sanitize_to_id(name)
+        name.to_s.delete("]").tr("^-a-zA-Z0-9:.", "_")
+      end
+
+      def set_default_disable_with(value, tag_options)
+        return unless ActionView::Base.automatically_disable_submit_tag
+        data = tag_options["data"]
+
+        if tag_options["data-disable-with"] == false || (data && data["disable_with"] == false)
+          data.delete("disable_with") if data
+        else
+          disable_with_text = tag_options["data-disable-with"]
+          disable_with_text ||= data["disable_with"] if data
+          disable_with_text ||= value.to_s.clone
+          tag_options.deep_merge!("data" => { "disable_with" => disable_with_text })
           end
-          options
+
+        tag_options.delete("data-disable-with")
+      end
+
+      def convert_direct_upload_option_to_url(options)
+        if options.delete(:direct_upload) && respond_to?(:rails_direct_uploads_url)
+          options["data-direct-upload-url"] = rails_direct_uploads_url
         end
+        options
+      end
     end
   end
 end

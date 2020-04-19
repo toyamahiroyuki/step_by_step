@@ -108,10 +108,10 @@ module ActionController
 
       if strong_etag
         response.strong_etag = combine_etags strong_etag,
-          last_modified: last_modified, public: public, template: template
+                                             last_modified: last_modified, public: public, template: template
       elsif weak_etag || template
         response.weak_etag = combine_etags weak_etag,
-          last_modified: last_modified, public: public, template: template
+                                           last_modified: last_modified, public: public, template: template
       end
 
       response.last_modified = last_modified if last_modified
@@ -267,8 +267,9 @@ module ActionController
     end
 
     private
-      def combine_etags(validator, options)
-        [validator, *etaggers.map { |etagger| instance_exec(options, &etagger) }].compact
-      end
+
+    def combine_etags(validator, options)
+      [validator, *etaggers.map { |etagger| instance_exec(options, &etagger) }].compact
+    end
   end
 end

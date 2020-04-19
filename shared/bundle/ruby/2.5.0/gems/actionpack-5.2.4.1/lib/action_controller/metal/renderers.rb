@@ -14,7 +14,7 @@ module ActionController
   end
 
   # See <tt>Responder#api_behavior</tt>
-  class MissingRenderer < LoadError
+  class MissingRenderer < StandardError
     def initialize(format)
       super "No renderer defined for format: #{format}"
     end
@@ -154,7 +154,7 @@ module ActionController
     end
 
     add :json do |json, options|
-      json = json.to_json(options) unless json.kind_of?(String)
+      json = json.to_json(options) unless json.is_a?(String)
 
       if options[:callback].present?
         if content_type.nil? || content_type == Mime[:json]

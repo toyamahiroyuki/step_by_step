@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'mustermann/to_pattern'
 require 'delegate'
@@ -26,6 +27,7 @@ describe Mustermann::ToPattern do
 
   context Mustermann::Pattern do
     subject(:pattern) { Mustermann.new('') }
+
     example { pattern.to_pattern.should be == pattern }
     example { pattern.to_pattern(type: :rails).should be_a(Mustermann::Sinatra) }
   end

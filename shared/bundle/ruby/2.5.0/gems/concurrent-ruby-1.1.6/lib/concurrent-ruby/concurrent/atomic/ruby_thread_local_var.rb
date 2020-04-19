@@ -2,11 +2,9 @@ require 'thread'
 require 'concurrent/atomic/abstract_thread_local_var'
 
 module Concurrent
-
   # @!visibility private
   # @!macro internal_implementation_note
   class RubyThreadLocalVar < AbstractThreadLocalVar
-
     # Each thread has a (lazily initialized) array of thread-local variable values
     # Each time a new thread-local var is created, we allocate an "index" for it
     # For example, if the allocated index is 1, that means slot #1 in EVERY
@@ -29,9 +27,9 @@ module Concurrent
     #   array, so we don't leak memory
 
     # @!visibility private
-    FREE   = []
+    FREE   = [].freeze
     LOCK   = Mutex.new
-    ARRAYS = {} # used as a hash set
+    ARRAYS = {}.freeze # used as a hash set
     # noinspection RubyClassVariableUsageInspection
     @@next = 0
     QUEUE  = Queue.new

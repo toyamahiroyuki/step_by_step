@@ -25,42 +25,43 @@ module ActiveSupport
       end
 
       private
-        def round_without_significant(number)
-          number = number.round(precision)
-          number = number.to_i if precision == 0 && number.finite?
-          number = number.abs if number.zero? # prevent showing negative zeros
-          number
-        end
 
-        def round_significant(number)
-          return 0 if number.zero?
-          digits = digit_count(number)
-          multiplier = 10**(digits - precision)
-          (number / BigDecimal(multiplier.to_f.to_s)).round * multiplier
-        end
+      def round_without_significant(number)
+        number = number.round(precision)
+        number = number.to_i if precision == 0 && number.finite?
+        number = number.abs if number.zero? # prevent showing negative zeros
+        number
+      end
 
-        def convert_to_decimal(number)
-          case number
-          when Float, String
-            BigDecimal(number.to_s)
-          when Rational
-            BigDecimal(number, digit_count(number.to_i) + precision)
-          else
-            number.to_d
-          end
-        end
+      def round_significant(number)
+        return 0 if number.zero?
+        digits = digit_count(number)
+        multiplier = 10**(digits - precision)
+        (number / BigDecimal(multiplier.to_f.to_s)).round * multiplier
+      end
 
-        def precision
-          options[:precision]
+      def convert_to_decimal(number)
+        case number
+        when Float, String
+          BigDecimal(number.to_s)
+        when Rational
+          BigDecimal(number, digit_count(number.to_i) + precision)
+        else
+          number.to_d
         end
+      end
 
-        def significant
-          options[:significant]
-        end
+      def precision
+        options[:precision]
+      end
 
-        def absolute_number(number)
-          number.respond_to?(:abs) ? number.abs : number.to_d.abs
-        end
+      def significant
+        options[:significant]
+      end
+
+      def absolute_number(number)
+        number.respond_to?(:abs) ? number.abs : number.to_d.abs
+      end
     end
   end
 end

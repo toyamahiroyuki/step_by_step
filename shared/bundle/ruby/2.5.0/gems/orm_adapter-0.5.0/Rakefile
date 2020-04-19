@@ -7,7 +7,7 @@ end
 
 require 'rake'
 require 'rspec/core/rake_task'
-$:.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
 require "orm_adapter/version"
 
 task :default => :spec
@@ -17,7 +17,7 @@ RSpec::Core::RakeTask.new(:spec)
 begin
   require 'yard'
   YARD::Rake::YardocTask.new(:doc) do |t|
-    t.files   = ['lib/**/*.rb', 'README.rdoc']
+    t.files = ['lib/**/*.rb', 'README.rdoc']
   end
 rescue LoadError
   task :doc do

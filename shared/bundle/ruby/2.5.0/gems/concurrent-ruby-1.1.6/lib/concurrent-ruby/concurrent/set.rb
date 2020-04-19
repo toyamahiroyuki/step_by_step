@@ -3,7 +3,6 @@ require 'concurrent/thread_safe/util'
 require 'set'
 
 module Concurrent
-
   # @!macro concurrent_set
   #
   #   A thread-safe subclass of Set. This version locks against the object
@@ -18,7 +17,6 @@ module Concurrent
   #     may be lost. Use `#merge` instead.
   #
   #   @see http://ruby-doc.org/stdlib-2.4.0/libdoc/set/rdoc/Set.html Ruby standard library `Set`
-
 
   # @!macro internal_implementation_note
   SetImplementation = case
@@ -63,4 +61,3 @@ module Concurrent
   class Set < SetImplementation
   end
 end
-

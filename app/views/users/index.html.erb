@@ -1,39 +1,40 @@
-<div class="title">
-  <h1>User一覧</h1>
-</div>
+<div class="user-background">
+	<div class="title">
+	  <h1>User一覧</h1>
+	</div>
 
-<div class="container">
-	<div class="row">
-		<div class="col-xs-12">
-		  <table class="green-table">
-				<tr>
-					<th>名前</th>
-					<th>性別</th>
-					<th>年齢</th>
-					<th>家賃</th>
-					<th>家族構成</th>
-					<th class="user-index-btn"></th>
-					<th class="user-index-btn"></th>
-			  </tr>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+			  <table class="user-green-table">
+					<tr>
+						<th>名前</th>
+						<th>性別</th>
+						<th>年齢</th>
+						<th><!-- 家賃 --></th>
+						<th>家族構成</th>
+						<th class="user-index-btn">　　　　</th>
+						<th class="user-index-btn">　　　　</th>
+				  </tr>
 
-			  <% @users.each do |user| %>
+				  <% @users.each do |user| %>
 
-				  <tr>
-						<td><%= user.name %></td>
-						<td><%= user.sex %></td>
-						<td><%= user.old %></td>
-						<td><%= user.fixed_cost.rent %>円</td>
-						<td><%= user.member %>人</td>
-						<td class="user-index-btn"><%= link_to "収入", income_path(user.id) %></td>
-						<td class="user-index-btn"><%= link_to "支出", cost_path(user.id) %></td>
-					</tr>
+					  <tr>
+							<td><%= user.name %></td>
+							<td><%= user.sex %></td>
+							<td><%= user.old %></td>
+							<td><%#= user.fixed_cost.rent %><!-- 円 --></td>
+							<td><%= user.member %>人</td>
+							<td class="user-index-btn"><%= link_to "収入", income_path(user.id) %></td>
+							<td class="user-index-btn"><%= link_to "支出", cost_path(user.id) %></td>
+						</tr>
 
-				<% end %>
+					<% end %>
 
-　		  </table>
+	　		  </table>
 
-    </div>
-  </div>
-</div>
+	    </div>
+	  </div>
+	</div>
 
 

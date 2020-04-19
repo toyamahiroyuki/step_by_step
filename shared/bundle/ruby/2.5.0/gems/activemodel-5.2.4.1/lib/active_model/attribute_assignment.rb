@@ -39,19 +39,19 @@ module ActiveModel
 
     private
 
-      def _assign_attributes(attributes)
-        attributes.each do |k, v|
-          _assign_attribute(k, v)
-        end
+    def _assign_attributes(attributes)
+      attributes.each do |k, v|
+        _assign_attribute(k, v)
       end
+    end
 
-      def _assign_attribute(k, v)
-        setter = :"#{k}="
-        if respond_to?(setter)
-          public_send(setter, v)
-        else
-          raise UnknownAttributeError.new(self, k)
-        end
+    def _assign_attribute(k, v)
+      setter = :"#{k}="
+      if respond_to?(setter)
+        public_send(setter, v)
+      else
+        raise UnknownAttributeError.new(self, k)
       end
+    end
   end
 end

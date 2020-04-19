@@ -16,8 +16,8 @@ class Date
       date.strftime("%B #{day_format}, %Y") # => "April 25th, 2007"
     },
     rfc822: "%d %b %Y",
-    iso8601: lambda { |date| date.iso8601 }
-  }
+    iso8601: lambda { |date| date.iso8601 },
+  }.freeze
 
   # Convert to a formatted string. See DATE_FORMATS for predefined formats.
   #

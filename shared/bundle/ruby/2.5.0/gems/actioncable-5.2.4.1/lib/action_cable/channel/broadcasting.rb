@@ -12,7 +12,7 @@ module ActionCable
       module ClassMethods
         # Broadcast a hash to a unique broadcasting for this <tt>model</tt> in this channel.
         def broadcast_to(model, message)
-          ActionCable.server.broadcast(broadcasting_for([ channel_name, model ]), message)
+          ActionCable.server.broadcast(broadcasting_for([channel_name, model]), message)
         end
 
         def broadcasting_for(model) #:nodoc:

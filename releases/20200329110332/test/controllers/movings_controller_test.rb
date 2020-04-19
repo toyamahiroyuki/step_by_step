@@ -15,5 +15,4 @@ class MovingsControllerTest < ActionDispatch::IntegrationTest
     get movings_edit_url
     assert_response :success
   end
-
 end

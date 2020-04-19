@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'ipaddr'
 
@@ -10,29 +11,29 @@ class TestDomainName < Test::Unit::TestCase
       '.example',
       '.example.com',
       '.example.example',
-    ].each { |hostname|
+    ].each do |hostname|
       assert_raises(ArgumentError) { DomainName.new(hostname) }
-    }
+    end
   end
 
   test "accept a String-alike for initialization" do
-    Object.new.tap { |obj|
+    Object.new.tap do |obj|
       def obj.to_str
         "Example.org"
       end
       assert_equal "example.org", DomainName.new(obj).hostname
-    }
+    end
 
-    Object.new.tap { |obj|
+    Object.new.tap do |obj|
       def obj.to_str
         123
       end
       assert_raises(TypeError) { DomainName.new(obj) }
-    }
+    end
 
-    Object.new.tap { |obj|
+    Object.new.tap do |obj|
       assert_raises(TypeError) { DomainName.new(obj) }
-    }
+    end
   end
 
   test "parse canonical domain names correctly" do
@@ -125,13 +126,13 @@ class TestDomainName < Test::Unit::TestCase
       ['www.xn--85x722f.xn--fiqs8s', 'xn--85x722f.xn--fiqs8s', true, 'xn--fiqs8s', true],
       ['shishi.xn--fiqs8s', 'shishi.xn--fiqs8s', true, 'xn--fiqs8s', true],
       ['xn--fiqs8s', nil, false, 'xn--fiqs8s', true],
-    ].each { |hostname, domain, canonical, tld, canonical_tld|
+    ].each do |hostname, domain, canonical, tld, canonical_tld|
       dn = DomainName.new(hostname)
       assert_equal(domain, dn.domain, hostname + ':domain')
       assert_equal(canonical, dn.canonical?, hostname + ':canoninal?')
       assert_equal(tld, dn.tld, hostname + ':tld')
       assert_equal(canonical_tld, dn.canonical_tld?, hostname + ':canoninal_tld?')
-    }
+    end
   end
 
   test "compare hostnames correctly" do
@@ -141,14 +142,14 @@ class TestDomainName < Test::Unit::TestCase
       ["abc.def.foo.com", "foo.com", -1],
       ["abc.def.foo.com", "ABC.def.FOO.com", 0],
       ["abc.def.foo.com", "bar.com", nil],
-    ].each { |x, y, v|
+    ].each do |x, y, v|
       dx, dy = DomainName(x), DomainName(y)
       [
         [dx, y, v],
         [dx, dy, v],
         [dy, x, v ? -v : v],
         [dy, dx, v ? -v : v],
-      ].each { |a, b, expected|
+      ].each do |a, b, expected|
         assert_equal expected, a <=> b
         case expected
         when 1
@@ -176,8 +177,8 @@ class TestDomainName < Test::Unit::TestCase
           assert_equal(nil,   a >= b)
           assert_equal(nil,   a >  b)
         end
-      }
-    }
+      end
+    end
   end
 
   test "check cookie domain correctly" do
@@ -243,16 +244,16 @@ class TestDomainName < Test::Unit::TestCase
         ['b.city.sapporo.jp', true],
         ['a.b.city.sapporo.jp', false],
       ],
-    }.each_pair { |host, pairs|
+    }.each_pair do |host, pairs|
       dn = DomainName(host)
       assert_equal(true, dn.cookie_domain?(host.upcase, true),     dn.to_s)
       assert_equal(true, dn.cookie_domain?(host.downcase, true),   dn.to_s)
       assert_equal(false, dn.cookie_domain?("www." << host, true), dn.to_s)
-      pairs.each { |domain, expected|
+      pairs.each do |domain, expected|
         assert_equal(expected, dn.cookie_domain?(domain),             "%s - %s" % [dn.to_s, domain])
         assert_equal(expected, dn.cookie_domain?(DomainName(domain)), "%s - %s" % [dn.to_s, domain])
-      }
-    }
+      end
+    end
   end
 
   test "parse IPv4 addresseses" do
@@ -273,7 +274,7 @@ class TestDomainName < Test::Unit::TestCase
   test "parse IPv6 addresseses" do
     a = '2001:200:dff:fff1:216:3eff:feb1:44d7'
     b = '2001:0200:0dff:fff1:0216:3eff:feb1:44d7'
-    [b, b.upcase, "[#{b}]", "[#{b.upcase}]"].each { |host|
+    [b, b.upcase, "[#{b}]", "[#{b.upcase}]"].each do |host|
       dn = DomainName(host)
       assert_equal("[#{a}]", dn.uri_host)
       assert_equal(a, dn.hostname)
@@ -286,22 +287,22 @@ class TestDomainName < Test::Unit::TestCase
       assert_equal(true, dn.cookie_domain?(a))
       assert_equal(true, dn.cookie_domain?(a, true))
       assert_equal(nil, dn.superdomain)
-    }
+    end
   end
 
   test "get superdomain" do
     [
-      %w[www.sub.example.local sub.example.local example.local local],
-      %w[www.sub.example.com sub.example.com example.com com],
-    ].each { |domain, *superdomains|
+      %w(www.sub.example.local sub.example.local example.local local),
+      %w(www.sub.example.com sub.example.com example.com com),
+    ].each do |domain, *superdomains|
       dn = DomainName(domain)
-      superdomains.each { |superdomain|
+      superdomains.each do |superdomain|
         sdn = DomainName(superdomain)
         assert_equal sdn, dn.superdomain
         dn = sdn
-      }
+      end
       assert_equal nil, dn.superdomain
-    }
+    end
   end
 
   test "have idn methods" do

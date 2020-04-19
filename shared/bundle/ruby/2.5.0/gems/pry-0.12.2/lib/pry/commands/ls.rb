@@ -19,8 +19,8 @@ class Pry
       exception_constant_color: :magenta, # e.g. Exception, RuntimeError
       unloaded_constant_color: :yellow, # Any constant that is still in .autoload? state
       separator: "  ",
-      ceiling: [Object, Module, Class]
-    }
+      ceiling: [Object, Module, Class],
+    }.freeze
 
     match 'ls'
     group 'Context'
@@ -82,7 +82,7 @@ class Pry
         no_user_opts: no_user_opts?,
         opts: opts,
         args: args,
-        _pry_: _pry_
+        _pry_: _pry_,
       })
 
       _pry_.pager.page ls_entity.entities_table
@@ -98,7 +98,7 @@ class Pry
         ['-g does not make sense with a specified Object', :globals, any_args],
         ['-q does not make sense with -v',                 :quiet, opts.present?(:verbose)],
         ['-M only makes sense with a Module or a Class',   'instance-methods', non_mod_interrogatee],
-        ['-c only makes sense with a Module or a Class',   :constants, any_args && non_mod_interrogatee]
+        ['-c only makes sense with a Module or a Class',   :constants, any_args && non_mod_interrogatee],
       ]
     end
 

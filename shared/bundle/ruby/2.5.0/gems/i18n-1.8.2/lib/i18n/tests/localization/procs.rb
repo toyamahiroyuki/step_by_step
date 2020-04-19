@@ -64,52 +64,52 @@ module I18n
 
         protected
 
-          def self.inspect_args(args)
-            args = args.map do |arg|
-              case arg
-              when ::Time, ::DateTime
-                arg.strftime('%a, %d %b %Y %H:%M:%S %Z').sub('+0000', '+00:00')
-              when ::Date
-                arg.strftime('%a, %d %b %Y')
-              when Hash
-                arg.delete(:fallback_in_progress)
-                arg.inspect
-              else
-                arg.inspect
-              end
+        def self.inspect_args(args)
+          args = args.map do |arg|
+            case arg
+            when ::Time, ::DateTime
+              arg.strftime('%a, %d %b %Y %H:%M:%S %Z').sub('+0000', '+00:00')
+            when ::Date
+              arg.strftime('%a, %d %b %Y')
+            when Hash
+              arg.delete(:fallback_in_progress)
+              arg.inspect
+            else
+              arg.inspect
             end
-            "[#{args.join(', ')}]"
           end
+          "[#{args.join(', ')}]"
+        end
 
-          def setup_time_proc_translations
-            I18n.backend.store_translations :ru, {
-              :time => {
-                :formats => {
-                  :proc => lambda { |*args| I18n::Tests::Localization::Procs.inspect_args(args) }
-                }
+        def setup_time_proc_translations
+          I18n.backend.store_translations :ru, {
+            :time => {
+              :formats => {
+                :proc => lambda { |*args| I18n::Tests::Localization::Procs.inspect_args(args) },
               },
-              :date => {
-                :formats => {
-                  :proc => lambda { |*args| I18n::Tests::Localization::Procs.inspect_args(args) }
-                },
-                :'day_names' => lambda { |key, options|
-                  (options[:format] =~ /^%A/) ?
-                  %w(Воскресенье Понедельник Вторник Среда Четверг Пятница Суббота) :
-                  %w(воскресенье понедельник вторник среда четверг пятница суббота)
-                },
-                :'month_names' => lambda { |key, options|
-                  (options[:format] =~ /(%d|%e)(\s*)?(%B)/) ?
-                  %w(января февраля марта апреля мая июня июля августа сентября октября ноября декабря).unshift(nil) :
-                  %w(Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь Декабрь).unshift(nil)
-                },
-                :'abbr_month_names' => lambda { |key, options|
-                  (options[:format] =~ /(%d|%e)(\s*)(%b)/) ?
-                  %w(янв. февр. марта апр. мая июня июля авг. сент. окт. нояб. дек.).unshift(nil) :
-                  %w(янв. февр. март апр. май июнь июль авг. сент. окт. нояб. дек.).unshift(nil)
-                },
-              }
-            }
-          end
+            },
+            :date => {
+              :formats => {
+                :proc => lambda { |*args| I18n::Tests::Localization::Procs.inspect_args(args) },
+              },
+              :day_names => lambda { |key, options|
+                (options[:format] =~ /^%A/) ?
+                %w(Воскресенье Понедельник Вторник Среда Четверг Пятница Суббота) :
+                %w(воскресенье понедельник вторник среда четверг пятница суббота)
+              },
+              :month_names => lambda { |key, options|
+                (options[:format] =~ /(%d|%e)(\s*)?(%B)/) ?
+                %w(января февраля марта апреля мая июня июля августа сентября октября ноября декабря).unshift(nil) :
+                %w(Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь Декабрь).unshift(nil)
+              },
+              :abbr_month_names => lambda { |key, options|
+                (options[:format] =~ /(%d|%e)(\s*)(%b)/) ?
+                %w(янв. февр. марта апр. мая июня июля авг. сент. окт. нояб. дек.).unshift(nil) :
+                %w(янв. февр. март апр. май июнь июль авг. сент. окт. нояб. дек.).unshift(nil)
+              },
+            },
+          }
+        end
       end
     end
   end

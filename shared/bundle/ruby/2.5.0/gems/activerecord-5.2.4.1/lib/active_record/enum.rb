@@ -117,9 +117,9 @@ module ActiveRecord
       def cast(value)
         return if value.blank?
 
-        if mapping.has_key?(value)
+        if mapping.key?(value)
           value.to_s
-        elsif mapping.has_value?(value)
+        elsif mapping.value?(value)
           mapping.key(value)
         else
           assert_valid_value(value)
@@ -136,7 +136,7 @@ module ActiveRecord
       end
 
       def assert_valid_value(value)
-        unless value.blank? || mapping.has_key?(value) || mapping.has_value?(value)
+        unless value.blank? || mapping.key?(value) || mapping.value?(value)
           raise ArgumentError, "'#{value}' is not a valid #{name}"
         end
       end
@@ -145,7 +145,7 @@ module ActiveRecord
       # Workaround for Ruby 2.2 "private attribute?" warning.
       protected
 
-        attr_reader :name, :mapping, :subtype
+      attr_reader :name, :mapping, :subtype
     end
 
     def enum(definitions)
@@ -206,39 +206,40 @@ module ActiveRecord
     end
 
     private
-      def _enum_methods_module
-        @_enum_methods_module ||= begin
-          mod = Module.new
-          include mod
-          mod
-        end
-      end
 
-      ENUM_CONFLICT_MESSAGE = \
-        "You tried to define an enum named \"%{enum}\" on the model \"%{klass}\", but " \
-        "this will generate a %{type} method \"%{method}\", which is already defined " \
-        "by %{source}."
-
-      def detect_enum_conflict!(enum_name, method_name, klass_method = false)
-        if klass_method && dangerous_class_method?(method_name)
-          raise_conflict_error(enum_name, method_name, type: "class")
-        elsif klass_method && method_defined_within?(method_name, Relation)
-          raise_conflict_error(enum_name, method_name, type: "class", source: Relation.name)
-        elsif !klass_method && dangerous_attribute_method?(method_name)
-          raise_conflict_error(enum_name, method_name)
-        elsif !klass_method && method_defined_within?(method_name, _enum_methods_module, Module)
-          raise_conflict_error(enum_name, method_name, source: "another enum")
-        end
+    def _enum_methods_module
+      @_enum_methods_module ||= begin
+        mod = Module.new
+        include mod
+        mod
       end
+    end
 
-      def raise_conflict_error(enum_name, method_name, type: "instance", source: "Active Record")
-        raise ArgumentError, ENUM_CONFLICT_MESSAGE % {
-          enum: enum_name,
-          klass: name,
-          type: type,
-          method: method_name,
-          source: source
-        }
+    ENUM_CONFLICT_MESSAGE = \
+      "You tried to define an enum named \"%{enum}\" on the model \"%{klass}\", but " \
+      "this will generate a %{type} method \"%{method}\", which is already defined " \
+      "by %{source}."
+
+    def detect_enum_conflict!(enum_name, method_name, klass_method = false)
+      if klass_method && dangerous_class_method?(method_name)
+        raise_conflict_error(enum_name, method_name, type: "class")
+      elsif klass_method && method_defined_within?(method_name, Relation)
+        raise_conflict_error(enum_name, method_name, type: "class", source: Relation.name)
+      elsif !klass_method && dangerous_attribute_method?(method_name)
+        raise_conflict_error(enum_name, method_name)
+      elsif !klass_method && method_defined_within?(method_name, _enum_methods_module, Module)
+        raise_conflict_error(enum_name, method_name, source: "another enum")
       end
+    end
+
+    def raise_conflict_error(enum_name, method_name, type: "instance", source: "Active Record")
+      raise ArgumentError, ENUM_CONFLICT_MESSAGE % {
+        enum: enum_name,
+        klass: name,
+        type: type,
+        method: method_name,
+        source: source,
+      }
+    end
   end
 end

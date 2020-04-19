@@ -20,7 +20,7 @@ module ActionView
       end
 
       def controller_path=(path)
-        self.class.controller_path = (path)
+        self.class.controller_path = path
       end
 
       def initialize
@@ -37,7 +37,8 @@ module ActionView
     module Behavior
       extend ActiveSupport::Concern
 
-      include ActionDispatch::Assertions, ActionDispatch::TestProcess
+      include ActionDispatch::TestProcess
+      include ActionDispatch::Assertions
       include Rails::Dom::Testing::Assertions
       include ActionController::TemplateAssertions
       include ActionView::Context
@@ -92,7 +93,7 @@ module ActionView
           super
         end
 
-      private
+        private
 
         def include_helper_modules!
           helper(helper_class) if helper_class
@@ -162,7 +163,7 @@ module ActionView
         ActiveSupport.run_load_hooks(:action_view_test_case, self)
       end
 
-    private
+      private
 
       # Need to experiment if this priority is the best one: rendered => output_buffer
       def document_root_element
@@ -249,8 +250,8 @@ module ActionView
         :@view_context_class,
         :@view_flow,
         :@_subscribers,
-        :@html_document
-      ]
+        :@html_document,
+      ].freeze
 
       def _user_defined_ivars
         instance_variables - INTERNAL_IVARS

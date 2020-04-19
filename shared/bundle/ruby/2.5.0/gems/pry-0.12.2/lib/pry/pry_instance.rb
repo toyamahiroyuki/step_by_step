@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ##
 # Pry is a powerful alternative to the standard IRB shell for Ruby. It
 # features syntax highlighting, a flexible plugin architecture, runtime
@@ -20,8 +21,6 @@
 # * https://github.com/pry/pry
 # * the IRC channel, which is #pry on the Freenode network
 #
-
-# rubocop:disable Metrics/ClassLength
 class Pry
   attr_accessor :binding_stack
   attr_accessor :custom_completions
@@ -228,14 +227,15 @@ class Pry
   end
 
   def sticky_locals
-    { _in_: input_ring,
+    {
+      _in_: input_ring,
       _out_: output_ring,
       _pry_: self,
       _ex_: last_exception && last_exception.wrapped_exception,
       _file_: last_file,
       _dir_: last_dir,
       _: proc { last_result },
-      __: proc { output_ring[-2] }
+      __: proc { output_ring[-2] },
     }.merge(config.extra_sticky_locals)
   end
 
@@ -286,7 +286,7 @@ class Pry
     # TODO: make this configurable?
     raise exception if exception
 
-    return false
+    false
   end
 
   def handle_line(line, options)
@@ -435,12 +435,11 @@ class Pry
     val = val.lstrip if /^\s\S/ !~ val
     val = val.chomp
     result = commands.process_line(val,
-      target: current_binding,
-      output: output,
-      eval_string: @eval_string,
-      pry_instance: self,
-      hooks: hooks
-    )
+                                   target: current_binding,
+                                   output: output,
+                                   eval_string: @eval_string,
+                                   pry_instance: self,
+                                   hooks: hooks)
 
     # set a temporary (just so we can inject the value we want into eval_string)
     Pry.current[:pry_cmd_result] = result
@@ -480,11 +479,10 @@ class Pry
   #   pry_instance.run_command("ls -m")
   def run_command(val)
     commands.process_line(val,
-      eval_string: @eval_string,
-      target: current_binding,
-      pry_instance: self,
-      output: output
-    )
+                          eval_string: @eval_string,
+                          target: current_binding,
+                          pry_instance: self,
+                          output: output)
     Pry::Command::VOID_VALUE
   end
 
@@ -564,18 +562,18 @@ class Pry
     open_token = @indent.open_delimiters.last || @indent.stack.last
 
     c = Pry::Config.assign({
-        object: object,
-        nesting_level: binding_stack.size - 1,
-        open_token: open_token,
-        session_line: Pry.history.session_line_count + 1,
-        history_line: Pry.history.history_line_count + 1,
-        expr_number: input_ring.count,
-        _pry_: self,
-        binding_stack: binding_stack,
-        input_ring: input_ring,
-        eval_string: @eval_string,
-        cont: !@eval_string.empty?
-      })
+      object: object,
+      nesting_level: binding_stack.size - 1,
+      open_token: open_token,
+      session_line: Pry.history.session_line_count + 1,
+      history_line: Pry.history.history_line_count + 1,
+      expr_number: input_ring.count,
+      _pry_: self,
+      binding_stack: binding_stack,
+      input_ring: input_ring,
+      eval_string: @eval_string,
+      cont: !@eval_string.empty?,
+    })
 
     Pry.critical_section do
       # If input buffer is empty then use normal prompt
@@ -599,7 +597,7 @@ class Pry
 
   # the array that the prompt stack is stored in
   def prompt_stack
-    @prompt_stack ||= Array.new
+    @prompt_stack ||= []
   end
   private :prompt_stack
 
@@ -686,9 +684,13 @@ class Pry
     end
   end
 
-  def raise_up(*args); raise_up_common(false, *args); end
+  def raise_up(*args)
+    raise_up_common(false, *args)
+  end
 
-  def raise_up!(*args); raise_up_common(true, *args); end
+  def raise_up!(*args)
+    raise_up_common(true, *args)
+  end
 
   # Convenience accessor for the `quiet` config key.
   # @return [Boolean]
@@ -696,4 +698,3 @@ class Pry
     config.quiet
   end
 end
-# rubocop:enable Metrics/ClassLength

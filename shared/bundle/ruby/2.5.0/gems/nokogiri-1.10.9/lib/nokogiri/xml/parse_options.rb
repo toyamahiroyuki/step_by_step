@@ -74,13 +74,13 @@ module Nokogiri
       DEFAULT_HTML = RECOVER | NOERROR | NOWARNING | NONET
 
       attr_accessor :options
-      def initialize options = STRICT
+      def initialize(options = STRICT)
         @options = options
       end
 
       constants.each do |constant|
         next if constant.to_sym == :STRICT
-        class_eval %{
+        class_eval %(
           def #{constant.downcase}
             @options |= #{constant}
             self
@@ -94,7 +94,7 @@ module Nokogiri
           def #{constant.downcase}?
             #{constant} & @options == #{constant}
           end
-        }
+        )
       end
 
       def strict

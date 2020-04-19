@@ -9,8 +9,10 @@ class DeviseController < Devise.parent_controller.constantize
   end
 
   if respond_to?(:helper_method)
-    helpers = %w(resource scope_name resource_name signed_in_resource
-                 resource_class resource_params devise_mapping)
+    helpers = %w(
+      resource scope_name resource_name signed_in_resource
+      resource_class resource_params devise_mapping
+    )
     helper_method(*helpers)
   end
 
@@ -26,9 +28,9 @@ class DeviseController < Devise.parent_controller.constantize
   # itself. Changing its visibility may break other gems.
   def _prefixes #:nodoc:
     @_prefixes ||= if self.class.scoped_views? && request && devise_mapping
-      ["#{devise_mapping.scoped_path}/#{controller_name}"] + super
-    else
-      super
+                     ["#{devise_mapping.scoped_path}/#{controller_name}"] + super
+                   else
+                     super
     end
   end
 
@@ -105,10 +107,10 @@ MESSAGE
     no_input = devise_mapping.no_input_strategies
 
     authenticated = if no_input.present?
-      args = no_input.dup.push scope: resource_name
-      warden.authenticate?(*args)
-    else
-      warden.authenticated?(resource_name)
+                      args = no_input.dup.push scope: resource_name
+                      warden.authenticate?(*args)
+                    else
+                      warden.authenticated?(resource_name)
     end
 
     if authenticated && resource = warden.user(resource_name)
@@ -122,10 +124,10 @@ MESSAGE
   # and instructions were sent.
   def successfully_sent?(resource)
     notice = if Devise.paranoid
-      resource.errors.clear
-      :send_paranoid_instructions
-    elsif resource.errors.empty?
-      :send_instructions
+               resource.errors.clear
+               :send_paranoid_instructions
+             elsif resource.errors.empty?
+               :send_instructions
     end
 
     if notice

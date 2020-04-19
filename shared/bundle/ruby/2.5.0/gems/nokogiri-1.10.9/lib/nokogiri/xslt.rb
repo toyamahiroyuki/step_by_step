@@ -9,7 +9,7 @@ module Nokogiri
     #
     #   xslt = Nokogiri::XSLT(File.read(ARGV[0]))
     #
-    def XSLT stylesheet, modules = {}
+    def XSLT(stylesheet, modules = {})
       XSLT.parse(stylesheet, modules)
     end
   end
@@ -21,7 +21,7 @@ module Nokogiri
     class << self
       ###
       # Parse the stylesheet in +string+, register any +modules+
-      def parse string, modules = {}
+      def parse(string, modules = {})
         modules.each do |url, klass|
           XSLT.register url, klass
         end
@@ -35,15 +35,15 @@ module Nokogiri
 
       ###
       # Quote parameters in +params+ for stylesheet safety
-      def quote_params params
+      def quote_params(params)
         parray = (params.instance_of?(Hash) ? params.to_a.flatten : params).dup
-        parray.each_with_index do |v,i|
+        parray.each_with_index do |v, i|
           if i % 2 > 0
-            parray[i]=
+            parray[i] =
               if v =~ /'/
-                "concat('#{ v.gsub(/'/, %q{', "'", '}) }')"
+                "concat('#{v.gsub(/'/, %q(', "'", '))}')"
               else
-                "'#{v}'";
+                "'#{v}'"
               end
           else
             parray[i] = v.to_s

@@ -16,7 +16,7 @@ module Dotenv
           \{?           # allow brace wrapping
           ([A-Z0-9_]+)? # optional alpha nums
           \}?           # closing brace
-        /xi
+        /xi.freeze
 
         def call(value, env, is_load)
           combined_env = if is_load

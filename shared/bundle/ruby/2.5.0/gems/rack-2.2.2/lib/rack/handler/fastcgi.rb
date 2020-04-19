@@ -9,7 +9,7 @@ if defined? FCGI::Stream
 
     def read(n, buffer = nil)
       buf = _rack_read_without_buffer n
-      buffer.replace(buf.to_s)  if buffer
+      buffer.replace(buf.to_s) if buffer
       buf
     end
   end
@@ -24,9 +24,9 @@ module Rack
         elsif options[:Port]
           STDIN.reopen(TCPServer.new(options[:Host], options[:Port]))
         end
-        FCGI.each { |request|
+        FCGI.each do |request|
           serve request, app
-        }
+        end
       end
 
       def self.valid_options
@@ -44,25 +44,25 @@ module Rack
         env = request.env
         env.delete "HTTP_CONTENT_LENGTH"
 
-        env[SCRIPT_NAME] = ""  if env[SCRIPT_NAME] == "/"
+        env[SCRIPT_NAME] = "" if env[SCRIPT_NAME] == "/"
 
         rack_input = RewindableInput.new(request.in)
 
         env.update(
-          RACK_VERSION      => Rack::VERSION,
-          RACK_INPUT        => rack_input,
-          RACK_ERRORS       => request.err,
-          RACK_MULTITHREAD  => false,
+          RACK_VERSION => Rack::VERSION,
+          RACK_INPUT => rack_input,
+          RACK_ERRORS => request.err,
+          RACK_MULTITHREAD => false,
           RACK_MULTIPROCESS => true,
-          RACK_RUNONCE      => false,
-          RACK_URL_SCHEME   => ["yes", "on", "1"].include?(env[HTTPS]) ? "https" : "http"
+          RACK_RUNONCE => false,
+          RACK_URL_SCHEME => ["yes", "on", "1"].include?(env[HTTPS]) ? "https" : "http"
         )
 
         env[QUERY_STRING] ||= ""
         env[HTTP_VERSION] ||= env[SERVER_PROTOCOL]
         env[REQUEST_PATH] ||= "/"
-        env.delete "CONTENT_TYPE"  if env["CONTENT_TYPE"] == ""
-        env.delete "CONTENT_LENGTH"  if env["CONTENT_LENGTH"] == ""
+        env.delete "CONTENT_TYPE" if env["CONTENT_TYPE"] == ""
+        env.delete "CONTENT_LENGTH" if env["CONTENT_LENGTH"] == ""
 
         begin
           status, headers, body = app.call(env)
@@ -70,7 +70,7 @@ module Rack
             send_headers request.out, status, headers
             send_body request.out, body
           ensure
-            body.close  if body.respond_to? :close
+            body.close if body.respond_to? :close
           end
         ensure
           rack_input.close
@@ -80,20 +80,20 @@ module Rack
 
       def self.send_headers(out, status, headers)
         out.print "Status: #{status}\r\n"
-        headers.each { |k, vs|
-          vs.split("\n").each { |v|
+        headers.each do |k, vs|
+          vs.split("\n").each do |v|
             out.print "#{k}: #{v}\r\n"
-          }
-        }
+          end
+        end
         out.print "\r\n"
         out.flush
       end
 
       def self.send_body(out, body)
-        body.each { |part|
+        body.each do |part|
           out.print part
           out.flush
-        }
+        end
       end
     end
   end

@@ -6,14 +6,14 @@ module ActionView
   module Helpers #:nodoc:
     module JavaScriptHelper
       JS_ESCAPE_MAP = {
-        '\\'    => '\\\\',
-        "</"    => '<\/',
-        "\r\n"  => '\n',
-        "\n"    => '\n',
-        "\r"    => '\n',
-        '"'     => '\\"',
-        "'"     => "\\'"
-      }
+        '\\' => '\\\\',
+        "</" => '<\/',
+        "\r\n" => '\n',
+        "\n" => '\n',
+        "\r" => '\n',
+        '"' => '\\"',
+        "'" => "\\'",
+      }.freeze
 
       JS_ESCAPE_MAP["\342\200\250".dup.force_encoding(Encoding::UTF_8).encode!] = "&#x2028;"
       JS_ESCAPE_MAP["\342\200\251".dup.force_encoding(Encoding::UTF_8).encode!] = "&#x2029;"
@@ -83,7 +83,7 @@ module ActionView
           html_options[:nonce] = content_security_policy_nonce
         end
 
-        content_tag("script".freeze, javascript_cdata_section(content), html_options)
+        content_tag("script", javascript_cdata_section(content), html_options)
       end
 
       def javascript_cdata_section(content) #:nodoc:

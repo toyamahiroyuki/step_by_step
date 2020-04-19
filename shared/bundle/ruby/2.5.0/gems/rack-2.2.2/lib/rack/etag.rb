@@ -48,28 +48,28 @@ module Rack
 
     private
 
-      def etag_status?(status)
-        status == 200 || status == 201
+    def etag_status?(status)
+      status == 200 || status == 201
+    end
+
+    def etag_body?(body)
+      !body.respond_to?(:to_path)
+    end
+
+    def skip_caching?(headers)
+      headers.key?(ETAG_STRING) || headers.key?('Last-Modified')
+    end
+
+    def digest_body(body)
+      parts = []
+      digest = nil
+
+      body.each do |part|
+        parts << part
+        (digest ||= Digest::SHA256.new) << part unless part.empty?
       end
 
-      def etag_body?(body)
-        !body.respond_to?(:to_path)
-      end
-
-      def skip_caching?(headers)
-        headers.key?(ETAG_STRING) || headers.key?('Last-Modified')
-      end
-
-      def digest_body(body)
-        parts = []
-        digest = nil
-
-        body.each do |part|
-          parts << part
-          (digest ||= Digest::SHA256.new) << part unless part.empty?
-        end
-
-        [digest && digest.hexdigest.byteslice(0, 32), parts]
-      end
+      [digest && digest.hexdigest.byteslice(0, 32), parts]
+    end
   end
 end

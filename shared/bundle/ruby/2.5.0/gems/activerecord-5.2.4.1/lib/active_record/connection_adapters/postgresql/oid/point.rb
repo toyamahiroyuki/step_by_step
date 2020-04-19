@@ -51,13 +51,13 @@ module ActiveRecord
 
           private
 
-            def number_for_point(number)
-              number.to_s.gsub(/\.0$/, "")
-            end
+          def number_for_point(number)
+            number.to_s.gsub(/\.0$/, "")
+          end
 
-            def build_point(x, y)
-              ActiveRecord::Point.new(Float(x), Float(y))
-            end
+          def build_point(x, y)
+            ActiveRecord::Point.new(Float(x), Float(y))
+          end
         end
       end
     end

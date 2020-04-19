@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'support'
 require 'mustermann'
 
@@ -58,6 +59,7 @@ describe Mustermann::Composite do
 
       context "without expandable patterns" do
         subject(:pattern) { Mustermann.new('/foo/:name', '/:first/:second', type: :simple) }
+
         example { subject.should_not respond_to(:expand) }
         example { expect { subject.expand(name: 'bar') }.to raise_error(NotImplementedError) }
       end
@@ -69,6 +71,7 @@ describe Mustermann::Composite do
 
       context "without patterns implementing to_templates" do
         subject(:pattern) { Mustermann.new('/foo/:name', '/:first/:second', type: :simple) }
+
         example { should_not respond_to(:to_templates) }
         example { expect { subject.to_templates }.to raise_error(NotImplementedError) }
       end
@@ -99,7 +102,7 @@ describe Mustermann::Composite do
     end
 
     describe :params do
-      example { subject.params("/foo/bar") .should be == { "name"  => "bar" } }
+      example { subject.params("/foo/bar") .should be == { "name" => "bar" } }
       example { subject.params("/fox/bar") .should be_nil                     }
       example { subject.params("/foo")     .should be_nil                     }
     end

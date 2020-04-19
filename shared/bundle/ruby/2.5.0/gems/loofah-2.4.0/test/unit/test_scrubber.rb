@@ -1,11 +1,10 @@
 require "helper"
 
 class UnitTestScrubber < Loofah::TestCase
-
-  FRAGMENT = "<span>hello</span><span>goodbye</span>"
+  FRAGMENT = "<span>hello</span><span>goodbye</span>".freeze
   FRAGMENT_NODE_COUNT         = 4 # span, text, span, text
   FRAGMENT_NODE_STOP_TOP_DOWN = 2 # span, span
-  DOCUMENT = "<html><head><link></link></head><body><span>hello</span><span>goodbye</span></body></html>"
+  DOCUMENT = "<html><head><link></link></head><body><span>hello</span><span>goodbye</span></body></html>".freeze
   DOCUMENT_NODE_COUNT         = 8 # html, head, link, body, span, text, span, text
   DOCUMENT_NODE_STOP_TOP_DOWN = 1 # html
 
@@ -67,7 +66,7 @@ class UnitTestScrubber < Loofah::TestCase
 
     context "not specifying direction" do
       before do
-        @scrubber = Loofah::Scrubber.new() do |node|
+        @scrubber = Loofah::Scrubber.new do |node|
           @count += 1
           Loofah::Scrubber::STOP
         end
@@ -123,9 +122,9 @@ class UnitTestScrubber < Loofah::TestCase
 
     context "invalid direction" do
       it "raise an exception" do
-        assert_raises(ArgumentError) {
-          Loofah::Scrubber.new(:direction => :quux) { }
-        }
+        assert_raises(ArgumentError) do
+          Loofah::Scrubber.new(:direction => :quux) {}
+        end
       end
     end
 
@@ -148,7 +147,7 @@ class UnitTestScrubber < Loofah::TestCase
       @klass = Class.new(Loofah::Scrubber) do
         attr_accessor :count
 
-        def initialize(direction=nil)
+        def initialize(direction = nil)
           @direction = direction
           @count = 0
         end
@@ -215,15 +214,15 @@ class UnitTestScrubber < Loofah::TestCase
   context "creating a new Scrubber class with no scrub method" do
     before do
       @klass = Class.new(Loofah::Scrubber) do
-        def initialize ; end
+        def initialize; end
       end
       @scrubber = @klass.new
     end
 
     it "raise an exception" do
-      assert_raises(Loofah::ScrubberNotFound) {
+      assert_raises(Loofah::ScrubberNotFound) do
         Loofah.scrub_fragment(FRAGMENT, @scrubber)
-      }
+      end
     end
   end
 end

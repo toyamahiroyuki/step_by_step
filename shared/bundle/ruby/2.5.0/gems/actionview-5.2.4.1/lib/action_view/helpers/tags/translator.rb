@@ -20,24 +20,24 @@ module ActionView
         # Workaround for Ruby 2.2 "private attribute?" warning.
         protected
 
-          attr_reader :object_name, :method_and_value, :scope, :model
+        attr_reader :object_name, :method_and_value, :scope, :model
 
         private
 
-          def i18n_default
-            if model
-              key = model.model_name.i18n_key
-              ["#{key}.#{method_and_value}".to_sym, ""]
-            else
-              ""
-            end
+        def i18n_default
+          if model
+            key = model.model_name.i18n_key
+            ["#{key}.#{method_and_value}".to_sym, ""]
+          else
+            ""
           end
+        end
 
-          def human_attribute_name
-            if model && model.class.respond_to?(:human_attribute_name)
-              model.class.human_attribute_name(method_and_value)
-            end
+        def human_attribute_name
+          if model && model.class.respond_to?(:human_attribute_name)
+            model.class.human_attribute_name(method_and_value)
           end
+        end
       end
     end
   end

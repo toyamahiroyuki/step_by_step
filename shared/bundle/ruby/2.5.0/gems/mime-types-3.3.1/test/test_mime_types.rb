@@ -5,7 +5,7 @@ require 'minitest_helper'
 
 describe MIME::Types do
   def mime_types
-    @mime_types ||= MIME::Types.new.tap { |mt|
+    @mime_types ||= MIME::Types.new.tap do |mt|
       mt.add MIME::Type.new(['text/plain', %w(txt)]),
              MIME::Type.new(['image/jpeg', %w(jpg jpeg)]),
              MIME::Type.new('application/x-wordperfect6.1'),
@@ -19,7 +19,7 @@ describe MIME::Types do
                'extensions' => 'gz',
                'registered' => true
              )
-    }
+    end
   end
 
   describe 'is enumerable' do

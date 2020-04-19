@@ -80,14 +80,14 @@ module ActiveJob
     # queueing adapter.
     def serialize
       {
-        "job_class"  => self.class.name,
-        "job_id"     => job_id,
+        "job_class" => self.class.name,
+        "job_id" => job_id,
         "provider_job_id" => provider_job_id,
         "queue_name" => queue_name,
-        "priority"   => priority,
-        "arguments"  => serialize_arguments_if_needed(arguments),
+        "priority" => priority,
+        "arguments" => serialize_arguments_if_needed(arguments),
         "executions" => executions,
-        "locale"     => I18n.locale.to_s
+        "locale" => I18n.locale.to_s,
       }
     end
 
@@ -128,31 +128,32 @@ module ActiveJob
     end
 
     private
-      def serialize_arguments_if_needed(arguments)
-        if arguments_serialized?
-          @serialized_arguments
-        else
-          serialize_arguments(arguments)
-        end
-      end
 
-      def deserialize_arguments_if_needed
-        if arguments_serialized?
-          @arguments = deserialize_arguments(@serialized_arguments)
-          @serialized_arguments = nil
-        end
+    def serialize_arguments_if_needed(arguments)
+      if arguments_serialized?
+        @serialized_arguments
+      else
+        serialize_arguments(arguments)
       end
+    end
 
-      def serialize_arguments(arguments)
-        Arguments.serialize(arguments)
+    def deserialize_arguments_if_needed
+      if arguments_serialized?
+        @arguments = deserialize_arguments(@serialized_arguments)
+        @serialized_arguments = nil
       end
+    end
 
-      def deserialize_arguments(serialized_args)
-        Arguments.deserialize(serialized_args)
-      end
+    def serialize_arguments(arguments)
+      Arguments.serialize(arguments)
+    end
 
-      def arguments_serialized?
-        defined?(@serialized_arguments) && @serialized_arguments
-      end
+    def deserialize_arguments(serialized_args)
+      Arguments.deserialize(serialized_args)
+    end
+
+    def arguments_serialized?
+      defined?(@serialized_arguments) && @serialized_arguments
+    end
   end
 end

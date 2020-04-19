@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Rack
-
   # Sets the Content-Type header on responses which don't have one.
   #
   # Builder Usage:

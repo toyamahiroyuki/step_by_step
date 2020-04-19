@@ -29,10 +29,10 @@ module ActiveSupport
     module ClassMethods
       def config
         @_config ||= if respond_to?(:superclass) && superclass.respond_to?(:config)
-          superclass.config.inheritable_copy
-        else
-          # create a new "anonymous" class that will host the compiled reader methods
-          Class.new(Configuration).new
+                       superclass.config.inheritable_copy
+                     else
+                       # create a new "anonymous" class that will host the compiled reader methods
+                       Class.new(Configuration).new
         end
       end
 
@@ -110,7 +110,7 @@ module ActiveSupport
         options = names.extract_options!
 
         names.each do |name|
-          raise NameError.new("invalid config attribute name") unless /\A[_A-Za-z]\w*\z/.match?(name)
+          raise NameError, "invalid config attribute name" unless /\A[_A-Za-z]\w*\z/.match?(name)
 
           reader, reader_line = "def #{name}; config.#{name}; end", __LINE__
           writer, writer_line = "def #{name}=(value); config.#{name} = value; end", __LINE__

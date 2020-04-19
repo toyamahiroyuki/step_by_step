@@ -22,16 +22,16 @@ class TestCase < Minitest::Test
       Thread.new do
         w.start
       end
-      until w.status==:Running
+      until w.status == :Running
         sleep 0.1
       end
     end
   end
 
   def stop_webrick
-    if w=@webrick
+    if w = @webrick
       w.shutdown
-      until w.status==:Stop
+      until w.status == :Stop
         sleep 0.1
       end
     end
@@ -46,7 +46,7 @@ class TestCase < Minitest::Test
     end
   end
 
-  def work_dir(r=recipe)
+  def work_dir(r = recipe)
     "tmp/#{r.host}/ports/#{r.name}/#{r.version}/#{r.name}-#{r.version}"
   end
 

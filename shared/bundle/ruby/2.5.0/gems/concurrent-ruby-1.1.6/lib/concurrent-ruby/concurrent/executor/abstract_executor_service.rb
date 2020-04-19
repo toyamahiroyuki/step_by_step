@@ -4,7 +4,6 @@ require 'concurrent/executor/executor_service'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # @!macro abstract_executor_service_public_api
   # @!visibility private
   class AbstractExecutorService < Synchronization::LockableObject
@@ -123,6 +122,5 @@ module Concurrent
     def ns_auto_terminate?
       @auto_terminate
     end
-
   end
 end

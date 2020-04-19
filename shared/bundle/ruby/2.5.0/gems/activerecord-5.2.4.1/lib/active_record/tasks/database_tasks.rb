@@ -50,7 +50,7 @@ module ActiveRecord
       attr_writer :current_config, :db_dir, :migrations_paths, :fixtures_path, :root, :env, :seed_loader
       attr_accessor :database_configuration
 
-      LOCAL_HOSTS = ["127.0.0.1", "localhost"]
+      LOCAL_HOSTS = ["127.0.0.1", "localhost"].freeze
 
       def check_protected_environments!
         unless ENV["DISABLE_DATABASE_ENVIRONMENT_CHECK"]
@@ -58,7 +58,7 @@ module ActiveRecord
           stored  = ActiveRecord::Base.connection.migration_context.last_stored_environment
 
           if ActiveRecord::Base.connection.migration_context.protected_environment?
-            raise ActiveRecord::ProtectedEnvironmentError.new(stored)
+            raise ActiveRecord::ProtectedEnvironmentError, stored
           end
 
           if stored && stored != current
@@ -87,9 +87,9 @@ module ActiveRecord
 
       def fixtures_path
         @fixtures_path ||= if ENV["FIXTURES_PATH"]
-          File.join(root, ENV["FIXTURES_PATH"])
-        else
-          File.join(root, "test", "fixtures")
+                             File.join(root, ENV["FIXTURES_PATH"])
+                           else
+                             File.join(root, "test", "fixtures")
         end
       end
 
@@ -107,7 +107,7 @@ module ActiveRecord
 
       def current_config(options = {})
         options.reverse_merge! env: env
-        if options.has_key?(:config)
+        if options.key?(:config)
           @current_config = options[:config]
         else
           @current_config ||= ActiveRecord::Base.configurations[options[:env]]
@@ -119,10 +119,10 @@ module ActiveRecord
         class_for_adapter(configuration["adapter"]).new(*arguments).create
         $stdout.puts "Created database '#{configuration['database']}'"
       rescue DatabaseAlreadyExists
-        $stderr.puts "Database '#{configuration['database']}' already exists"
+        warn "Database '#{configuration['database']}' already exists"
       rescue Exception => error
-        $stderr.puts error
-        $stderr.puts "Couldn't create '#{configuration['database']}' database. Please check your configuration."
+        warn error
+        warn "Couldn't create '#{configuration['database']}' database. Please check your configuration."
         raise
       end
 
@@ -135,9 +135,9 @@ module ActiveRecord
       end
 
       def create_current(environment = env)
-        each_current_configuration(environment) { |configuration|
+        each_current_configuration(environment) do |configuration|
           create configuration
-        }
+        end
         ActiveRecord::Base.establish_connection(environment.to_sym)
       end
 
@@ -146,10 +146,10 @@ module ActiveRecord
         class_for_adapter(configuration["adapter"]).new(*arguments).drop
         $stdout.puts "Dropped database '#{configuration['database']}'"
       rescue ActiveRecord::NoDatabaseError
-        $stderr.puts "Database '#{configuration['database']}' does not exist"
+        warn "Database '#{configuration['database']}' does not exist"
       rescue Exception => error
-        $stderr.puts error
-        $stderr.puts "Couldn't drop database '#{configuration['database']}'"
+        warn error
+        warn "Couldn't drop database '#{configuration['database']}'"
         raise
       end
 
@@ -158,9 +158,9 @@ module ActiveRecord
       end
 
       def drop_current(environment = env)
-        each_current_configuration(environment) { |configuration|
+        each_current_configuration(environment) do |configuration|
           drop configuration
-        }
+        end
       end
 
       def migrate
@@ -184,7 +184,7 @@ module ActiveRecord
       end
 
       def target_version
-        ENV["VERSION"].to_i if ENV["VERSION"] && !ENV["VERSION"].empty?
+        ENV["VERSION"].to_i if ENV["VERSION"].present?
       end
 
       def charset_current(environment = env)
@@ -210,15 +210,15 @@ module ActiveRecord
       end
 
       def purge_all
-        each_local_configuration { |configuration|
+        each_local_configuration do |configuration|
           purge configuration
-        }
+        end
       end
 
       def purge_current(environment = env)
-        each_current_configuration(environment) { |configuration|
+        each_current_configuration(environment) do |configuration|
           purge configuration
-        }
+        end
         ActiveRecord::Base.establish_connection(environment.to_sym)
       end
 
@@ -262,16 +262,16 @@ module ActiveRecord
       end
 
       def load_schema_current(format = ActiveRecord::Base.schema_format, file = nil, environment = env)
-        each_current_configuration(environment) { |configuration, configuration_environment|
+        each_current_configuration(environment) do |configuration, configuration_environment|
           load_schema configuration, format, file, configuration_environment
-        }
+        end
         ActiveRecord::Base.establish_connection(environment.to_sym)
       end
 
       def check_schema_file(filename)
         unless File.exist?(filename)
-          message = %{#{filename} doesn't exist yet. Run `rails db:migrate` to create it, then try again.}.dup
-          message << %{ If you do not intend to use a database, you should instead alter #{Rails.root}/config/application.rb to limit the frameworks that will be loaded.} if defined?(::Rails.root)
+          message = %(#{filename} doesn't exist yet. Run `rails db:migrate` to create it, then try again.).dup
+          message << %( If you do not intend to use a database, you should instead alter #{Rails.root}/config/application.rb to limit the frameworks that will be loaded.) if defined?(::Rails.root)
           Kernel.abort message
         end
       end
@@ -298,40 +298,40 @@ module ActiveRecord
 
       private
 
-        def class_for_adapter(adapter)
-          _key, task = @tasks.each_pair.detect { |pattern, _task| adapter[pattern] }
-          unless task
-            raise DatabaseNotSupported, "Rake tasks not supported by '#{adapter}' adapter"
+      def class_for_adapter(adapter)
+        _key, task = @tasks.each_pair.detect { |pattern, _task| adapter[pattern] }
+        unless task
+          raise DatabaseNotSupported, "Rake tasks not supported by '#{adapter}' adapter"
+        end
+        task.is_a?(String) ? task.constantize : task
+      end
+
+      def each_current_configuration(environment)
+        environments = [environment]
+        environments << "test" if environment == "development"
+
+        ActiveRecord::Base.configurations.slice(*environments).each do |configuration_environment, configuration|
+          next unless configuration["database"]
+
+          yield configuration, configuration_environment
+        end
+      end
+
+      def each_local_configuration
+        ActiveRecord::Base.configurations.each_value do |configuration|
+          next unless configuration["database"]
+
+          if local_database?(configuration)
+            yield configuration
+          else
+            warn "This task only modifies local databases. #{configuration['database']} is on a remote host."
           end
-          task.is_a?(String) ? task.constantize : task
         end
+      end
 
-        def each_current_configuration(environment)
-          environments = [environment]
-          environments << "test" if environment == "development"
-
-          ActiveRecord::Base.configurations.slice(*environments).each do |configuration_environment, configuration|
-            next unless configuration["database"]
-
-            yield configuration, configuration_environment
-          end
-        end
-
-        def each_local_configuration
-          ActiveRecord::Base.configurations.each_value do |configuration|
-            next unless configuration["database"]
-
-            if local_database?(configuration)
-              yield configuration
-            else
-              $stderr.puts "This task only modifies local databases. #{configuration['database']} is on a remote host."
-            end
-          end
-        end
-
-        def local_database?(configuration)
-          configuration["host"].blank? || LOCAL_HOSTS.include?(configuration["host"])
-        end
+      def local_database?(configuration)
+        configuration["host"].blank? || LOCAL_HOSTS.include?(configuration["host"])
+      end
     end
   end
 end

@@ -68,10 +68,10 @@ module ActiveRecord
 
     private
 
-      def relation_with(values)
-        result = Relation.create(klass, values: values)
-        result.extend(*extending_values) if extending_values.any?
-        result
-      end
+    def relation_with(values)
+      result = Relation.create(klass, values: values)
+      result.extend(*extending_values) if extending_values.any?
+      result
+    end
   end
 end

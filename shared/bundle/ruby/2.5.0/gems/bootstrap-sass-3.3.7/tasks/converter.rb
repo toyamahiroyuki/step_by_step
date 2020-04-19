@@ -1,4 +1,5 @@
 # coding: utf-8
+
 # Based on convert script from vwall/compass-twitter-bootstrap gem.
 # https://github.com/vwall/compass-twitter-bootstrap/blob/master/build/convert.rb
 #
@@ -42,9 +43,10 @@ class Converter
     @cache_path = cache_path
     @repo_url   = "https://github.com/#@repo"
     @save_to    = {
-        js:    'assets/javascripts/bootstrap',
-        scss:  'assets/stylesheets/bootstrap',
-        fonts: 'assets/fonts/bootstrap'}.merge(save_to)
+      js: 'assets/javascripts/bootstrap',
+      scss: 'assets/stylesheets/bootstrap',
+      fonts: 'assets/fonts/bootstrap',
+    }.merge(save_to)
   end
 
   def_delegators :@logger, :log, :log_status, :log_processing, :log_transform, :log_file_info, :log_processed, :log_http_get_file, :log_http_get_files, :silence_log
@@ -65,7 +67,7 @@ class Converter
     store_version
   end
 
-  def save_file(path, content, mode='w')
+  def save_file(path, content, mode = 'w')
     dir = File.dirname(path)
     FileUtils.mkdir_p(dir) unless File.directory?(dir)
     File.open(path, mode) { |file| file.write(content) }

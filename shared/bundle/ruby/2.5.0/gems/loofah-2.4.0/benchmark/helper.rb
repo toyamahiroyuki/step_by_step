@@ -30,16 +30,16 @@ class HTML5libSanitize
 
   def sanitize(html)
     HTMLParser.parse_fragment(html, {
-      :tokenizer  => HTMLSanitizer,
-      :encoding   => 'utf-8',
-      :tree       => TreeBuilders::REXML::TreeBuilder
+      :tokenizer => HTMLSanitizer,
+      :encoding => 'utf-8',
+      :tree => TreeBuilders::REXML::TreeBuilder,
     }).to_s
   end
 end
 
 BIG_FILE = File.read(File.join(File.dirname(__FILE__), "www.slashdot.com.html"))
 FRAGMENT = File.read(File.join(File.dirname(__FILE__), "fragment.html"))
-SNIPPET = "This is typical form field input in <b>length and content."
+SNIPPET = "This is typical form field input in <b>length and content.".freeze
 
 class Measure
   def initialize

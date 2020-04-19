@@ -66,7 +66,7 @@ module Byebug
     end
 
     def info
-      if Byebug.catchpoints && !Byebug.catchpoints.empty?
+      if Byebug.catchpoints.present?
         Byebug.catchpoints.each_key do |exception|
           puts("#{exception}: #{exception.is_a?(Class)}")
         end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'sinatra/version'
 fail "no need to load the Mustermann extension for #{::Sinatra::VERSION}" if ::Sinatra::VERSION >= '2.0.0'
 
@@ -25,12 +26,12 @@ module Mustermann
   #
   # @see file:README.md#Sinatra_Integration "Sinatra Integration" in the README
   module Extension
-    def compile!(verb, path, block, except: nil, capture: nil, pattern: { }, **options)
+    def compile!(verb, path, block, except: nil, capture: nil, pattern: {}, **options)
       if path.respond_to? :to_str
         pattern[:except]  = except  if except
         pattern[:capture] = capture if capture
 
-        if settings.respond_to? :pattern and settings.pattern?
+        if settings.respond_to?(:pattern) && settings.pattern?
           pattern.merge! settings.pattern do |key, local, global|
             next local unless local.is_a? Hash
             next global.merge(local) if global.is_a? Hash

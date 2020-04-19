@@ -31,43 +31,44 @@ module ActiveRecord
       end
 
       private
-        def scope_for_create
-          super.except!(klass.primary_key)
+
+      def scope_for_create
+        super.except!(klass.primary_key)
+      end
+
+      def find_target
+        scope = self.scope
+        return scope.take if skip_statement_cache?(scope)
+
+        conn = klass.connection
+        sc = reflection.association_scope_cache(conn, owner) do |params|
+          as = AssociationScope.create { params.bind }
+          target_scope.merge!(as.scope(self)).limit(1)
         end
 
-        def find_target
-          scope = self.scope
-          return scope.take if skip_statement_cache?(scope)
+        binds = AssociationScope.get_bind_values(owner, reflection.chain)
+        sc.execute(binds, conn) do |record|
+          set_inverse_instance record
+        end.first
+      rescue ::RangeError
+        nil
+      end
 
-          conn = klass.connection
-          sc = reflection.association_scope_cache(conn, owner) do |params|
-            as = AssociationScope.create { params.bind }
-            target_scope.merge!(as.scope(self)).limit(1)
-          end
+      def replace(record)
+        raise NotImplementedError, "Subclasses must implement a replace(record) method"
+      end
 
-          binds = AssociationScope.get_bind_values(owner, reflection.chain)
-          sc.execute(binds, conn) do |record|
-            set_inverse_instance record
-          end.first
-        rescue ::RangeError
-          nil
-        end
+      def set_new_record(record)
+        replace(record)
+      end
 
-        def replace(record)
-          raise NotImplementedError, "Subclasses must implement a replace(record) method"
-        end
-
-        def set_new_record(record)
-          replace(record)
-        end
-
-        def _create_record(attributes, raise_error = false, &block)
-          record = build_record(attributes, &block)
-          saved = record.save
-          set_new_record(record)
-          raise RecordInvalid.new(record) if !saved && raise_error
-          record
-        end
+      def _create_record(attributes, raise_error = false, &block)
+        record = build_record(attributes, &block)
+        saved = record.save
+        set_new_record(record)
+        raise RecordInvalid, record if !saved && raise_error
+        record
+      end
     end
   end
 end

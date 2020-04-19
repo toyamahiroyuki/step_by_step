@@ -4,7 +4,6 @@ require 'find'
 require 'shellwords'
 
 class SprocketsRailsTest < Minitest::Test
-
   def test_sprockets_digest_asset_refs
     root     = 'test/dummy_rails'
     command  = "bundle exec rake assets:precompile GEMFILE=#{GEM_PATH}/Gemfile RAILS_ENV=production"

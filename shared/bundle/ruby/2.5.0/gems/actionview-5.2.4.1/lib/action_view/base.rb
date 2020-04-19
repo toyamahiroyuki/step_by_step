@@ -139,7 +139,9 @@ module ActionView #:nodoc:
   # For more information on Builder please consult the {source
   # code}[https://github.com/jimweirich/builder].
   class Base
-    include Helpers, ::ERB::Util, Context
+    include Context
+    include ::ERB::Util
+    include Helpers
 
     # Specify the proc used to decorate input tags that refer to attributes with errors.
     cattr_accessor :field_error_proc, default: Proc.new { |html_tag, instance| "<div class=\"field_with_errors\">#{html_tag}</div>".html_safe }

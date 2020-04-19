@@ -13,7 +13,7 @@ module Devise
 
     def self.compare(klass, hashed_password, password)
       return false if hashed_password.blank?
-      bcrypt   = ::BCrypt::Password.new(hashed_password)
+      bcrypt = ::BCrypt::Password.new(hashed_password)
       if klass.pepper.present?
         password = "#{password}#{klass.pepper}"
       end

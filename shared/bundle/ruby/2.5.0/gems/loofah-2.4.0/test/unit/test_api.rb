@@ -1,10 +1,9 @@
 require "helper"
 
 class UnitTestApi < Loofah::TestCase
-
-  HTML          = "<div>a</div>\n<div>b</div>"
-  XML_FRAGMENT  = "<div>a</div>\n<div>b</div>"
-  XML           = "<root>#{XML_FRAGMENT}</root>"
+  HTML          = "<div>a</div>\n<div>b</div>".freeze
+  XML_FRAGMENT  = "<div>a</div>\n<div>b</div>".freeze
+  XML           = "<root>#{XML_FRAGMENT}</root>".freeze
 
   describe "HTML" do
     it "creates documents" do
@@ -138,5 +137,4 @@ class UnitTestApi < Loofah::TestCase
     assert_kind_of Loofah::XML::DocumentFragment,   doc
     assert_equal XML_FRAGMENT, doc.children.to_xml
   end
-
 end

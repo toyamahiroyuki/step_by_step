@@ -2,7 +2,6 @@ require 'concurrent/atomic/mutex_atomic_fixnum'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   ###################################################################
 
   # @!macro atomic_fixnum_method_initialize

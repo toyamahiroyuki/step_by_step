@@ -46,7 +46,7 @@ module Devise
       raise "Could not find a valid mapping for #{obj.inspect}"
     end
 
-    def self.find_by_path!(path, path_type=:fullpath)
+    def self.find_by_path!(path, path_type = :fullpath)
       Devise.mappings.each_value { |m| return m if path.include?(m.send(path_type)) }
       raise "Could not find a valid mapping for path #{path.inspect}"
     end
@@ -84,19 +84,19 @@ module Devise
     end
 
     def strategies
-      @strategies ||= STRATEGIES.values_at(*self.modules).compact.uniq.reverse
+      @strategies ||= STRATEGIES.values_at(*modules).compact.uniq.reverse
     end
 
     def no_input_strategies
-      self.strategies & Devise::NO_INPUT
+      strategies & Devise::NO_INPUT
     end
 
     def routes
-      @routes ||= ROUTES.values_at(*self.modules).compact.uniq
+      @routes ||= ROUTES.values_at(*modules).compact.uniq
     end
 
     def authenticatable?
-      @authenticatable ||= self.modules.any? { |m| m.to_s =~ /authenticatable/ }
+      @authenticatable ||= modules.any? { |m| m.to_s =~ /authenticatable/ }
     end
 
     def fullpath
@@ -130,36 +130,36 @@ module Devise
 
     def default_controllers(options)
       mod = options[:module] || "devise"
-      @controllers = Hash.new { |h,k| h[k] = "#{mod}/#{k}" }
+      @controllers = Hash.new { |h, k| h[k] = "#{mod}/#{k}" }
       @controllers.merge!(options[:controllers]) if options[:controllers]
-      @controllers.each { |k,v| @controllers[k] = v.to_s }
+      @controllers.each { |k, v| @controllers[k] = v.to_s }
     end
 
     def default_path_names(options)
-      @path_names = Hash.new { |h,k| h[k] = k.to_s }
+      @path_names = Hash.new { |h, k| h[k] = k.to_s }
       @path_names[:registration] = ""
       @path_names.merge!(options[:path_names]) if options[:path_names]
     end
 
     def default_constraints(options)
-      @constraints = Hash.new
+      @constraints = {}
       @constraints.merge!(options[:constraints]) if options[:constraints]
     end
 
     def default_defaults(options)
-      @defaults = Hash.new
+      @defaults = {}
       @defaults.merge!(options[:defaults]) if options[:defaults]
     end
 
     def default_used_route(options)
       singularizer = lambda { |s| s.to_s.singularize.to_sym }
 
-      if options.has_key?(:only)
-        @used_routes = self.routes & Array(options[:only]).map(&singularizer)
+      if options.key?(:only)
+        @used_routes = routes & Array(options[:only]).map(&singularizer)
       elsif options[:skip] == :all
         @used_routes = []
       else
-        @used_routes = self.routes - Array(options[:skip]).map(&singularizer)
+        @used_routes = routes - Array(options[:skip]).map(&singularizer)
       end
     end
 
@@ -169,9 +169,9 @@ module Devise
       if options[:skip_helpers] == true
         @used_helpers = @used_routes
       elsif skip = options[:skip_helpers]
-        @used_helpers = self.routes - Array(skip).map(&singularizer)
+        @used_helpers = routes - Array(skip).map(&singularizer)
       else
-        @used_helpers = self.routes
+        @used_helpers = routes
       end
     end
   end

@@ -16,7 +16,7 @@ if gems == "-I"
 end
 
 gems.split(",").each do |s|
-  name, ver = s.split(":",2)
+  name, ver = s.split(":", 2)
   gem name, ver
 end
 

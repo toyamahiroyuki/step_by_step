@@ -1,6 +1,6 @@
 module Nokogiri
   # The version of Nokogiri you are using
-  VERSION = "1.10.9"
+  VERSION = "1.10.9".freeze
 
   class VersionInfo # :nodoc:
     def jruby?
@@ -93,7 +93,9 @@ module Nokogiri
     @@instance.warnings.each do |warning|
       warn "WARNING: #{warning}"
     end
-    def self.instance; @@instance; end
+    def self.instance
+      @@instance
+    end
   end
 
   # More complete version information about libxml

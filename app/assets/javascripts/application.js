@@ -37,7 +37,26 @@ function eventCalendar() {
     }
     $('#calendar').fullCalendar({
       dayClick: function(date, jsEvent, view, resourceObj) {
-        window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
+        window.location.href = '/incomes/new?day=' + date.format();　//日付をqueryパラメーターで送信
+        // $.ajax({
+        //   url: '/incomes/new'
+        // }).done(function(res){
+        // //イベント登録用のhtmlを作成
+        // $('modal-body').html(res);
+        //  console.log($('.modal-body'))
+        // //イベント登録フォームの日付をクリックした日付とする
+        // $('#event_start_time_1i').val(date.format());
+        // $('#event_start_time_2i').val(date.format());
+        // $('#event_start_time_3i').val(date.format());
+        // //イベント登録フォームのモーダル表示
+        // $('#modal').modal();
+        // // 成功処理
+
+        // }).fail(function(date){
+        //   alert('エラーが発生しました。')
+
+        // });
+
       },
       titleFormat: 'YYYY年 M月',
       dayNamesShort: ['日', '月', '火', '水', '木', '金', '土'],

@@ -19,7 +19,7 @@ module Byebug
           file_line: location(ctx),
           pid: Process.pid,
           status: ctx.thread.status,
-          current: current_thread?(ctx)
+          current: current_thread?(ctx),
         }
       end
 

@@ -14,4 +14,3 @@ gem 'autoprefixer-rails', github: 'ai/autoprefixer-rails'
 gem 'compass', '~> 1.0.1', require: false
 
 gemspec path: '../../'
-

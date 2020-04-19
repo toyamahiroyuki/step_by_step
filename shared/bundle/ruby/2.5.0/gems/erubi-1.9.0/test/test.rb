@@ -3,8 +3,8 @@ require 'rubygems'
 unless defined?(TESTDIR)
   TESTDIR = File.dirname(__FILE__)
   LIBDIR  = TESTDIR == '.' ? '../lib' : File.dirname(TESTDIR) + '/lib'
-  $: << TESTDIR
-  $: << LIBDIR
+  $LOAD_PATH << TESTDIR
+  $LOAD_PATH << LIBDIR
 end
 
 if ENV['COVERAGE']
@@ -15,8 +15,8 @@ if ENV['COVERAGE']
   SimpleCov.instance_eval do
     start do
       add_filter "/test/"
-      add_group('Missing'){|src| src.covered_percent < 100}
-      add_group('Covered'){|src| src.covered_percent == 100}
+      add_group('Missing') { |src| src.covered_percent < 100 }
+      add_group('Covered') { |src| src.covered_percent == 100 }
     end
   end
 end
@@ -44,7 +44,10 @@ describe Erubi::Engine do
   def setup_foo
     @foo = Object.new
     @foo.instance_variable_set(:@t, self)
-    def self.a; @a; end
+    class << self
+      attr_reader :a
+    end
+
     def @foo.bar
       @t.a << "a"
       yield
@@ -60,12 +63,14 @@ describe Erubi::Engine do
       @a << 'b'
       @a.upcase
     end
+
     def self.baz
       @a << "c"
       yield
       @a << 'd'
       @a * 2
     end
+
     def self.quux
       @a << "a"
       3.times do |i|
@@ -80,7 +85,7 @@ describe Erubi::Engine do
 
   it "should handle no options" do
     list = ['&\'<>"2']
-    check_output(<<END1, <<END2, <<END3){}
+    check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <% i = 0
@@ -97,12 +102,12 @@ END1
 _buf = ::String.new; _buf << '<table>
  <tbody>
 ';   i = 0
-     list.each_with_index do |item, i| 
+     list.each_with_index do |item, i|
  _buf << '  <tr>
    <td>'; _buf << ( i+1 ).to_s; _buf << '</td>
    <td>'; _buf << ::Erubi.h(( item )); _buf << '</td>
   </tr>
-';  end 
+';  end
  _buf << ' </tbody>
 </table>
 '; _buf << ::Erubi.h(( i+1 )); _buf << '
@@ -122,42 +127,42 @@ END3
   end
 
   it "should strip only whitespace for <%, <%- and <%# tags" do
-    check_output(<<END1, <<END2, <<END3){}
-  <% 1 %>  
+    check_output(<<END1, <<END2, <<END3) {}
+  <% 1 %>
 a
-  <%- 2 %>  
+  <%- 2 %>
 b
-  <%# 3 %>  
+  <%# 3 %>
 c
- /<% 1 %>  
+ /<% 1 %>
 a
-/ <%- 2 %>  
+/ <%- 2 %>
 b
-//<%# 3 %>  
+//<%# 3 %>
 c
   <% 1 %> /
 a
-  <%- 2 %>/ 
+  <%- 2 %>/
 b
   <%# 3 %>//
 c
 END1
-_buf = ::String.new;   1   
+_buf = ::String.new;   1
  _buf << 'a
-';   2   
+';   2
  _buf << 'b
 ';
  _buf << 'c
- /'; 1 ; _buf << '  
+ /'; 1 ; _buf << '
 '; _buf << 'a
-/ '; 2 ; _buf << '  
+/ '; 2 ; _buf << '
 '; _buf << 'b
 //';
- _buf << '  
+ _buf << '
 '; _buf << 'c
 '; _buf << '  '; 1 ; _buf << ' /
 a
-'; _buf << '  '; 2 ; _buf << '/ 
+'; _buf << '  '; 2 ; _buf << '/
 b
 '; _buf << '  ';; _buf << '//
 c
@@ -167,15 +172,15 @@ END2
 a
 b
 c
- /  
+ /
 a
-/   
+/
 b
-//  
+//
 c
    /
 a
-  / 
+  /
 b
   //
 c
@@ -187,7 +192,7 @@ END3
     @options[:ensure] = true
     @options[:bufvar] = '@a'
     @a = 'bar'
-    check_output(<<END1, <<END2, <<END3){}
+    check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <% i = 0
@@ -204,12 +209,12 @@ END1
 begin; __original_outvar = @a if defined?(@a); @a = ::String.new; @a << '<table>
  <tbody>
 ';   i = 0
-     list.each_with_index do |item, i| 
+     list.each_with_index do |item, i|
  @a << '  <tr>
    <td>'; @a << ( i+1 ).to_s; @a << '</td>
    <td>'; @a << ::Erubi.h(( item )); @a << '</td>
   </tr>
-';  end 
+';  end
  @a << ' </tbody>
 </table>
 '; @a << ::Erubi.h(( i+1 )); @a << '
@@ -234,18 +239,18 @@ END3
 
   it "should have <%|= with CaptureEndEngine not escape by default" do
     eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>').src).must_equal '&'
-    eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>', :escape=>false).src).must_equal '&'
-    eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>', :escape_capture=>false).src).must_equal '&'
-    eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>', :escape=>true).src).must_equal '&amp;'
-    eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>', :escape_capture=>true).src).must_equal '&amp;'
+    eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>', :escape => false).src).must_equal '&'
+    eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>', :escape_capture => false).src).must_equal '&'
+    eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>', :escape => true).src).must_equal '&amp;'
+    eval(::Erubi::CaptureEndEngine.new('<%|= "&" %><%| %>', :escape_capture => true).src).must_equal '&amp;'
   end
 
   it "should have <%|== with CaptureEndEngine escape by default" do
     eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>').src).must_equal '&amp;'
-    eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>', :escape=>true).src).must_equal '&'
-    eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>', :escape_capture=>true).src).must_equal '&'
-    eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>', :escape=>false).src).must_equal '&amp;'
-    eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>', :escape_capture=>false).src).must_equal '&amp;'
+    eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>', :escape => true).src).must_equal '&'
+    eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>', :escape_capture => true).src).must_equal '&'
+    eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>', :escape => false).src).must_equal '&amp;'
+    eval(::Erubi::CaptureEndEngine.new('<%|== "&" %><%| %>', :escape_capture => false).src).must_equal '&amp;'
   end
 
   [['', false], ['=', true]].each do |ind, escape|
@@ -256,7 +261,7 @@ END3
       @options[:escape] = !escape
       @options[:engine] = ::Erubi::CaptureEndEngine
       setup_bar
-      check_output(<<END1, <<END2, <<END3){}
+      check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <%|=#{ind} bar do %>
@@ -292,7 +297,7 @@ END3
       @options[:escape] = escape
       @options[:engine] = ::Erubi::CaptureEndEngine
       setup_bar
-      check_output(<<END1, <<END2, <<END3){}
+      check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <%|=#{ind} bar do %>
@@ -326,7 +331,7 @@ END3
       @options[:escape] = escape
       @options[:engine] = ::Erubi::CaptureEndEngine
       setup_bar
-      check_output(<<END1, <<END2, <<END3){}
+      check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <%|=#{ind} quux do |i| %>
@@ -364,7 +369,7 @@ END3
       @options[:escape] = escape
       @options[:engine] = ::Erubi::CaptureEndEngine
       setup_bar
-      check_output(<<END1, <<END2, <<END3){}
+      check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <%|=#{ind} bar do %>
@@ -403,7 +408,7 @@ END3
       @options[:freeze] = true
       @items = [2]
       i = 0
-      check_output(<<END1, <<END2, <<END3){}
+      check_output(<<END1, <<END2, <<END3) {}
 <table>
   <% for item in @items %>
   <tr>
@@ -415,12 +420,12 @@ END3
 END1
 # frozen_string_literal: true
 @_out_buf = ::String.new; @_out_buf << '<table>
-';   for item in @items 
+';   for item in @items
  @_out_buf << '  <tr>
     <td>'; @_out_buf << ( i+1 ).to_s; @_out_buf << '</td>
     <td>'; @_out_buf << ::Erubi.h(( item )); @_out_buf << '</td>
   </tr>
-';   end 
+';   end
  @_out_buf << '</table>
 ';
 @_out_buf.to_s
@@ -438,7 +443,7 @@ END3
   it "should handle <%% and <%# syntax" do
     @items = [2]
     i = 0
-    check_output(<<END1, <<END2, <<END3){}
+    check_output(<<END1, <<END2, <<END3) {}
 <table>
 <%% for item in @items %>
   <tr>
@@ -474,11 +479,11 @@ END3
     @options[:trim] = false
     @items = [2]
     i = 0
-    check_output(<<END1, <<END2, <<END3){}
+    check_output(<<END1, <<END2, <<END3) {}
 <table>
   <% for item in @items %>
   <tr>
-    <td><%# 
+    <td><%#
     i+1
     %></td>
     <td><%== item %></td>
@@ -505,25 +510,25 @@ _buf = ::String.new; _buf << '<table>
 _buf.to_s
 END2
 <table>
-  
+
   <tr>
     <td></td>
     <td>2</td>
   </tr>
-  
+
   a
-  
+
 </table>
 END3
   end
 
-  [:escape, :escape_html].each do  |opt|
+  [:escape, :escape_html].each do |opt|
     it "should handle :#{opt} and :escapefunc options" do
       @options[opt] = true
       @options[:escapefunc] = 'h.call'
-      h = proc{|s| s.to_s*2}
+      h = proc { |s| s.to_s * 2 }
       list = ['2']
-      check_output(<<END1, <<END2, <<END3){}
+      check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <% i = 0
@@ -540,12 +545,12 @@ END1
 _buf = ::String.new; _buf << '<table>
  <tbody>
 ';   i = 0
-     list.each_with_index do |item, i| 
+     list.each_with_index do |item, i|
  _buf << '  <tr>
    <td>'; _buf << h.call(( i+1 )); _buf << '</td>
    <td>'; _buf << ( item ).to_s; _buf << '</td>
   </tr>
-';  end 
+';  end
  _buf << ' </tbody>
 </table>
 '; _buf << ( i+1 ).to_s; _buf << '
@@ -568,7 +573,7 @@ END3
   it "should handle :escape option without :escapefunc option" do
     @options[:escape] = true
     list = ['&\'<>"2']
-    check_output(<<END1, <<END2, <<END3){}
+    check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <% i = 0
@@ -584,12 +589,12 @@ END1
 __erubi = ::Erubi;_buf = ::String.new; _buf << '<table>
  <tbody>
 ';   i = 0
-     list.each_with_index do |item, i| 
+     list.each_with_index do |item, i|
  _buf << '  <tr>
    <td>'; _buf << ( i+1 ).to_s; _buf << '</td>
    <td>'; _buf << __erubi.h(( item )); _buf << '</td>
   </tr>
-';  end 
+';  end
  _buf << ' </tbody>
 </table>
 ';
@@ -610,7 +615,7 @@ END3
     @options[:preamble] = '_buf = String.new("1");'
     @options[:postamble] = "_buf[0...18]\n"
     list = ['2']
-    check_output(<<END1, <<END2, <<END3){}
+    check_output(<<END1, <<END2, <<END3) {}
 <table>
  <tbody>
   <% i = 0
@@ -627,12 +632,12 @@ END1
 _buf = String.new("1"); _buf << '<table>
  <tbody>
 ';   i = 0
-     list.each_with_index do |item, i| 
+     list.each_with_index do |item, i|
  _buf << '  <tr>
    <td>'; _buf << ( i+1 ).to_s; _buf << '</td>
    <td>'; _buf << ::Erubi.h(( item )); _buf << '</td>
   </tr>
-';  end 
+';  end
  _buf << ' </tbody>
 </table>
 '; _buf << ::Erubi.h(( i+1 )); _buf << '
@@ -645,19 +650,21 @@ END3
   end
 
   it "should have working filename accessor" do
-    Erubi::Engine.new('', :filename=>'foo.rb').filename.must_equal 'foo.rb'
+    Erubi::Engine.new('', :filename => 'foo.rb').filename.must_equal 'foo.rb'
   end
 
   it "should have working bufvar accessor" do
-    Erubi::Engine.new('', :bufvar=>'foo').bufvar.must_equal 'foo'
-    Erubi::Engine.new('', :outvar=>'foo').bufvar.must_equal 'foo'
+    Erubi::Engine.new('', :bufvar => 'foo').bufvar.must_equal 'foo'
+    Erubi::Engine.new('', :outvar => 'foo').bufvar.must_equal 'foo'
   end
 
-  it "should work with BasicObject methods" do
-    c = Class.new(BasicObject)
-    c.class_eval("def a; #{Erubi::Engine.new('2').src} end")
-    c.new.a.must_equal '2'
-  end if defined?(BasicObject)
+  if defined?(BasicObject)
+    it "should work with BasicObject methods" do
+      c = Class.new(BasicObject)
+      c.class_eval("def a; #{Erubi::Engine.new('2').src} end")
+      c.new.a.must_equal '2'
+    end
+  end
 
   it "should return frozen object" do
     Erubi::Engine.new('').frozen?.must_equal true
@@ -668,8 +675,8 @@ END3
   end
 
   it "should raise an error if a tag is not handled when a custom regexp is used" do
-    proc{Erubi::Engine.new('<%] %>', :regexp =>/<%(={1,2}|\]|-|\#|%)?(.*?)([-=])?%>([ \t]*\r?\n)?/m)}.must_raise ArgumentError
-    proc{Erubi::CaptureEndEngine.new('<%] %>', :regexp =>/<%(={1,2}|\]|-|\#|%)?(.*?)([-=])?%>([ \t]*\r?\n)?/m)}.must_raise ArgumentError
+    proc { Erubi::Engine.new('<%] %>', :regexp => /<%(={1,2}|\]|-|\#|%)?(.*?)([-=])?%>([ \t]*\r?\n)?/m) }.must_raise ArgumentError
+    proc { Erubi::CaptureEndEngine.new('<%] %>', :regexp => /<%(={1,2}|\]|-|\#|%)?(.*?)([-=])?%>([ \t]*\r?\n)?/m) }.must_raise ArgumentError
   end
 
   it "should respect the :yield_returns_buffer option for making templates return the (potentially modified) buffer" do
@@ -677,7 +684,7 @@ END3
     @options[:bufvar] = '@a'
 
     def self.bar
-      a = String.new
+      a = ''
       a << "a"
       yield 'burgers'
       case b = (yield 'salads')
@@ -688,7 +695,7 @@ END3
       end
     end
 
-    check_output(<<END1, <<END2, <<END3){}
+    check_output(<<END1, <<END2, <<END3) {}
 <%|= bar do |item| %>
 Let's eat <%= item %>!
 <% nil %><%| end %>

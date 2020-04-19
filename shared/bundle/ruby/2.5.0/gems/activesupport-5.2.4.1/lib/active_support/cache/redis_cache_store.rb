@@ -51,11 +51,11 @@ module ActiveSupport
       MAX_KEY_BYTESIZE = 1024
 
       DEFAULT_REDIS_OPTIONS = {
-        connect_timeout:    20,
-        read_timeout:       1,
-        write_timeout:      1,
+        connect_timeout: 20,
+        read_timeout: 1,
+        write_timeout: 1,
         reconnect_attempts: 0,
-      }
+      }.freeze
 
       DEFAULT_ERROR_HANDLER = -> (method:, returning:, exception:) do
         if logger
@@ -70,36 +70,37 @@ module ActiveSupport
       # Support raw values in the local cache strategy.
       module LocalCacheWithRaw # :nodoc:
         private
-          def read_entry(key, options)
-            entry = super
-            if options[:raw] && local_cache && entry
-              entry = deserialize_entry(entry.value)
-            end
-            entry
-          end
 
-          def write_entry(key, entry, options)
-            if options[:raw] && local_cache
+        def read_entry(key, options)
+          entry = super
+          if options[:raw] && local_cache && entry
+            entry = deserialize_entry(entry.value)
+          end
+          entry
+        end
+
+        def write_entry(key, entry, options)
+          if options[:raw] && local_cache
+            raw_entry = Entry.new(serialize_entry(entry, raw: true))
+            raw_entry.expires_at = entry.expires_at
+            super(key, raw_entry, options)
+          else
+            super
+          end
+        end
+
+        def write_multi_entries(entries, options)
+          if options[:raw] && local_cache
+            raw_entries = entries.map do |key, entry|
               raw_entry = Entry.new(serialize_entry(entry, raw: true))
               raw_entry.expires_at = entry.expires_at
-              super(key, raw_entry, options)
-            else
-              super
-            end
-          end
+            end.to_h
 
-          def write_multi_entries(entries, options)
-            if options[:raw] && local_cache
-              raw_entries = entries.map do |key, entry|
-                raw_entry = Entry.new(serialize_entry(entry, raw: true))
-                raw_entry.expires_at = entry.expires_at
-              end.to_h
-
-              super(raw_entries, options)
-            else
-              super
-            end
+            super(raw_entries, options)
+          else
+            super
           end
+        end
       end
 
       prepend Strategy::LocalCache
@@ -132,15 +133,16 @@ module ActiveSupport
         end
 
         private
-          def build_redis_distributed_client(urls:, **redis_options)
-            ::Redis::Distributed.new([], DEFAULT_REDIS_OPTIONS.merge(redis_options)).tap do |dist|
-              urls.each { |u| dist.add_node url: u }
-            end
-          end
 
-          def build_redis_client(url:, **redis_options)
-            ::Redis.new DEFAULT_REDIS_OPTIONS.merge(redis_options.merge(url: url))
+        def build_redis_distributed_client(urls:, **redis_options)
+          ::Redis::Distributed.new([], DEFAULT_REDIS_OPTIONS.merge(redis_options)).tap do |dist|
+            urls.each { |u| dist.add_node url: u }
           end
+        end
+
+        def build_redis_client(url:, **redis_options)
+          ::Redis.new DEFAULT_REDIS_OPTIONS.merge(redis_options.merge(url: url))
+        end
       end
 
       attr_reader :redis_options
@@ -178,8 +180,8 @@ module ActiveSupport
         @error_handler = error_handler
 
         super namespace: namespace,
-          compress: compress, compress_threshold: compress_threshold,
-          expires_in: expires_in, race_condition_ttl: race_condition_ttl
+              compress: compress, compress_threshold: compress_threshold,
+              expires_in: expires_in, race_condition_ttl: race_condition_ttl
       end
 
       def redis
@@ -313,149 +315,154 @@ module ActiveSupport
       end
 
       private
-        def set_redis_capabilities
-          case redis
-          when Redis::Distributed
-            @mget_capable = true
-            @mset_capable = false
+
+      def set_redis_capabilities
+        case redis
+        when Redis::Distributed
+          @mget_capable = true
+          @mset_capable = false
+        else
+          @mget_capable = true
+          @mset_capable = true
+        end
+      end
+
+      # Store provider interface:
+      # Read an entry from the cache.
+      def read_entry(key, options = nil)
+        failsafe :read_entry do
+          deserialize_entry redis.with { |c| c.get(key) }
+        end
+      end
+
+      def read_multi_entries(names, _options)
+        if mget_capable?
+          read_multi_mget(*names)
+        else
+          super
+        end
+      end
+
+      def read_multi_mget(*names)
+        options = names.extract_options!
+        options = merged_options(options)
+
+        keys = names.map { |name| normalize_key(name, options) }
+
+        values = failsafe(:read_multi_mget, returning: {}) do
+          redis.with { |c| c.mget(*keys) }
+        end
+
+        names.zip(values).each_with_object({}) do |(name, value), results|
+          if value
+            entry = deserialize_entry(value)
+            unless entry.nil? || entry.expired? || entry.mismatched?(normalize_version(name, options))
+              results[name] = entry.value
+            end
+          end
+        end
+      end
+
+      # Write an entry to the cache.
+      #
+      # Requires Redis 2.6.12+ for extended SET options.
+      def write_entry(key, entry, unless_exist: false, raw: false, expires_in: nil, race_condition_ttl: nil, **options)
+        serialized_entry = serialize_entry(entry, raw: raw)
+
+        # If race condition TTL is in use, ensure that cache entries
+        # stick around a bit longer after they would have expired
+        # so we can purposefully serve stale entries.
+        if race_condition_ttl && expires_in && expires_in > 0 && !raw
+          expires_in += 5.minutes
+        end
+
+        failsafe :write_entry, returning: false do
+          if unless_exist || expires_in
+            modifiers = {}
+            modifiers[:nx] = unless_exist
+            modifiers[:px] = (1000 * expires_in.to_f).ceil if expires_in
+
+            redis.with { |c| c.set key, serialized_entry, modifiers }
           else
-            @mget_capable = true
-            @mset_capable = true
+            redis.with { |c| c.set key, serialized_entry }
           end
         end
+      end
 
-        # Store provider interface:
-        # Read an entry from the cache.
-        def read_entry(key, options = nil)
-          failsafe :read_entry do
-            deserialize_entry redis.with { |c| c.get(key) }
-          end
+      # Delete an entry from the cache.
+      def delete_entry(key, options)
+        failsafe :delete_entry, returning: false do
+          redis.with { |c| c.del key }
         end
+      end
 
-        def read_multi_entries(names, _options)
-          if mget_capable?
-            read_multi_mget(*names)
+      # Nonstandard store provider API to write multiple values at once.
+      def write_multi_entries(entries, expires_in: nil, **options)
+        if entries.any?
+          if mset_capable? && expires_in.nil?
+            failsafe :write_multi_entries do
+              redis.with { |c| c.mapped_mset(serialize_entries(entries, raw: options[:raw])) }
+            end
           else
             super
           end
         end
+      end
 
-        def read_multi_mget(*names)
-          options = names.extract_options!
-          options = merged_options(options)
+      # Truncate keys that exceed 1kB.
+      def normalize_key(key, options)
+        truncate_key super.b
+      end
 
-          keys = names.map { |name| normalize_key(name, options) }
-
-          values = failsafe(:read_multi_mget, returning: {}) do
-            redis.with { |c| c.mget(*keys) }
-          end
-
-          names.zip(values).each_with_object({}) do |(name, value), results|
-            if value
-              entry = deserialize_entry(value)
-              unless entry.nil? || entry.expired? || entry.mismatched?(normalize_version(name, options))
-                results[name] = entry.value
-              end
-            end
-          end
+      def truncate_key(key)
+        if key.bytesize > max_key_bytesize
+          suffix = ":sha2:#{::Digest::SHA2.hexdigest(key)}"
+          truncate_at = max_key_bytesize - suffix.bytesize
+          "#{key.byteslice(0, truncate_at)}#{suffix}"
+        else
+          key
         end
+      end
 
-        # Write an entry to the cache.
-        #
-        # Requires Redis 2.6.12+ for extended SET options.
-        def write_entry(key, entry, unless_exist: false, raw: false, expires_in: nil, race_condition_ttl: nil, **options)
-          serialized_entry = serialize_entry(entry, raw: raw)
-
-          # If race condition TTL is in use, ensure that cache entries
-          # stick around a bit longer after they would have expired
-          # so we can purposefully serve stale entries.
-          if race_condition_ttl && expires_in && expires_in > 0 && !raw
-            expires_in += 5.minutes
-          end
-
-          failsafe :write_entry, returning: false do
-            if unless_exist || expires_in
-              modifiers = {}
-              modifiers[:nx] = unless_exist
-              modifiers[:px] = (1000 * expires_in.to_f).ceil if expires_in
-
-              redis.with { |c| c.set key, serialized_entry, modifiers }
-            else
-              redis.with { |c| c.set key, serialized_entry }
-            end
-          end
+      def deserialize_entry(serialized_entry)
+        if serialized_entry
+          entry = begin
+                      Marshal.load(serialized_entry)
+                  rescue
+                    serialized_entry
+                    end
+          entry.is_a?(Entry) ? entry : Entry.new(entry)
         end
+      end
 
-        # Delete an entry from the cache.
-        def delete_entry(key, options)
-          failsafe :delete_entry, returning: false do
-            redis.with { |c| c.del key }
-          end
+      def serialize_entry(entry, raw: false)
+        if raw
+          entry.value.to_s
+        else
+          Marshal.dump(entry)
         end
+      end
 
-        # Nonstandard store provider API to write multiple values at once.
-        def write_multi_entries(entries, expires_in: nil, **options)
-          if entries.any?
-            if mset_capable? && expires_in.nil?
-              failsafe :write_multi_entries do
-                redis.with { |c| c.mapped_mset(serialize_entries(entries, raw: options[:raw])) }
-              end
-            else
-              super
-            end
-          end
+      def serialize_entries(entries, raw: false)
+        entries.transform_values do |entry|
+          serialize_entry entry, raw: raw
         end
+      end
 
-        # Truncate keys that exceed 1kB.
-        def normalize_key(key, options)
-          truncate_key super.b
-        end
+      def failsafe(method, returning: nil)
+        yield
+      rescue ::Redis::BaseConnectionError => e
+        handle_exception exception: e, method: method, returning: returning
+        returning
+      end
 
-        def truncate_key(key)
-          if key.bytesize > max_key_bytesize
-            suffix = ":sha2:#{::Digest::SHA2.hexdigest(key)}"
-            truncate_at = max_key_bytesize - suffix.bytesize
-            "#{key.byteslice(0, truncate_at)}#{suffix}"
-          else
-            key
-          end
+      def handle_exception(exception:, method:, returning:)
+        if @error_handler
+          @error_handler.call(method: method, exception: exception, returning: returning)
         end
-
-        def deserialize_entry(serialized_entry)
-          if serialized_entry
-            entry = Marshal.load(serialized_entry) rescue serialized_entry
-            entry.is_a?(Entry) ? entry : Entry.new(entry)
-          end
-        end
-
-        def serialize_entry(entry, raw: false)
-          if raw
-            entry.value.to_s
-          else
-            Marshal.dump(entry)
-          end
-        end
-
-        def serialize_entries(entries, raw: false)
-          entries.transform_values do |entry|
-            serialize_entry entry, raw: raw
-          end
-        end
-
-        def failsafe(method, returning: nil)
-          yield
-        rescue ::Redis::BaseConnectionError => e
-          handle_exception exception: e, method: method, returning: returning
-          returning
-        end
-
-        def handle_exception(exception:, method:, returning:)
-          if @error_handler
-            @error_handler.(method: method, exception: exception, returning: returning)
-          end
-        rescue => failsafe
-          warn "RedisCacheStore ignored exception in handle_exception: #{failsafe.class}: #{failsafe.message}\n  #{failsafe.backtrace.join("\n  ")}"
-        end
+      rescue => failsafe
+        warn "RedisCacheStore ignored exception in handle_exception: #{failsafe.class}: #{failsafe.message}\n  #{failsafe.backtrace.join("\n  ")}"
+      end
     end
   end
 end

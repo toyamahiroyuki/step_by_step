@@ -1,4 +1,4 @@
-$:.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
 require "orm_adapter/version"
 
 Gem::Specification.new do |s|
@@ -33,4 +33,3 @@ Gem::Specification.new do |s|
   s.add_development_dependency "dm-sqlite-adapter", ">= 1.0"
   s.add_development_dependency "dm-active_model", ">= 1.0"
 end
-

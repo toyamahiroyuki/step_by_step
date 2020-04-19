@@ -3,7 +3,6 @@ require 'concurrent/concern/logging'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # Ensures passed jobs in a serialized order never running at the same time.
   class SerializedExecution < Synchronization::LockableObject
     include Concern::Logging

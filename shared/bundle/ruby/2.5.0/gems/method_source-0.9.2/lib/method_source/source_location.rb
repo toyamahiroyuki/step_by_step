@@ -3,7 +3,9 @@ module MethodSource
     # Ruby enterprise edition provides all the information that's
     # needed, in a slightly different way.
     def source_location
-      [__file__, __line__] rescue nil
+      [__file__, __line__]
+    rescue
+      nil
     end
   end
 
@@ -18,10 +20,9 @@ module MethodSource
         # JRuby version source_location hack
         # @return [Array] A two element array containing the source location of the method
         def source_location
-          to_java.source_location(Thread.current.to_java.getContext())
+          to_java.source_location(Thread.current.to_java.getContext)
         end
       else
-
 
         def trace_func(event, file, line, id, binding, classname)
           return unless event == 'call'
@@ -39,10 +40,14 @@ module MethodSource
         #   method definition is found.
         def source_location
           if @file.nil?
-            args =[*(1..(arity<-1 ? -arity-1 : arity ))]
+            args = [*(1..(arity < -1 ? -arity - 1 : arity))]
 
             set_trace_func method(:trace_func).to_proc
-            call(*args) rescue nil
+            begin
+              call(*args)
+            rescue
+              nil
+            end
             set_trace_func nil
             @file = File.expand_path(@file) if @file && File.exist?(File.expand_path(@file))
           end
@@ -72,8 +77,8 @@ module MethodSource
         #   file, second element is the line in the file where the
         #   proc definition is found.
         def source_location
-          self.to_s =~ /@(.*):(\d+)/
-          [$1, $2.to_i]
+          to_s =~ /@(.*):(\d+)/
+          [Regexp.last_match(1), Regexp.last_match(2).to_i]
         end
       end
     end
@@ -88,11 +93,10 @@ module MethodSource
         # JRuby version source_location hack
         # @return [Array] A two element array containing the source location of the method
         def source_location
-          to_java.source_location(Thread.current.to_java.getContext())
+          to_java.source_location(Thread.current.to_java.getContext)
         end
 
       else
-
 
         # Return the source location of an instance method for Ruby 1.8.
         # @return [Array] A two element array. First element is the

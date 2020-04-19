@@ -1,8 +1,7 @@
 require "helper"
 
 class UnitTestHelpers < Loofah::TestCase
-
-  HTML_STRING = "<div>omgwtfbbq</div>"
+  HTML_STRING = "<div>omgwtfbbq</div>".freeze
 
   describe "Helpers" do
     context ".strip_tags" do

@@ -4,9 +4,16 @@ module ActionDispatch
   class RequestEncoder # :nodoc:
     class IdentityEncoder
       def content_type; end
+
       def accept_header; end
-      def encode_params(params); params; end
-      def response_parser; -> body { body }; end
+
+      def encode_params(params)
+        params
+      end
+
+      def response_parser
+        -> body { body }
+      end
     end
 
     @encoders = { identity: IdentityEncoder.new }

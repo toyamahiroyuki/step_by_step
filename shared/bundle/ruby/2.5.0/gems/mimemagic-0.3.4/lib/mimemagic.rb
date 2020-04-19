@@ -24,10 +24,12 @@ class MimeMagic
   # * <i>:comment</i>: Comment string
   def self.add(type, options)
     extensions = [options[:extensions]].flatten.compact
-    TYPES[type] = [extensions,
-                  [options[:parents]].flatten.compact,
-                  options[:comment]]
-    extensions.each {|ext| EXTENSIONS[ext] = type }
+    TYPES[type] = [
+      extensions,
+      [options[:parents]].flatten.compact,
+      options[:comment],
+    ]
+    extensions.each { |ext| EXTENSIONS[ext] = type }
     MAGIC.unshift [type, options[:magic]] if options[:magic]
   end
 
@@ -35,18 +37,28 @@ class MimeMagic
   # you're seeing impossible conflicts (for instance, application/x-gmc-link).
   # * <i>type</i>: The mime type to remove.  All associated extensions and magic are removed too.
   def self.remove(type)
-    EXTENSIONS.delete_if {|ext, t| t == type }
-    MAGIC.delete_if {|t, m| t == type }
+    EXTENSIONS.delete_if { |ext, t| t == type }
+    MAGIC.delete_if { |t, m| t == type }
     TYPES.delete(type)
   end
 
   # Returns true if type is a text format
-  def text?; mediatype == 'text' || child_of?('text/plain'); end
+  def text?
+    mediatype == 'text' || child_of?('text/plain')
+  end
 
   # Mediatype shortcuts
-  def image?; mediatype == 'image'; end
-  def audio?; mediatype == 'audio'; end
-  def video?; mediatype == 'video'; end
+  def image?
+    mediatype == 'image'
+  end
+
+  def audio?
+    mediatype == 'audio'
+  end
+
+  def video?
+    mediatype == 'video'
+  end
 
   # Returns true if type is child of parent type
   def child_of?(parent)
@@ -105,7 +117,7 @@ class MimeMagic
   alias == eql?
 
   def self.child?(child, parent)
-    child == parent || TYPES.key?(child) && TYPES[child][1].any? {|p| child?(p, parent) }
+    child == parent || TYPES.key?(child) && TYPES[child][1].any? { |p| child?(p, parent) }
   end
 
   def self.magic_match(io, method)

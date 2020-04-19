@@ -38,6 +38,7 @@ module ActiveSupport
       end
 
       private
+
       def accumulate_descendants(klass, acc)
         if direct_descendants = @@direct_descendants[klass]
           acc.concat(direct_descendants)

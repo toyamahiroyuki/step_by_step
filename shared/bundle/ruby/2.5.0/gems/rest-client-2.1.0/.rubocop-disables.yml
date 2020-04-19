@@ -364,7 +364,7 @@ Style/UnlessElse:
 # TODO?
 # Offense count: 6
 # Cop supports --auto-correct.
-Style/UnneededPercentQ:
+Style/RedundantPercentQ:
   Enabled: false
 
 # Offense count: 5

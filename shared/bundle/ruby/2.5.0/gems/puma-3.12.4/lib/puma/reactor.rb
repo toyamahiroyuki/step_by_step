@@ -62,7 +62,6 @@ module Puma
 
     private
 
-
     # Until a request is added via the `add` method this method will internally
     # loop, waiting on the `sockets` array objects. The only object in this
     # array at first is the `@ready` IO object, which is the read end of a pipe
@@ -129,8 +128,8 @@ module Puma
         rescue IOError => e
           Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
           if sockets.any? { |socket| socket.closed? }
-            STDERR.puts "Error in select: #{e.message} (#{e.class})"
-            STDERR.puts e.backtrace
+            warn "Error in select: #{e.message} (#{e.class})"
+            warn e.backtrace
             sockets = sockets.reject { |socket| socket.closed? }
             retry
           else
@@ -138,7 +137,7 @@ module Puma
           end
         end
 
-        if ready and reads = ready[0]
+        if ready && (reads = ready[0])
           reads.each do |c|
             if c == @ready
               @mutex.synchronize do
@@ -249,16 +248,14 @@ module Puma
 
     def run_in_thread
       @thread = Thread.new do
-        begin
-          run_internal
-        rescue StandardError => e
-          STDERR.puts "Error in reactor loop escaped: #{e.message} (#{e.class})"
-          STDERR.puts e.backtrace
-          retry
-        ensure
-          @trigger.close
-          @ready.close
-        end
+        run_internal
+      rescue StandardError => e
+        warn "Error in reactor loop escaped: #{e.message} (#{e.class})"
+        warn e.backtrace
+        retry
+      ensure
+        @trigger.close
+        @ready.close
       end
     end
 
@@ -318,7 +315,7 @@ module Puma
 
         if c.timeout_at
           @timeouts << c
-          @timeouts.sort! { |a,b| a.timeout_at <=> b.timeout_at }
+          @timeouts.sort! { |a, b| a.timeout_at <=> b.timeout_at }
 
           calculate_sleep
         end
@@ -327,11 +324,9 @@ module Puma
 
     # Close all watched sockets and clear them from being watched
     def clear!
-      begin
-        @trigger << "c"
-      rescue IOError
-        Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
-      end
+      @trigger << "c"
+    rescue IOError
+      Thread.current.purge_interrupt_queue if Thread.current.respond_to? :purge_interrupt_queue
     end
 
     def shutdown
