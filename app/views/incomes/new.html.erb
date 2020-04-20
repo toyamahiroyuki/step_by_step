@@ -17,8 +17,6 @@
 
       <%= f.hidden_field :day ,value: @income_day %>
 
-      <%= hidden_field_tag( 'day', @income_day) %>
-
       <tr>
         <th>収入金額</th>
         <td><%= f.text_field :income,value: 0, class: "validate[required,custom[number]]" %>円</td>
@@ -64,39 +62,6 @@
 
 
 <% end %>
-
-
-
-    <table class="income-list-table">
-
-    <%# if current_user.incomes == nil %>
-
-    <%# else %>
-
-        <tr>
-          <th>日付</th>
-          <th>収入金額</th>
-          <th>項目</th>
-          <th>メモ</th>
-          <th></th>
-          <th></th>
-        </tr>
-    <%# end %>
-
-    <% @incomes.each do |income| %>
-
-        <tr>
-          <td><%= income.day %></td>
-          <td><%= income.income %></td>
-          <td><%= income.income_item %></td>
-          <td><%= income.income_memo %></td>
-          <td><%= link_to "編集画面へ", edit_income_path(income, day: @income_day), class:'btn btn-primary',data: {"turbolinks"=>false} %></td>
-          <td><%= link_to "削除へ", income_path(income), method: :delete, class:'btn btn-danger' %></td>
-        </tr>
-
-    <% end %>
-    </table>
-
 
  </div>
 </div>

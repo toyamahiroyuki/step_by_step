@@ -2,34 +2,55 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.cost-title {
-  h1 {
-	  position: relative;
-	  background: #f0e68c;
-	  box-shadow: 0px 0px 0px 5px #f0e68c;
-	  padding: 10px 10px;
-	  margin: 20px 20px;
-	  color: #454545;
-	  width: 550px;
-	  text-align: center;
-	  font-family: 'M PLUS Rounded 1c', sans-serif;
-	  margin: 10px auto 30px;
-	  }
-
+.cost-title h1 {
+    margin:  0;
+    position:  relative;
+    font-weight:  normal;
+    font-size: 32px;
+    text-align:  center;
+    padding: 10px 0 10px;
+    border-top: solid 1px;
+    border-bottom:  solid 1px;
+    width:  550px;
+    background-color: #ffd3a8;
+    margin: 0 auto 35px;
 }
 
-h1:after {
-  position: absolute;
-  content: '';
-  left: -7px;
-  top: -7px;
-  border-width: 0 0 15px 15px;
-  border-style: solid;
-  border-color: #fff #fff #f0e68c;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+.cost-title h1:after {
+  content:  '';
+  background-color: #b3b3b3;
+  display:  block;
+  position:  absolute;
+  left: 50%;
+  height: 60%;
+  top: 26%;
+  z-index:  -1;
+  width: 46%;
+  box-shadow: 0 0 8px 8px #b3b3b3;
+  transform: rotate(3deg);
 }
 
-.calendar {
-	width: 1000px;
-	margin-left: 220px;
+.cost-box {
+  background-image: image-url('pie_background.jpg');
+  padding:50px;
+}
+
+.cost-inbox {
+  display: flex;
+  background-size: cover;
+  border: 2px solid black;
+  border-radius: 10px;
+  box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.3);
+}
+
+.render-cost-pie {
+  width: 45%;
+  height: 450px;
+  padding:10px 20px 20px;
+  margin: 10px 20px 0;
+}
+
+.cost-table {
+  width: 50%;
+  padding: 100px 0 0;
 }

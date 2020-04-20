@@ -8,13 +8,13 @@
 
     <%= form_for(@income) do |f| %>
 
-    <%= f.hidden_field :day ,value: @income_day %>
+    <%= f.hidden_field :day ,value: @income.day %>
 
     <table class="income-blue-table">
 
         <tr>
           <th>日付</th>
-          <td><%= @income_day %></td>
+          <td><%= @income.day %></td>
         </tr>
 
         <tr>

@@ -8,13 +8,13 @@
 
     <%= form_for(@proportial_cost) do |f| %>
 
-    <%= f.hidden_field :day ,value: @income_day %></td>
+    <%= f.hidden_field :day ,value: @proportial_cost.day %></td>
 
     <table class="pro-cost-red-table">
 
       <tr>
         <th>日付</th>
-        <td><%= @income_day %></td>
+        <td><%= @proportial_cost.day %></td>
       </tr>
 
       <tr>

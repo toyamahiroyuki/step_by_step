@@ -1,0 +1,41 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<div class="cost-title">
+  <h1>今月の収入・・・<%= @total_incomes %>円</h1>
+</div>
+
+<div class="calendar">
+  <canvas id="myChart"></canvas>
+</div>
+
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'doughnut',
+
+    // The data for our dataset
+    data: {
+        labels: ['給料', '手当て', '退職金', 'その他'],
+        datasets: [{
+            label: 'My First dataset',
+            backgroundColor: ['red', 'yellow', 'blue', 'yellowgreen',],
+            borderColor: 'rgb(255, 255, 255)',
+            data: [<%= @incomes_salary %>, <%= @incomes_help %>, <%= @incomes_retirement %>, <%= @incomes_other %>]
+        }]
+    },
+
+    // Configuration options go here
+    options: {
+      legend: {
+        position: 'left',
+        labels: {
+          fontColor: 'black',
+          boxWidth: 20,
+          fontSize: 18,
+          padding: 15,
+        }
+      },
+    }
+});
+</script>

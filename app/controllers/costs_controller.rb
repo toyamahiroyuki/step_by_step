@@ -13,6 +13,8 @@ class CostsController < ApplicationController
       @proportial_cost_entertainment = user.proportial_costs.where(proportial_cost_item: "交際費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
       @proportial_cost_daily = user.proportial_costs.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
 
+      @proportial_costs = user.proportial_costs.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month)
+
       @fixed_cost = user.fixed_cost
 
       @fixed_costs = user.fixed_cost.rent.to_i + user.fixed_cost.insurance.to_i + user.fixed_cost.fixed_costs_other.to_i
@@ -37,7 +39,7 @@ class CostsController < ApplicationController
       end
       @taxes = Tax.where(fixed_cost_id: user.fixed_cost.id, created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:health) + Tax.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:pension) + Tax.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:resident) + Tax.sum(:taxes_other)
 
-      @total_cost = @proportial_cost_food + @proportial_cost_taransition + @proportial_cost_entertainment + @proportial_cost_daily + @fixed_costs + @communications + @lifelines + @loan_items.to_i + @target_items.to_i + @taxes
+      @total_cost = - @proportial_cost_food - @proportial_cost_taransition - @proportial_cost_entertainment - @proportial_cost_daily + @fixed_costs + @communications + @lifelines + @loan_items.to_i + @target_items.to_i + @taxes
    end
   end
 end

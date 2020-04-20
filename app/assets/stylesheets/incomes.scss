@@ -3,26 +3,30 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .income-title h1 {
-	  position: relative;
-	  background: #f0e68c;
-	  box-shadow: 0px 0px 0px 5px #f0e68c;
-	  padding: 10px 10px;
-	  margin: 20px 20px;
-	  color: #454545;
-	  width: 250px;
-	  text-align: center;
+    margin:  0;
+    font-size:  24px;
+    position:  relative;
+    font-weight:  normal;
+    display:  inline-block;
+    background-color: #feeaac;
+    padding:  10px;
+    margin-bottom: 15px;
+    border-radius:  2px;
 	  font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
 .income-title h1:after {
-  position: absolute;
-  content: '';
-  left: -7px;
-  top: -7px;
-  border-width: 0 0 15px 15px;
-  border-style: solid;
-  border-color: #fff #fff #f0e68c;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+    content:  '';
+    background-color: #b3b3b3;
+    display:  block;
+    position:  absolute;
+    left: 50%;
+    height: 60%;
+    top: 26%;
+    z-index:  -1;
+    width: 46%;
+    box-shadow: 0 0 8px 8px #b3b3b3;
+    transform: rotate(3deg);
 }
 
 .income-blue-table{
@@ -74,11 +78,10 @@
 }
 
 .income-list-table{
-  width: 1200px;
-  height:20px;
+  width: 100%;
+  height: 20px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 16px;
-  margin-top: 20px;
+  font-size: 18px;
 }
 
 .income-list-table tr{
@@ -91,33 +94,20 @@
 }
 
 .income-list-table th{
+  width: 20%;
   position: relative;
-  text-align: left;
-  width: 100px;
-  background-color: linen;
+  background-color: palegreen;
   text-align: center;
-  padding:  0;
-  height:10px;
+  height: 10px;
 }
 
 .income-list-table td{
-  text-align: left;
-  width: 100px;
+  width: 20%;
   text-align: center;
   background-color: #dcdcdc;
-  padding: 10px 0;
-  font-size: 20px;
+  padding: 10px 5px;
+  font-size: 18px;
   height:20px;
-}
-
-.income-list-table td input{
-  text-align: left;
-  width: 100;
-  text-align: center;
-  background-color: #d6ebff;
-  border-radius: 10px;
-  margin: 0 auto;
-  font-size: 20px;
 }
 
 .income-create-btn {
@@ -135,13 +125,45 @@
   display: inline-block;
 }
 
-.income_item {
- padding: 0;
-}
+
 
 input#income_income_item_給料,
 input#income_income_item_手当て,
 input#income_income_item_退職金,
 input#income_income_item_その他,{
 	width: 20px;
+}
+
+.income-box {
+  background-image: image-url('pie_background.jpg');
+  padding:50px;
+}
+
+.income-inbox {
+  display: flex;
+  background-size: cover;
+  border: 2px solid black;
+  border-radius: 10px;
+  box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.3);
+}
+
+.render-income-pie {
+  width: 45%;
+  height: 450px;
+  padding:10px 20px 20px;
+  margin: 10px 20px 0;
+}
+
+.income-table {
+  width: 50%;
+  padding: 100px 0 0;
+}
+
+.income-head, .income-body{
+  display:block;
+}
+
+.income-body{
+  overflow-y:scroll;
+  height:300px;
 }

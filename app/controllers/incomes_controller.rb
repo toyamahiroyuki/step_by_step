@@ -3,7 +3,6 @@ class IncomesController < ApplicationController
   def new
     @income = Income.new
     @income_day = params["day"]
-    @incomes = current_user.incomes.where(day: @income_day)
 
     # partial = render_to_string(partial: 'new', layout: false, collection: @income)
     # puts partial
@@ -27,7 +26,8 @@ class IncomesController < ApplicationController
     @incomes_retirement = user.incomes.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
     @incomes_other = user.incomes.where(income_item: "その他", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
     # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
-    @imcomes = user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes = user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month)
+    @total_incomes = user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
 
     # end
   end
@@ -46,16 +46,15 @@ class IncomesController < ApplicationController
   end
 
   def edit
-    @income_day = params["day"]
     @income = Income.find(params[:id])
   end
 
   def update
     income = Income.find(params[:id])
     if income.update(income_params)
-      redirect_to homes_top_path
+      redirect_to income_path(current_user)
     else
-      @income_day = params["day"]
+      # @income_day = params["day"]
       @income = Income.find(params[:id])
       render action: :edit
     end
@@ -65,7 +64,7 @@ class IncomesController < ApplicationController
     income = Income.find(params[:id])
     income.destroy
 
-    redirect_to homes_top_path
+    redirect_to income_path(current_user)
   end
 
   private

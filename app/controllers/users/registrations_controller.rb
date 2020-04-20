@@ -2,7 +2,11 @@
 
 class Users::RegistrationsController < Devise::RegistrationsController
   def after_sign_in_path_for(resource)
-    homes_top_path
+    if current_user.sign_in_count.zero?
+       new_fixed_costs_path
+    else
+       homes_top_path
+    end
   end
   # def after_sign_out_path_for(resource)
   #     homes_path

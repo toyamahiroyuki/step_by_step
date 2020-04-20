@@ -3,7 +3,6 @@ class ProportialCostsController < ApplicationController
   def new
     @proportial_cost = ProportialCost.new
     @income_day = params["day"]
-    @proportial_costs = ProportialCost.where(day: @income_day)
   end
 
   def create
@@ -19,17 +18,17 @@ class ProportialCostsController < ApplicationController
   end
 
   def edit
-    @income_day = params["day"]
     @proportial_cost = ProportialCost.find(params[:id])
  end
 
   def update
     proportial_cost = ProportialCost.find(params[:id])
+
     if proportial_cost.update(proportial_cost_params)
 
       redirect_to homes_top_path
     else
-      @income_day = params["day"]
+      # @income_day = params["day"]
       @proportial_cost = ProportialCost.find(params[:id])
       render action: :edit
     end

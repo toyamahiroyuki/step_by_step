@@ -84,53 +84,6 @@
   font-size: 20px;
 }
 
-.pro-cost-list-table{
-  width: 1200px;
-  height:20px;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 16px;
-  margin: 20px 0;
-}
-
-.pro-cost-list-table tr{
-  border-bottom: solid 2px white;
-  height:10px;
-}
-
-.pro-cost-list-table tr:last-child{
-  border-bottom: none;
-}
-
-.pro-cost-list-table th{
-  position: relative;
-  text-align: left;
-  width: 100px;
-  background-color: linen;
-  text-align: center;
-  padding:  0;
-  height:10px;
-}
-
-.pro-cost-list-table td{
-  text-align: left;
-  width: 100px;
-  text-align: center;
-  background-color: #dcdcdc;
-  padding: 10px 0;
-  font-size: 20px;
-  height:20px;
-}
-
-.pro-cost-list-table td input{
-  text-align: left;
-  width: 100;
-  text-align: center;
-  background-color: #d6ebff;
-  border-radius: 10px;
-  margin: 0 auto;
-  font-size: 20px;
-}
-
 .pro-cost-create-btn {
   margin: 10px 0 20px 0;
   width: 200px;
@@ -146,14 +99,54 @@
   width: 80px;
 }
 
-.pro-cost-item {
- padding: 0;
-}
-
 input#proportial_cost_proportial_cost_item_食費,
 input#proportial_cost_proportial_cost_item_交通費,
 input#proportial_cost_proportial_cost_item_交際費,
 input#proportial_cost_proportial_cost_item_日用品,
 input#proportial_cost_proportial_cost_item_その他, {
 	width: 15px;
+}
+
+.pro-cost-list-table {
+  width: 100%;
+  height: 20px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 18px;
+}
+
+.pro-cost-list-table tr {
+  width: 20%;
+  border-bottom: solid 2px white;
+  height:10px;
+}
+
+.pro-cost-list-table tr:last-child {
+  border-bottom: none;
+}
+
+.pro-cost-list-table th {
+  width: 20%;
+  position: relative;
+  background-color: palegreen;
+  text-align: center;
+  height: 10px;
+}
+
+.pro-cost-list-table td {
+  width: 20%;
+  text-align: left;
+  text-align: center;
+  background-color: #dcdcdc;
+  padding: 10px 5px;
+  font-size: 18px;
+  height:20px;
+}
+
+.pro-cost-head, .pro-cost-body{
+  display:block;
+}
+
+.pro-cost-body{
+  overflow-y: scroll;
+  height: 300px;
 }

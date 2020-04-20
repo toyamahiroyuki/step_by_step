@@ -1,0 +1,27 @@
+<table class="pro-cost-list-table">
+  <thead class="pro-cost-head">
+    <tr>
+      <th>日付</th>
+      <th>収入金額</th>
+      <th>項目</th>
+      <th>メモ</th>
+      <th><!-- レイアウト上のスペース -->　　　　</th>
+      <th><!-- レイアウト上のスペース -->　　　　</th>
+    </tr>
+  </thead>
+
+  <tbody class="pro-cost-body">
+    <% @proportial_costs.each do |proportial_cost| %>
+
+    <tr>
+      <td><%= proportial_cost.day %></td>
+      <td><%= proportial_cost.proportial_cost %>円</td>
+      <td><%= proportial_cost.proportial_cost_item %></td>
+      <td><%= proportial_cost.proportial_cost_memo %></td>
+      <td><%= link_to "編集", edit_proportial_cost_path(proportial_cost, day: @income_day), class:'btn btn-primary',data: {"turbolinks"=>false} %></td>
+      <td><%= link_to "削除", proportial_cost_path(proportial_cost), method: :delete, class:'btn btn-danger' %></td>
+    </tr>
+
+    <% end %>
+  </tbody>
+</table>

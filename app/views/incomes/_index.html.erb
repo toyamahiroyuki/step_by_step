@@ -1,0 +1,27 @@
+<table class="income-list-table">
+  <thead class="income-head">
+    <tr>
+      <th>日付</th>
+      <th>収入金額</th>
+      <th>項目</th>
+      <th>メモ</th>
+      <th><!-- レイアウト上のスペース -->　　　　</th>
+      <th><!-- レイアウト上のスペース -->　　　　</th>
+    </tr>
+  </thead>
+
+  <tbody class="income-body">
+    <% @incomes.each do |income| %>
+
+    <tr>
+      <td><%= income.day %></td>
+      <td><%= income.income %>円</td>
+      <td><%= income.income_item %></td>
+      <td><%= income.income_memo %></td>
+      <td><%= link_to "編集", edit_income_path(income, day: @income_day), class:'btn btn-primary',data: {"turbolinks"=>false} %></td>
+      <td><%= link_to "削除", income_path(income), method: :delete, class:'btn btn-danger' %></td>
+    </tr>
+
+    <% end %>
+  </tbody>
+</table>

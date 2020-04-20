@@ -27,7 +27,7 @@ class FixedCostsController < ApplicationController
 
     if @fixed_cost.save
       @lifeline.save
-      redirect_to fixed_costs_path
+      redirect_to homes_top_path
     else
       @fixed_cost = FixedCost.new
       @lifeline = Lifeline.new
