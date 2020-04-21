@@ -6,6 +6,6 @@ class Income < ApplicationRecord
   validates :income, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :income_item, presence: true
 
-  #配列のソート（昇順）
+  # 配列のソート（昇順）
   default_scope -> { order(day: :asc) }
 end

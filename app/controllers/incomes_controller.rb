@@ -21,13 +21,13 @@ class IncomesController < ApplicationController
     #                                                             # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
     #   @imcomes = current_user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
     #  else
-    @incomes_salary = user.incomes.where(income_item: "給料", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-    @incomes_help = user.incomes.where(income_item: "手当て", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-    @incomes_retirement = user.incomes.where(income_item: "退職金", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
-    @incomes_other = user.incomes.where(income_item: "その他", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes_salary = user.incomes.where(income_item: "給料", day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes_help = user.incomes.where(income_item: "手当て", day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes_retirement = user.incomes.where(income_item: "退職金", day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes_other = user.incomes.where(income_item: "その他", day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
     # @income.created_at.beginning_of_month..Time.now.end_of_month).sum(:income)
-    @incomes = user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month)
-    @total_incomes = user.incomes.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
+    @incomes = user.incomes.where(day: Time.now.beginning_of_month..Time.now.end_of_month)
+    @total_incomes = user.incomes.where(day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:income)
 
     # end
   end

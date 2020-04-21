@@ -12,20 +12,22 @@
         <h3 class="loan-item-table-title">項目と目標金額</h3>
 
           <table class="loan-item-red-table">
-
           	<tr>
           	  <th>返済額の変更</th>
           	  <td><%= f.text_field :loan_by_month, class: "validate[required,custom[number]]" %>円</td>
           	</tr>
-
           </table>
 
   	 </div>
-     <div class="loan-item-create-btn">
-      <%= f.submit "変更",class:'btn btn-primary' %>
-     </div>
-     <% end %>
     </div>
   </div>
+
+  <div class="loan-item-create-btn">
+    <%= f.submit "変更",class:'btn btn-danger btn-block' %>
+  </div>
+
+  <% end %>
+
   <div class="loan-item-space"></div>
+
 </div>

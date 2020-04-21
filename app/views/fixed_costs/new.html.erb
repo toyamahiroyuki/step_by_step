@@ -4,7 +4,7 @@
 
 <div class="fixes-cost-background">
   <div class="fixed-costs-title">
-    <h1>まずは固定費を登録しよう</h1>
+    <h1>固定費の登録</h1>
   </div>
 
   <%= form_for @fixed_cost, url: fixed_costs_path do |f| %>
@@ -36,7 +36,7 @@
 
     </div>
 
-      <div class="col-xs-1"></div>
+      <div class="col-xs-2"></div>
 
       <%= fields_for @lifeline, url: lifelines_path do |c| %>
 
@@ -68,14 +68,11 @@
       <% end %>
 
     </div>
-
-    <div class="fixed-edit-btn">
-      <%= f.submit "登録", class:'btn btn-success btn-block' %>
-    </div>
-
   </div>
 
-
+  <div class="fixed-edit-btn">
+    <%= f.submit "登録", class:'btn btn-success btn-block' %>
+  </div>
 
   <% end %>
 </div>

@@ -54,8 +54,8 @@ class TargetsController < ApplicationController
 
   def update
     target = Target.find(params[:id])
-    target_item = TargetItem.find(params[:id])
-    target.target_balance = target.target_cost - target_item.target_by_month
+    target_item = target.target_items
+    target_item.target_balance = target.target_cost - target_item.target_by_month
 
     if target.update(target_params)
       # target_item.update(target_item_params)

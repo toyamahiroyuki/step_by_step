@@ -39,7 +39,7 @@ describe RestClient::Response, :include_helpers do
   end
 
   describe "cookie processing" do
-    it "should correctly deal with one Set-Cookie header with one cookie inside" do
+    it "correctly deal with one Set-Cookie header with one cookie inside" do
       header_val = "main_page=main_page_no_rewrite; path=/; expires=Sat, 10-Jan-2037 15:03:14 GMT".freeze
 
       net_http_res = double('net http response', :to_hash => {"etag" => ["\"e1ac1a2df945942ef4cac8116366baad\""], "set-cookie" => [header_val]})
@@ -48,30 +48,30 @@ describe RestClient::Response, :include_helpers do
       expect(response.cookies).to eq({ "main_page" => "main_page_no_rewrite" })
     end
 
-    it "should correctly deal with multiple cookies [multiple Set-Cookie headers]" do
+    it "correctly deal with multiple cookies [multiple Set-Cookie headers]" do
       net_http_res = double('net http response', :to_hash => {"etag" => ["\"e1ac1a2df945942ef4cac8116366baad\""], "set-cookie" => ["main_page=main_page_no_rewrite; path=/; expires=Sat, 10-Jan-2037 15:03:14 GMT", "remember_me=; path=/; expires=Sat, 10-Jan-2037 00:00:00 GMT", "user=somebody; path=/; expires=Sat, 10-Jan-2037 00:00:00 GMT"]})
       response = RestClient::Response.create('abc', net_http_res, @request)
       expect(response.headers[:set_cookie]).to eq ["main_page=main_page_no_rewrite; path=/; expires=Sat, 10-Jan-2037 15:03:14 GMT", "remember_me=; path=/; expires=Sat, 10-Jan-2037 00:00:00 GMT", "user=somebody; path=/; expires=Sat, 10-Jan-2037 00:00:00 GMT"]
       expect(response.cookies).to eq({
         "main_page" => "main_page_no_rewrite",
         "remember_me" => "",
-        "user" => "somebody"
+        "user" => "somebody",
       })
     end
 
-    it "should correctly deal with multiple cookies [one Set-Cookie header with multiple cookies]" do
+    it "correctly deal with multiple cookies [one Set-Cookie header with multiple cookies]" do
       net_http_res = double('net http response', :to_hash => {"etag" => ["\"e1ac1a2df945942ef4cac8116366baad\""], "set-cookie" => ["main_page=main_page_no_rewrite; path=/; expires=Sat, 10-Jan-2037 15:03:14 GMT, remember_me=; path=/; expires=Sat, 10-Jan-2037 00:00:00 GMT, user=somebody; path=/; expires=Sat, 10-Jan-2037 00:00:00 GMT"]})
       response = RestClient::Response.create('abc', net_http_res, @request)
       expect(response.cookies).to eq({
         "main_page" => "main_page_no_rewrite",
         "remember_me" => "",
-        "user" => "somebody"
+        "user" => "somebody",
       })
     end
   end
 
   describe "exceptions processing" do
-    it "should return itself for normal codes" do
+    it "returns itself for normal codes" do
       (200..206).each do |code|
         net_http_res = res_double(:code => '200')
         resp = RestClient::Response.create('abc', net_http_res, @request)
@@ -79,7 +79,7 @@ describe RestClient::Response, :include_helpers do
       end
     end
 
-    it "should throw an exception for other codes" do
+    it "throws an exception for other codes" do
       RestClient::Exceptions::EXCEPTIONS_MAP.each_pair do |code, exc|
         unless (200..207).include? code
           net_http_res = res_double(:code => code.to_i)
@@ -117,16 +117,17 @@ describe RestClient::Response, :include_helpers do
     end
 
     it "follows a redirection and keep the cookies" do
-      stub_request(:get, 'http://some/resource').to_return(:body => '', :status => 301, :headers => {'Set-Cookie' => 'Foo=Bar', 'Location' => 'http://some/new_resource', })
+      stub_request(:get, 'http://some/resource').to_return(:body => '', :status => 301, :headers => {'Set-Cookie' => 'Foo=Bar', 'Location' => 'http://some/new_resource' })
       stub_request(:get, 'http://some/new_resource').with(:headers => {'Cookie' => 'Foo=Bar'}).to_return(:body => 'Qux')
       expect(RestClient::Request.execute(:url => 'http://some/resource', :method => :get).body).to eq 'Qux'
     end
 
     it 'respects cookie domains on redirect' do
       stub_request(:get, 'http://some.example.com/').to_return(:body => '', :status => 301,
-        :headers => {'Set-Cookie' => 'Foo=Bar', 'Location' => 'http://new.example.com/', })
+                                                               :headers => {'Set-Cookie' => 'Foo=Bar', 'Location' => 'http://new.example.com/' })
       stub_request(:get, 'http://new.example.com/').with(
-        :headers => {'Cookie' => 'passedthrough=1'}).to_return(:body => 'Qux')
+        :headers => {'Cookie' => 'passedthrough=1'}
+      ).to_return(:body => 'Qux')
 
       expect(RestClient::Request.execute(:url => 'http://some.example.com/', :method => :get, cookies: [HTTP::Cookie.new('passedthrough', '1', domain: 'new.example.com', path: '/')]).body).to eq 'Qux'
     end

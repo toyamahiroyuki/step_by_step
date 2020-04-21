@@ -43,7 +43,7 @@ class Uglifier
       :wrap_iife => false, # Wrap IIFEs in parenthesis. Note: this disables the negate_iife compression option.
       :shebang => true, # Preserve shebang (#!) in preamble (shell scripts)
       :quote_style => 0, # Quote style, possible values :auto (default), :single, :double, :original
-      :keep_quoted_props => false # Keep quotes property names
+      :keep_quoted_props => false, # Keep quotes property names
     },
     :mangle => {
       :eval => false, # Mangle names when eval of when is used in scope
@@ -91,7 +91,7 @@ class Uglifier
       :expression => false, # Parse a single expression, rather than a program (for parsing JSON).
       :html5_comments => true, # Ignore HTML5 comments in input
       :shebang => true, # support #!command as the first line
-      :strict => false
+      :strict => false,
     },
     :define => {}, # Define values for symbol replacement
     :keep_fnames => false, # Generate code safe for the poor souls relying on Function.prototype.name at run-time. Sets both compress and mangle keep_fanems to true.
@@ -99,7 +99,7 @@ class Uglifier
     :ie8 => true, # Generate safe code for IE8
     :source_map => false, # Generate source map
     :error_context_lines => 8, # How many lines surrounding the error line
-    :harmony => false # Enable ES6/Harmony mode (experimental). Disabling mangling and compressing is recommended with Harmony mode.
+    :harmony => false, # Enable ES6/Harmony mode (experimental). Disabling mangling and compressing is recommended with Harmony mode.
   }
 
   EXTRA_OPTIONS = [:comments, :mangle_properties]
@@ -119,7 +119,7 @@ class Uglifier
     :filename => nil, # The filename of the input file
     :root => nil, # The URL of the directory which contains :filename
     :output_filename => nil, # The filename or URL where the minified output can be found
-    :input_source_map => nil # The contents of the source map describing the input
+    :input_source_map => nil, # The contents of the source map describing the input
   }
 
   # rubocop:enable LineLength
@@ -198,8 +198,10 @@ class Uglifier
   end
 
   def source_with(path)
-    [ES5FallbackPath, SplitFallbackPath, SourceMapPath, path,
-     UglifyJSWrapperPath].map do |file|
+    [
+      ES5FallbackPath, SplitFallbackPath, SourceMapPath, path,
+      UglifyJSWrapperPath,
+    ].map do |file|
       File.open(file, "r:UTF-8", &:read)
     end.join("\n")
   end
@@ -215,7 +217,7 @@ class Uglifier
       :mangle => mangle_options,
       :parse => parse_options,
       :sourceMap => source_map_options(input_map),
-      :ie8 => ie8?
+      :ie8 => ie8?,
     }
 
     parse_result(context.call("uglifier", options), generate_map, options)
@@ -245,7 +247,7 @@ class Uglifier
       :base_index => low,
       :line_width => line_width,
       :line_format => "\e[36m%#{line_width + 1}d\e[0m ", # cyan
-      :col => column
+      :col => column,
     }
   end
 
@@ -401,8 +403,8 @@ class Uglifier
   end
 
   def output_options
-    migrate_braces(DEFAULTS[:output].merge(@options[:output] || {}))
-      .merge(:comments => comment_options, :quote_style => quote_style)
+    migrate_braces(DEFAULTS[:output].merge(@options[:output] || {})).
+      merge(:comments => comment_options, :quote_style => quote_style)
   end
 
   def migrate_braces(options)
@@ -436,13 +438,13 @@ class Uglifier
       :content => input_map,
       #:map_url => options[:map_url],
       :url => options[:url],
-      :includeSources => options[:sources_content]
+      :includeSources => options[:sources_content],
     }
   end
 
   def parse_options
-    conditional_option(@options[:parse], DEFAULTS[:parse])
-      .merge(parse_source_map_options)
+    conditional_option(@options[:parse], DEFAULTS[:parse]).
+      merge(parse_source_map_options)
   end
 
   def parse_source_map_options

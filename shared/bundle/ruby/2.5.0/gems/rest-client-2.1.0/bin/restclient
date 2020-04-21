@@ -14,7 +14,7 @@ def usage(why = nil)
   exit(1)
 end
 
-POSSIBLE_VERBS = ['get', 'put', 'post', 'delete']
+POSSIBLE_VERBS = ['get', 'put', 'post', 'delete'].freeze
 
 if POSSIBLE_VERBS.include? ARGV.first
   @verb = ARGV.shift
@@ -43,7 +43,7 @@ r # force rc to load
 
 if @verb
   begin
-    if %w( put post ).include? @verb
+    if %w(put post).include? @verb
       puts r.send(@verb, STDIN.read)
     else
       puts r.send(@verb)

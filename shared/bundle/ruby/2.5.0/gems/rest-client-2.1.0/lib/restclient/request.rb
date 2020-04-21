@@ -63,8 +63,10 @@ module RestClient
       new(args).execute(& block)
     end
 
-    SSLOptionList = %w{client_cert client_key ca_file ca_path cert_store
-                       version ciphers verify_callback verify_callback_warnings}
+    SSLOptionList = %w{
+      client_cert client_key ca_file ca_path cert_store
+      version ciphers verify_callback verify_callback_warnings
+    }.freeze
 
     def inspect
       "<RestClient::Request @method=#{@method.inspect}, @url=#{@url.inspect}>"
@@ -106,7 +108,8 @@ module RestClient
       @stream_log_percent = args[:stream_log_percent] || 10
       if @stream_log_percent <= 0 || @stream_log_percent > 100
         raise ArgumentError.new(
-          "Invalid :stream_log_percent #{@stream_log_percent.inspect}")
+          "Invalid :stream_log_percent #{@stream_log_percent.inspect}"
+        )
       end
 
       @proxy = args.fetch(:proxy) if args.include?(:proxy)
@@ -215,7 +218,7 @@ module RestClient
       end
 
       # build resulting URL with query string
-      if url_params && !url_params.empty?
+      if url_params.present?
         query_string = RestClient::Utils.encode_query_string(url_params)
 
         if url.include?('?')
@@ -265,7 +268,7 @@ module RestClient
       arr = cookie_jar.cookies(url)
       return nil if arr.empty?
 
-      return HTTP::Cookie.cookie_value(arr)
+      HTTP::Cookie.cookie_value(arr)
     end
 
     # Process cookies passed as hash or as HTTP::CookieJar. For backwards
@@ -325,7 +328,8 @@ module RestClient
       # Avoid that mess by erroring out instead.
       if headers[:cookies] && args[:cookies]
         raise ArgumentError.new(
-          "Cannot pass :cookies in Request.new() and in headers hash")
+          "Cannot pass :cookies in Request.new() and in headers hash"
+        )
       end
 
       cookies_data = headers.delete(:cookies) || args[:cookies]
@@ -359,7 +363,7 @@ module RestClient
         # assume implicit domain from the request URI, and set for_domain to
         # permit subdomains
         jar.add(HTTP::Cookie.new(key, val, domain: uri.hostname.downcase,
-                                 path: '/', for_domain: true))
+                                           path: '/', for_domain: true))
       end
 
       jar
@@ -399,8 +403,8 @@ module RestClient
         # also supplied by the user.
         payload_headers.each_pair do |key, val|
           if headers.include?(key) && headers[key] != val
-            warn("warning: Overriding #{key.inspect} header " +
-                 "#{headers.fetch(key).inspect} with #{val.inspect} " +
+            warn("warning: Overriding #{key.inspect} header " \
+                 "#{headers.fetch(key).inspect} with #{val.inspect} " \
                  "due to payload")
           end
         end
@@ -410,7 +414,7 @@ module RestClient
 
       # merge in cookies
       cookies = make_cookie_header
-      if cookies && !cookies.empty?
+      if cookies.present?
         if headers['Cookie']
           warn('warning: overriding "Cookie" header with :cookies option')
         end
@@ -468,9 +472,9 @@ module RestClient
     def net_http_do_request(http, req, body=nil, &block)
       if body && body.respond_to?(:read)
         req.body_stream = body
-        return http.request(req, nil, &block)
+        http.request(req, nil, &block)
       else
-        return http.request(req, body, &block)
+        http.request(req, body, &block)
       end
     end
 

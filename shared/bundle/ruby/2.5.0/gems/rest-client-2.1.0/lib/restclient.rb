@@ -132,7 +132,7 @@ module RestClient
         elsif param == 'stderr'
           stderr_logger = Class.new do
             def << obj
-              STDERR.puts obj
+              warn obj
             end
           end
           stderr_logger.new

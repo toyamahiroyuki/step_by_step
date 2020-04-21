@@ -8,12 +8,12 @@ class CostsController < ApplicationController
     else
       user = User.find(params[:id])
 
-      @proportial_cost_food = user.proportial_costs.where(proportial_cost_item: "食費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-      @proportial_cost_taransition = user.proportial_costs.where(proportial_cost_item: "交通費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-      @proportial_cost_entertainment = user.proportial_costs.where(proportial_cost_item: "交際費", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
-      @proportial_cost_daily = user.proportial_costs.where(proportial_cost_item: "日用品", created_at: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+      @proportial_cost_food = user.proportial_costs.where(proportial_cost_item: "食費", day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+      @proportial_cost_taransition = user.proportial_costs.where(proportial_cost_item: "交通費", day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+      @proportial_cost_entertainment = user.proportial_costs.where(proportial_cost_item: "交際費", day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
+      @proportial_cost_daily = user.proportial_costs.where(proportial_cost_item: "日用品", day: Time.now.beginning_of_month..Time.now.end_of_month).sum(:proportial_cost)
 
-      @proportial_costs = user.proportial_costs.where(created_at: Time.now.beginning_of_month..Time.now.end_of_month)
+      @proportial_costs = user.proportial_costs.where(day: Time.now.beginning_of_month..Time.now.end_of_month)
 
       @fixed_cost = user.fixed_cost
 

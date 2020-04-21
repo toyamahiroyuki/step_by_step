@@ -10,24 +10,22 @@
       <div class="col-xs-6">
 
         <h3 class="target-item-table-title">項目と目標金額</h3>
-
           <table class="target-item-blue-table">
-
           	<tr>
           	  <th>貯金額の変更</th>
           	  <td><%= f.text_field :target_by_month, class: "validate[required,custom[number]]" %>円</td>
           	</tr>
-
           </table>
 
   	  </div>
-       <div class="target-item-edit-btn">
-             <%= f.submit "貯金",class:'btn btn-primary btn-block' %>
-       </div>
-
-    <% end %>
     </div>
   </div>
+  <div class="target-item-edit-btn">
+       <%= f.submit "貯金",class:'btn btn-primary btn-block' %>
+  </div>
+
+  <% end %>
+
   <div class="target-item-space"></div>
 </div>
 

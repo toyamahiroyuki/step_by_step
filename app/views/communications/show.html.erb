@@ -10,61 +10,59 @@
         <h3 class="communication-table-title">通信費</h3>
 
         <table class="communication-green-table">
-
           <tr>
             <th>携帯代</th>
-            <td><%= @communication.phone %></td>
+            <td><%= @communication.phone %>円</td>
           </tr>
 
           <tr>
-            <th>Wi-iI</th>
-            <td><%= @communication.wi_fi %></td>
+            <th>Wi-Fi</th>
+            <td><%= @communication.wi_fi %>円</td>
           </tr>
 
           <tr>
             <th>その他</th>
-            <td><%= @communication.communications_other %></td>
+            <td><%= @communication.communications_other %>円</td>
           </tr>
 
         </table>
 
       </div>
 
-      <div class="col-xs-1"></div>
+      <div class="col-xs-2"></div>
 
       <div class="col-xs-5">
 
-          <h3 class="communication-table-title">保険・税金</h3>
+        <h3 class="communication-table-title">保険・税金</h3>
 
-          <table class="communication-green-table">
+        <table class="communication-green-table">
+          <tr>
+            <th>健康保険</th>
+            <td><%= @tax.health %>円</td>
+          </tr>
 
-            <tr>
-              <th>健康保険</th>
-              <td><%= @tax.health %></td>
-            </tr>
+          <tr>
+            <th>年金</th>
+            <td><%= @tax.pension %>円</td>
+          </tr>
 
-            <tr>
-              <th>年金</th>
-              <td><%= @tax.pension %></td>
-            </tr>
+          <tr>
+            <th>市民税/府民税</th>
+            <td><%= @tax.resident %>円</td>
+          </tr>
 
-            <tr>
-              <th>市民税/府民税</th>
-              <td><%= @tax.resident %></td>
-            </tr>
+          <tr>
+            <th>その他</th>
+            <td><%= @tax.taxes_other %>円</td>
+          </tr>
 
-            <tr>
-              <th>その他</th>
-              <td><%= @tax.taxes_other %></td>
-            </tr>
-
-          </table>
+        </table>
 
       </div>
     </div>
-    <div class="commication-edit-btn">
-      <%= link_to "編集画面へ", edit_communication_path, class:'btn btn-success btn-block',data: {"turbolinks"=>false} %>
-    </div>
+  </div>
+  <div class="commication-edit-btn">
+    <%= link_to "編集画面へ", edit_communication_path, class:'btn btn-success btn-block',data: {"turbolinks"=>false} %>
   </div>
 </div>
 

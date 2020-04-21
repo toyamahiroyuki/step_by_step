@@ -3,31 +3,24 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .goal-background {
-  background-image: image-url('table_background.jpg');
+  background-image: image-url('pie_background.jpg');
   background-size: 100% 100%;
+  padding: 100px 0 30px;
 }
 
 .goal-title h1 {
-	  position: relative;
-	  background: #f0e68c;
-	  box-shadow: 0px 0px 0px 5px #f0e68c;
-	  padding: 10px 10px;
-	  margin: 0px 20px 20px;
-	  color: #454545;
-	  width: 500px;
-	  text-align: center;
-	  font-family: 'M PLUS Rounded 1c', sans-serif;
-}
-
-.goal-title h1:after {
-  position: absolute;
-  content: '';
-  left: -7px;
-  top: -7px;
-  border-width: 0 0 15px 15px;
-  border-style: solid;
-  border-color: #fff #fff #f0e68c;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+  margin: 0;
+  position:  relative;
+  font-weight:  normal;
+  font-size: 32px;
+  text-align:  center;
+  padding: 10px 0 10px;
+  border-top: solid 1px;
+  border-bottom:  solid 1px;
+  width:  450px;
+  background-color: #ccffcc;
+  margin: 0 0 35px 130px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
 .goal-table-title {
@@ -104,18 +97,33 @@
 }
 
 .goal-create-btn {
-  margin: 30px 0;
-  width: 200px;
-}
-
-.goal-background .col-xs-5, .row .col-xs-3  {
-  border: solid 2px gray;
-  border-radius: 10px;
-  padding:10px 20px 20px;
-  margin-top: 30px;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.15);
+  width: 300px;
+  margin: 50px 0 30px 130px;
 }
 
 .goal-create-btn .btn-primary  {
   margin-left: 0;
+}
+
+.goal-edit-btn {
+  width: 300px;
+  margin: 20px 0 30px 160px;
+  display: flex;
+}
+
+.goal-edit-btn .btn-success, .goal-edit-btn .btn-danger {
+  width:100px;
+  margin: 0 0 0 10px;
+}
+
+.goal-background .col-xs-5, .goal-grap  {
+  border: solid 2px gray;
+  border-radius: 10px;
+  padding:10px 20px 20px;
+  margin-top: 20px;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.15);
+}
+
+#myBarChart {
+  margin-top: 50px;
 }

@@ -16,7 +16,7 @@ describe RestClient::AbstractResponse, :include_helpers do
   end
 
   before do
-    @net_http_res = res_double()
+    @net_http_res = res_double
     @request = request_double(url: 'http://example.com', method: 'get')
     @response = MyAbstractResponse.new(@net_http_res, @request)
   end
@@ -34,12 +34,12 @@ describe RestClient::AbstractResponse, :include_helpers do
 
   describe '.beautify_headers' do
     it "beautifies the headers by turning the keys to symbols" do
-      h = RestClient::AbstractResponse.beautify_headers('content-type' => [ 'x' ])
+      h = RestClient::AbstractResponse.beautify_headers('content-type' => ['x'])
       expect(h.keys.first).to eq :content_type
     end
 
     it "beautifies the headers by turning the values to strings instead of one-element arrays" do
-      h = RestClient::AbstractResponse.beautify_headers('x' => [ 'text/html' ] )
+      h = RestClient::AbstractResponse.beautify_headers('x' => ['text/html'] )
       expect(h.values.first).to eq 'text/html'
     end
 
@@ -57,7 +57,7 @@ describe RestClient::AbstractResponse, :include_helpers do
   end
 
   it "fetches the headers" do
-    expect(@net_http_res).to receive(:to_hash).and_return('content-type' => [ 'text/html' ])
+    expect(@net_http_res).to receive(:to_hash).and_return('content-type' => ['text/html'])
     expect(@response.headers).to eq({ :content_type => 'text/html' })
   end
 
@@ -93,7 +93,7 @@ describe RestClient::AbstractResponse, :include_helpers do
       net_http_res = double('net http response')
       expect(net_http_res).to receive(:to_hash).and_return('set-cookie' => ['session_id=1; path=/'])
       request = double('request', url: 'example.com', uri: URI.parse('http://example.com'),
-                       method: 'get', cookie_jar: HTTP::CookieJar.new, redirection_history: nil)
+                                  method: 'get', cookie_jar: HTTP::CookieJar.new, redirection_history: nil)
       response = MyAbstractResponse.new(net_http_res, request)
       expect(response.cookie_jar).to be_a HTTP::CookieJar
 
@@ -110,33 +110,33 @@ describe RestClient::AbstractResponse, :include_helpers do
   end
 
   describe "#return!" do
-    it "should return the response itself on 200-codes" do
+    it "returns the response itself on 200-codes" do
       expect(@net_http_res).to receive(:code).and_return('200')
       expect(@response.return!).to be_equal(@response)
     end
 
-    it "should raise RequestFailed on unknown codes" do
+    it "raises RequestFailed on unknown codes" do
       expect(@net_http_res).to receive(:code).and_return('1000')
       expect { @response.return! }.to raise_error RestClient::RequestFailed
     end
 
-    it "should raise an error on a redirection after non-GET/HEAD requests" do
+    it "raises an error on a redirection after non-GET/HEAD requests" do
       expect(@net_http_res).to receive(:code).and_return('301')
       expect(@request).to receive(:method).and_return('put')
       expect(@response).not_to receive(:follow_redirection)
       expect { @response.return! }.to raise_error RestClient::RequestFailed
     end
 
-    it "should follow 302 redirect" do
+    it "follows 302 redirect" do
       expect(@net_http_res).to receive(:code).and_return('302')
       expect(@response).to receive(:check_max_redirects).and_return('fake-check')
       expect(@response).to receive(:follow_redirection).and_return('fake-redirection')
       expect(@response.return!).to eq 'fake-redirection'
     end
 
-    it "should gracefully handle 302 redirect with no location header" do
+    it "gracefullies handle 302 redirect with no location header" do
       @net_http_res = res_double(code: 302)
-      @request = request_double()
+      @request = request_double
       @response = MyAbstractResponse.new(@net_http_res, @request)
       expect(@response).to receive(:check_max_redirects).and_return('fake-check')
       expect { @response.return! }.to raise_error RestClient::Found

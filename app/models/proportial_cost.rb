@@ -6,6 +6,6 @@ class ProportialCost < ApplicationRecord
   validates :proportial_cost, presence: true, numericality: { less_than: 0 }
   validates :proportial_cost_item, presence: true
 
-  #配列のソート（昇順）
+  # 配列のソート（昇順）
   default_scope -> { order(day: :asc) }
 end

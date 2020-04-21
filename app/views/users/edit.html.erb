@@ -1,79 +1,77 @@
-<div class="title">
-  <h1>編集画面</h1>
-</div>
+<div class="user-background">
+  <div class="title">
+    <h1>編集画面</h1>
+  </div>
 
-<%= form_for @user do |f| %>
+  <%= form_for @user do |f| %>
 
-<div class="container">
-  <div class="row-">
-    <div class="col-xs-6">
+  <div class="container">
+    <div class="row-">
+      <div class="col-xs-6">
 
-      <h3 class="table-title">個人情報</h3>
+        <h3 class="table-title">個人情報</h3>
 
-      <table class="user-green-table">
+        <table class="user-green-table">
+        	 <tr>
+              <th><%= f.label :名前 %></th>
+              <td><%= f.text_field :name, autofocus: true, autocomplete: "name",class: "validate[required]" %></td>
+            </tr>
 
-      	 <tr>
-            <th><%= f.label :名前 %></th>
-            <td><%= f.text_field :name, autofocus: true, autocomplete: "name",class: "validate[required]" %></td>
-          </tr>
+            <tr>
+              <th><%= f.label :年齢 %></th>
+              <td><%= f.text_field :old, autofocus: true, autocomplete: "old", class: "validate[required,custom[number]]" %></td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :年齢 %></th>
-            <td><%= f.text_field :old, autofocus: true, autocomplete: "old", class: "validate[required,custom[number]]" %></td>
-          </tr>
+            <tr>
+              <th><%= f.label :性別 %></th>
+              <td>
+              	<ul class="sex-item">
+                  <li class="sex-items-edit">
+                    男性
+                    <%= f.radio_button :sex, "男性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
+                  </li>
+                  <li class="sex-items-edit">
+                    女性
+                    <%= f.radio_button :sex, "女性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
+                  </li>
 
-          <tr>
-            <th><%= f.label :性別 %></th>
-            <td>
-            	<ul class="sex-item">
-
-	                <li class="sex-items-edit">
-	                    男性
-	                    <%= f.radio_button :sex, "男性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
-	                </li>
-	                <li class="sex-items-edit">
-	                    女性
-	                    <%= f.radio_button :sex, "女性", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
-	                </li>
-
-	                <li class="sex-items-edit">
-	                    その他
-	                    <%= f.radio_button :sex, "その他", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
-	                </li>
+                  <li class="sex-items-edit">
+                    その他
+                    <%= f.radio_button :sex, "その他", autofocus: true, autocomplete: "sex",class: "validate[required]" %>
+                  </li>
                 </ul>
-            </td>
-          </tr>
+              </td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :職業（前職） %></th>
-            <td><%= f.text_field :job, autofocus: true, autocomplete: "job", class: "validate[required]" %></td>
-          </tr>
+            <tr>
+              <th><%= f.label :職業（前職） %></th>
+              <td><%= f.text_field :job, autofocus: true, autocomplete: "job", class: "validate[required]" %></td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :預金額 %></th>
-            <td><%= f.text_field :deposit, autofocus: true, autocomplete: "deposit", class: "validate[required,custom[number]]" %></td>
-          </tr>
+            <tr>
+              <th><%= f.label :預金額 %></th>
+              <td><%= f.text_field :deposit, autofocus: true, autocomplete: "deposit", class: "validate[required,custom[number]]" %></td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :家族の人数 %></th>
-            <td><%= f.text_field :member, autofocus: true, autocomplete: "member", class: "validate[required,custom[number]]" %></td>
-          </tr>
+            <tr>
+              <th><%= f.label :家族の人数 %></th>
+              <td><%= f.text_field :member, autofocus: true, autocomplete: "member", class: "validate[required,custom[number]]" %></td>
+            </tr>
 
-          <tr>
-            <th><%= f.label :メールアドレス %></th>
-            <td><%= f.email_field :email, autofocus: true, autocomplete: "email", class: "validate[required,custom[email]]" %></td>
-          </tr>
+            <tr>
+              <th><%= f.label :メールアドレス %></th>
+              <td><%= f.email_field :email, autofocus: true, autocomplete: "email", class: "validate[required,custom[email]]" %></td>
+            </tr>
 
-      </table>
-
-    </div>
-
-      <div class="goal-btn">
-
-        <%= f.submit "更新",class:'btn btn-primary' %>
+        </table>
 
       </div>
+    </div>
   </div>
-</div>
 
-<% end %>
+  <div class="goal-btn">
+    <%= f.submit "更新",class:'btn btn-success' %>
+  </div>
+
+  <% end %>
+</div>

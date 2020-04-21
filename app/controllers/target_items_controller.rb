@@ -36,11 +36,11 @@ class TargetItemsController < ApplicationController
     target_items.each do |target_item|
       target_item.target_balance = target.target_cost - target.target_items.where(id: 1..target_item.id).sum(:target_by_month)
       if target_item.update(target_item_params)
-    end
       redirect_to targets_path
       else
-      @target_item = TargetItem.find(params[:id])
+      @target_item = target_item
       render aciton: :edit
+      end
     end
   end
 

@@ -139,7 +139,7 @@ module RestClient
     end
 
     class Multipart < Base
-      EOL = "\r\n"
+      EOL = "\r\n".freeze
 
       def build_stream(params)
         b = '--' + boundary

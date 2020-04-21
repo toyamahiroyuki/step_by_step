@@ -122,7 +122,7 @@ describe RestClient::Request, :include_helpers do
     [
       {session_id: '1', user_id: 'someone'},
       jar,
-      cookies_arr
+      cookies_arr,
     ].each do |cookies|
       [true, false].each do |in_headers|
         if in_headers
@@ -202,7 +202,7 @@ describe RestClient::Request, :include_helpers do
     expect(@request).to receive(:default_headers).and_return({'Foo' => 'bar'})
     expect(@request.make_headers({})).to eq({
       'Foo' => 'bar',
-      'Cookie' => "test=#{cookie}"
+      'Cookie' => "test=#{cookie}",
     })
   end
 
@@ -802,16 +802,16 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should default to verifying ssl certificates" do
+    it "defaults to verifying ssl certificates" do
       expect(@request.verify_ssl).to eq OpenSSL::SSL::VERIFY_PEER
     end
 
-    it "should have expected values for VERIFY_PEER and VERIFY_NONE" do
+    it "has expected values for VERIFY_PEER and VERIFY_NONE" do
       expect(OpenSSL::SSL::VERIFY_NONE).to eq(0)
       expect(OpenSSL::SSL::VERIFY_PEER).to eq(1)
     end
 
-    it "should set net.verify_mode to OpenSSL::SSL::VERIFY_NONE if verify_ssl is false" do
+    it "sets net.verify_mode to OpenSSL::SSL::VERIFY_NONE if verify_ssl is false" do
       @request = RestClient::Request.new(:method => :put, :verify_ssl => false, :url => 'http://some/resource', :payload => 'payload')
       expect(@net).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
       allow(@http).to receive(:request)
@@ -820,7 +820,7 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set net.verify_mode to OpenSSL::SSL::VERIFY_NONE if verify_ssl is true" do
+    it "does not set net.verify_mode to OpenSSL::SSL::VERIFY_NONE if verify_ssl is true" do
       @request = RestClient::Request.new(:method => :put, :url => 'https://some/resource', :payload => 'payload', :verify_ssl => true)
       expect(@net).not_to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
       allow(@http).to receive(:request)
@@ -829,7 +829,7 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should set net.verify_mode to OpenSSL::SSL::VERIFY_PEER if verify_ssl is true" do
+    it "sets net.verify_mode to OpenSSL::SSL::VERIFY_PEER if verify_ssl is true" do
       @request = RestClient::Request.new(:method => :put, :url => 'https://some/resource', :payload => 'payload', :verify_ssl => true)
       expect(@net).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_PEER)
       allow(@http).to receive(:request)
@@ -838,7 +838,7 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should set net.verify_mode to OpenSSL::SSL::VERIFY_PEER if verify_ssl is not given" do
+    it "sets net.verify_mode to OpenSSL::SSL::VERIFY_PEER if verify_ssl is not given" do
       @request = RestClient::Request.new(:method => :put, :url => 'https://some/resource', :payload => 'payload')
       expect(@net).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_PEER)
       allow(@http).to receive(:request)
@@ -847,7 +847,7 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should set net.verify_mode to the passed value if verify_ssl is an OpenSSL constant" do
+    it "sets net.verify_mode to the passed value if verify_ssl is an OpenSSL constant" do
       mode = OpenSSL::SSL::VERIFY_PEER | OpenSSL::SSL::VERIFY_FAIL_IF_NO_PEER_CERT
       @request = RestClient::Request.new( :method => :put,
                                           :url => 'https://some/resource',
@@ -860,11 +860,11 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should default to not having an ssl_client_cert" do
+    it "defaults to not having an ssl_client_cert" do
       expect(@request.ssl_client_cert).to be(nil)
     end
 
-    it "should set the ssl_version if provided" do
+    it "sets the ssl_version if provided" do
       @request = RestClient::Request.new(
         :method => :put,
         :url => 'https://some/resource',
@@ -878,7 +878,7 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set the ssl_version if not provided" do
+    it "does not set the ssl_version if not provided" do
       @request = RestClient::Request.new(
         :method => :put,
         :url => 'https://some/resource',
@@ -891,7 +891,7 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should set the ssl_ciphers if provided" do
+    it "sets the ssl_ciphers if provided" do
       ciphers = 'AESGCM:HIGH:!aNULL:!eNULL:RC4+RSA'
       @request = RestClient::Request.new(
         :method => :put,
@@ -906,7 +906,7 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set the ssl_ciphers if set to nil" do
+    it "does not set the ssl_ciphers if set to nil" do
       @request = RestClient::Request.new(
         :method => :put,
         :url => 'https://some/resource',
@@ -920,12 +920,12 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should set the ssl_client_cert if provided" do
+    it "sets the ssl_client_cert if provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload',
-              :ssl_client_cert => "whatsupdoc!"
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload',
+        :ssl_client_cert => "whatsupdoc!"
       )
       expect(@net).to receive(:cert=).with("whatsupdoc!")
       allow(@http).to receive(:request)
@@ -934,11 +934,11 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set the ssl_client_cert if it is not provided" do
+    it "does not set the ssl_client_cert if it is not provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload'
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload'
       )
       expect(@net).not_to receive(:cert=)
       allow(@http).to receive(:request)
@@ -947,16 +947,16 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should default to not having an ssl_client_key" do
+    it "defaults to not having an ssl_client_key" do
       expect(@request.ssl_client_key).to be(nil)
     end
 
-    it "should set the ssl_client_key if provided" do
+    it "sets the ssl_client_key if provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload',
-              :ssl_client_key => "whatsupdoc!"
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload',
+        :ssl_client_key => "whatsupdoc!"
       )
       expect(@net).to receive(:key=).with("whatsupdoc!")
       allow(@http).to receive(:request)
@@ -965,11 +965,11 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set the ssl_client_key if it is not provided" do
+    it "does not set the ssl_client_key if it is not provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload'
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload'
       )
       expect(@net).not_to receive(:key=)
       allow(@http).to receive(:request)
@@ -978,16 +978,16 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should default to not having an ssl_ca_file" do
+    it "defaults to not having an ssl_ca_file" do
       expect(@request.ssl_ca_file).to be(nil)
     end
 
-    it "should set the ssl_ca_file if provided" do
+    it "sets the ssl_ca_file if provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload',
-              :ssl_ca_file => "Certificate Authority File"
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload',
+        :ssl_ca_file => "Certificate Authority File"
       )
       expect(@net).to receive(:ca_file=).with("Certificate Authority File")
       expect(@net).not_to receive(:cert_store=)
@@ -997,11 +997,11 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set the ssl_ca_file if it is not provided" do
+    it "does not set the ssl_ca_file if it is not provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload'
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload'
       )
       expect(@net).not_to receive(:ca_file=)
       allow(@http).to receive(:request)
@@ -1010,16 +1010,16 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should default to not having an ssl_ca_path" do
+    it "defaults to not having an ssl_ca_path" do
       expect(@request.ssl_ca_path).to be(nil)
     end
 
-    it "should set the ssl_ca_path if provided" do
+    it "sets the ssl_ca_path if provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload',
-              :ssl_ca_path => "Certificate Authority Path"
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload',
+        :ssl_ca_path => "Certificate Authority Path"
       )
       expect(@net).to receive(:ca_path=).with("Certificate Authority Path")
       expect(@net).not_to receive(:cert_store=)
@@ -1029,11 +1029,11 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set the ssl_ca_path if it is not provided" do
+    it "does not set the ssl_ca_path if it is not provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload'
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload'
       )
       expect(@net).not_to receive(:ca_path=)
       allow(@http).to receive(:request)
@@ -1042,15 +1042,15 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should set the ssl_cert_store if provided" do
+    it "sets the ssl_cert_store if provided" do
       store = OpenSSL::X509::Store.new
       store.set_default_paths
 
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload',
-              :ssl_cert_store => store
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload',
+        :ssl_cert_store => store
       )
       expect(@net).to receive(:cert_store=).with(store)
       expect(@net).not_to receive(:ca_path=)
@@ -1061,11 +1061,11 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should by default set the ssl_cert_store if no CA info is provided" do
+    it "bies default set the ssl_cert_store if no CA info is provided" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload'
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload'
       )
       expect(@net).to receive(:cert_store=)
       expect(@net).not_to receive(:ca_path=)
@@ -1076,12 +1076,12 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set the ssl_cert_store if it is set falsy" do
+    it "does not set the ssl_cert_store if it is set falsy" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload',
-              :ssl_cert_store => nil,
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload',
+        :ssl_cert_store => nil,
       )
       expect(@net).not_to receive(:cert_store=)
       allow(@http).to receive(:request)
@@ -1090,11 +1090,11 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should not set the ssl_verify_callback by default" do
+    it "does not set the ssl_verify_callback by default" do
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload',
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload',
       )
       expect(@net).not_to receive(:verify_callback=)
       allow(@http).to receive(:request)
@@ -1103,13 +1103,13 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', 'payload')
     end
 
-    it "should set the ssl_verify_callback if passed" do
+    it "sets the ssl_verify_callback if passed" do
       callback = lambda {}
       @request = RestClient::Request.new(
-              :method => :put,
-              :url => 'https://some/resource',
-              :payload => 'payload',
-              :ssl_verify_callback => callback,
+        :method => :put,
+        :url => 'https://some/resource',
+        :payload => 'payload',
+        :ssl_verify_callback => callback,
       )
       expect(@net).to receive(:verify_callback=).with(callback)
 
@@ -1128,11 +1128,11 @@ describe RestClient::Request, :include_helpers do
     # </ssl>
   end
 
-  it "should still return a response object for 204 No Content responses" do
+  it "stills return a response object for 204 No Content responses" do
     @request = RestClient::Request.new(
-            :method => :put,
-            :url => 'https://some/resource',
-            :payload => 'payload'
+      :method => :put,
+      :url => 'https://some/resource',
+      :payload => 'payload'
     )
     net_http_res = Net::HTTPNoContent.new("", "204", "No Content")
     allow(net_http_res).to receive(:read_body).and_return(nil)
@@ -1143,7 +1143,7 @@ describe RestClient::Request, :include_helpers do
   end
 
   describe "raw response" do
-    it "should read the response into a binary-mode tempfile" do
+    it "reads the response into a binary-mode tempfile" do
       @request = RestClient::Request.new(:method => "get", :url => "example.com", :raw_response => true)
 
       tempfile = double("tempfile")
@@ -1160,7 +1160,7 @@ describe RestClient::Request, :include_helpers do
   end
 
   describe 'payloads' do
-    it 'should accept string payloads' do
+    it 'accepts string payloads' do
       payload = 'Foo'
       @request = RestClient::Request.new(method: :get, url: 'example.com', :payload => payload)
       expect(@request).to receive(:process_result)
@@ -1168,7 +1168,7 @@ describe RestClient::Request, :include_helpers do
       @request.send(:transmit, @uri, 'req', payload)
     end
 
-    it 'should accept streaming IO payloads' do
+    it 'accepts streaming IO payloads' do
       payload = StringIO.new('streamed')
 
       @request = RestClient::Request.new(method: :get, url: 'example.com', :payload => payload)
@@ -1184,7 +1184,7 @@ describe RestClient::Request, :include_helpers do
   end
 
   describe 'constructor' do
-    it 'should reject valid URIs with no hostname' do
+    it 'rejects valid URIs with no hostname' do
       expect(URI.parse('http:///').hostname).to be_nil
 
       expect {
@@ -1192,7 +1192,7 @@ describe RestClient::Request, :include_helpers do
       }.to raise_error(URI::InvalidURIError, /\Abad URI/)
     end
 
-    it 'should reject invalid URIs' do
+    it 'rejects invalid URIs' do
       expect {
         RestClient::Request.new(method: :get, url: 'http://::')
       }.to raise_error(URI::InvalidURIError)
@@ -1200,7 +1200,7 @@ describe RestClient::Request, :include_helpers do
   end
 
   describe 'process_url_params' do
-    it 'should handle basic URL params' do
+    it 'handles basic URL params' do
       expect(@request.process_url_params('https://example.com/foo', params: {key1: 123, key2: 'abc'})).
         to eq 'https://example.com/foo?key1=123&key2=abc'
 
@@ -1208,31 +1208,30 @@ describe RestClient::Request, :include_helpers do
         to eq 'https://example.com/foo?key1=123'
 
       expect(@request.process_url_params('https://example.com/path',
-                                  params: {foo: 'one two', bar: 'three + four == seven'})).
+                                         params: {foo: 'one two', bar: 'three + four == seven'})).
         to eq 'https://example.com/path?foo=one+two&bar=three+%2B+four+%3D%3D+seven'
     end
 
-    it 'should combine with & when URL params already exist' do
+    it 'combines with & when URL params already exist' do
       expect(@request.process_url_params('https://example.com/path?foo=1', params: {bar: 2})).
         to eq 'https://example.com/path?foo=1&bar=2'
     end
 
-    it 'should handle complex nested URL params per Rack / Rails conventions' do
+    it 'handles complex nested URL params per Rack / Rails conventions' do
       expect(@request.process_url_params('https://example.com/', params: {
-        foo: [1,2,3],
+        foo: [1, 2, 3],
         null: nil,
         falsy: false,
         math: '2+2=4',
-        nested: {'key + escaped' => 'value + escaped', other: [], arr: [1,2]},
+        nested: {'key + escaped' => 'value + escaped', other: [], arr: [1, 2]},
       })).to eq 'https://example.com/?foo[]=1&foo[]=2&foo[]=3&null&falsy=false&math=2%2B2%3D4' \
                    '&nested[key+%2B+escaped]=value+%2B+escaped&nested[other]' \
                    '&nested[arr][]=1&nested[arr][]=2'
     end
 
-    it 'should handle ParamsArray objects' do
+    it 'handles ParamsArray objects' do
       expect(@request.process_url_params('https://example.com/',
-        params: RestClient::ParamsArray.new([[:foo, 1], [:foo, 2]])
-      )).to eq 'https://example.com/?foo=1&foo=2'
+                                         params: RestClient::ParamsArray.new([[:foo, 1], [:foo, 2]]))).to eq 'https://example.com/?foo=1&foo=2'
     end
   end
 end

@@ -88,7 +88,7 @@ namespace :uglifyjs do
       'lib/uglify.js',
       'lib/uglify-harmony.js',
       'vendor/uglifyjs',
-      'vendor/uglifyjs-harmony'
+      'vendor/uglifyjs-harmony',
     ]
     git_commit(files, "Update UglifyJS to #{version}")
   end

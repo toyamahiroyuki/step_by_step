@@ -59,13 +59,19 @@
         <nav class="icon clearfix" >
             <ul class="header-item clearfix text-right">
               <li class="header-items btn" aria-hidden="true">
-                <%= link_to "calendar", homes_top_path %>
+                <%= link_to "Calendar", homes_top_path %>
               </li>
+
               <li class="header-items btn" ">
-                <%= link_to "about", homes_about_path %>
+                <%= link_to "About", homes_about_path %>
               </li>
+
               <li class="header-items btn" aria-hidden="true">
                 <%= link_to "My page", user_path(current_user) %>
+              </li>
+
+              <li class="header-items btn" aria-hidden="true">
+                <%= link_to "Users", users_path %>
               </li>
 
               <li class="header-items btn" aria-hidden="true">

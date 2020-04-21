@@ -24,7 +24,7 @@ describe RestClient::Exception do
 end
 
 describe RestClient::ServerBrokeConnection do
-  it "should have a default message of 'Server broke connection'" do
+  it "has a default message of 'Server broke connection'" do
     e = RestClient::ServerBrokeConnection.new
     expect(e.message).to eq 'Server broke connection'
   end

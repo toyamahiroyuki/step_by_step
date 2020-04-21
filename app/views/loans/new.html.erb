@@ -1,5 +1,4 @@
 <div class="loan-background">
-
 	<div class="loan-title">
 		<h1>ローン項目の作成</h1>
 	</div>
@@ -13,7 +12,6 @@
 	      <h3 class="loan-table-title">項目と返済金額</h3>
 
 				<table class="loan-item-red-table">
-
 					<tr>
 						<th>ローン項目</th>
 						<td><%= g.text_field :loan_purpose, class: "validate[required]" %>　</td>
@@ -33,15 +31,16 @@
 					</tr>
 
 					<% end %>
-
 				</table>
 
 			</div>
-				<div class="loan-create-btn">
-					<%= g.submit "登録", class:'btn btn-danger btn-block' %>
-				</div>
 		</div>
 	</div>
+
+	<div class="loan-create-btn">
+		<%= g.submit "登録", class:'btn btn-danger btn-block' %>
+	</div>
+
 	<div class="loan-space"></div>
 
 	<% end %>

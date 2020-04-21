@@ -121,30 +121,24 @@ input#user_sex_その他,{
 .user-background {
   background-image: image-url('background_yellow.jpg');
   background-size: 100% 100%;
+  height: 700px;
+  padding-top: 30px;
 }
 
 .title h1 {
-  position: relative;
-  background: #f0e68c;
-  box-shadow: 0px 0px 0px 5px #f0e68c;
-  padding: 0px 10px;
-  margin: 0px 20px 20px;
-  color: #454545;
-  width: 250px;
-  text-align: center;
+  margin: 0;
+  position:  relative;
+  font-weight:  normal;
+  font-size: 32px;
+  text-align:  center;
+  padding: 10px 0 10px;
+  border-top: solid 1px;
+  border-bottom:  solid 1px;
+  width:  450px;
+  background-color: #ccffcc;
+  margin: 0 0 35px 135px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
 
-}
-
-.title h1 :after {
-  position: absolute;
-  content: '';
-  left: -7px;
-  top: -7px;
-  border-width: 0 0 15px 15px;
-  border-style: solid;
-  border-color: #fff #fff #f0e68c;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
 .table-title {
@@ -174,9 +168,47 @@ input#user_sex_その他,{
   border-bottom: solid 3px #52c2d0;
 }
 
+.users-green-table {
+  border-collapse: collapse;
+  width: 90%;
+  height: 20px;
+  table-layout: fixed;
+}
+
+.users-green-table tr{
+  border-bottom: solid 2px white;
+  height:20px;
+}
+
+.users-green-table tr:last-child{
+  border-bottom: none;
+}
+
+.users-green-table th{
+  position: relative;
+  text-align: left;
+  width: 150px;
+  background-color: #52c2d0;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  height: 15px;
+}
+
+.users-green-table td{
+  text-align: center;
+  background-color: #dcdcdc;
+  padding: 0px 20px;
+  font-size: 20px;
+  height: 60px;
+  width: 150px;
+  color: black;
+}
+
 .user-green-table {
   border-collapse: collapse;
-  height:20px;
+  width: 90%;
+  height: 30px;
   table-layout: fixed;
 }
 
@@ -188,10 +220,11 @@ input#user_sex_その他,{
 .user-green-table tr:last-child{
   border-bottom: none;
 }
+
 .user-green-table th{
   position: relative;
   text-align: left;
-  width: 150px;
+  width: 70px;
   background-color: #52c2d0;
   color: white;
   text-align: center;
@@ -200,13 +233,12 @@ input#user_sex_その他,{
 }
 
 .user-green-table td{
-  text-align: left;
   text-align: center;
   background-color: #dcdcdc;
-  padding: 10px 50px;
+  padding: 0px 20px;
   font-size: 20px;
   height:20px;
-  width: 300px;
+  width: 150px;
   color: black;
 }
 
@@ -220,66 +252,22 @@ input#user_sex_その他,{
 }
 
 .user-green-table .user-index-btn a{
-  width: 40px;
+  width: 120px;
 }
 
 .user-green-table .user-index-btn {
-  width: 40px;
+  width: 120px;
   padding: 10px
 }
 
-
 .goal-btn {
+  width: 500px;
+  margin: 30px 0 15px 130px;
+}
+
+.goal-btn .btn-success, .goal-btn .btn-danger {
   width: 200px;
-  margin: 10px 0 15px 0;
-}
-
-
-.list-table{
-  width: 100%;
-  height:20px;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 16px;
-  margin-top: 20px;
-}
-
-.list-table tr{
-  border-bottom: solid 2px white;
-  height:10px;
-}
-
-.list-table tr:last-child{
-  border-bottom: none;
-}
-.list-table th{
-  position: relative;
-  text-align: left;
-  width: 10%;
-  background-color: d6ebff;
-  color: white;
-  text-align: center;
-  padding:  0;
-  height:10px;
-}
-
-.list-table td{
-  text-align: left;
-  width: 100px;
-  text-align: center;
-  background-color: #dcdcdc;
-  padding: 10px 0;
-  font-size: 20px;
-  height:20px;
-}
-
-.list-table td input{
-  text-align: left;
-  width: 70%;
-  text-align: center;
-  background-color: #d6ebff;
-  border-radius: 10px;
-  margin: 0 auto;
-  font-size: 20px;
+  margin: 0px 20px;
 }
 
 .sex-items-edit {
@@ -291,7 +279,15 @@ input#user_sex_その他,{
   border: solid 2px gray;
   border-radius: 10px;
   padding:10px 20px 20px;
-  margin-top: 50px;
+  margin-top: 20px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.15);
 }
 
+.user-thead, .user-tbody{
+  display:block;
+}
+
+.user-tbody {
+  overflow-y:scroll;
+  height:450px;
+}

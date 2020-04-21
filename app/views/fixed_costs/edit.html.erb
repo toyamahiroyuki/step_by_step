@@ -34,7 +34,7 @@
 
       <%= fields_for @lifeline, url: lifelines_path do |c| %>
 
-      <div class="col-xs-1"></div>
+      <div class="col-xs-2"></div>
 
       <div class="col-xs-5">
 
@@ -61,15 +61,12 @@
 
       </div>
     </div>
-
-    <div class="fixed-edit-btn">
-    <%= f.submit "登録", class:'btn btn-success btn-block' %>
-    </div>
   </div>
 
+  <div class="fixed-edit-btn">
+    <%= f.submit "登録", class:'btn btn-success btn-block' %>
+  </div>
 
-
-    <% end %>
-
+      <% end %>
   <% end %>
 </div>

@@ -16,7 +16,7 @@ describe RestClient::Request do
         :url => 'https://www.mozilla.org',
         :ssl_ca_file => File.join(File.dirname(__FILE__), "certs", "digicert.crt")
       )
-      expect { request.execute }.to_not raise_error
+      expect { request.execute }.not_to raise_error
     end
 
     it "is successful with the correct ca_path" do
@@ -25,7 +25,7 @@ describe RestClient::Request do
         :url => 'https://www.mozilla.org',
         :ssl_ca_path => File.join(File.dirname(__FILE__), "capath_digicert")
       )
-      expect { request.execute }.to_not raise_error
+      expect { request.execute }.not_to raise_error
     end
 
     # TODO: deprecate and remove RestClient::SSLCertificateNotVerified and just
@@ -60,7 +60,7 @@ describe RestClient::Request do
         :url => 'https://www.mozilla.org',
         :verify_ssl => true,
       )
-      expect {request.execute }.to_not raise_error
+      expect {request.execute }.not_to raise_error
     end
 
     it "executes the verify_callback" do
@@ -74,7 +74,7 @@ describe RestClient::Request do
           preverify_ok
         },
       )
-      expect {request.execute }.to_not raise_error
+      expect {request.execute }.not_to raise_error
       expect(ran_callback).to eq(true)
     end
 
@@ -98,7 +98,7 @@ describe RestClient::Request do
         :ssl_ca_file => File.join(File.dirname(__FILE__), "certs", "verisign.crt"),
         :ssl_verify_callback => lambda { |preverify_ok, store_ctx| true },
       )
-      expect { request.execute }.to_not raise_error
+      expect { request.execute }.not_to raise_error
     end
   end
 
@@ -110,7 +110,8 @@ describe RestClient::Request do
         :open_timeout => 1e-10,
       )
       expect { request.execute }.to(
-        raise_error(RestClient::Exceptions::OpenTimeout))
+        raise_error(RestClient::Exceptions::OpenTimeout)
+      )
     end
 
     it "raises ReadTimeout when it hits a read timeout via :read_timeout" do
@@ -120,7 +121,8 @@ describe RestClient::Request do
         :read_timeout => 1e-10,
       )
       expect { request.execute }.to(
-        raise_error(RestClient::Exceptions::ReadTimeout))
+        raise_error(RestClient::Exceptions::ReadTimeout)
+      )
     end
   end
 

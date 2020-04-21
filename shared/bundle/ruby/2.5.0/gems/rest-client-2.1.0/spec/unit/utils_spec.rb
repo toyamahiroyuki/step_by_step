@@ -10,25 +10,32 @@ describe RestClient::Utils do
 
     it 'returns nil on failures' do
       expect(RestClient::Utils.get_encoding_from_headers(
-        {:content_type => 'blah'})).to eq nil
+        {:content_type => 'blah'}
+      )).to eq nil
       expect(RestClient::Utils.get_encoding_from_headers(
-        {})).to eq nil
+        {}
+      )).to eq nil
       expect(RestClient::Utils.get_encoding_from_headers(
-        {:content_type => 'foo; bar=baz'})).to eq nil
+        {:content_type => 'foo; bar=baz'}
+      )).to eq nil
     end
 
     it 'handles various charsets' do
       expect(RestClient::Utils.get_encoding_from_headers(
-        {:content_type => 'text/plain; charset=UTF-8'})).to eq 'UTF-8'
+        {:content_type => 'text/plain; charset=UTF-8'}
+      )).to eq 'UTF-8'
       expect(RestClient::Utils.get_encoding_from_headers(
-        {:content_type => 'application/json; charset=ISO-8859-1'})).
+        {:content_type => 'application/json; charset=ISO-8859-1'}
+      )).
         to eq 'ISO-8859-1'
       expect(RestClient::Utils.get_encoding_from_headers(
-        {:content_type => 'text/html; charset=windows-1251'})).
+        {:content_type => 'text/html; charset=windows-1251'}
+      )).
         to eq 'windows-1251'
 
       expect(RestClient::Utils.get_encoding_from_headers(
-        {:content_type => 'text/html; charset="UTF-16"'})).
+        {:content_type => 'text/html; charset="UTF-16"'}
+      )).
         to eq 'UTF-16'
     end
   end
@@ -48,23 +55,28 @@ describe RestClient::Utils do
         to eq ['text/plain', {'charset' => 'us-ascii'}]
 
       expect(RestClient::Utils.cgi_parse_header(
-        'text/plain ; charset="us-ascii"; another=opt')).
+        'text/plain ; charset="us-ascii"; another=opt'
+      )).
         to eq ['text/plain', {'charset' => 'us-ascii', 'another' => 'opt'}]
 
       expect(RestClient::Utils.cgi_parse_header(
-        'foo/bar; filename="silly.txt"')).
+        'foo/bar; filename="silly.txt"'
+      )).
         to eq ['foo/bar', {'filename' => 'silly.txt'}]
 
       expect(RestClient::Utils.cgi_parse_header(
-        'foo/bar; filename="strange;name"')).
+        'foo/bar; filename="strange;name"'
+      )).
         to eq ['foo/bar', {'filename' => 'strange;name'}]
 
       expect(RestClient::Utils.cgi_parse_header(
-        'foo/bar; filename="strange;name";size=123')).to eq \
+        'foo/bar; filename="strange;name";size=123'
+      )).to eq \
         ['foo/bar', {'filename' => 'strange;name', 'size' => '123'}]
 
       expect(RestClient::Utils.cgi_parse_header(
-        'foo/bar; name="files"; filename="fo\\"o;bar"')).to eq \
+        'foo/bar; name="files"; filename="fo\\"o;bar"'
+      )).to eq \
         ['foo/bar', {'name' => 'files', 'filename' => 'fo"o;bar'}]
     end
   end
@@ -87,7 +99,7 @@ describe RestClient::Utils do
         {foo: [1, 2, 3]} => 'foo[]=1&foo[]=2&foo[]=3',
         {foo: %w{a b c}, bar: [1, 2, 3]} => 'foo[]=a&foo[]=b&foo[]=c&bar[]=1&bar[]=2&bar[]=3',
         {foo: ['one two', 3]} => 'foo[]=one+two&foo[]=3',
-        {'a+b' => [1,2,3]} => 'a%2Bb[]=1&a%2Bb[]=2&a%2Bb[]=3',
+        {'a+b' => [1, 2, 3]} => 'a%2Bb[]=1&a%2Bb[]=2&a%2Bb[]=3',
       }.each_pair do |input, expected|
         expect(RestClient::Utils.encode_query_string(input)).to eq expected
       end

@@ -1,117 +1,133 @@
-<div class="goal-title">
-  <h1>予算と実績の比較</h1>
-</div>
-
-<div class="container">
-  <div class="row">
-    <div class="col-xs-3">
-
-        <% @goals.each do |goal| %>
-
-        <h3 class="fixed-table-title">比例費の予算</h3>
-
-        <table class="goal-green-table">
-
-          <tr>
-            <th>食費</th>
-            <td><%= goal.food %>円</td>
-          </tr>
-
-          <tr>
-            <th>交通費</th>
-            <td><%= goal.transportation %>円</td>
-          </tr>
-
-          <tr>
-            <th>交際費</th>
-            <td><%= goal.entertainment %>円</td>
-          </tr>
-
-          <tr>
-            <th>日用品</th>
-            <td><%= goal.daily %>円</td>
-          </tr>
-
-          <tr>
-            <th>ガス</th>
-            <td><%= goal.gass %>円</td>
-          </tr>
-
-          <tr>
-            <th>電気</th>
-            <td><%= goal.electron %>円</td>
-          </tr>
-
-          <tr>
-            <th>水道</th>
-            <td><%= goal.water %>円</td>
-          </tr>
-
-          <tr>
-            <th>その他</th>
-            <td><%= goal.goals_other %>円</td>
-          </tr>
-
-        </table>
-
-    </div>
-
-    <div class="col-xs-9">
-
-      <canvas id="myBarChart"></canvas>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
-
-        <script>
-        var ctx = document.getElementById("myBarChart");
-        var myBarChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['食費', '交通費', '交際費', '日用品', 'ガス', '電気', '水道', 'その他'],
-            datasets: [
-              {
-                label: '現在の支出',
-                data: [<%= -@proportial_cost_food %>, <%= -@proportial_cost_taransition %>, <%= -@proportial_cost_entertainment %>, <%= -@proportial_cost_daily %>, <%= @lifelines_gass %>, <%= @lifelines_electron %>, <%= @lifeline_water %>, <%= -@proportial_cost_other %>],
-                backgroundColor: "rgba(130,201,169,0.5)"
-              },{
-                label: '予算',
-                data: [<%= goal.food %>, <%= goal.transportation %>, <%= goal.entertainment %>, <%= goal.daily %>, <%= goal.gass %>, <%= goal.electron %>, <%= goal.water %>, <%= goal.goals_other %>],
-                backgroundColor: "rgba(255,183,76,0.5)"
-              }
-            ]
-          },
-          options: {
-            title: {
-              display: true,
-              text: '予算管理グラフ'
-            },
-            scales: {
-              yAxes: [{
-                ticks: {
-                  suggestedMax: 30000,
-                  suggestedMin: 0,
-                  stepSize: 5000,
-                  callback: function(value, index, values){
-                    return  value +  '円'
-                  }
-                }
-              }]
-            },
-          }
-        });
-        </script>
-
-        <% end %>
-
-      </div>
-    </div>
-
-      <div class="goal-create-btn">
-
-        <%= link_to "編集へ",edit_goal_path, class:'btn btn-primary btn-block' %>
-
-        <%= link_to "削除へ", goal_path, method: :delete, class:'btn btn-danger btn-block' %>
-      </div>
+<div class="goal-background">
+  <div class="goal-title">
+    <h1>予算と実績の比較</h1>
   </div>
+
+  <div class="container">
+    <div class="row goal-grap">
+      <div class="col-xs-3">
+
+          <% @goals.each do |goal| %>
+
+          <h3 class="fixed-table-title">比例費の予算</h3>
+
+          <table class="goal-green-table">
+            <tr>
+              <th>食費</th>
+              <td><%= goal.food %>円</td>
+            </tr>
+
+            <tr>
+              <th>交通費</th>
+              <td><%= goal.transportation %>円</td>
+            </tr>
+
+            <tr>
+              <th>交際費</th>
+              <td><%= goal.entertainment %>円</td>
+            </tr>
+
+            <tr>
+              <th>日用品</th>
+              <td><%= goal.daily %>円</td>
+            </tr>
+
+            <tr>
+              <th>ガス</th>
+              <td><%= goal.gass %>円</td>
+            </tr>
+
+            <tr>
+              <th>電気</th>
+              <td><%= goal.electron %>円</td>
+            </tr>
+
+            <tr>
+              <th>水道</th>
+              <td><%= goal.water %>円</td>
+            </tr>
+
+            <tr>
+              <th>その他</th>
+              <td><%= goal.goals_other %>円</td>
+            </tr>
+          </table>
+
+      </div>
+
+      <div class="col-xs-1"></div>
+
+      <div class="col-xs-8">
+
+        <canvas id="myBarChart"></canvas>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+
+          <script>
+          var ctx = document.getElementById("myBarChart");
+          var myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['食費', '交通費', '交際費', '日用品', 'ガス', '電気', '水道', 'その他'],
+              datasets: [
+                {
+                  label: '現在の支出',
+                  data: [<%= -@proportial_cost_food %>, <%= -@proportial_cost_taransition %>, <%= -@proportial_cost_entertainment %>, <%= -@proportial_cost_daily %>, <%= @lifelines_gass %>, <%= @lifelines_electron %>, <%= @lifeline_water %>, <%= -@proportial_cost_other %>],
+                  backgroundColor: "rgba(130,201,169,0.5)"
+                },{
+                  label: '予算',
+                  data: [<%= goal.food %>, <%= goal.transportation %>, <%= goal.entertainment %>, <%= goal.daily %>, <%= goal.gass %>, <%= goal.electron %>, <%= goal.water %>, <%= goal.goals_other %>],
+                  backgroundColor: "rgba(255,183,76,0.5)"
+                }
+              ]
+            },
+            options: {
+              title: {
+                display: true,
+                text: '予算管理グラフ',
+                fontSize: 18,
+              },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    suggestedMax: 30000,
+                    suggestedMin: 0,
+                    stepSize: 5000,
+                    fontSize: 16,
+                    callback: function(value, index, values){
+                      return  value +  '円'
+                      }
+                    },
+                  gridLines: {
+                    lineWidth: 0.3,
+                    color: 'rgba(0, 0, 0)',
+                  　},
+                }],
+                xAxes: [{
+                  ticks: {
+                    fontSize: 16,
+                  },
+                  gridLines: {
+                    lineWidth: 0.3,
+                    color: 'rgba(0, 0, 0)',
+                  　},
+                }],
+              },
+            }
+          });
+          </script>
+
+          <% end %>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="goal-edit-btn">
+      <%= link_to "編集",edit_goal_path, class:'btn btn-success btn-block' %>
+      <%= link_to "削除", goal_path, method: :delete, class:'btn btn-danger btn-block' %>
+    </div>
+
+</div>
 
 
 
