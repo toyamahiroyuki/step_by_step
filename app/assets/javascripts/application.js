@@ -19,11 +19,7 @@
 //= require fullcalendar
 //= require_tree .
 
-// $('#calendar').fullCalendar({ });
-
-
 function eventCalendar() {
-  //fullcalendarの日付クリック
   $.ajax({
     type: 'GET',
     url: 'calendar_total',
@@ -36,27 +32,22 @@ function eventCalendar() {
       })
     }
     $('#calendar').fullCalendar({
-      dayClick: function(date, jsEvent, view, resourceObj) {
-        window.location.href = '/incomes/new?day=' + date.format();　//日付をqueryパラメーターで送信
-        // $.ajax({
-        //   url: '/incomes/new'
-        // }).done(function(res){
-        // //イベント登録用のhtmlを作成
-        // $('modal-body').html(res);
-        //  console.log($('.modal-body'))
-        // //イベント登録フォームの日付をクリックした日付とする
-        // $('#event_start_time_1i').val(date.format());
-        // $('#event_start_time_2i').val(date.format());
-        // $('#event_start_time_3i').val(date.format());
-        // //イベント登録フォームのモーダル表示
-        // $('#modal').modal();
-        // // 成功処理
-
-        // }).fail(function(date){
-        //   alert('エラーが発生しました。')
-
-        // });
-
+      dayClick: function(date, jsEvent, view, resourceObj, start) {
+        // window.location.href = '/incomes/new?day=' + date.format();　//日付をqueryパラメーターで送信
+        var day = date.format('YYYY/MM/DD');  //クリックした日付情報を取得        console.log(day)
+        $.ajax({          //newアクション発火
+          type: 'GET',
+          url: '/incomes/new',
+        }).done(function (res) {
+          $('.modal-body').html(res);          //収入登録用のhtmlを作成
+          $('.income-day').html(day);          //フォームの日付をクリックした日付とする
+          $('.hidden-income-day').val(day);　　//フォームのhiddenのvalueを作成
+          $('.modal').modal();       　　　　   // フォームのモーダル表示
+          // 成功処理
+        }).fail(function (result) {
+          // 失敗処理
+          alert('エラーが発生しました。運営に問い合わせてください。')
+        });
       },
       titleFormat: 'YYYY年 M月',
       dayNamesShort: ['日', '月', '火', '水', '木', '金', '土'],
@@ -66,7 +57,7 @@ function eventCalendar() {
                     center: '',
                     right: 'today prev,next',
                 },
-     eventColor: '#1e90ff'
+      eventColor: '#1e90ff'
     });
 
 　　//収支が+,-,0の時で色が変わる
@@ -88,6 +79,9 @@ $(document).on('turbolinks:load', function(){
 });
 $(document).on('turbolinks:before-cache', clearCalendar);
 
+
+
+
 //ナビの途中からスクロール
 $(function () {
   $(window).scroll(function () {
@@ -101,82 +95,3 @@ $(function () {
       }
   });
 });
-  //   type: 'GET',
-  //   url: 'calendar_incomes',
-  // }).done(function(incomes){
-  //   var income_key = [];
-  //   for (var income in incomes) {
-  //     income_key.push({
-  //       title: incomes[income],
-  //       start: income,
-  //     })
-  //   }
-  //   console.log (income_key)
-  //   return $('#calendar').fullCalendar({
-  //     dayClick: function(date, jsEvent, view, resourceObj) {
-  //       window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
-  //     },
-  //     events: income_key,
-  //   });
-  // });
-
-  // $.ajax({
-  //   type: 'GET',
-  //   url: 'calendar_proportial_costs',
-  // }).done(function(proportial_costs){
-  //   var proportial_cost = [];
-
-  //   for (var proportial_cost_key in proportial_costs) {
-  //    proportial_cost.push({
-  //       title: proportial_costs[proportial_cost_key],
-  //       start: proportial_cost_key,
-  //     })
-  //   }
-  //   console.log(proportial_cost)
-
-  //   return $('#calendar').fullCalendar({
-  //     dayClick: function(date, jsEvent, view, resourceObj) {
-  //       window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
-  //     },
-  //     events: proportial_cost,
-  //   });
-  // });
-
- /*
-  * 1. getEventsのリクエスト送信
-  * 2. getEventsのレスポンス返却
-    3. fullCalendarの画面描画
-  */
-  /*
-  * 1. getEventsのリクエスト送信 -> 1.2. getEventsのレスポンス返却
-  * 2. fullCalendarの画面描画
-  */
-  // var events = getEvents();
-  // return $('#calendar').fullCalendar({
-  //   dayClick: function(date, jsEvent, view, resourceObj) {
-  //     window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
-  //   },
-  //   events: events,
-  // });
-
-  // return $('#calendar').fullCalendar({
-  //   dayClick: function(date, jsEvent, view, resourceObj) {
-  //     window.location.href = '/incomes/new?day=' + date.format()// 通常の遷移
-  //   },
-  //   viewRender :function(){
-  //     $.ajax({
-  //       type: 'GET',
-  //       url: 'calendar_incomes',
-  //     }).done(function(res){
-  //       console.log(res)
-  //       var dste = {"id":"1", "title":"aaaaaa", "start":"2020-03-21", "end":"2020-03-21", "url":"some_address", "description":"説明"}
-  //       events: dste
-  //     });
-  //   }
-  //     // .fail(function() {
-  //     // // // 通信失敗時の処理を記述
-  //     //    });
-
-
-
-  // });

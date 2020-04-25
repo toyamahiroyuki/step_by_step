@@ -1,0 +1,73 @@
+<!-- <div class="modal-dialog" role="document">
+  <div class="modal-content"> -->
+    <div class="income-title">
+      <h1>収入</h1>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+
+        <%= form_for(@income) do |f| %>
+          <!-- data: { remote: true } -->
+
+          <table class="income-blue-table">
+
+            <tr>
+              <th>日付</th>
+              <td class="income-day"></td>
+            </tr>
+
+            <%= f.hidden_field :day, class: "hidden-income-day" %>
+
+            <tr>
+              <th>収入金額</th>
+              <td><%= f.text_field :income, value: 0, class: "validate[required,custom[number]]" %>円</td>
+            </tr>
+
+            <tr>
+              <th>項目</th>
+              <td>
+                <ul class="income-item">
+
+                  <li class="income-items"><%= f.radio_button :income_item, "給料",class: "validate[required]" %>給料
+                  </li>
+
+                  <li class="income-items">
+              	  <%= f.radio_button :income_item, "手当て",class: "validate[required]" %>手当て
+                  </li>
+
+                  <li class="income-items">
+              	  <%= f.radio_button :income_item, "退職金",class: "validate[required]" %>退職金
+                  </li>
+
+                  <li class="income-items">
+              	  <%= f.radio_button :income_item, "その他",class: "validate[required]" %>その他
+                  </li>
+                </ul>
+              </td>
+            </tr>
+
+            <tr>
+              <th>メモ</th>
+              <td><%= f.text_field :income_memo,class: "validate[required]" %></td>
+            </tr>
+
+          </table>
+
+          <div class="income-create-btn">
+             <%= f.submit "登録", class:'btn btn-primary'%>
+             <%= link_to "支出画面へ", new_proportial_cost_path(day: @income_day), class:'btn btn-warning' %>
+          </div>
+
+      　</div>
+
+
+      <% end %>
+
+     </div>
+    </div>
+<!--   </div>
+</div> -->
+
+

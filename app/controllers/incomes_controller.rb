@@ -7,8 +7,7 @@ class IncomesController < ApplicationController
     # partial = render_to_string(partial: 'new', layout: false, collection: @income)
     # puts partial
     # render json: { html: partial }
-
-    # render plain: render_to_string(partial: 'new', layout: false, locals: { income: @income})
+    render plain: render_to_string(partial: 'new', layout: false, locals: { income: @income})
   end
 
   def show
@@ -35,14 +34,23 @@ class IncomesController < ApplicationController
   def create
     @income = Income.new(income_params)
     @income.user_id = current_user.id
+
+    # respond_to do |format|
     if @income.save
       redirect_to homes_top_path
+      # format.html { redirect_to @income, notice: 'income was successfully created.' }
+      # format.json { render 'homes/top', status: :created, location: @income }
+      # format.js { @status = "success" }
     else
-      @income = Income.new
-      @income_day = params["day"]
-      @incomes = current_user.incomes.where(day: @income_day)
-      render action: :new
+      # format.html { render :new }
+      # format.json { render json: @income.errors, status: :unprocessable_entity }
+      # format.js { @status = "fail" }
+      # @income = Income.new
+      # @income_day = params["day"]
+      # @incomes = current_user.incomes.where(day: @income_day)
+      # render action: :new
     end
+    # end
   end
 
   def edit
