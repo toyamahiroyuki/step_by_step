@@ -14,30 +14,34 @@
 }
 
 .pro-cost-title h1 {
-	  position: relative;
-	  background: #f0e68c;
-	  box-shadow: 0px 0px 0px 5px #f0e68c;
-	  padding: 10px 10px;
-	  margin: 20px 20px;
-	  color: #454545;
-	  width: 250px;
-	  text-align: center;
-	  font-family: 'M PLUS Rounded 1c', sans-serif;
+  margin:  0;
+  font-size:  24px;
+  position:  relative;
+  font-weight:  normal;
+  display:  inline-block;
+  background-color: #feeaac;
+  padding:  10px;
+  margin-bottom: 15px;
+  border-radius:  2px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
 .pro-cost-title h1:after {
-  position: absolute;
-  content: '';
-  left: -7px;
-  top: -7px;
-  border-width: 0 0 15px 15px;
-  border-style: solid;
-  border-color: #fff #fff #f0e68c;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
+  content:  '';
+  background-color: #b3b3b3;
+  display:  block;
+  position:  absolute;
+  left: 50%;
+  height: 60%;
+  top: 26%;
+  z-index:  -1;
+  width: 46%;
+  box-shadow: 0 0 8px 8px #b3b3b3;
+  transform: rotate(3deg);
 }
 
 .pro-cost-red-table{
-  width: 700px;
+  width: 600px;
   border-collapse: collapse;
   height:20px;
   font-family: 'M PLUS Rounded 1c', sans-serif;
@@ -56,7 +60,7 @@
 .pro-cost-red-table th{
   position: relative;
   text-align: left;
-  width: 30px;
+  width: 50px;
   background-color: #fa8072;
   color: white;
   text-align: center;
@@ -82,6 +86,105 @@
   border-radius: 10px;
   margin: 0 auto;
   font-size: 20px;
+}
+
+//モーダルのデザイン
+
+.modal-body .row{
+  margin: 0 auto;
+}
+
+.pro-cost-new-box {
+  border-radius: 10px;
+  background-color: white;
+  background-image: image-url('modal_back.jpg');
+  margin: 100px 200px;
+}
+
+.modal-body .pro-cost-title {
+  display: flex;
+}
+
+.modal-body .pro-cost-title h1 {
+  width: 30%;
+  text-align: center;
+  margin: 15px auto;
+  font-size:  30px;
+  position:  relative;
+  font-weight:  normal;
+  display:  inline-block;
+  padding:  10px;
+  border-radius:  10px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.23);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  background-color: #ffb6c1;
+}
+
+.modal-body .pro-cost-red-table{
+  width: 600px;
+  border: 2px solid black;
+  height: 20px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 20px;
+  margin: 25px auto;
+}
+
+.modal-body .pro-cost-red-table tr{
+  border-bottom: none;
+  height:20px;
+  border-radius: 20px;
+}
+
+.modal-body .pro-cost-red-table tr:last-child{
+  border-bottom: none;
+}
+
+.modal-body .pro-cost-red-table th{
+  position: relative;
+  text-align: left;
+  width: 15%;
+  background-color: #e0e0e0;
+  color: red;
+  text-align: center;
+  padding: 10px 0;
+  margin-bottom: 5px;
+  height: 20px;
+  border-bottom: 2px dashed black;
+}
+
+.modal-body .pro-cost-red-table td{
+  text-align: left;
+  width: 50%;
+  text-align: center;
+  background-color: #e0e0e0;
+  padding: 10px 0;
+  margin-bottom: 5px;
+  font-size: 20px;
+  height:20px;
+  border-left: 2px solid black;
+  border-bottom: 2px dashed black;
+}
+
+.modal-body .pro-cost-red-table td input{
+  text-align: left;
+  width: 70%;
+  text-align: center;
+  background-color: none;
+  border-radius: 10px;
+  margin: 0 auto;
+  font-size: 20px;
+}
+
+.modal-body .pro-cost-create-btn {
+  margin: 10px 0 40px 0;
+  width: 200px;
+}
+
+.modal-body  .pro-cost-title .btn {
+  height: 30px;
+  width: 30px;
+  padding: 0;
+  margin-top: 10px;
 }
 
 .pro-cost-create-btn {

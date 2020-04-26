@@ -19,6 +19,7 @@
 //= require fullcalendar
 //= require_tree .
 
+
 function eventCalendar() {
   $.ajax({
     type: 'GET',
@@ -34,14 +35,15 @@ function eventCalendar() {
     $('#calendar').fullCalendar({
       dayClick: function(date, jsEvent, view, resourceObj, start) {
         // window.location.href = '/incomes/new?day=' + date.format();　//日付をqueryパラメーターで送信
-        var day = date.format('YYYY/MM/DD');  //クリックした日付情報を取得        console.log(day)
+        var day = date.format('YYYY/MM/DD');  //クリックした日付情報を取得
         $.ajax({          //newアクション発火
           type: 'GET',
           url: '/incomes/new',
         }).done(function (res) {
           $('.modal-body').html(res);          //収入登録用のhtmlを作成
-          $('.income-day').html(day);          //フォームの日付をクリックした日付とする
-          $('.hidden-income-day').val(day);　　//フォームのhiddenのvalueを作成
+          $('#income-day').html(day);          //フォームの日付をクリックした日付とする
+          $('.hidden-income-day').val(day);
+          $('.pro-cost-day').val(day);　　     //フォームのhiddenのvalueを作成
           $('.modal').modal();       　　　　   // フォームのモーダル表示
           // 成功処理
         }).fail(function (result) {
@@ -95,3 +97,5 @@ $(function () {
       }
   });
 });
+
+

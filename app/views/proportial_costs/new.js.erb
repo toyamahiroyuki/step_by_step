@@ -1,0 +1,13 @@
+$(".modal-body").html("<%= j(render 'proportial_costs/new', proportial_cost: @proportial_cost, income_day: @income_day ) %>");
+
+console.log(test)
+
+window.onload = function(){
+	var id = document.getElementById("income_day");
+	var val = id.value;
+
+	};
+
+
+// console.log(document.getElementById("myid").value);
+$(".modal").modal("show")

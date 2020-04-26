@@ -133,7 +133,7 @@
 .modal-body .income-blue-table th{
   position: relative;
   text-align: left;
-  width: 50px;
+  width: 15%;
   background-color: #e0e0e0;
   color: blue;
   text-align: center;
@@ -145,7 +145,7 @@
 
 .modal-body .income-blue-table td{
   text-align: left;
-  width: 100px;
+  width: 50%;
   text-align: center;
   background-color: #e0e0e0;
   padding: 10px 0;
@@ -171,8 +171,11 @@
   width: 200px;
 }
 
-.income-title .btn {
+.modal-body  .income-title .btn {
   height: 30px;
+  width: 30px;
+  padding: 0;
+  margin-top: 10px;
 }
 
 .income-list-table{

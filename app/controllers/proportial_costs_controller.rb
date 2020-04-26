@@ -1,5 +1,6 @@
 class ProportialCostsController < ApplicationController
   before_action :authenticate_user!
+
   def new
     @proportial_cost = ProportialCost.new
     @income_day = params["day"]

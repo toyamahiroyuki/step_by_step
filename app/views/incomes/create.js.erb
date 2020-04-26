@@ -1,34 +1,4 @@
-<% if @status == 'success' %>
-<%  elsif @status == 'fail' %>
-    alert('error!');
-<% end %>
-
-// function eventCalendar() {
-//   $.ajax({
-//     type: 'GET',
-//     url: 'calendar_total',
-//   }).done(function(totals){
-// 	    var total = [];
-// 	    for (var total_key in totals) {
-// 	      total.push({
-// 	        title: totals[total_key],
-// 	        start: total_key,
-// 	      })
-// 	    }
-// 	 $('#calendar').fullCalendar('removeEvents');
-//    $('#calendar').fullCalendar({
-//    	events: total,
-//    });
-//      	console.log(events)
-// 	}).fail(function (result) {
-//           // 失敗処理
-//           alert('エラーが発生しました。運営に問い合わせてください。')
-//         });
-// }
-
-// $('#calendar').fullCalendar( 'rerenderEvents' );
-// $('#calendar').fullCalendar( 'refetchEvents' );
-// console.log($('#calendar').fullCalendar( 'refetchEvents' ))
-
-$(".modal").modal("hide");
+// $(".modal").modal("hide");
+// $('modal_body').html("<%= j (render 'incomes/new', income: @income) %>");
+  // $(".book_<%= @book.id %>").html("<%= j(render 'books/book',  book: @book ) %>")
 

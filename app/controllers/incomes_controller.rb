@@ -35,22 +35,22 @@ class IncomesController < ApplicationController
     @income = Income.new(income_params)
     @income.user_id = current_user.id
 
-    # respond_to do |format|
-    if @income.save
-      redirect_to homes_top_path
-      # format.html { redirect_to @income, notice: 'income was successfully created.' }
-      # format.json { render 'homes/top', status: :created, location: @income }
-      # format.js { @status = "success" }
-    else
-      # format.html { render :new }
-      # format.json { render json: @income.errors, status: :unprocessable_entity }
-      # format.js { @status = "fail" }
-      # @income = Income.new
-      # @income_day = params["day"]
-      # @incomes = current_user.incomes.where(day: @income_day)
-      # render action: :new
+    respond_to do |format|
+      if @income.save
+        # redirect_to homes_top_path
+        format.html { redirect_to homes_top_path, notice: 'income was successfully created.' }
+        # format.json { render 'homes/top', status: :created, location: @income }
+        # format.js { @status = "success" }
+      else
+        # format.html { render action: :new }
+        # format.json { render json: @income.errors, status: :unprocessable_entity }
+        format.js
+        # @income = Income.new
+        # @income_day = params["day"]
+        # # @incomes = current_user.incomes.where(day: @income_day)
+        # render action: :new
+      end
     end
-    # end
   end
 
   def edit
