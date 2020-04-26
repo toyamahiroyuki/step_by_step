@@ -41,10 +41,38 @@ function eventCalendar() {
           url: '/incomes/new',
         }).done(function (res) {
           $('.modal-body').html(res);          //収入登録用のhtmlを作成
-          $('#income-day').html(day);          //フォームの日付をクリックした日付とする
-          $('.hidden-income-day').val(day);
-          $('.pro-cost-day').val(day);　　     //フォームのhiddenのvalueを作成
+          $('#incomes-day').html(day);          //フォームの日付をクリックした日付とする
+          $('.hidden-income-day').val(day);　     //フォームのhiddenのvalueを作成
           $('.modal').modal();       　　　　   // フォームのモーダル表示
+
+          $(".to-pro-cost").on("click", function(){
+            $.ajax({
+              type: 'GET',
+              url: '/proportial_costs/new'
+            }).done(function(rest) {
+              $('.modal-body').html(rest);
+              $('#pro-cost-day').html(day);
+              $('.hidden-pro-cost-day').val(day);
+              $('.modal').modal();
+
+              $(".to-income").on("click", function(){
+                $.ajax({
+                  type: 'GET',
+                  url: '/incomes/new'
+                }).done(function(res) {
+                  console.log(res)
+                  $('.modal-body').html(res);          //収入登録用のhtmlを作成
+                  $('#incomes-day').html(day);          //フォームの日付をクリックした日付とする
+                  $('.hidden-income-day').val(day);　     //フォームのhiddenのvalueを作成
+                  $('.modal').modal();
+                }).fail(function(result){
+                  alert('エラーが発生しました。その3。')
+                });
+              });
+            }).fail(function(result){
+              alert('エラーが発生しました。その２。')
+            });
+          });
           // 成功処理
         }).fail(function (result) {
           // 失敗処理
@@ -61,6 +89,7 @@ function eventCalendar() {
                 },
       eventColor: '#1e90ff'
     });
+
 
 　　//収支が+,-,0の時で色が変わる
     $(".fc-event:contains('-')").css("background-color",'#ff0000');

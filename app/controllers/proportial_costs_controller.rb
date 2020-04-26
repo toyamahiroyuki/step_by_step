@@ -4,17 +4,22 @@ class ProportialCostsController < ApplicationController
   def new
     @proportial_cost = ProportialCost.new
     @income_day = params["day"]
+
+    render plain: render_to_string(partial: 'new', layout: false, locals: { proportial_cost: @proportial_cost})
   end
 
   def create
     @ProportialCost = ProportialCost.new(proportial_cost_params)
     @ProportialCost.user_id = current_user.id
     @income_day = params[:day]
-    if @ProportialCost.save
-      redirect_to homes_top_path
-    else
-      flash[:notice] = "金額には「-」を含めてください。"
-      redirect_to new_proportial_cost_path(day: @income_day)
+
+    respond_to do |format|
+      if @ProportialCost.save
+        format.html { redirect_to homes_top_path, notice: 'income was successfully created.' }
+      else
+        flash[:notice] = "金額には「-」を含めてください。"
+        format.js
+      end
     end
   end
 
